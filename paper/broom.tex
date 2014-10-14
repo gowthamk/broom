@@ -1,0 +1,248 @@
+%-----------------------------------------------------------------------------
+%
+%               Template for sigplanconf LaTeX Class
+%
+% Name:         sigplanconf-template.tex
+%
+% Purpose:      A template for sigplanconf.cls, which is a LaTeX 2e class
+%               file for SIGPLAN conference proceedings.
+%
+% Guide:        Refer to "Author's Guide to the ACM SIGPLAN Class,"
+%               sigplanconf-guide.pdf
+%
+% Author:       Paul C. Anagnostopoulos
+%               Windfall Software
+%               978 371-2316
+%               paul@windfall.com
+%
+% Created:      15 February 2005
+%
+%-----------------------------------------------------------------------------
+
+
+\documentclass{sigplanconf}
+
+% The following \documentclass options may be useful:
+
+% preprint      Remove this option only once the paper is in final form.
+% 10pt          To set in 10-point type instead of 9-point.
+% 11pt          To set in 11-point type instead of 9-point.
+% authoryear    To obtain author/year citation style instead of numeric.
+
+\usepackage{mathtools}
+\usepackage{mathpartir}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{listings}
+\usepackage{subcaption}
+\usepackage{stmaryrd}
+\usepackage{comment}
+\usepackage{float}
+\usepackage{verbatimbox}
+\usepackage{breakurl}
+\usepackage[breaklinks]{hyperref}
+
+%Formatting Commands
+%-------------------
+\newcommand{\C}[1]{\code{#1}}
+\renewcommand{\k}[1]{\mathtt{#1}} % Code font in math mode.
+\newcommand{\code}[1]{\,{\tt #1}\,}
+\newcommand{\conj}{\wedge}
+\newcommand{\disj}{\vee}
+\newcommand{\seqn}[1]{\overline {#1}}
+\newcommand{\tuplee}[1]{\langle #1 \rangle}
+\newcommand{\ALT}{~\mid~}
+\newcommand{\lamb}[2]{\lambda #1.\,#2}
+\newcommand{\spc}[0]{\quad}
+\newcommand{\U}[0]{\cup}
+\newcommand{\X}[0]{\times}
+\newcommand{\xn}[0]{\cap}
+\newcommand{\redsto}[0]{\longrightarrow}
+\newcommand{\rredsto}[0]{\rightsquigarrow_r }
+\newcommand{\evalsto}[0]{\longrightarrow }
+\newcommand{\env}[0]{\Gamma}
+\newcommand{\finmaparrow}[0]{\overset { Fin }{ \longrightarrow } }
+\newcommand{\envwf}[1]{\vdash\,#1}
+\newcommand{\tywf}[2]{#1\,\vdash\,#2}
+\newcommand{\hastyp}[3]{#1\,\vdash\,#2\,:\,#3}
+\newcommand{\hassort}[3]{#1\,\vdash\,#2\,::\,#3}
+\newcommand{\subtyp}[3]{#1\,\vdash\,#2 <: #3}
+\newcommand{\generalizes}[3]{#1\,\vdash\,#2 \succ #3}
+\newcommand{\msfolsig}[0]{{\Lambda \equiv}}
+%\newcommand{\msentails}[2]{#1\,\models_L\,#2}
+\newcommand{\msentails}[2]{#1\,\models\,#2}
+\newcommand{\thesemof}[1]{ \llbracket #1 \rrbracket}
+\newcommand{\defeq}[0]{ \triangleq }
+\newcommand{\tymap}[0]{\mathcal{F}}
+\newcommand{\etaeq}[0]{\eta_{eq}}
+\newcommand{\semof}[1]{\thesemof{#1}}
+\newcommand{\mssemof}[1]{\thesemof{#1}}
+\newcommand{\rwsto}[0]{=}
+\newcommand{\rrwsto}[0]{\hookrightarrow}
+\newcommand{\rwbindfwd}[0]{\gamma_{\Rightarrow}}
+\newcommand{\rwbindbwd}[0]{\gamma_{\Leftarrow}}
+\newcommand{\eqhlt}[1]{\underline{#1}}
+\newcommand{\tfr}[0]{F_R}
+\newcommand{\ground}[1]{\underline{#1}}
+\newcommand{\semeq}[0]{\equiv}
+\newcommand{\elabsto}[0]{\looparrowright }
+\newcommand{\arr}[0]{$\rightarrow$}
+\newcommand{\eef}[0]{$\Leftrightarrow$}
+\newcommand{\imp}[0]{$\Rightarrow$}
+\newcommand{\RNull}[0]{\emptyset}
+\newcommand{\cty}[0]{ty}
+\newcommand{\hsp}[0]{\hspace*{-0.1in}}
+\newcommand{\hspa}[0]{\hspace*{-0.08in}}
+% removable:
+\newcommand{\subst}[2]{\lbrack #1/#2 \rbrack}
+\newcommand{\rel}[1]{{R}_{\mathit{#1}}}
+\newcommand{\absof}[1]{\left\| #1 \right\| }
+
+%Rules
+%-----
+\newcommand{\rulelabel}[1]{\textrm{\sc {#1}}}
+\newcommand{\ilrulelabel}[1]{{\sc #1}}
+\newcommand{\RULE}[2]{\frac{\begin{array}{c}#1\end{array}}
+                           {\begin{array}{c}#2\end{array}}}
+
+% Math mode
+%-----------
+\newenvironment{nop}{}{}
+\newenvironment{smathpar}{
+\begin{nop}\small\begin{mathpar}}{
+\end{mathpar}\end{nop}\ignorespacesafterend}
+
+% Theorems Environment
+%----------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\newenvironment{proof}[1][Proof]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{definition}[1][Definition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{example}[1][Example]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+\newenvironment{remark}[1][Remark]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newcommand{\qed}{\nobreak \ifvmode \relax \else
+      \ifdim\lastskip<1.5em \hskip-\lastskip
+      \hskip1.5em plus0em minus0.5em \fi \nobreak
+      \vrule height0.75em width0.5em depth0.25em\fi}
+
+\usepackage{listings}
+\usepackage{subcaption}
+\usepackage{stmaryrd}
+\usepackage[skip=5pt]{caption}
+
+\lstset{ %
+language=Java, % choose the language of the code
+basicstyle=\scriptsize\ttfamily,       % the size of the fonts that are used for the code
+keywordstyle=\color{Bittersweet},
+% numbers=left,                   % where to put the line-numbers
+numberstyle=\tiny,      % the size of the fonts that are used for the line-numbers
+stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
+numbersep=5pt,                  % how far the line-numbers are from the code
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+% frame=single,                   % adds a frame around the code
+tabsize=2,                      % sets default tabsize to 2 spaces
+captionpos=b,                   % sets the caption-position to bottom
+breaklines=true,                % sets automatic line breaking
+breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+commentstyle=\itshape\color{MidnightBlue},
+%escapeinside={\%*}{*)},         % if you want to add a comment within your code
+morekeywords={relation, not, : , /\\}
+}
+\lstdefinestyle{hs} {
+  language=Haskell,
+  basicstyle=\scriptsize\ttfamily
+}
+
+\begin{document}
+
+% Uncomment one of the following two, if you are not going for the 
+% traditional copyright transfer agreement.
+
+%\exclusivelicense                % ACM gets exclusive license to publish, 
+                                  % you retain copyright
+
+%\permissiontopublish             % ACM gets nonexclusive license to publish
+                                  % (paid open-access papers, 
+                                  % short abstracts)
+
+% \titlebanner{banner above paper title}        % These are ignored unless
+% \preprintfooter{short description of paper}   % 'preprint' option specified.
+
+%The Paper
+%---------------------
+\title{Broom: Safe Region-Based Memory Management for Dataflow
+Programs}
+
+\authorinfo{}
+           {}
+           {}
+\maketitle
+
+\begin{abstract}
+
+Distributed execution engines, such as MapReduce and Dryad, represent
+a data-parallel computation as a dataflow graph with computational
+vertices connected by communication edges. The computation is run by
+executing the vertices of this graph on a set of available computers,
+while communication edges are materialized as either network
+connections, or appropriate inter-process communication channels.
+Although MapReduce and Dryad can perform optimal distribution the
+computation across available computers, they nevertheless rely on
+language runtimes, such as JVM or C\#.Net, to manage an atomic
+computation on a given machine. 
+
+In this paper, we demonstrate that the general purpose garbage
+collection scheme employed by C\#.Net runtime is not very effective
+for dataflow programs insofar as the latency due to GC is intolerably
+high in many practical examples. We propose a memory management scheme
+that combines user-managed memory regions with automatic garbage
+collection, and lets programmers exploit specific memory behaviours
+exhibited by dataflow programs. To protect programmers from the
+dangers of manual memory management, we supplement our memory
+management scheme with a region type system that statically ensures
+the memory safety of region-annotated C\# programs, even in presence
+of higher-order stateful functions. Further, we describe a type
+inference algorithm that infers principal region types for first-order
+programs thereby saving programmers the need to write region
+annotations on types. Our inference algorithm is also very effective,
+albeit incomplete, for higher-order programs. As a testament to
+efficacy of our approach, we demonstrate performance improvements over
+a range of realistic dataflow programs that were rewritten to use
+region-based manual memory management, but are nevertheless judged to
+be safe by our type system.
+
+\end{abstract}
+
+% general terms are not compulsory anymore, 
+% you may leave them out
+%% \terms
+%% term1, term2
+
+\input{introduction}
+
+% \appendix
+% \section{Appendix Title}
+
+% This is the text of the appendix, if you need one.
+
+% We recommend abbrvnat bibliography style.
+
+\bibliographystyle{abbrvnat}
+\bibliography{catalyst}
+
+
+\end{document}
+
