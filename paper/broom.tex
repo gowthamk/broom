@@ -29,6 +29,11 @@
 % 11pt          To set in 11-point type instead of 9-point.
 % authoryear    To obtain author/year citation style instead of numeric.
 
+\usepackage{courier}            % standard fixed width font
+\usepackage[scaled]{helvet} % see www.ctan.org/get/macros/latex/required/psnfss/psnfss2e.pdf
+\usepackage{listings}          % format code
+\usepackage{enumitem}      % adjust spacing in enums
+\usepackage{xspace}
 \usepackage{mathtools}
 \usepackage{mathpartir}
 \usepackage{amssymb}
@@ -100,6 +105,11 @@
 \newcommand{\subst}[2]{\lbrack #1/#2 \rbrack}
 \newcommand{\rel}[1]{{R}_{\mathit{#1}}}
 \newcommand{\absof}[1]{\left\| #1 \right\| }
+\newcommand{\broom}{{\sc Broom}\xspace}
+\newcommand{\name}{{\sc Broom}\xspace}
+\newcommand{\naiad}{{\sc Naiad}\xspace}
+\newcommand{\csolve}{{\sc Csolve}\xspace}
+\newcommand{\GK}[1]{{\textcolor{red}{{GK: #1}}}}
 
 %Rules
 %-----
@@ -232,6 +242,8 @@ be safe by our type system.
 %% term1, term2
 
 \input{introduction}
+
+\input{overview}
 
 % \appendix
 % \section{Appendix Title}
