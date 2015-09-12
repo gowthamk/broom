@@ -110,6 +110,8 @@
 \newcommand{\naiad}{{\sc Naiad}\xspace}
 \newcommand{\csolve}{{\sc Csolve}\xspace}
 \newcommand{\GK}[1]{{\textcolor{red}{{GK: #1}}}}
+\newcommand{\csharp}{C\#~}
+\newcommand{\outlives}{\succeq}
 
 %Rules
 %-----
@@ -151,9 +153,9 @@
 \usepackage{stmaryrd}
 \usepackage[skip=5pt]{caption}
 
-\lstset{ %
+\newcommand{\lstjava}{\lstset{ %
 language=Java, % choose the language of the code
-basicstyle=\scriptsize\ttfamily,       % the size of the fonts that are used for the code
+basicstyle=\small\ttfamily,       % the size of the fonts that are used for the code
 keywordstyle=\color{Bittersweet},
 % numbers=left,                   % where to put the line-numbers
 numberstyle=\tiny,      % the size of the fonts that are used for the line-numbers
@@ -169,12 +171,24 @@ breaklines=true,                % sets automatic line breaking
 breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
 commentstyle=\itshape\color{MidnightBlue},
 %escapeinside={\%*}{*)},         % if you want to add a comment within your code
-morekeywords={relation, not, : , /\\}
-}
-\lstdefinestyle{hs} {
-  language=Haskell,
-  basicstyle=\scriptsize\ttfamily
-}
+morekeywords={letregion, openalloc, open, withroot, not, : , /\\}
+}}
+\lstnewenvironment{codejava}
+    { % \centering
+			\lstjava
+      \lstset{}%
+      \csname lst@setfirstlabel\endcsname}
+    { %\centering
+      \csname lst@savefirstlabel\endcsname}
+
+\lstnewenvironment{numcodejava}
+    { % \centering
+			\lstjava
+      \lstset{numbers=left,firstnumber=1}%
+      \csname lst@setfirstlabel\endcsname}
+    { %\centering
+      \csname lst@savefirstlabel\endcsname}
+
 
 \begin{document}
 

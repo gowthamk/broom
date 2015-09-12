@@ -9,5 +9,7 @@ all:
 ##bibtex broom
 ##pdflatex -shell-escape broom
 
+fast:
+	pdflatex broom
 clean:
 	rm *.log *.aux *.bbl

@@ -1,2 +1,272 @@
-\section{Overview}
+\section{Overview of \name}
 \label{sec:overview}
+
+Stripped of its region-specific constructs, the core language of \name
+is a familar subset of \csharp that includes features such as
+class-based inheritance, dynamic dispatch, parametric polymorphism,
+and lambdas.  We therefore elide a discussion of the core language,
+focusing instead on the concepts specific to region-based memory
+management in \name.
+
+\subsection{Stack Regions and Outlives Relation}
+
+Simplest of the region-specific constructs in \name is a \C{letregion}
+lexical block that creates a new labeled memory region. The semantics
+of the \C{letregion} block is similar to Tofte and
+Talpin~\cite{ttpopl94}'s \C{letregion} expression; the newly
+introduced region is live only inside the block, where its label is in
+scope for \C{new} expressions to make allocations inside the region.
+For example, in the following code, object \C{a} is allocated in the
+region \C{R0} introduced by the \C{letregion}:
+\begin{center}
+\begin{codejava}
+  letregion R0 {
+    Object a = new@R0 Object();
+  }
+\end{codejava}
+\end{center}
+The \C{letregion} blocks can be nested, leading to a stack of regions
+that are deallocated in the reverse order in which they are allocated.
+Following ~\cite{cyclonepldi02}, we therefore call regions introduced
+by \C{letregion} expressions as \emph{stack regions}. The stack
+discipline induces \emph{outlives} relationship among regions created
+by nested \C{letregion}s, where the region introduced by the outer
+\C{letregion} is guaranteed to outlive the one introduced by the inner
+\C{letregion}. It is therefore safe to refer to an object allocated in
+outer region from the inner region, but the converse is not true. For
+example, consider the following code (assume that class \C{A} has
+field \C{x} of type \C{Object}):
+\begin{center}
+\begin{codejava}
+  letregion R0 {
+    A a0 = new@R0 A();
+    letregion R1 {
+      A a1 = new@R1 A();
+      a1.x = new@R0 Object();
+      a0.x = new@R1 Object();
+      ...
+    }
+    ...
+  }
+\end{codejava}
+\end{center}
+The code creates two stack regions - \C{R0} and \C{R1}, where \C{R0}
+outlives \C{R1} (denoted as $\C{R0 \outlives R1}$). Objects \C{a0} and
+\C{a1} are allocated in regions \C{R0} and \C{R1}, respectively. The
+first assignment statement assigns to \C{a1.x} an object allocated in
+outer region (\C{R0}). This assignment is absolutely safe as \C{a1.x}
+refers to a longer living object, hence is guaranteed to be a valid
+reference throughout the lifetime of \C{a1}. In contrast, the second
+assignment is unsafe, as it assigns to \C{a0.x} an object, whose
+lifetime is shorter than the lifetime of \C{a0}, making it unsafe to
+dereference \C{a0.x} outside the inner block. 
+% Unsafe assignments can also happen indirectly via a function call..
+Preempting such unsafe assignments is the \emph{raison d'etre} of the
+region type system.
+
+\subsection{Allocation Context}
+
+As evident from the examples shown above, the suffix \C{@R} in
+\C{new@R} instruct the \C{new} keyword to allocate the newly created
+object in the region labeled \C{R}. However, \name does not require
+the allocation region to be specified following a \C{new}. In the
+absence of explicit specification, \name allocates the newly created
+object in its \emph{allocation context}, which is the region
+introduced by the closest enclosing \C{letregion} block. Besides being
+a syntactic convenience, the facility to elide allocation region
+specification is imperative to interface region-oblivious standard
+library code with region-aware application code. For instance, the
+following \name code, which makes explicit use of regions, calls
+the standard library's iterator methods, which are region-oblivious:
+\begin{center}
+\begin{codejava}
+  int findMin(List<int> l) {
+    assert(!l.isEmpty());
+    int min = l.get(0);
+    letregion R0 {
+      ListIterator<int> iter = l.listIterator();
+      while(iter.hasNext()) {
+        int n = iter.getNext();
+        if (n<min) min = n;
+      }
+    }
+    return min;
+  }
+\end{codejava}
+\end{center}
+Due to the absence of new region creations, and explicit region
+annotations with \C{new} expressions, all new objects created by a
+standard library method are allocated in the allocation context for
+the method call. In the above example, the allocation context for the
+call to \C{List} library's \C{listIterator} method is the region
+\C{R1}. Therefore, all objects created by the method, including the
+iterator object, are allocated in \C{R0}. This fact should be captured
+appropriately by the region type of \C{listIterator} method if the
+type system were to prove the safety of the above code.
+
+\subsection{Boxed and Unboxed Values}
+
+In \name, like in \csharp, values of some primitive types, such as
+integers and bools, are unboxed, whereas others, such as strings are
+arrays, are boxed. Unlike unboxed values, boxed values are objects,
+hence passed by reference. It is therefore important to be mindful
+of allocation regions for strings and arrays, but not so much for
+integers and bools. For instance, in the following code, the
+assignment to integer variable \C{x} is safe, but the assignment to
+the string variable \C{y} is unsafe, as the allocation region (\C{R0})
+of the string constant has lesser lifetime than \C{y}.
+\begin{center}
+\begin{codejava}
+  int x;
+  string y;
+  letregion R0 {
+    x = 2;
+    y = "Hello, World!";
+  }
+  ...
+\end{codejava}
+\end{center}
+
+\subsection{Dynamic (Transferable) Regions}
+
+\name's stack regions have lexically scoped lifetimes, hence are not
+suitable for applications that need to transfer data between
+autonomous actors, such as \naiad dataflow operators. To support these
+applications, it is imperative to support regions whose lifetimes
+transcend the boundaries of lexical blocks, functions, or even
+programs. Regions that fit this description in \name are called
+\emph{dynamic regions}, or \emph{transferable regions}. 
+
+Transferable regions, like stack regions, are memory regions
+Transferable regions are first class values of \name; they are
+considered objects of \C{Region} class, and, like objects of other
+classes, they are created using the \C{new} keyword, can be passed as
+arguments, and returned from methods. Like a stack region, a
+transferable region facilitates arbitrary object allocations, but
+unlike a stack region, it has a well-defined \emph{root} object
+denoting the root of the data structure being transferred. In a
+typical dataflow computation, an upstream actor (e.g., a \C{SELECT}
+operator) constructs a transferable region, sets its root to the data
+structure supposed to contain intermediate results, populates the data
+structure with intermediate results, and then transfers it to a
+downstream actor (e.g., a \C{COUNT} operator), which performs further
+processing. Since a transferable region escapes the lifetime of the
+sender, there must be no references from inside of the transferable
+region to objects allocated in other memory regions of the sender.
+Such references, if exist, may become invalid references in the
+context of recipient's address space, jeopardizing memory safety.
+\name relies on its region type system to prevent such unsafe
+references from being created.
+
+\begin{figure}
+\begin{codejava}
+  public class Region<T> {
+    public Region(Func<void,T> mkRoot);
+    public void free();
+    public void transfer();
+  }
+\end{codejava}
+\caption{The type signature of the \C{Region} class}
+\label{fig:region-class}
+\end{figure}
+The type signature of \C{Region} class is described in
+Fig.~\ref{fig:region-class}. The class is parametric over the type of
+the root object (i.e., the \emph{root type}) of the transferable
+region it creates. The \C{Region} constructor expects a \C{Func}
+object - a higher-order function argument that returns an object of
+root type.  The idea is to execute this function with the newly
+created transferable region as its allocation context. The object thus
+created inside the transferable region will serve as its root object.
+For instance, the following code creates a transferable region
+(\C{rgn}) and sets its root to the string object returned by its
+\C{Func} argument (a lambda expression):
+\begin{codejava}
+  Region<string> rgn = new Region<string>
+                        (() => "Hello");
+\end{codejava}
+Among the methods of the \C{Region} class, \C{free} deallocates
+region's memory, while \C{transfer} transfers the region to a
+downstream actor as determined by the run-time. The precise semantics
+of \C{transfer} are unimportant in the context of the region type
+system; it suffices to understand \C{transfer} as an alias of
+\C{free}.
+
+A transferable region is said to be in \emph{closed} state when
+created. \name provides \C{openalloc} lexical construct to \emph{open}
+a transferable region as an allocation context, and to access its root
+object:
+\begin{codejava}
+  Region<string> rgn = new Region<string>
+                        (() => "Hello");
+  openalloc rgn withroot str {
+    print str; //prints "Hello"
+    str = str + " World!"; 
+  }
+\end{codejava}
+In the above code, the \C{openalloc} lexical block opens \C{rgn} for
+allocation, and sets the newly introduced local variable (\C{str}) to
+refer to its root object.  The assignment statement within the block
+updates the root. Since \C{rgn} is the allocation context within the
+block, the new string is allocated inside \C{rgn}, hence the
+assignment is safe. In some cases, it is desirable to open a
+transferable region only to read its contents, but not to perform any
+allocations. For this purpose, \name provides \C{open} lexical
+construct that, like \C{openalloc}, opens a transferable region and
+names its root object, but unlike \C{openalloc}, does not make it an
+allocation context. A transferable region can be \C{openalloc}'d or
+\C{open}'d many times, before it is eventually \C{free}'d or
+\C{transfer}'d.
+
+The design decisions reflected above, \emph{viz.}, to ascribe a root
+object to every transferable region, to make use of a higher-order
+argument to initialize the root object, and to require that a region
+be explictly opened in a lexical block for allocations, were made to
+reflect the message semantics of transferable regions, to promote
+uniform style of programming with different kinds of regions, and to
+precisely state and enforce the safety guarantees offered by \name's
+region type system (\S~\ref{sec:type-system}).
+
+\input{naiad-ex}
+
+Fig~\ref{fig:naiad-ex} shows \C{SelectVertex} class, which is a
+straightforward implementation of the \C{SELECT} dataflow operator.
+\C{SelectVertex} implements \C{onReceive} method, which is called by
+the run-time when a message from an upstream actor is ready to be
+delivered. A message is usually a sequence of tuples (e.g., key-value
+pairs) wrapped inside a transferable region (\C{inRgn}).
+\C{SelectVertex} opens its input region \C{inRgn} (line 16), iterates
+through the sequence, filtering the input tuples that meet the
+selection criterion of the \C{whereFn} (line 19), and applying the
+\C{mapFn} to map the selected input tuples to output (line 22).
+Observe that the iterator is allocated in the temporary (stack) region
+\C{R0} that lives just long enough.  Functions \C{mapFn} and
+\C{whereFn} are defined by the users of the dataflow system, hence
+they are called \emph{user-defined functions}.  Unlike dataflow system
+builders, users are oblivious of regions, hence user-defined functions
+are expected to not contain explicit region annotations. While
+\C{whereFn} defines the selection criterion that the user is
+interested in (e.g: \C{age $\ge$ 18}), \C{mapFn} can either project
+attributes of its input tuple amounting to type \C{TOut}, or can
+create and return a new \C{TOut} object. Note that, unlike \C{inRgn},
+the output transferable region (\C{outRgn}) was opened for allocation
+and the \C{mapFn} is applied under this allocation context. Also note
+that the input tuple is cloned under this allocation context.
+Consequently, the result (\C{outp}) of applying the \C{mapFn} (line
+22), which is subsequently added to \C{outMsg}, is guaranteed to be in
+the \C{outRgn} regardless of the semantics of \C{mapFn}. On the other
+hand, if the input tuple is not cloned (i.e., \C{inp} instead of
+\C{inp.clone()} on line 22) and the \C{mapFn} simply projects its
+input, then \C{outp} refers to an object inside \C{inp}, which no
+longer exists when the \C{outRgn} is transferred to a downstream
+actor. Therefore, if \C{mapFn} is applied over \C{inp} instead of
+\C{inp.clone()}, then it better be a function that creates and returns
+a new \C{TOut} object. Under such scenario, the region type of
+\C{SelectVertex.mapFn} should be precise enough to prevent it from
+being assigned a function (line 6) that simply returns its input.
+Fortunately, \name's region type system (\S~\ref{sec:type-system}) is
+capable of capturing such nuances in the type of
+\C{SelectVertex.mapFn}. Furthermore, the type can be automatically
+inferred by \name's region type inference
+(\S~\ref{sec:type-inference}), which can peform the above non-trivial
+reasoning on behalf of the programmer.
+
