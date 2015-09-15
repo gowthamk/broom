@@ -112,6 +112,36 @@
 \newcommand{\GK}[1]{{\textcolor{red}{{GK: #1}}}}
 \newcommand{\csharp}{C\#~}
 \newcommand{\outlives}{\succeq}
+\newcommand{\coloneqq}{::=}
+\newcommand{\R}[1]{\textrm{#1}}
+\newcommand{\N}[1]{{\normalfont #1}}
+\newcommand{\M}[1]{\mathtt{#1}}
+\newcommand{\ObjZ}{\C{Object}}
+\newcommand{\RgnZ}{\C{Region}}
+\newcommand{\inang}[1]{\langle #1 \rangle}
+\newcommand{\rhoalloc}{\rho^a}
+\newcommand{\rhobar}{\bar{\rho}}
+\newcommand{\ralloc}{\pi^a}
+\newcommand{\rbar}{\bar{\pi}}
+\newcommand{\tbar}{\bar{T}}
+\newcommand{\taubar}{\bar{\tau}}
+\newcommand{\xbar}{\bar{x}}
+\newcommand{\vbar}{\bar{v}}
+\newcommand{\ebar}{\bar{e}}
+\newcommand{\extends}{\triangleleft}
+\newcommand{\rextends}{\blacktriangleleft}
+\renewcommand{\bar}[1]{\overline{#1}}
+\newcommand{\angR}{\inang{\rhoalloc\rhobar \,|\, \phi}}
+\newcommand{\angT}{\inang{\tbar}}
+\newcommand{\angAlpha}{\inang{\bar{\alpha} \extends \bar{T}}}
+\newcommand{\headerOf}[1]{\C{class}\; #1\angR\angAlpha \extends N}
+\newcommand{\substFn}{\mathcal{S}}
+\newcommand{\mang}{\inang{\rhoalloc_m\bar{\rho_m} \,|\, \phi_m}}
+\newcommand{\rhoset}{\Sigma}
+\newcommand{\rhoenv}{\Theta}
+\newcommand{\phicx}{\Phi}
+\newcommand{\subtypcx}{\rhoset,\,\rhoenv,\,\Delta,\,\phicx}
+\newcommand{\A}{{\mathcal{A}}}
 
 %Rules
 %-----
@@ -258,6 +288,8 @@ be safe by our type system.
 \input{introduction}
 
 \input{overview}
+
+\input{type-system}
 
 % \appendix
 % \section{Appendix Title}
