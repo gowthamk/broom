@@ -72,10 +72,13 @@
 \newcommand{\finmaparrow}[0]{\overset { Fin }{ \longrightarrow } }
 \newcommand{\envwf}[1]{\vdash\,#1}
 \newcommand{\tywf}[2]{#1\,\vdash\,#2 \; \texttt{ok}}
+\newcommand{\fgjtywf}[2]{#1\,\Vdash\,#2 \; \texttt{ok}}
 \newcommand{\isvalid}[2]{#1\,\vdash\,#2}
 \newcommand{\hastyp}[3]{#1\,\vdash\,#2:#3}
+\newcommand{\hasfgjtyp}[3]{#1\,\Vdash^{}\,#2\,:\,#3}
 \newcommand{\hassort}[3]{#1\,\vdash\,#2\,::\,#3}
 \newcommand{\subtyp}[3]{#1\,\vdash\,#2 <: #3}
+\newcommand{\fgjsubtyp}[3]{#1\,\Vdash\,#2 <: #3}
 \newcommand{\generalizes}[3]{#1\,\vdash\,#2 \succ #3}
 \newcommand{\msfolsig}[0]{{\Lambda \equiv}}
 %\newcommand{\msentails}[2]{#1\,\models_L\,#2}
@@ -104,7 +107,6 @@
 \newcommand{\hspa}[0]{\hspace*{-0.08in}}
 % removable:
 \newcommand{\subst}[2]{\lbrack #1/#2 \rbrack}
-\newcommand{\rel}[1]{{R}_{\mathit{#1}}}
 \newcommand{\absof}[1]{\left\| #1 \right\| }
 \newcommand{\broom}{{\sc Broom}\xspace}
 \newcommand{\name}{{\sc Broom}\xspace}
@@ -122,7 +124,9 @@
 \newcommand{\RgnZ}{\C{Region}}
 \newcommand{\thisZ}{\C{this}}
 \newcommand{\superZ}{\C{super}}
+\newcommand{\unitZ}{\C{unit}}
 \newcommand{\FuncZ}{\C{Func}}
+\newcommand{\unitval}{\C{()}}
 \newcommand{\inang}[1]{\langle #1 \rangle}
 \newcommand{\rhoalloc}{\rho^a}
 \newcommand{\rhobar}{\bar{\rho}}

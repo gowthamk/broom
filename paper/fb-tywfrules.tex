@@ -1,5 +1,5 @@
 %
-\begin{minipage}{1.4in}
+\begin{minipage}{1.6in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -14,12 +14,13 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.5in}
+\begin{minipage}{1.7in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \fgjtywf{\A.\aenv}{T}\spc
     \ralloc \in \A.\rhoset
   }
   {
@@ -29,13 +30,13 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.5in}
+\begin{minipage}{1.7in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \\
+    \fgjtywf{\A.\aenv}{T} \\
   }
   {
     \tywf{\A}{\exists\rho.\RgnZ\inang{\rho}\inang{T}}
@@ -44,12 +45,13 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.2in}
+\begin{minipage}{1.4in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \fgjtywf{\A.\aenv}{T}\spc
     \ralloc \in \A.\rhoenv
   }
   {
@@ -59,32 +61,19 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.2in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \rho_0,\rho_1 \in \A.\rhoenv
-  }
-  {
-    \tywf{\rhoenv}{\rho_0 \outlives \rho_1}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
 \bigskip
 
 %
-\begin{minipage}{4in}
+\begin{minipage}{4.5in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
     CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\spc
-    \rhoalloc,\rhobar \in \rhoenv \\
+    \fgjtywf{\A.\aenv}{T}\spc
+    \fgjsubtyp{\A.\aenv}{\tbar}{\bar{\fgjN}}\\
+    \rhoalloc,\rhobar \in \rhoenv \spc
     \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}] \spc
     \isvalid{\A.\phicx}{\substFn(\phi)} \spc
     \tywf{\A}{\substFn(\bar{\fbN})} \spc
@@ -97,13 +86,29 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{2in}
+\begin{minipage}{1in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \tywf{\rhoenv}{\phi_0} \spc \tywf{\rhoenv}{\phi_1}
+    \\
+    \rho_0,\rho_1 \in \A.\rhoenv
+  }
+  {
+    \tywf{\rhoenv}{\rho_0 \outlives \rho_1}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \tywf{\rhoenv}{\phi_0} \\ \tywf{\rhoenv}{\phi_1}
   }
   {
     \tywf{\rhoenv}{\phi_0 \wedge \phi_1}

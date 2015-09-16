@@ -4,31 +4,31 @@
 \renewcommand{\arraystretch}{1.2}
 \begin{array}{lclcl} 
 \multicolumn{5}{c}{
-  {\rho, R} \in \mathtt{Static \; region \; ids} \qquad \qquad
+  {\rho, \rgn} \in \mathtt{Static \; region \; ids} \qquad \qquad
   {\tyvar, \tyvarb} \in \mathtt{Type \; variables} \qquad \qquad 
   {mn} \in \mathtt{Method \; names} \qquad \qquad 
   {x,y,f} \in \mathtt{Variables \; and \; Class \; fields} }\\
 cn & \in & \M{Class \; names} & \coloneqq & \ObjZ \ALT \RgnZ \ALT A \ALT B\\
 \fgjN & \in & \M{FGJ \; class \; types} & \coloneqq & cn\inang{\tbar}\\
-T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \\
+T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \ALT \unitZ\\
 \fbN  & \in & \M{Region-annotated \; class \; types} & \coloneqq & 
      cn\inang{\rhoalloc \rhobar}\inang{\tbar} \\
 \tau &\in& \M{Region-annotated \; types} & \coloneqq & T@\rho  
-      \ALT \fbN \ALT \exists \rho.\,\tau \\
+      \ALT \fbN \ALT \exists \rho.\,\tau \ALT \unitZ \\
 C  & \in & \M{Class \; definitions} & \coloneqq & 
      \C{class} \; cn\inang{\rhoalloc \rhobar} 
                     \inang{\bar{\tyvar} \extends \bar{\fgjN}} \extends \fbN 
                     \{\bar{\tau} \; \bar{f};\; k\; \bar{d}\}\;\\
 k  & \in & \M{Constructors} & \coloneqq & 
-     cn(\bar{\tau} \; \bar{x})\{\C{super}(\bar{v}); \;
-                                \C{this}.\bar{f}\,=\,\bar{v}\}\\
+     cn(\bar{\tau} \; \bar{x})\{\C{super}(\bar{x}); \;
+                                \C{this}.\bar{f}\,=\,\bar{x}\}\\
 d  & \in & \M{Methods} & \coloneqq & 
      \tau \; mn\inang{\rhoalloc \rhobar \,|\, \phi} (\taubar \; \xbar)
      \{s;\;\C{return}\;e;\}\\
 \phi,\phicx &\in& \M{Region\;constraints} & \coloneqq & true 
       \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi\\
-v  & \in & \M{Value\;expressions} & \coloneqq & x \ALT \C{new} \; \fbN(\vbar)\\
-e  & \in & \M{Expressions} & \coloneqq & x \ALT e.f 
+% v  & \in & \M{Value\;expressions} & \coloneqq & x \ALT \C{new} \; \fbN(\vbar)\\
+e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f 
      \ALT e.mn\inang{\rhoalloc \rhobar}(\ebar) \ALT \C{new}\;\fbN(\ebar) 
      \ALT \C{pack} \; (\rho,e) \; \C{as} \; \exists\rho.\tau\\
 s  & \in & \M{Statements} & \coloneqq & \tau\;x\;=\;e \ALT x\;=\;e

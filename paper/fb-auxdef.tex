@@ -4,6 +4,7 @@
 \begin{smathpar}
 \begin{array}{lcl}
   allocRgn(A\inang{\rhoalloc\rhobar}\inang{\tbar}) & = & \rhoalloc\\
+  shape(A\inang{\rhoalloc\rhobar}\inang{\tbar}) & = & A\inang{\tbar}\\
   bound_{\aenv}(\tyvar@\ralloc) & = & \aenv(\tyvar)@\ralloc\\
   bound_{\aenv}(\fbN) & = & \fbN\\
 \end{array}
@@ -46,50 +47,18 @@
 %
 \bigskip
 
-\begin{minipage}{3in}
+\begin{minipage}{3.5in}
 \begin{smathpar}
 \begin{array}{lcl}
   ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
   ctype(\RgnZ\inang{\rgn}\inang{T}) & = & \inang{\rhoalloc}
-    \functy{\rgn}{\void}{T@\rhoalloc}\\
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{3in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\,\bar{d}\} \spc
-    k = B(\taubar\;\xbar)\{...\}
-  }
-  {
-    ctype(B\inang{\ralloc\rbar}\inang{\tbar}) \;=\;
-      [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]\taubar
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\bigskip
-
-
-\begin{minipage}{3.75in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\\
-    \tau^2 \; m\mang (\bar{\tau^1}\;\bar{x})\{...\} \in \bar{d} \qquad
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
-  }
-  {
-    mtype (m,B\inang{\ralloc\rbar}\inang{\tbar}) \;=\;
-    \substFn(\mang\bar{\tau^1} \rightarrow \tau^2)
-  }
+    {\unitZ}\rightarrow{T@\rhoalloc}\\
+  ctype(B\inang{\ralloc\rbar}\inang{\tbar}) & = & 
+    fields(B\inang{\ralloc\rbar}\inang{\tbar})\\
+  mtype(\C{transfer}, \RgnZ\inang{\rgn}\inang{T}) & = & 
+    \inang{\rhoalloc} {\unitZ}\rightarrow{\unitZ}\\
+  mtype(\C{free}, \RgnZ\inang{\rgn}\inang{T}) & = & 
+    \inang{\rhoalloc} {\unitZ}\rightarrow{\unitZ}\\
 \end{array}
 \end{smathpar}
 \end{minipage}
@@ -113,12 +82,21 @@
 \end{minipage}
 %
 \bigskip
-\begin{minipage}{3in}
+
+\begin{minipage}{3.25in}
 \begin{smathpar}
-\begin{array}{lcl}
-\rhoset,\rhoenv & \in & \{\rho\}\\
-\aenv & \in & \tyvar \rightarrow \fgjN\\
-\A & = & (\subtypcx)\\
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\\
+    \tau^2 \; m\mang (\bar{\tau^1}\;\bar{x})\{...\} \in \bar{d} \qquad
+    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
+  }
+  {
+    mtype (m,B\inang{\ralloc\rbar}\inang{\tbar}) \;=\;
+    \substFn(\mang\bar{\tau^1} \rightarrow \tau^2)
+  }
 \end{array}
 \end{smathpar}
 \end{minipage}
@@ -140,6 +118,18 @@
     override(\A,\fbN,\inang{\rhoalloc_2\bar{\rho_2}}\bar{\tau^{21}} 
                       \rightarrow \tau^{22})
   }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+\begin{minipage}{5in}
+\begin{smathpar}
+\begin{array}{c}
+  \rhoset,\rhoenv \in 2^{\rho} \qquad
+  \aenv \in \tyvar \rightarrow \fgjN \qquad
+  \A = (\subtypcx)\\
 \end{array}
 \end{smathpar}
 \end{minipage}
