@@ -5,18 +5,19 @@
 \begin{array}{lclcl} 
 \multicolumn{5}{c}{
   {\rho, R} \in \mathtt{Static \; region \; ids} \qquad \qquad
-  {\alpha, \beta} \in \mathtt{Type \; variables} \qquad \qquad 
+  {\tyvar, \tyvarb} \in \mathtt{Type \; variables} \qquad \qquad 
   {mn} \in \mathtt{Method \; names} \qquad \qquad 
   {x,y,f} \in \mathtt{Variables \; and \; Class \; fields} }\\
 cn & \in & \M{Class \; names} & \coloneqq & \ObjZ \ALT \RgnZ \ALT A \ALT B\\
-T  & \in & \M{Base \; types} & \coloneqq & \alpha \ALT cn\inang{\tbar} \\
-N  & \in & \M{Region-annotated \; class \; types} & \coloneqq & 
+\fgjN & \in & {FGJ \; class \; types} & \coloneqq & cn\inang{\tbar}\\
+T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \\
+\fbN  & \in & \M{Region-annotated \; class \; types} & \coloneqq & 
      cn\inang{\rhoalloc \rhobar}\inang{\tbar} \\
 \tau &\in& \M{Region-annotated \; types} & \coloneqq & T@\rho  
-      \ALT N \ALT \exists \rho.\,\tau \\
+      \ALT \fbN \ALT \exists \rho.\,\tau \\
 C  & \in & \M{Class \; definitions} & \coloneqq & 
      \C{class} \; cn\inang{\rhoalloc \rhobar} 
-                    \inang{\bar{\alpha} \extends \bar{T}} \extends N 
+                    \inang{\bar{\tyvar} \extends \bar{\fgjN}} \extends \fbN 
                     \{\bar{\tau} \; \bar{f};\; k\; \bar{d}\}\;\\
 k  & \in & \M{Constructors} & \coloneqq & 
      cn(\bar{\tau} \; \bar{x})\{\C{super}(\bar{v}); \;
@@ -26,18 +27,18 @@ d  & \in & \M{Methods} & \coloneqq &
      \{s;\;\C{return}\;e;\}\\
 \phi &\in& \M{Region\;constraints} & \coloneqq & true 
       \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi\\
-v  & \in & \M{Value\;expressions} & \coloneqq & x \ALT \C{new} \; N(\vbar)\\
+v  & \in & \M{Value\;expressions} & \coloneqq & x \ALT \C{new} \; \fbN(\vbar)\\
 e  & \in & \M{Expressions} & \coloneqq & x \ALT e.f 
-     \ALT e.mn\inang{\rhoalloc \rhobar}(\ebar) \ALT \C{new}\;N(\ebar) 
+     \ALT e.mn\inang{\rhoalloc \rhobar}(\ebar) \ALT \C{new}\;\fbN(\ebar) 
      \ALT \C{pack} \; (\rho,e) \; \C{as} \; \exists\rho.\tau\\
 s  & \in & \M{Statements} & \coloneqq & \tau\;x\;=\;e \ALT x\;=\;e
      \ALT e.f\;=\;e \ALT \C{letregion}\;\rho\;\{s\} 
      \ALT \C{open}\;x\;\C{withroot}\;y\;\{s\} \\
     & & & & \ALT \C{openalloc}\;x\;\C{withroot}\;y\;\{s\} 
-     \ALT (\rho,\tau\;x)\;=\;\C{unpack}\;e\\
+     \ALT (\rho,\tau\;x)\;=\;\C{unpack}\;e \ALT s\,;\,s\\
 \end{array}
 \end{smathpar}
 
-\caption{Syntax of {\sc Featherweight} \name}
+\caption{\fbname: Syntax}
 \label{fig:fb-syntax}
 \end{figure*}

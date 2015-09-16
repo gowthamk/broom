@@ -1,0 +1,147 @@
+%
+\begin{minipage}{2.2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    \hastyp{\exptycx{\ralloc}{\env}}{e}{\tau'}\\
+    \tywf{\A}{\tau}\spc
+    \subtyp{\A}{\tau'}{\tau}
+  }
+  {
+    \stmtsem{\ralloc}{\tau\;x\;=\;e}{\stmtsemcx}{\A,\,\env[x\mapsto\tau]}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.1in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    e_1 \in \{x,\,e.f\}\spc
+    \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\tau_1}\\
+    \hastyp{\exptycx{\ralloc}{\env}}{e_2}{\tau_2}\spc
+    \subtyp{\A}{\tau_2}{\tau_1}
+  }
+  {
+    \stmtsem{\ralloc}{e_1\;=\;e_2}{\stmtsemcx}{\stmtsemcx}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx) \spc
+    \rgn \notin \rhoenv \\
+    \rhoset' = \rhoset \cup \{\rgn\} \spc
+    \rhoenv' = \rhoenv \cup \{\rgn\} \spc
+    \phicx' = \phicx \conj \rhoenv \outlives \rgn \\
+    \A' = (\rhoset',\rhoenv',\Delta,\phicx') \spc
+    \stmtsem{\ralloc}{s}{\A',\,\env}{\A'',\,\env'}
+  }
+  {
+    \stmtsem{\ralloc}{\C{letregion}\;\rgn\;\{s\}}{\stmtsemcx}{\stmtsemcx}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{x}{\RgnZ\inang{\rgn}\inang{T}}\\
+    \A = (\subtypcx) \spc
+    \rhoenv' = \rhoenv \cup \{\rgn\} \spc
+    \A' = (\rhoset,\rhoenv',\Delta,\phicx) \\
+    \env' = \env[y\mapsto T@\rgn]\spc
+    \stmtsem{\ralloc}{s} {\A',\,\env'}{\A'',\,\env''}
+  }
+  {
+    \stmtsem{\ralloc}{\C{open}\;x\;\C{withroot}\;y\;\{s\}}
+            {\stmtsemcx}{\stmtsemcx}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{x}{\RgnZ\inang{\rgn}\inang{T}}\\
+    \A = (\subtypcx) \spc
+    \rhoenv' = \rhoenv \cup \{\rgn\} \spc
+    \A' = (\rhoset,\rhoenv',\Delta,\phicx) \\
+    \env' = \env[y\mapsto T@\rgn]\spc
+    \stmtsem{\rgn}{s} {\A',\,\env'}{\A'',\,\env''}
+  }
+  {
+    \stmtsem{\ralloc}{\C{openalloc}\;x\;\C{withroot}\;y\;\{s\}}
+            {\stmtsemcx}{\stmtsemcx}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{e}{\exists \rho.\tau}\spc
+    \A = (\subtypcx) \spc
+    \rho' \notin \rhoset \\
+    \A' = (\rhoset \cup \{\rho'\},\rhoenv,\Delta,\phicx) \spc
+    \tau' = [\rho'/\rho]\tau \spc
+    \env' = \env[x\mapsto\tau']
+  }
+  {
+    \stmtsem{\ralloc}{(\rho',\tau'\;x)\;=\;\C{unpack}\;e }
+            {\stmtsemcx}{\stmtsemcxp}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \stmtsem{\ralloc}{s_1}
+            {\stmtsemcx}{\stmtsemcxp} \spc
+    \stmtsem{\ralloc}{s_2}
+            {\stmtsemcxp}{\stmtsemcxpp}
+  }
+  {
+    \stmtsem{\ralloc}{s_1\,;\,s_2}
+            {\stmtsemcx}{\stmtsemcxpp}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%

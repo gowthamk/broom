@@ -1,0 +1,100 @@
+%
+\begin{minipage}{1.2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    \env(x) = \tau
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{x}{\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{x}{\tau'}\\
+    f:\tau \,\in\, fields(bounds_{\A.\Delta}(\tau'))
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{e.f}{\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \tywf{\exptycx{\ralloc}{\env}}{\fbN} \spc
+    allocRgn(\fbN) = \rgn \spc 
+    \isvalid{\A.\phicx}{\rgn \outlives \ralloc}\\
+    ctype(\fbN) = \taubar \spc
+    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\bar{\tau'}} \spc
+    \subtyp{\A}{\bar{\tau'}}{\taubar}
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\; \fbN(\bar{e})}{\fbN}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{4.6in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{e_0}{\tau} \spc
+    \rbar \in \A.\Delta \\
+    mtype(m,bounds_{\A.\Delta}(\tau)) = \inang{\rhoalloc\rhobar \,|\, 
+        \phi}\bar{\tau^1}\rightarrow{\tau^2} \spc
+    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc] \\
+    \tywf{\A}{\substFn(\bar{\tau^1})} \spc
+    \tywf{\A}{\substFn(\tau^2)} \spc
+    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\bar{\tau'}} \spc
+    \subtyp{\A}{\bar{\tau'}}{\substFn(\bar{\tau^1})} \spc
+    \isvalid{\A}{\substFn(\phi)}
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{e_0.m\inang{\ralloc\rbar}(\bar{e})} 
+           {\substFn(\tau^2)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    \tywf{\A}{\exists\rho.\tau}\\
+    \hastyp{\exptycx{\ralloc}{\env}}{e}{[\rho_0/\rho]\tau}
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}
+           {\C{pack} \; (\rho_0,e) \; \C{as} \; \exists\rho.\tau}
+           {\exists\rho.\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+

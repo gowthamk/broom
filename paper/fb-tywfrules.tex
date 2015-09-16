@@ -1,0 +1,113 @@
+%
+\begin{minipage}{1.4in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \ralloc \in \A.\rhoenv
+  }
+  {
+    \tywf{\A}{\ObjZ\inang{\ralloc}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \ralloc \in \A.\rhoset
+  }
+  {
+    \tywf{\A}{\RgnZ\inang{\ralloc}\inang{T}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+  }
+  {
+    \tywf{\A}{\exists\rho.\RgnZ\inang{\rho}\inang{T}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \ralloc \in \A.\rhoenv
+  }
+  {
+    \tywf{\A}{T@\ralloc}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rho_0,\rho_1 \in \A.\rhoenv
+  }
+  {
+    \tywf{\A}{\rho_0 \outlives \rho_1}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{4in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\spc
+    \rhoalloc,\rhobar \in \rhoenv \\
+    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}] \spc
+    \isvalid{\A.\phicx}{\substFn(\phi)} \spc
+    \tywf{\A}{\substFn(\bar{\fbN})} \spc
+    \tywf{\A}{\substFn(\fbN)} 
+  }
+  {
+    \tywf{\A}{B\inang{\ralloc\rbar}\inang{\tbar}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \tywf{\A}{\phi_0} \spc \tywf{\A}{\phi_1}
+  }
+  {
+    \tywf{\A}{\phi_0 \wedge \phi_1}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
