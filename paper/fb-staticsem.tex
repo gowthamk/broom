@@ -8,7 +8,7 @@
 
 \textbf{Type, and Type Constraint Well-formedness}  \; \fbox
   {\(\tywf{\A}{\tau}, \spc 
-     \tywf{\A}{\phi}\)}\\
+     \tywf{\rhoenv}{\phi}\)}\\
 \input{fb-tywfrules}
 %
 \bigskip
@@ -22,35 +22,16 @@
 \textbf{Statement Semantics}  \; \fbox
   {\(\stmtsem{\ralloc}{s}{\stmtsemcx}{\stmtsemcxp}\)}\\
 \input{fb-stmttyprules}
-%
-\bigskip
-
-\textbf{Method Well-formedness}  \; \fbox
-  {\(d \; \mathtt{ok \; in} \; B \)}\\
-%
-\bigskip
-
-%
-\begin{minipage}{4.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \rhoset,\rhoenv = \{\rhoalloc,\rhobar,\rhoalloc_m,\bar{\rho_m}\} \spc
-    \Delta = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
-    \phicx = \phi \conj \phi_m \spc
-    \A = (\rhoset,\rhoenv,\Delta,\phicx)\\
-    \tywf{\A}{\phi_m} \spc
-  }
-  {
-    d \; \mathtt{ok \; in} \; B 
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
 
 \caption{\fbname: Static Semantics}
 \label{fig:fb-staticsem}
 \end{figure*}
+
+
+%% Trash
+%%\env = [\xbar \mapsto \bar{\tau^B},
+%%        \thisZ \mapsto B\inang{\rhoalloc\rhobar}\inang{\bar{\tyvar}}]\spc
+%%\hastyp{\exptycx{\rhoalloc}{\env}}{\bar{u}}
+%%       {\bar{\tau^{u}}}\spc
+%%\hastyp{\exptycx{\rhoalloc}{\env}}{\bar{v}}
+%%       {\bar{\tau^{v}}}\spc

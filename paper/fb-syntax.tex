@@ -9,7 +9,7 @@
   {mn} \in \mathtt{Method \; names} \qquad \qquad 
   {x,y,f} \in \mathtt{Variables \; and \; Class \; fields} }\\
 cn & \in & \M{Class \; names} & \coloneqq & \ObjZ \ALT \RgnZ \ALT A \ALT B\\
-\fgjN & \in & {FGJ \; class \; types} & \coloneqq & cn\inang{\tbar}\\
+\fgjN & \in & \M{FGJ \; class \; types} & \coloneqq & cn\inang{\tbar}\\
 T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \\
 \fbN  & \in & \M{Region-annotated \; class \; types} & \coloneqq & 
      cn\inang{\rhoalloc \rhobar}\inang{\tbar} \\
@@ -25,7 +25,7 @@ k  & \in & \M{Constructors} & \coloneqq &
 d  & \in & \M{Methods} & \coloneqq & 
      \tau \; mn\inang{\rhoalloc \rhobar \,|\, \phi} (\taubar \; \xbar)
      \{s;\;\C{return}\;e;\}\\
-\phi &\in& \M{Region\;constraints} & \coloneqq & true 
+\phi,\phicx &\in& \M{Region\;constraints} & \coloneqq & true 
       \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi\\
 v  & \in & \M{Value\;expressions} & \coloneqq & x \ALT \C{new} \; \fbN(\vbar)\\
 e  & \in & \M{Expressions} & \coloneqq & x \ALT e.f 

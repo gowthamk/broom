@@ -73,7 +73,7 @@
 \newcommand{\envwf}[1]{\vdash\,#1}
 \newcommand{\tywf}[2]{#1\,\vdash\,#2 \; \texttt{ok}}
 \newcommand{\isvalid}[2]{#1\,\vdash\,#2}
-\newcommand{\hastyp}[3]{#1\,\vdash\,#2\,:\,#3}
+\newcommand{\hastyp}[3]{#1\,\vdash\,#2:#3}
 \newcommand{\hassort}[3]{#1\,\vdash\,#2\,::\,#3}
 \newcommand{\subtyp}[3]{#1\,\vdash\,#2 <: #3}
 \newcommand{\generalizes}[3]{#1\,\vdash\,#2 \succ #3}
@@ -120,10 +120,14 @@
 \newcommand{\M}[1]{\mathtt{#1}}
 \newcommand{\ObjZ}{\C{Object}}
 \newcommand{\RgnZ}{\C{Region}}
+\newcommand{\thisZ}{\C{this}}
+\newcommand{\superZ}{\C{super}}
 \newcommand{\FuncZ}{\C{Func}}
 \newcommand{\inang}[1]{\langle #1 \rangle}
 \newcommand{\rhoalloc}{\rho^a}
 \newcommand{\rhobar}{\bar{\rho}}
+\newcommand{\rhoallocm}{\rho^a_m}
+\newcommand{\rhobarm}{\bar{\rho_m}}
 \newcommand{\ralloc}{\pi^a}
 \newcommand{\rgn}{\pi}
 \newcommand{\rbar}{\bar{\pi}}
@@ -140,24 +144,26 @@
 \newcommand{\tyvar}{a}
 \newcommand{\tyvarb}{b}
 \newcommand{\angAlpha}{\inang{\bar{\tyvar} \extends \bar{\fgjN}}}
-\newcommand{\fgjN}{N}
-\newcommand{\fbN}{\mathsf{N}}
+\newcommand{\fgjN}{K}
+\newcommand{\fbN}{N}
 \newcommand{\headerOf}[1]{\C{class}\; #1\angR\angAlpha \extends \fbN}
 \newcommand{\substFn}{\mathcal{S}}
 \newcommand{\mang}{\inang{\rhoalloc_m\bar{\rho_m} \,|\, \phi_m}}
 \newcommand{\rhoset}{\Sigma}
-\newcommand{\rhoenv}{\Theta}
+\newcommand{\rhoenv}{\Delta}
+\newcommand{\aenv}{\Theta}
 \newcommand{\phicx}{\Phi}
-\newcommand{\subtypcx}{\rhoset,\,\rhoenv,\,\Delta,\,\phicx}
+\newcommand{\subtypcx}{\rhoset,\rhoenv,\aenv,\phicx}
 \newcommand{\A}{{\mathcal{A}}}
-\newcommand{\exptycx}[2]{\A,\,#1,\,#2}
+\newcommand{\exptycx}[2]{\A,#1,#2}
 \newcommand{\void}{\C{void}}
 \newcommand{\functy}[3]{\FuncZ\inang{#1}\inang{#2,#3}}
-\newcommand{\stmtsemcx}{\A,\,\env}
-\newcommand{\stmtsemcxp}{\A',\,\env'}
-\newcommand{\stmtsemcxpp}{\A'',\,\env''}
+\newcommand{\stmtsemcx}{\A,\env}
+\newcommand{\stmtsemcxp}{\A',\env'}
+\newcommand{\stmtsemcxpp}{\A'',\env''}
 \newcommand{\sredsto}{\Rightarrow}
 \newcommand{\stmtsem}[4]{#1 \, \vdash \, #2 \,/\, #3 \sredsto #4}
+\newcommand{\okin}[2]{#1 \; \mathtt{ok \; in} \; #2}
 
 %Rules
 %-----

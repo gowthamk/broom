@@ -68,7 +68,7 @@
     \rho_0,\rho_1 \in \A.\rhoenv
   }
   {
-    \tywf{\A}{\rho_0 \outlives \rho_1}
+    \tywf{\rhoenv}{\rho_0 \outlives \rho_1}
   }
 \end{array}
 \end{smathpar}
@@ -103,10 +103,10 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \tywf{\A}{\phi_0} \spc \tywf{\A}{\phi_1}
+    \tywf{\rhoenv}{\phi_0} \spc \tywf{\rhoenv}{\phi_1}
   }
   {
-    \tywf{\A}{\phi_0 \wedge \phi_1}
+    \tywf{\rhoenv}{\phi_0 \wedge \phi_1}
   }
 \end{array}
 \end{smathpar}

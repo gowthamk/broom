@@ -22,7 +22,7 @@
 \RULE
   {
     \hastyp{\exptycx{\ralloc}{\env}}{x}{\tau'}\\
-    f:\tau \,\in\, fields(bounds_{\A.\Delta}(\tau'))
+    f:\tau \,\in\, fields(bound_{\A.\aenv}(\tau'))
   }
   {
     \hastyp{\exptycx{\ralloc}{\env}}{e.f}{\tau}
@@ -61,8 +61,8 @@
 \RULE
   {
     \hastyp{\exptycx{\ralloc}{\env}}{e_0}{\tau} \spc
-    \rbar \in \A.\Delta \\
-    mtype(m,bounds_{\A.\Delta}(\tau)) = \inang{\rhoalloc\rhobar \,|\, 
+    \rbar \in \A.\aenv \\
+    mtype(m,bound_{\A.\aenv}(\tau)) = \inang{\rhoalloc\rhobar \,|\, 
         \phi}\bar{\tau^1}\rightarrow{\tau^2} \spc
     \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc] \\
     \tywf{\A}{\substFn(\bar{\tau^1})} \spc

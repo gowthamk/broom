@@ -47,7 +47,7 @@
     \rhoset' = \rhoset \cup \{\rgn\} \spc
     \rhoenv' = \rhoenv \cup \{\rgn\} \spc
     \phicx' = \phicx \conj \rhoenv \outlives \rgn \\
-    \A' = (\rhoset',\rhoenv',\Delta,\phicx') \spc
+    \A' = (\rhoset',\rhoenv',\aenv,\phicx') \spc
     \stmtsem{\ralloc}{s}{\A',\,\env}{\A'',\,\env'}
   }
   {
@@ -69,7 +69,7 @@
     \hastyp{\exptycx{\ralloc}{\env}}{x}{\RgnZ\inang{\rgn}\inang{T}}\\
     \A = (\subtypcx) \spc
     \rhoenv' = \rhoenv \cup \{\rgn\} \spc
-    \A' = (\rhoset,\rhoenv',\Delta,\phicx) \\
+    \A' = (\rhoset,\rhoenv',\aenv,\phicx) \\
     \env' = \env[y\mapsto T@\rgn]\spc
     \stmtsem{\ralloc}{s} {\A',\,\env'}{\A'',\,\env''}
   }
@@ -90,7 +90,7 @@
     \hastyp{\exptycx{\ralloc}{\env}}{x}{\RgnZ\inang{\rgn}\inang{T}}\\
     \A = (\subtypcx) \spc
     \rhoenv' = \rhoenv \cup \{\rgn\} \spc
-    \A' = (\rhoset,\rhoenv',\Delta,\phicx) \\
+    \A' = (\rhoset,\rhoenv',\aenv,\phicx) \\
     \env' = \env[y\mapsto T@\rgn]\spc
     \stmtsem{\rgn}{s} {\A',\,\env'}{\A'',\,\env''}
   }
@@ -114,7 +114,7 @@
     \hastyp{\exptycx{\ralloc}{\env}}{e}{\exists \rho.\tau}\spc
     \A = (\subtypcx) \spc
     \rho' \notin \rhoset \\
-    \A' = (\rhoset \cup \{\rho'\},\rhoenv,\Delta,\phicx) \spc
+    \A' = (\rhoset \cup \{\rho'\},\rhoenv,\aenv,\phicx) \spc
     \tau' = [\rho'/\rho]\tau \spc
     \env' = \env[x\mapsto\tau']
   }

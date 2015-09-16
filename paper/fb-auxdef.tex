@@ -4,8 +4,8 @@
 \begin{smathpar}
 \begin{array}{lcl}
   allocRgn(A\inang{\rhoalloc\rhobar}\inang{\tbar}) & = & \rhoalloc\\
-  bound_{\Delta}(\tyvar@\ralloc) & = & \Delta(\tyvar)@\ralloc\\
-  bound_{\Delta}(\fbN) & = & \fbN\\
+  bound_{\aenv}(\tyvar@\ralloc) & = & \aenv(\tyvar)@\ralloc\\
+  bound_{\aenv}(\fbN) & = & \fbN\\
 \end{array}
 \end{smathpar}
 \end{minipage}
@@ -113,9 +113,36 @@
 \end{minipage}
 %
 \bigskip
+\begin{minipage}{3in}
 \begin{smathpar}
-\A \;=\; (\subtypcx)
+\begin{array}{lcl}
+\rhoset,\rhoenv & \in & \{\rho\}\\
+\aenv & \in & \tyvar \rightarrow \fgjN\\
+\A & = & (\subtypcx)\\
+\end{array}
 \end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    mtype(m,\fbN) = \inang{\rhoalloc_1\bar{\rho_1}}\bar{\tau^{11}} 
+                      \rightarrow \tau^{12} \spc \mathtt{implies}\\
+    \bar{\tau^{21}} = [\bar{\rho_2}/\bar{\rho_1},\rhoalloc_2/\rhoalloc_1] 
+    \spc \mathtt{and} \spc
+    \subtyp{\A}{\tau^{22}} {[\bar{\rho_2}/\bar{\rho_1},\rhoalloc_2/\rhoalloc_1]\tau^{12}}
+    %\substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
+  }
+  {
+    override(\A,\fbN,\inang{\rhoalloc_2\bar{\rho_2}}\bar{\tau^{21}} 
+                      \rightarrow \tau^{22})
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
 %
 
 \caption{\fbname: Auxiliary Definitions}
