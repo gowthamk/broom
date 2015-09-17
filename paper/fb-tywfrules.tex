@@ -20,6 +20,7 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \fgjsubtyp{\A.\aenv}{T}{\ObjZ}\\
     \fgjtywf{\A.\aenv}{T}\spc
     \ralloc \in \A.\rhoset
   }
@@ -37,6 +38,7 @@
 \RULE
   {
     \fgjtywf{\A.\aenv}{T} \\
+    \fgjsubtyp{\A.\aenv}{T}{\ObjZ}
   }
   {
     \tywf{\A}{\exists\rho.\RgnZ\inang{\rho}\inang{T}}
@@ -51,7 +53,8 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \fgjtywf{\A.\aenv}{T}\spc
+    \fgjtywf{\A.\aenv}{T}\\
+    \fgjsubtyp{\A.\aenv}{T}{\ObjZ}\spc
     \ralloc \in \A.\rhoenv
   }
   {
@@ -93,7 +96,7 @@
 \RULE
   {
     \\
-    \rho_0,\rho_1 \in \A.\rhoenv
+    \rho_0,\rho_1 \in \rhoenv
   }
   {
     \tywf{\rhoenv}{\rho_0 \outlives \rho_1}

@@ -9,12 +9,15 @@
   {mn} \in \mathtt{Method \; names} \qquad \qquad 
   {x,y,f} \in \mathtt{Variables \; and \; Class \; fields} }\\
 cn & \in & \M{Class \; names} & \coloneqq & \ObjZ \ALT \RgnZ \ALT A \ALT B\\
-\fgjN & \in & \M{FGJ \; class \; types} & \coloneqq & cn\inang{\tbar}\\
-T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \ALT \unitZ\\
+     \fgjN & \in & \M{FGJ \; class \; types} & \coloneqq & cn\inang{\tbar}\\
+T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \ALT \unitZ
+     \ALT T \rightarrow T \\
 \fbN  & \in & \M{Region-annotated \; class \; types} & \coloneqq & 
-     cn\inang{\rhoalloc \rhobar}\inang{\tbar} \\
-\tau &\in& \M{Region-annotated \; types} & \coloneqq & T@\rho  
-      \ALT \fbN \ALT \exists \rho.\,\tau \ALT \unitZ \\
+     cn\inang{\ralloc \rbar}\inang{\tbar} \\
+\tau &\in& \M{Region-annotated \; types} & \coloneqq & T@\rgn  
+      \ALT \fbN \ALT \exists \rho.\,\tau \ALT \unitZ 
+      \ALT \inang{\rhoalloc\rhobar \,|\, \phi}\tau
+      \xrightarrow{\ralloc} \tau \\
 C  & \in & \M{Class \; definitions} & \coloneqq & 
      \C{class} \; cn\inang{\rhoalloc \rhobar} 
                     \inang{\bar{\tyvar} \extends \bar{\fgjN}} \extends \fbN 
@@ -29,13 +32,22 @@ d  & \in & \M{Methods} & \coloneqq &
       \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi\\
 % v  & \in & \M{Value\;expressions} & \coloneqq & x \ALT \C{new} \; \fbN(\vbar)\\
 e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f 
-     \ALT e.mn\inang{\rhoalloc \rhobar}(\ebar) \ALT \C{new}\;\fbN(\ebar) 
-     \ALT \C{pack} \; (\rho,e) \; \C{as} \; \exists\rho.\tau\\
-s  & \in & \M{Statements} & \coloneqq & \tau\;x\;=\;e \ALT x\;=\;e
-     \ALT e.f\;=\;e \ALT \C{letregion}\;\rho\;\{s\} 
-     \ALT \C{open}\;x\;\C{withroot}\;y\;\{s\} \\
-    & & & & \ALT \C{openalloc}\;x\;\C{withroot}\;y\;\{s\} 
-     \ALT (\rho,\tau\;x)\;=\;\C{unpack}\;e \ALT s\,;\,s\\
+     \ALT e.mn\inang{\ralloc \rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar) 
+     \ALT \C{pack} \; (\rho,e) \; \C{as} \; \exists\rho.\tau \ALT
+     (\tau)\, e\\
+   & & & & \ALT \lambdaexp{\tau\;x} {e}
+           \ALT \Lambda\inang{\rhoalloc\rhobar \,|\, \phi}.e
+           \ALT e\inang{\ralloc\rbar}
+           \ALT e(\bar{e}) 
+           \ALT \letexp{x}{e} \ALT \letregion{\rho}{e}\\
+   & & & & \ALT x\,:=\,e \ALT e.f\,:=\,e \ALT \open{x}{y}{e} 
+           \ALT \openalloc{x}{y}{e}\\
+   & & & & \ALT \unpackexp{\rgn}{x}{e}{e} \ALT e\,;\,e\\
+% s  & \in & \M{Statements} & \coloneqq & \tau\;x\;=\;e \ALT x\;=\;e
+%      \ALT e.f\;=\;e 
+%      \ALT \C{open}\;x\;\C{withroot}\;y\;\{s\} \\
+%     & & & & \ALT \C{openalloc}\;x\;\C{withroot}\;y\;\{s\} 
+%      \ALT (\rho,\tau\;x)\;=\;\C{unpack}\;e \ALT s\,;\,s\\
 \end{array}
 \end{smathpar}
 

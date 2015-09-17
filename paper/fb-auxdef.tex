@@ -1,9 +1,11 @@
 \begin{figure*}[t]
 %
-\begin{minipage}{2in}
+\begin{minipage}{2.25in}
 \begin{smathpar}
 \begin{array}{lcl}
-  allocRgn(A\inang{\rhoalloc\rhobar}\inang{\tbar}) & = & \rhoalloc\\
+  allocRgn(A\inang{\ralloc\rbar}\inang{\tbar}) & = & \ralloc\\
+  allocRgn(\inang{\rhoalloc\rhobar \,|\, \phi}\tau^1
+      \xrightarrow{\ralloc} \tau^2) & = & \ralloc\\
   shape(A\inang{\rhoalloc\rhobar}\inang{\tbar}) & = & A\inang{\tbar}\\
   bound_{\aenv}(\tyvar@\ralloc) & = & \aenv(\tyvar)@\ralloc\\
   bound_{\aenv}(\fbN) & = & \fbN\\
@@ -108,9 +110,9 @@
 \RULE
   {
     mtype(m,\fbN) = \inang{\rhoalloc_1\bar{\rho_1}}\bar{\tau^{11}} 
-                      \rightarrow \tau^{12} \spc \mathtt{implies}\\
-    \bar{\tau^{21}} = [\bar{\rho_2}/\bar{\rho_1},\rhoalloc_2/\rhoalloc_1] 
-    \spc \mathtt{and} \spc
+                      \rightarrow \tau^{12} \spc \texttt{implies}\\
+    \bar{\tau^{21}} = [\bar{\rho_2}/\bar{\rho_1},\rhoalloc_2/\rhoalloc_1]
+                      \bar{\tau^{11}} \spc \texttt{and} \spc
     \subtyp{\A}{\tau^{22}} {[\bar{\rho_2}/\bar{\rho_1},\rhoalloc_2/\rhoalloc_1]\tau^{12}}
     %\substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
   }
