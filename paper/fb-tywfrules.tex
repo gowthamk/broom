@@ -1,5 +1,5 @@
 %
-\begin{minipage}{1.6in}
+\begin{minipage}{1.2in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -14,7 +14,7 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.7in}
+\begin{minipage}{1.5in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -31,7 +31,7 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.7in}
+\begin{minipage}{1.5in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -47,18 +47,23 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.4in}
+\begin{minipage}{2.5in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \fgjtywf{\A.\aenv}{T}\\
-    \fgjsubtyp{\A.\aenv}{T}{\ObjZ}\spc
-    \ralloc \in \A.\rhoenv
+    \A = (\subtypcx)\\
+    \A' = (\rhoset \cup \{\rhoalloc,\rhobar\}, 
+           \rhoenv \cup \{\rhoalloc,\rhobar\}, 
+           \aenv, \phicx \conj \phi) \\
+    \tywf{\A'.\rhoenv}{\phi}\spc 
+    \tywf{\A'}{\bar{\tau^1}} \spc
+    \tywf{\A'}{\tau^2}
   }
   {
-    \tywf{\A}{T@\ralloc}
+    \tywf{\A}{\inang{\rhoalloc\rhobar \,|\, \phi}
+              \bar{\tau^1} \rightarrow \tau^2}
   }
 \end{array}
 \end{smathpar}
@@ -67,23 +72,39 @@
 \bigskip
 
 %
-\begin{minipage}{4.5in}
+\begin{minipage}{3.1in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\spc
-    \fgjtywf{\A.\aenv}{T}\spc
-    \fgjsubtyp{\A.\aenv}{\tbar}{\bar{\fgjN}}\\
-    \rhoalloc,\rhobar \in \rhoenv \spc
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\\
+    \fgjtywf{\A.\aenv}{\tbar}\spc
+    \fgjsubtyp{\A.\aenv}{\tbar}{\bar{\fgjN}}\spc
+    \ralloc,\rbar \in \A.\rhoenv \\
     \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}] \spc
     \isvalid{\A.\phicx}{\substFn(\phi)} \spc
-    \tywf{\A}{\substFn(\bar{\fbN})} \spc
     \tywf{\A}{\substFn(\fbN)} 
   }
   {
     \tywf{\A}{B\inang{\ralloc\rbar}\inang{\tbar}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.4in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \fgjtywf{\A.\aenv}{T}\spc
+    \ralloc \in \A.\rhoenv\\
+    \fgjsubtyp{\A.\aenv}{T}{\ObjZ}\spc
+  }
+  {
+    \tywf{\A}{T@\ralloc}
   }
 \end{array}
 \end{smathpar}
@@ -105,7 +126,7 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1in}
+\begin{minipage}{0.75in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}

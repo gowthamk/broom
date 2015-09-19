@@ -43,12 +43,12 @@
 \RULE
   {
     \A = (\subtypcx) \spc
-    \rgn \notin \rhoenv \\
+    \rgn \notin \rhoset \\
     \rhoset' = \rhoset \cup \{\rgn\} \spc
     \rhoenv' = \rhoenv \cup \{\rgn\} \spc
     \phicx' = \phicx \conj \rhoenv \outlives \rgn \\
     \A' = (\rhoset',\rhoenv',\aenv,\phicx') \spc
-    \stmtsem{\ralloc}{s}{\A',\,\env}{\A'',\,\env'}
+    \stmtsem{\rgn}{s}{\A',\,\env}{\A'',\,\env'}
   }
   {
     \stmtsem{\ralloc}{\C{letregion}\;\rgn\;\{s\}}{\stmtsemcx}{\stmtsemcx}

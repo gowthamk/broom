@@ -1,30 +1,10 @@
 %
-\begin{minipage}{1in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \\
-  }
-  {
-    \subtyp{\A}{\tau}{\tau}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
 \begin{minipage}{1.2in}
 \begin{smathpar}
-\begin{array}{c}
+\begin{array}{l}
 \renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \\
-  }
-  {
-    \subtyp{\A}{\tyvar @\rho}{\aenv(\tyvar) @\rho}
-  }
+  \subtyp{\A}{\tau}{\tau} \\
+  \subtyp{\A}{\tyvar @\rho}{\aenv(\tyvar) @\rho}
 \end{array}
 \end{smathpar}
 \end{minipage}
@@ -44,42 +24,30 @@
 \end{array}
 \end{smathpar}
 \end{minipage}
+% Existential type subtyping is redundant.
+%%\begin{minipage}{1.5in}
+%%\begin{smathpar}
+%%\begin{array}{c}
+%%\renewcommand*{\arraystretch}{1.2}
+%%\RULE
+%%  {
+%%    \rho' \;\texttt{not free in}\; \tau
+%%  }
+%%  {
+%%    \subtyp{\A}{\exists\rho.\tau}{\exists\rho'.[\rho'/\rho]\tau}
+%%  }
+%%\end{array}
+%%\end{smathpar}
+%%\end{minipage}
 %
-\begin{minipage}{1.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \rho' \;\texttt{not free in}\; \tau
-  }
-  {
-    \subtyp{\A}{\exists\rho.\tau}{\exists\rho'.[\rho'/\rho]\tau}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\bigskip
-\begin{minipage}{1.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  { }
-  { }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{3.5in}
+\begin{minipage}{3.2in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
     CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\\
-    \tywf{\A}{B\inang{\pi^a\bar{\pi}\inang{\taubar}}}\qquad
+    \tywf{\A}{B\inang{\pi^a\bar{\pi}}\inang{\taubar}}\qquad
     \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}] \qquad 
     \tywf{\A}{\substFn(\fbN)}
     \
@@ -91,3 +59,27 @@
 \end{smathpar}
 \end{minipage}
 %
+\bigskip
+
+%
+\begin{minipage}{3.2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \isvalid{\A.\phicx}{\phi_1 \Rightarrow \phi_2} \\
+    \subtyp{\A}{\bar{\tau^{11}}}{\bar{\tau^{21}}} \spc
+    \subtyp{\A}{\tau^{22}}{\tau^{12}}
+  }
+  {
+    \subtyp{\A}
+      {\inang{\rhoalloc\rhobar \,|\, \phi_2}\bar{\tau^{21}}
+          \rightarrow \tau^{22}}
+      {\inang{\rhoalloc\rhobar \,|\, \phi_1}\bar{\tau^{11}}
+          \rightarrow \tau^{12}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+
