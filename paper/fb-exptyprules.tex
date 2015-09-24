@@ -88,6 +88,25 @@
 \end{smathpar}
 \end{minipage}
 %
+\begin{minipage}{2.1in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{e}{\tau} \\
+    \subtyp{\A}{\tau}{\inang{\rhoalloc}
+    {\unitZ}\rightarrow{T@\rhoalloc}}
+  }
+  {
+    {\exptycx{\ralloc}{\env}}\,\vdash\,
+          {\C{new}\; \RgnZ\inang{\rho}\inang{T}(e)}\\
+           \hspace*{0.5in}{:\exists\rho.\RgnZ\inang{\rho}\inang{T}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
 \begin{minipage}{2.75in}
 \begin{smathpar}
 \begin{array}{c}
@@ -97,10 +116,10 @@
     \hastyp{\exptycx{\ralloc}{\env}}{e_0}{\tau} \spc
     \rbar \in \A.\aenv \\
     mtype(m,bound_{\A.\aenv}(\tau)) = \inang{\rhoalloc\rhobar \,|\, 
-        \phi}\bar{\tau^1}\rightarrow{\tau^2} \spc
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc] \\
+        \phi}\bar{\tau^1}\rightarrow{\tau^2} \\
+    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc] \spc
     \tywf{\A}{\substFn(\bar{\tau^1})} \spc
-    \tywf{\A}{\substFn(\tau^2)} \spc
+    \tywf{\A}{\substFn(\tau^2)} \\
     \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\bar{\tau'}} \spc
     \subtyp{\A}{\bar{\tau'}}{\substFn(\bar{\tau^1})} \spc
     \isvalid{\A}{\substFn(\phi)}

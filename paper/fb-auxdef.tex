@@ -4,7 +4,7 @@
 \begin{smathpar}
 \begin{array}{lcl}
   allocRgn(A\inang{\ralloc\rbar}\inang{\tbar}) & = & \ralloc\\
-  allocRgn(\inang{\rhoalloc\rhobar \,|\, \phi}\tau^1
+  allocRgn(\inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau^1}
       \xrightarrow{\ralloc} \tau^2) & = & \ralloc\\
   shape(A\inang{\rhoalloc\rhobar}\inang{\tbar}) & = & A\inang{\tbar}\\
   bound_{\aenv}(\tyvar@\ralloc) & = & \aenv(\tyvar)@\ralloc\\
@@ -53,8 +53,8 @@
 \begin{smathpar}
 \begin{array}{lcl}
   ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
-  ctype(\RgnZ\inang{\rgn}\inang{T}) & = & \inang{\rhoalloc}
-    {\unitZ}\rightarrow{T@\rhoalloc}\\
+% ctype(\RgnZ\inang{\rgn}\inang{T}) & = & \inang{\rhoalloc}
+%   {\unitZ}\rightarrow{T@\rhoalloc}\\
   ctype(B\inang{\ralloc\rbar}\inang{\tbar}) & = & 
     fields(B\inang{\ralloc\rbar}\inang{\tbar})\\
   mtype(\C{transfer}, \RgnZ\inang{\rgn}\inang{T}) & = & 

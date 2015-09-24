@@ -111,6 +111,7 @@
 \newcommand{\broom}{{\sc Broom}\xspace}
 \newcommand{\name}{{\sc Broom}\xspace}
 \newcommand{\fbname}{{\sc Featherweight Broom}\xspace}
+\newcommand{\FB}{{\sc FB}\xspace}
 \newcommand{\naiad}{{\sc Naiad}\xspace}
 \newcommand{\csolve}{{\sc Csolve}\xspace}
 \newcommand{\GK}[1]{{\textcolor{red}{{GK: #1}}}}
@@ -293,23 +294,23 @@ computation on a given machine.
 
 In this paper, we demonstrate that the general purpose garbage
 collection scheme employed by C\#.Net runtime is not very effective
-for dataflow programs insofar as the latency due to GC is intolerably
-high in many practical examples. We propose a memory management scheme
-that combines user-managed memory regions with automatic garbage
-collection, and lets programmers exploit specific memory behaviours
-exhibited by dataflow programs. To protect programmers from the
-dangers of manual memory management, we supplement our memory
-management scheme with a region type system that statically ensures
-the memory safety of region-annotated C\# programs, even in presence
-of higher-order stateful functions. Further, we describe a type
-inference algorithm that infers principal region types for first-order
-programs thereby saving programmers the need to write region
-annotations on types. Our inference algorithm is also very effective,
-albeit incomplete, for higher-order programs. As a testament to
-efficacy of our approach, we demonstrate performance improvements over
-a range of realistic dataflow programs that were rewritten to use
-region-based manual memory management, but are nevertheless judged to
-be safe by our type system.
+for dataflow programs to the extent that the latency due to GC is
+intolerably high in many practical examples. We propose a memory
+management scheme that combines user-managed memory regions with
+automatic garbage collection, and lets programmers exploit specific
+memory behaviours exhibited by dataflow programs. To protect
+programmers from the dangers of manual memory management, we
+supplement our memory management scheme with a region type system that
+statically ensures the memory safety of region-annotated C\# programs,
+even in presence of higher-order stateful functions. Further, we
+describe a type inference algorithm that infers principal region types
+for first-order programs thereby saving programmers the need to write
+region annotations on types. Our inference algorithm is also very
+effective, albeit incomplete, for higher-order programs. As a
+testament to efficacy of our approach, we demonstrate performance
+improvements over a range of realistic dataflow programs that were
+rewritten to use region-based manual memory management, but are
+nevertheless judged to be safe by our type system.
 
 \end{abstract}
 
