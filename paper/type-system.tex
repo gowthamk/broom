@@ -9,4 +9,132 @@
 We build on the Featherweight Generic Java (FGJ)~\cite{fgj} formalism
 to formalize \name and its region type system.
 Fig~\ref{fig:fb-syntax} describes the syntax of the formal language,
-which we call {\sc Featherweight \name} (\FB). 
+which we call \fbname (\FB). The language is seeded with \ObjZ and
+\RgnZ classes. More classes can be defined using the \C{class}
+keyword. Class types in \FB are region-annotated variants of class
+types in FGJ (also called \emph{core types}). This correspondence is
+reflected in the $T@\rgn$ syntax of the region type of an object,
+whose core type is $T$, and which is contained in the region $\rgn$.
+We let $\rgn$ range over static identifiers of regions in \FB. Note
+that all \FB objects are boxed values, hence their \FB types are
+always region-annotated. The only unboxed value in \FB is $\unitval$
+of type \unitZ.  
+
+\FB class definitions can be understood as extensions of FGJ class
+definitions with region annotations and region parameters. More
+precisely, a \fbname definition of a class is obtained from its
+Featherweight Generic Java definition by (a). lifting all core types
+in the body of the class (i.e, fields, constructors and methods) to
+their region-annotated versions, and (b). adding region parameters to
+its header. Note that region parameterization is independent of its
+parameterization over core types; they are not conflated to make the
+class definition parameteric over region types. We let $a, b$ range
+over (core) type parameters and $\rho$ range over region parameters of
+a class. The following definition of \C{Pair} class is an example of
+type and region parametric definition in \FB (The symbol $\extends$
+should be read \emph{extends}):
+\begin{codejava}[mathescape=true]
+class Pair<$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a 
+                      \conj \rho_2 \outlives \rho^a$>
+          <a $\extends$ Object, b $\extends$ Object> {
+  a@$\rho_1$ fst; 
+  b@$\rho_2$ snd;
+  Pair(a@$\rho_1$ fst, b@$\rho_2$ snd) {
+    super(); 
+    this.fst = fst; 
+    this.snd = snd;
+  }
+  a@$\rho_1$ getFst() {
+    return this.fst;
+  }
+}
+\end{codejava}
+Every class definition in \FB is necessarily parameterized over the
+allocation region of its objects. As a rule, allocation region
+parameter (denoted $\rho^a$) is the first region parameter of a class.
+Besides the allocation region of its objects, \C{Pair} class is also
+parametric over the regions its first and second elements are
+allocated in. References between objects allocated in different
+regions are only allowed if the referred object is guaranteed to
+outlive the referring object. In case of \C{Pair} class, this means
+that allocation regions ($\rho_1$ and $\rho_2$) of both objects that
+make up the pair must outlive the allocation region ($\rho^a$) of the
+\C{Pair} object. Such conditions over region parameters of a class
+need to be recorded in its header as region constraints ($\phi$) in
+order for the class to be judged well-formed by the type system
+(Fig.~\ref{fig:fb-morewfrules}). 
+
+To construct objects of the \C{Pair} class, its type and region
+parameters need to be instantiated with core types ($T$) and concrete
+region identifiers ($\rgn$), respectively. Region instantiation has to
+satisfy the stated constraints over region parameters. For example,
+the following code snippet appropriately instantiates region
+parameters of the \C{Pair} class to construct a \C{Pair} of
+{\ObjZ}{\!}s, each allocated in different regions:
+\begin{codejava}
+letregion $\rgn_0$ {
+  Object<$\rgn_0$> fst = new Object<$\rgn_0$>();
+  letregion $\rgn_1$ {
+    Object<$\rgn_1$> snd = new Object<$\rgn_1$>();
+    Pair<Object,Object><$\rgn_1$,$\rgn_0$,$\rgn_1$> p = 
+       new Pair<Object,Object><$\rgn_1$,$\rgn_0$,$\rgn_1$>(fst,snd);
+  }
+}
+\end{codejava}
+Since $\rgn_0 \outlives \rgn_1 \conj \rgn_1 \outlives \rgn_1$, the
+region constraints of the \C{Pair} class are satisfied. Observe that
+the region type of pair object \C{p} conveys the fact that (a). it is
+allocated in region $\rgn_1$, and (b). it holds references to
+object(s) allocated in region $\rgn_0$. On the other hand, if we
+choose to allocate the \C{fst} object also in $\rgn_1$, the region
+type of \C{p} would be
+\C{Pair<\ObjZ,\ObjZ><$\rgn_1$,$\rgn_1$,$\rgn_1$>}, which can be
+written simply as \C{Pair<\ObjZ,\ObjZ>@$\rgn_1$}. In general, the
+\C{@} notation in a region type of an object \C{x} highlights that
+\C{x}, and all the objects reachable from \C{x} via references are
+allocated in a single region. We say that \C{x} is \emph{contained} in
+the region. The objects of $\ObjZ$ class, by the virtue of
+containing no references to other objects, are always contained in
+their allocation region. Hence the type $\ObjZ@\rgn$ is equivalent to
+the type $\ObjZ\inang{\rgn}$.
+%%An object \emph{allocated} in a region $\rgn$ contains its spine in
+%%$\rgn$, but can refer to objects allocated in other regions.  On the
+%%other hand,
+
+A method definitions ($d$) in \fbname can be region polymorphic with
+respect to (a). its allocation context (Sec.~\ref{sec:alloc-ctxt}),
+and (b). the regions occuring in the region types of its arguments.
+Region parameters on the methods, like those on classes, are
+accompanied by constraints ($\phi$) capturing the conditions that the
+parameters need to satisfy for the method to be considered well-formed
+(Fig.~\ref{fig:fb-morewfrules}). Allocation context ($\rho^a$ or
+$\rho^a_m$) is the first and inevitable region parameter of every
+method in \FB. If a method is not polymorphic with respect to its
+allocation context (for example, if its allocation context needs to be
+same as the allocation region of its class), then the monomorphism
+needs to be encoded as an explicit equality constraint in $\phi$.  
+
+\fbname supports first-class functions via lambda expressions and
+arrow types. A lambda expression defines a region-polymorphic
+multi-argument function closure parameterized over function's
+allocation context parameter. The arrow type of a function closure is
+prenex-quantified over its constrained region arguments
+($\inang{\rho^a\rhobar \,|\, \phi}$). Since closures can escape the
+context in which they are created, it is important to keep track of
+the regions where closures are allocated in order to prevent unsafe
+dereferences. The $\rgn^a$ annotation above the arrow in the arrow
+type denotes the allocation region of the corresponding closure. Note
+that it is important to distinguish between the allocation context
+argument of a function and the allocation region of its closure. For
+instance, in the following example:
+\begin{codejava}
+letregion $\rgn$ {
+  let f = $\lambda{\inang{\rho^a}}$()$\,\Rightarrow\,$new Object$\inang{\rho^a}$() 
+  in f
+}
+\end{codejava}
+The type of \C{f} is $\inang{\rho^a}\unitZ \xrightarrow{\rgn}
+\ObjZ\inang{\rho^a}$, coveying that (a). \C{f}'s closure is allocated
+in $\rgn$, and (b). when executed under an allocation context
+$\rho^a$, the closure returns an object allocated in $\rho^a$.
+

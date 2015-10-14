@@ -53,14 +53,16 @@
   {
     \rhoset,\rhoenv = \{\rhoalloc,\rhobar\} \spc
     \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
-    \A = (\rhoset,\rhoenv,\aenv,\phi)\\
+    \phicx = \phi \spc
+    \A = (\rhoset,\rhoenv,\aenv,\phicx)\\
     \tywf{\rhoenv}{\phi} \spc
     \tywf{\A}{\fbN} \spc
     shape(\fbN) \neq \RgnZ\inang{T}\spc 
-    \tywf{\A}{\bar{\tau^f}} \\
+    \tywf{\A}{\bar{\tau^f}} \spc
+    \isvalid{\phicx}{allocRgn(\bar{\tau^f}) \outlives \rho^a} \\
     ctype(\fbN) = \bar{\tau^{\fbN}} \spc
     k = B(\bar{\tau^f}\;\xbar,\bar{\tau^{\fbN}}\;\bar{y})
-        \{\superZ(\xbar);\,\thisZ.\bar{f} = \bar{y}\} \spc
+        \{\superZ(\xbar);\,\thisZ.\bar{f} = \bar{y};\} \spc
     \okin{\bar{d}}{B}
   }
   {

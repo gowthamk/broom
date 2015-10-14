@@ -11,13 +11,14 @@ management in \name.
 \subsection{Stack Regions and Outlives Relation}
 
 Simplest of the region-specific constructs in \name is a \C{letregion}
-lexical block that creates a new labeled memory region. The semantics
-of the \C{letregion} block is similar to Tofte and
-Talpin~\cite{ttpopl94}'s \C{letregion} expression; the newly
-introduced region is live only inside the block, where its label is in
-scope for \C{new} expressions to make allocations inside the region.
-For example, in the following code, object \C{a} is allocated in the
-region \C{R0} introduced by the \C{letregion}:
+lexical block that creates a new memory region adressable via its
+static identifier. The semantics of the \C{letregion} block is similar
+to Tofte and Talpin~\cite{ttpopl94}'s \C{letregion} expression; the
+newly introduced region is live only inside the block, where its
+identifier is in scope for \C{new} expressions to make allocations
+inside the region. For example, in the following code, object \C{a} is
+allocated in the region with identifier \C{R0} introduced by the
+\C{letregion}:
 \begin{center}
 \begin{codejava}
   letregion R0 {
@@ -50,21 +51,86 @@ field \C{x} of type \C{Object}):
   }
 \end{codejava}
 \end{center}
-The code creates two stack regions - \C{R0} and \C{R1}, where \C{R0}
-outlives \C{R1} (denoted as $\C{R0 \outlives R1}$). Objects \C{a0} and
-\C{a1} are allocated in regions \C{R0} and \C{R1}, respectively. The
-first assignment statement assigns to \C{a1.x} an object allocated in
-outer region (\C{R0}). This assignment is absolutely safe as \C{a1.x}
-refers to a longer living object, hence is guaranteed to be a valid
-reference throughout the lifetime of \C{a1}. In contrast, the second
-assignment is unsafe, as it assigns to \C{a0.x} an object, whose
-lifetime is shorter than the lifetime of \C{a0}, making it unsafe to
-dereference \C{a0.x} outside the inner block. 
+The code creates two stack regions with identifiers \C{R0} and \C{R1},
+where the region \C{R0} outlives the region \C{R1} (denoted as $\C{R0}
+\outlives \C{R1}$).  Objects \C{a0} and \C{a1} are allocated in regions
+\C{R0} and \C{R1}, respectively. The first assignment statement
+assigns to \C{a1.x} an object allocated in outer region (\C{R0}). This
+assignment is safe as \C{a1.x} refers to a longer living object, hence
+is guaranteed to be a valid reference throughout the lifetime of
+\C{a1}.  In contrast, the second assignment is unsafe, as it assigns
+to \C{a0.x} an object, whose lifetime is shorter than the lifetime of
+\C{a0}, making it unsafe to dereference \C{a0.x} outside the inner
+block. 
 % Unsafe assignments can also happen indirectly via a function call..
 Preempting such unsafe assignments is the \emph{raison d'etre} of the
 region type system.
 
+\paragraph{A Note on region identifiers} In \name, every \C{letregion}
+expression introduces a new stack region with a static identifier that
+uniquely identifies the region within its scope. At runtime, a
+\C{letregion} expression could be evaluated multiple times if, for
+instance, it is wrapped inside a \C{while} loop or a recursive method,
+introducing multiple stack regions with the same static identifier.
+Which among these regions the identifier is bound to under a given
+runtime context is then determined by the scope of the identifier.
+Furthermore, any proposition involving static region identifiers is
+true if and only if the proposition is true in \emph{all} possible
+runtime contexts containing bindings for those identifiers. For
+instance, consider the following example:
+%\begin{minipage}{1.55in}
+\begin{codejava}
+for (int i=0; i<=10; i++) {
+  letregion R0 {
+    ...
+    letregion R1 {
+      A a1 = new@R1 A();
+    }
+  }
+}
+\end{codejava}
+%\end{minipage}
+%\begin{minipage}{1.4in}
+%\begin{codejava}
+%void m(int i) {
+%  letregion R0 {
+%    A a = new@R0 A();
+%  }
+%  this.m(++i);
+%}
+%...
+%this.m(1);
+%\end{codejava}
+%\end{minipage}
+When \C{i=2}, the \C{new} expression refers to the \C{R1} (and the
+corresponding stack region) introduced in the 2nd iteration of the
+loop, as it is the only \C{R1} in scope. Furthermore, the proposition
+\emph{\C{a1} refers to an object of type \C{A} contained in region
+\C{R1}} (denoted succinctly as $\C{a1}:\C{A@R1}$) is true because it
+is true for all stack regions identified by \C{R1} at runtime.
+Likewise, the propostion $\C{R0} \outlives \C{R1}$ is true because it
+is true in every runtime context that binds \C{R0} and \C{R1} to
+regions .
+
+Note that it is possible for multiple stack regions introduced by
+evaluating a \C{letregion} multiple times in a recursive definition to
+be in outlives relationship. For instance, in the following example:
+\begin{codejava}
+void m(A a) {
+  letregion R0 {
+    B b = new@R0 B();
+    b.x = a;
+    this.m(new@R0 A());
+  }
+}
+\end{codejava}
+stack regions identified by \C{R0} introduced in successive recursive
+calls are in outlives relationship. Consequently, the assignment to
+\C{b.x} should be considered safe. Region type system has to allow for
+this possibility.
+
 \subsection{Allocation Context}
+\label{sec:alloc-ctxt}
 
 As evident from the examples shown above, the suffix \C{@R} in
 \C{new@R} instruct the \C{new} keyword to allocate the newly created

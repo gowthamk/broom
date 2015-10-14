@@ -15,17 +15,17 @@ T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \ALT \unitZ
      \ALT T \rightarrow T \\
 \fbN  & \in & \M{Region-annotated \; class \; types} & \coloneqq & 
      cn\inang{\ralloc \rbar}\inang{\tbar} \\
-\tau &\in& \M{Region-annotated \; types} & \coloneqq & T@\rgn  
+\tau &\in& \M{types} & \coloneqq & T@\rgn  
       \ALT \fbN \ALT \exists \rho.\,\tau \ALT \unitZ 
       \ALT \inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau}
       \xrightarrow{\ralloc} \tau \\
 C  & \in & \M{Class \; definitions} & \coloneqq & 
-     \C{class} \; cn\inang{\rhoalloc \rhobar} 
+     \C{class} \; cn\inang{\rhoalloc \rhobar \,|\, \phi} 
                     \inang{\bar{\tyvar} \extends \bar{\fgjN}} \extends \fbN 
                     \{\bar{\tau} \; \bar{f};\; k\; \bar{d}\}\;\\
 k  & \in & \M{Constructors} & \coloneqq & 
      cn(\bar{\tau} \; \bar{x})\{\C{super}(\bar{x}); \;
-                                \C{this}.\bar{f}\,=\,\bar{x}\}\\
+                                \C{this}.\bar{f}\,=\,\bar{x};\}\\
 d  & \in & \M{Methods} & \coloneqq & 
      \tau \; mn\inang{\rhoalloc \rhobar \,|\, \phi} (\taubar \; \xbar)
      \{\C{return}\;e;\}\\
@@ -36,7 +36,7 @@ e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f
      \ALT e.mn\inang{\ralloc \rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar) 
      \ALT \C{pack} \; (\rho,e) \; \C{as} \; \exists\rho.\tau \ALT
      (\tau)\, e\\
-   & & & & \ALT \lambdaexp{\rhoalloc\rhobar \,|\, \phi}{x:\tau} {e}
+   & & & & \ALT \lambdaexp{\rhoalloc\rhobar \,|\, \phi}{\xbar:\taubar} {e}
            \ALT \Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}
            \ALT e\inang{\ralloc\rbar}
            \ALT e(\bar{e}) \ALT x\,:=\,e \ALT e.f\,:=\,e\\
