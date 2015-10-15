@@ -66,29 +66,26 @@ block.
 Preempting such unsafe assignments is the \emph{raison d'etre} of the
 region type system.
 
-\paragraph{A Note on region identifiers} In \name, every \C{letregion}
-expression introduces a new stack region with a static identifier that
-uniquely identifies the region within its scope. At runtime, a
-\C{letregion} expression could be evaluated multiple times if, for
-instance, it is wrapped inside a \C{while} loop or a recursive method,
-introducing multiple stack regions with the same static identifier.
-Which among these regions the identifier is bound to under a given
-runtime context is then determined by the scope of the identifier.
-Furthermore, any proposition involving static region identifiers is
-true if and only if the proposition is true in \emph{all} possible
-runtime contexts containing bindings for those identifiers. For
-instance, consider the following example:
+\paragraph{A Note on region identifiers} Every stack region in \name
+is associated with a static identifier that uniquely identifies the
+region within its scope. At runtime, if a \C{letregion} expression is
+evaluated multiple times in a loop or a recursive method, the
+corresponding identifier is bound to a new stack region each time. 
+Any proposition involving static region identifiers is
+considered true at a program location if and only if the proposition
+is true under all possible evaluation contexts of that program
+location. For instance, consider the following example:
 %\begin{minipage}{1.55in}
-\begin{codejava}
+\begin{numcodejava}
 for (int i=0; i<=10; i++) {
   letregion R0 {
-    ...
     letregion R1 {
       A a1 = new@R1 A();
+      ...
     }
   }
 }
-\end{codejava}
+\end{numcodejava}
 %\end{minipage}
 %\begin{minipage}{1.4in}
 %\begin{codejava}
@@ -102,48 +99,42 @@ for (int i=0; i<=10; i++) {
 %this.m(1);
 %\end{codejava}
 %\end{minipage}
-When \C{i=2}, the \C{new} expression refers to the \C{R1} (and the
-corresponding stack region) introduced in the 2nd iteration of the
-loop, as it is the only \C{R1} in scope. Furthermore, the proposition
-\emph{\C{a1} refers to an object of type \C{A} contained in region
-\C{R1}} (denoted succinctly as $\C{a1}:\C{A@R1}$) is true because it
-is true for all stack regions identified by \C{R1} at runtime.
-Likewise, the propostion $\C{R0} \outlives \C{R1}$ is true because it
-is true in every runtime context that binds \C{R0} and \C{R1} to
-regions .
+The identifiers \C{R0} and \C{R1} are bound to new stack regions each
+time the loop is evaulated. Nonetheless, the propositions (a). $\C{R0}
+\outlives \C{R1}$, and (b). $\C{a1}:\C{A@R1}$ (read as \emph{\C{a1}
+refers to an object of type \C{A} contained in region \C{R1}}) are
+true at line 5, as they are true under all possible bindings of \C{R0}
+and \C{R1} at line 5.
 
-Note that it is possible for multiple stack regions introduced by
-evaluating a \C{letregion} multiple times in a recursive definition to
-be in outlives relationship. For instance, in the following example:
-\begin{codejava}
-void m(A a) {
-  letregion R0 {
-    B b = new@R0 B();
-    b.x = a;
-    this.m(new@R0 A());
-  }
-}
-\end{codejava}
-stack regions identified by \C{R0} introduced in successive recursive
-calls are in outlives relationship. Consequently, the assignment to
-\C{b.x} should be considered safe. Region type system has to allow for
-this possibility.
+% Interestingly, it is possible for multiple stack regions introduced by
+% evaluating a the same \C{letregion} expression to be in outlives
+% relationship. For instance, in the following example:
+% \begin{codejava}
+% void m(A a) {
+%   letregion R0 {
+%     B b = new@R0 B();
+%     b.x = a;
+%     this.m(new@R0 A());
+%   }
+% }
+% \end{codejava}
+% Stack regions identified by \C{R0} introduced in successive recursive
+% calls are in outlives relationship. Consequently, the assignment to
+% \C{b.x} should be considered safe. Region type system has to allow for
+% this possibility.
 
-\subsection{Allocation Context}
+\subsection{Allocation Context and Qualified Region Polymorphism}
 \label{sec:alloc-ctxt}
 
 As evident from the examples shown above, the suffix \C{@R} in
-\C{new@R} instruct the \C{new} keyword to allocate the newly created
+\C{new@R} instructs the \C{new} keyword to allocate the newly created
 object in the region labeled \C{R}. However, \name does not require
 the allocation region to be specified following a \C{new}. In the
 absence of explicit specification, \name allocates the newly created
-object in its \emph{allocation context}, which is the region
-introduced by the closest enclosing \C{letregion} block. Besides being
-a syntactic convenience, the facility to elide allocation region
-specification is imperative to interface region-oblivious standard
-library code with region-aware application code. For instance, the
-following \name code, which makes explicit use of regions, calls
-the standard library's iterator methods, which are region-oblivious:
+object in its \emph{allocation context}, which is the region at the
+top of the stack when \C{new} is executed. For instance, the
+\C{findMin} function shown below, which makes explicit use of regions,
+calls the standard \C{List} library's \C{listIterator} method:
 \begin{center}
 \begin{codejava}
   int findMin(List<int> l) {
@@ -160,15 +151,27 @@ the standard library's iterator methods, which are region-oblivious:
   }
 \end{codejava}
 \end{center}
-Due to the absence of new region creations, and explicit region
-annotations with \C{new} expressions, all new objects created by a
-standard library method are allocated in the allocation context for
-the method call. In the above example, the allocation context for the
-call to \C{List} library's \C{listIterator} method is the region
-\C{R1}. Therefore, all objects created by the method, including the
-iterator object, are allocated in \C{R0}. This fact should be captured
-appropriately by the region type of \C{listIterator} method if the
-type system were to prove the safety of the above code.
+The \C{listIterator} method neither creates new regions, nor does it
+annotate \C{new} expressions with region specifications. Consequently,
+all new objects created by the method are allocated in the allocation
+context for the call to \C{listIterator}, which in this case is
+\C{R0}. 
+
+Observe that \C{listIterator} can be called under multiple different
+allocation contexts, and each time it returns a \C{ListIterator}
+allocated in its allocation context. The iterator object might hold
+references to the list, requiring the list to be allocated in a region
+that outlives \C{listIterator}\!'s allocation context. However, modulo
+this constraint, \C{listIterator} is not concerned about where the
+list is allocated. As such, \C{listIterator} is
+\emph{region-polymorphic} with respect to (a). its allocation context
+argument, and (b). the allocation region of the list, subject to the
+constraint that the later outlives the former. We call such region
+polymorphism with constraints in \name as \emph{qualified region
+polymorphism}. The provision to elide allocation region
+specifications, and the ability to infer qualified region-region
+polymorphic types are pivotal to interface region-oblivious standard
+library code with region-aware application code in \name. 
 
 \subsection{Boxed and Unboxed Values}
 
@@ -192,37 +195,38 @@ of the string constant has lesser lifetime than \C{y}.
   ...
 \end{codejava}
 \end{center}
+Accordingly, \name's region type system lets the former assignment
+pass by, but flags the later as an error.
 
 \subsection{Dynamic (Transferable) Regions}
 
 \name's stack regions have lexically scoped lifetimes, hence are not
 suitable for applications that need to transfer data between
-autonomous actors, such as \naiad dataflow operators. To support these
-applications, it is imperative to support regions whose lifetimes
-transcend the boundaries of lexical blocks, functions, or even
-programs. Regions that fit this description in \name are called
+autonomous entities, such as \naiad dataflow operators. To support
+these applications, it is imperative to support regions whose
+lifetimes transcend the boundaries of lexical blocks, functions, or
+even programs. Regions that fit this description in \name are called
 \emph{dynamic regions}, or \emph{transferable regions}. 
 
-Transferable regions, like stack regions, are memory regions
-Transferable regions are first class values of \name; they are
+Transferable regions, like stack regions, are memory regions, but
+unlike stack regions, they are first class values of \name; they are
 considered objects of \C{Region} class, and, like objects of other
 classes, they are created using the \C{new} keyword, can be passed as
-arguments, and returned from methods. Like a stack region, a
-transferable region facilitates arbitrary object allocations, but
-unlike a stack region, it has a well-defined \emph{root} object
-denoting the root of the data structure being transferred. In a
-typical dataflow computation, an upstream actor (e.g., a \C{SELECT}
-operator) constructs a transferable region, sets its root to the data
-structure supposed to contain intermediate results, populates the data
-structure with intermediate results, and then transfers it to a
-downstream actor (e.g., a \C{COUNT} operator), which performs further
-processing. Since a transferable region escapes the lifetime of the
-sender, there must be no references from inside of the transferable
-region to objects allocated in other memory regions of the sender.
-Such references, if exist, may become invalid references in the
-context of recipient's address space, jeopardizing memory safety.
-\name relies on its region type system to prevent such unsafe
-references from being created.
+arguments, stored in data structures, and returned from methods. Like
+a stack region, a transferable region facilitates arbitrary object
+allocations, but unlike a stack region, it has a well-defined
+\emph{root} object denoting the root of the data structure being
+transferred. In a typical dataflow computation, an upstream actor
+(e.g., a \C{SELECT} operator) constructs a transferable region, sets
+its root to the data structure containing intermediate results, and
+then transfers it to a downstream actor (e.g., a \C{COUNT} operator),
+which performs further processing. Since a transferable region escapes
+the lifetime of the sender, there must be no references from inside of
+the transferable region to objects allocated in other memory regions
+of the sender. Such references, if exist, may become invalid
+references in the context of recipient's address space, jeopardizing
+memory safety. \name relies on its region type system to prevent such
+unsafe references from being created.
 
 \begin{figure}
 \begin{codejava}

@@ -28,7 +28,7 @@ in the body of the class (i.e, fields, constructors and methods) to
 their region-annotated versions, and (b). adding region parameters to
 its header. Note that region parameterization is independent of its
 parameterization over core types; they are not conflated to make the
-class definition parameteric over region types. We let $a, b$ range
+class definition parametric over region types. We let $a, b$ range
 over (core) type parameters and $\rho$ range over region parameters of
 a class. The following definition of \C{Pair} class is an example of
 type and region parametric definition in \FB (The symbol $\extends$
@@ -137,4 +137,15 @@ The type of \C{f} is $\inang{\rho^a}\unitZ \xrightarrow{\rgn}
 \ObjZ\inang{\rho^a}$, coveying that (a). \C{f}'s closure is allocated
 in $\rgn$, and (b). when executed under an allocation context
 $\rho^a$, the closure returns an object allocated in $\rho^a$.
+
+The expression language admits expressions to instantiate
+($e\inang{\ralloc\rbar}$) region parameters, and to apply
+($e(\bar{e})$) functions. For a method call, however, region parameter
+instantiation and method application are captured in a single
+expression ($e.mn\inang{\ralloc \rbar}(\ebar)$). The language also
+admits a big-lambda expression, which, when used in conjunction with
+the instantiation expression, serves the bureaucratic purpose of
+renaming bound region variables in the type of a function closure. 
+
+The 
 
