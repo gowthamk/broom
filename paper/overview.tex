@@ -228,6 +228,64 @@ references in the context of recipient's address space, jeopardizing
 memory safety. \name relies on its region type system to prevent such
 unsafe references from being created.
 
+\subsection{Memory Safety}
+\label{sec:memory-safety}
+
+Memory safety in \name is predominantly due to its region type system.
+However, the type system does not ensure the integrity of a small
+subset of pointers, called the \emph{unsafe set}, for which runtime
+verification is needed to guarantee safety. This is more a design
+decision rather than an unfortunate inevitability. Rest of this
+subsection presents an overview of the region type system, discusses
+the unsafe set, and briefly describes the runtime mechanisms used to
+ensure safety of references in the unsafe set. 
+
+At a fundamental level, the region type system's approach to memory
+safety involves approximating (a). \emph{liveness}: the set of memory
+regions that are live at any given program location, and (b).
+\emph{outlives} relationships between them, and using this information
+to preempt potentially unsafe references from being created. These
+include:
+\begin{itemize}
+\item References into dead/non-existing regions,
+\item References from longer-living stack regions to shorter-living ones, and 
+\item References that escape transferable regions.
+\end{itemize}
+Unsurprisingly, the type system's approximation of liveness and
+outlives information for stack regions is precise. However, for
+transferable regions, statically determining liveness is equivalent to
+determining if a C pointer is null in presence of dynamic memory
+allocation, which is undecidable in general. Therefore, the region
+type system has to be necessarily conservative in approximating the
+liveness of transferable regions in order to ensure full memory
+safety. Maintaining a good conservative approximation requires the
+type system to employ techniques such as linear types~\cite{wadlerlt}
+or unique pointers~\cite{rust}, which impose restrictions that are
+often too hard to program around~\footnote{Internet has many tutorials
+on how to \emph{fight} the borrow checker in Rust.}. This is
+particularly unacceptable in the context of \name, as dataflow
+programs are often run offline, and the concern for performance and
+developer productivity outweighs the concern for safety. 
+
+\name's region type system therefore overapproximates the liveness
+information for transferable regions, i.e., it might assume that a
+transferable region is live when, in fact, it might have already been
+transferred or freed. This necessarily leads to cases where creation of
+unsafe references, and their subsquent dereferencing can go unnoticed
+by the type system. Considering that stack regions can contain
+pointers into transferable regions, the worst case cost of
+overapproximating liveness is therefore the integrity of \emph{every}
+pointer on stack.
+
+Fortunately, \name avoids this worst case scenario. It does so by
+restricting the unsafe set to only include $\RgnZ$ objects. In
+particular, pointers \emph{into} transferable regions are excluded
+from this set (hence safe). \name achieves this by imposing simple
+restrictions on how $\RgnZ$ objects can be used to operate on
+transferable regions. The following describes the $\RgnZ$ class, and
+how $\RgnZ$ objects should be used to make allocations into, and to
+read from transferable regions.
+
 \begin{figure}
 \begin{codejava}
   public class Region<T> {
@@ -297,6 +355,8 @@ precisely state and enforce the safety guarantees offered by \name's
 region type system (\S~\ref{sec:type-system}).
 
 \input{naiad-ex}
+
+\subsection{An Example}
 
 Fig~\ref{fig:naiad-ex} shows \C{SelectVertex} class, which is a
 straightforward implementation of the \C{SELECT} dataflow operator.
