@@ -21,14 +21,10 @@ The paper makes the following contributions:
   59\%. 
 
   \item \name is equipped with a region type system that statically
-  guarantees safety for a well-defined subset of all memory accesses
-  in a well-typed program. This subset includes all memory accesses,
-  including accesses that happen across different regions, except
-  dereferences of \C{Region} objects themselves. For the later kind,
-  we rely on \GK{reference counting?} to ensure safety at run-time.
-  Our experiments with \naiad workloads show that \GK{x\%} of all
-  memory memory accesses fall under the statically safe subset, while
-  only \GK{100-x\%} require run-time mechanisms to ensure safety.
+  guarantees safety all memory accesses in a well-typed program,
+  subject to some conditions that can be checked efficiently at
+  run-time. The overhead of checking these conditions is less than
+  \GK{x\%} in our experiments with \naiad workloads.
 
   \item We define an operational semantics for \name, and a type
   safety result that formalizes and proves safety guarantees described

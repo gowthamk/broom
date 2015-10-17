@@ -228,64 +228,6 @@ references in the context of recipient's address space, jeopardizing
 memory safety. \name relies on its region type system to prevent such
 unsafe references from being created.
 
-\subsection{Memory Safety}
-\label{sec:memory-safety}
-
-Memory safety in \name is predominantly due to its region type system.
-However, the type system does not ensure the integrity of a small
-subset of pointers, called the \emph{unsafe set}, for which runtime
-verification is needed to guarantee safety. This is more a design
-decision rather than an unfortunate inevitability. Rest of this
-subsection presents an overview of the region type system, discusses
-the unsafe set, and briefly describes the runtime mechanisms used to
-ensure safety of references in the unsafe set. 
-
-At a fundamental level, the region type system's approach to memory
-safety involves approximating (a). \emph{liveness}: the set of memory
-regions that are live at any given program location, and (b).
-\emph{outlives} relationships between them, and using this information
-to preempt potentially unsafe references from being created. These
-include:
-\begin{itemize}
-\item References into dead/non-existing regions,
-\item References from longer-living stack regions to shorter-living ones, and 
-\item References that escape transferable regions.
-\end{itemize}
-Unsurprisingly, the type system's approximation of liveness and
-outlives information for stack regions is precise. However, for
-transferable regions, statically determining liveness is equivalent to
-determining if a C pointer is null in presence of dynamic memory
-allocation, which is undecidable in general. Therefore, the region
-type system has to be necessarily conservative in approximating the
-liveness of transferable regions in order to ensure full memory
-safety. Maintaining a good conservative approximation requires the
-type system to employ techniques such as linear types~\cite{wadlerlt}
-or unique pointers~\cite{rust}, which impose restrictions that are
-often too hard to program around~\footnote{Internet has many tutorials
-on how to \emph{fight} the borrow checker in Rust.}. This is
-particularly unacceptable in the context of \name, as dataflow
-programs are often run offline, and the concern for performance and
-developer productivity outweighs the concern for safety. 
-
-\name's region type system therefore overapproximates the liveness
-information for transferable regions, i.e., it might assume that a
-transferable region is live when, in fact, it might have already been
-transferred or freed. This necessarily leads to cases where creation of
-unsafe references, and their subsquent dereferencing can go unnoticed
-by the type system. Considering that stack regions can contain
-pointers into transferable regions, the worst case cost of
-overapproximating liveness is therefore the integrity of \emph{every}
-pointer on stack.
-
-Fortunately, \name avoids this worst case scenario. It does so by
-restricting the unsafe set to only include $\RgnZ$ objects. In
-particular, pointers \emph{into} transferable regions are excluded
-from this set (hence safe). \name achieves this by imposing simple
-restrictions on how $\RgnZ$ objects can be used to operate on
-transferable regions. The following describes the $\RgnZ$ class, and
-how $\RgnZ$ objects should be used to make allocations into, and to
-read from transferable regions.
-
 \begin{figure}
 \begin{codejava}
   public class Region<T> {
@@ -319,40 +261,148 @@ of \C{transfer} are unimportant in the context of the region type
 system; it suffices to understand \C{transfer} as an alias of
 \C{free}.
 
-A transferable region is said to be in \emph{closed} state when
-created. \name provides \C{openalloc} lexical construct to \emph{open}
-a transferable region as an allocation context, and to access its root
-object:
-\begin{codejava}
-  Region<string> rgn = new Region<string>
-                        (() => "Hello");
-  openalloc rgn withroot str {
-    print str; //prints "Hello"
-    str = str + " World!"; 
-  }
-\end{codejava}
-In the above code, the \C{openalloc} lexical block opens \C{rgn} for
-allocation, and sets the newly introduced local variable (\C{str}) to
-refer to its root object.  The assignment statement within the block
-updates the root. Since \C{rgn} is the allocation context within the
-block, the new string is allocated inside \C{rgn}, hence the
-assignment is safe. In some cases, it is desirable to open a
-transferable region only to read its contents, but not to perform any
-allocations. For this purpose, \name provides \C{open} lexical
-construct that, like \C{openalloc}, opens a transferable region and
-names its root object, but unlike \C{openalloc}, does not make it an
-allocation context. A transferable region can be \C{openalloc}'d or
-\C{open}'d many times, before it is eventually \C{free}'d or
-\C{transfer}'d.
+\name imposes a simple discipline on how $\RgnZ$ objects can be used
+to perform operations on transferable regions. This discipline is
+imposed in the interest of memory safety, which is discussed in the
+following subsection.
 
-The design decisions reflected above, \emph{viz.}, to ascribe a root
-object to every transferable region, to make use of a higher-order
-argument to initialize the root object, and to require that a region
-be explictly opened in a lexical block for allocations, were made to
-reflect the message semantics of transferable regions, to promote
-uniform style of programming with different kinds of regions, and to
-precisely state and enforce the safety guarantees offered by \name's
-region type system (\S~\ref{sec:type-system}).
+\subsection{Memory Safety}
+\label{sec:memory-safety}
+
+Memory safety in \name is primarily due to its region type system,
+although few runtime checks are needed.
+% However, the type system does not ensure the integrity of a small
+% subset of pointers, called the \emph{unsafe set}, for which runtime
+% verification is needed to guarantee safety. This is more a design
+% decision rather than an unfortunate inevitability, as the following
+% discussion elaborates.
+At a fundamental level, the region type system's approach to memory
+safety involves approximating (a). the set of memory regions that are
+live at any given program location\footnote{We say the type system
+tracks \emph{liveness} of memory regions}, and (b).  \emph{outlives}
+relationships between them, and using this information to preempt
+potentially unsafe references from being created. These include:
+\begin{itemize}
+\item References into dead/non-existing regions,
+\item References from longer-living stack regions to shorter-living ones, and 
+\item References that escape transferable regions.
+\end{itemize}
+Maintaining precise approximation of liveness and outlives information
+for stack regions is easy. However, for dynamic (transferable) regions,
+statically determining liveness is equivalent to determining if a C
+pointer is null in presence of dynamic memory allocation, which is
+undecidable in general. Systems that attempt to ensure full memory
+safety in presence of dynamic memory (e.g., ~\cite{henglein},
+~\cite{rust}) do so by conservatively approximating liveness
+information for memory (regions). Maintaining a good conservative
+approximation requires them to employ techniques such as linear
+types~\cite{wadlerlt} or unique pointers~\cite{rust}, which impose
+restrictions that are often too hard to program
+around\footnote{Internet has many tutorials on how to \emph{fight} the
+borrow checker in Rust.}. This is particularly unacceptable in the
+context of \name, as dataflow programs are often run offline, and the
+concern for performance and developer productivity outweighs the
+concern for safety. 
+
+\name's region type system therefore adopts the novel approach of
+overapproximating liveness information for transferable regions, i.e.,
+it might assume that a transferable region is live when, in fact, it
+might have already been transferred or freed. This imprecision should
+be a cause of concern as it can lead to cases where creation of unsafe
+references, and their subsquent dereferencing go unnoticed by the type
+system. Considering that stack regions can contain pointers into
+transferable regions, the worst case cost of overapproximating
+liveness is therefore the integrity of \emph{every} pointer on stack.
+
+Fortunately, \name avoids this worst case scenario.  \name achieves
+this by imposing a simple state transition discipline on the lifetime
+of a transferable region.  The relevant finite state machine is shown
+in Fig.~\ref{fig:region-fsm}.
+
+\begin{figure}
+\includegraphics[scale=0.45]{region-fsm.png}
+\caption{The lifetime of a dynamic (transferable) region in \name}
+\label{fig:region-fsm}
+\end{figure}
+
+A transferable region starts its lifetime in a \emph{closed} state,
+when it is created through \C{new Region} expresion. \name provides
+\C{open} lexical construct to \emph{open} a transferable region as an
+allocation context, and to access its root object:
+\begin{codejava}
+  Region<string> rgn = new Region<List<String>>
+                        (() => new List<String>());
+  open rgn as R0 withroot strList {
+    strList.addAtHead("World");
+    strList.addAtHead("Hello");
+  }
+  rgn.transfer();
+\end{codejava}
+In the above code, the \C{open} lexical block performs the
+following operations: (a). It opens the transferable region handled by
+\C{rgn} for allocation (i.e., makes it the current allocation
+context), (b). assigns the identifier \C{R0} to the open region, and
+(c). sets the newly introduced local variable (\C{strList}) to refer
+to its root object (a list of strings). As Fig.~\ref{fig:region-fsm}
+indicates, it is not possible to open a region that is already
+transferred/freed. The fact that \C{rgn} is open within the block
+therefore guarantees that it is not yet transferred/freed, and that
+dereferencing \C{strList} within the block is safe. The end of
+\C{open} block marks the return of transferable region to the closed
+state.  While closed, the region is eligible to be transferred to a
+downstream actor, or to be freed.  An actor that receives the
+transferable region, receives it in the closed state. It can then
+reopen the received region to read its contents, possibly add more
+data and transfer it to another actor, or free the region. 
+
+\name lets stack regions to be used as working memory while operating
+with the data stored in a transferable region. Consider the following
+code, for instance\footnote{For brevity, we drop \C{as} part of the
+\C{open} expression whenever there is no need to assign a static
+identifier for the open region.}:
+\begin{codejava}
+void onReceive(Region<List<String>> rgn)
+  open rgn withroot strList {
+    letregion R1 {
+      String s = "";
+      ListIterator<String> i = strList.listIterator();
+      while(i.hasNext()) {
+        s += i.getNext();
+      }
+      print s; //prints "HelloWorld"
+    }
+  }
+  rgn.free();
+}
+\end{codejava}
+The stack region \C{R1} is being used in the above code to provide
+working memory to work with the objects of transferable region
+\C{rgn}. Since a transferable region cannot be transferred/freed while
+it is still open (Fig~\ref{fig:region-fsm}), \C{rgn} is guaranteed to
+outlive the stack region \C{R1} in the above code, making it safe for
+the later to contain references to the former. \name therefore allows
+such references.
+
+% The design decisions reflected above, \emph{viz.}, to ascribe a root
+% object to every transferable region, to make use of a higher-order
+% argument to initialize the root object, and to require that a region
+% be explictly opened in a lexical block for allocations, were made to
+% reflect the message semantics of transferable regions, to promote
+% uniform style of programming with different kinds of regions, and to
+% precisely state and enforce the safety guarantees offered by \name's
+% region type system (\S~\ref{sec:type-system}).
+
+As evident in the above examples, the safety of memory accesses in
+\name is now subject to the condition that the lifetime of every
+transferable region aligns with the state transition discipline shown
+in Fig.~\ref{fig:region-fsm}. If the transition discipline is somehow
+guaranteed, then \name's region type system statically guarantees the
+safety of all memory accesses. In other words, the type system reduces
+the problem of ensuring memory safety in \name programs to the problem
+of enforcing state transition discipline on the lifetimes of
+transferable regions. In \name, this enforcement is done at runtime by
+explicitly keeping track \emph{current state} for $\RgnZ$ objects, and
+preventing them from going through invalid transitions.
 
 \input{naiad-ex}
 
