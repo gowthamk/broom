@@ -1,4 +1,4 @@
-\section{The Region Type System}
+\section{The Core Language}
 \label{sec:type-system}
 
 \input{fb-syntax}
@@ -10,8 +10,14 @@
 \label{sec:fb-syntax}
 
 We build on the Featherweight Generic Java (FGJ)~\cite{fgj} formalism
-to formalize \name and its region type system.
-Fig~\ref{fig:fb-syntax} describes the syntax of the formal language,
+to formalize \name and its region type system. Our development reuses
+notations from~\cite{fgj}, and relies on several of its definitions,
+such as the definition of type well-formedness for the core
+(region-free) language. Due to space constraints, we are unable to
+reproduce them here, and instead encourage the reader to refer
+to~\cite{fgj}.
+
+Fig~\ref{fig:fb-syntax} describes the syntax of our formal language,
 which we call \fbname (\FB). The language is seeded with \ObjZ and
 \RgnZ classes. More classes can be defined using the \C{class}
 keyword. Class types in \FB are region-annotated variants of class
@@ -21,21 +27,55 @@ whose core type is $T$, and which is contained in the region $\rgn$.
 We let $\rgn$ range over static identifiers of regions in \FB. Note
 that all \FB objects are boxed values, hence their \FB types are
 always region-annotated. The only unboxed value in \FB is $\unitval$
-of type \unitZ.  
+of type \unitZ.
 
-\FB class definitions can be understood as extensions of FGJ class
-definitions with region annotations and region parameters. More
-precisely, a \fbname definition of a class is obtained from its
-Featherweight Generic Java definition by (a). lifting all core types
-in the body of the class (i.e, fields, constructors and methods) to
-their region-annotated versions, and (b). adding region parameters to
-its header. Note that region parameterization is independent of its
-parameterization over core types; they are not conflated to make the
-class definition parametric over region types. We let $a, b$ range
-over (core) type parameters and $\rho$ range over region parameters of
-a class. The following definition of \C{Pair} class is an example of
-type and region parametric definition in \FB (The symbol $\extends$
-should be read \emph{extends}):
+The expression language of FGJ is impoverished, lacking, among others,
+an assignment expression. Note that it is possible to \emph{encode}
+assignments to instance variables (object fields) in FGJ by creating a
+new object with its fields set to new values. Unfortunately, such
+encoding is not semantics preserving in case of \name, as the new
+object could be allocated in a region different from the allocation
+region of the original object. To avoid such complications, we extend
+the expression language with assignments and local variable
+declarations (via \C{let} expressions). Instead of distinguishing
+between statements (e.g., assignments) and expressions (e.g., method
+calls) in \FB, we consider statements as expressions of \unitZ type.
+Statements that introduce lexical blocks in \name, such as
+\C{letregion} and \C{open} are, are converted to their expression form
+using the \C{in} keyword.
+
+The expression language has been equipped with lambda abstraction
+($\lambdaexp{...}{\xbar : \taubar}{e}$) and application ($e(\bar{e})$)
+expressions to define and apply anonymous functions.  Modulo the angle
+braces containing $\rho$'s and $\phi$'s, whose presence will be
+justified later, these expressions are uncurried variants of
+corresponding expressions from simply typed lambda calculus. Note that
+FGJ formalism does not include higher-order functions, hence the
+syntactic class (\C{T}) of FGJ types needs to be extended with an
+(uncurried) arrow type.
+
+Informally, \FB class definitions are extensions of FGJ class
+definitions with regions. A class definition in FGJ can be lifted to
+its \FB definition by (a). lifting all core types in the body of the
+class (i.e, fields, constructors and methods) to their
+region-annotated versions, and (b). parameterizing the class over
+region variables that occur free in the region-annotated body of the
+class. Note that in \FB, regions, and their static identifiers
+($\rgn$) are confined to the expression language. Consequently, the
+region annotated types of class fields, constructors and methods do
+not refer to identifiers of concrete regions, but rather their place
+holders called \emph{region variables} ($\rho$). Informally, region
+variables ($\rho$) are to region identifiers ($\rgn$) as type
+variables ($a$) are to types ($T$). 
+
+Note that when a generic class definition in FGJ is lifted to a
+region-polymorphic definition in \FB, it nonetheless remains generic
+with respect to core types. We say that the class is now a
+region-polymorphic generic class. Region parameterization of a class
+in \FB is independent of its parameterization over core types; they
+are not conflated to make the class parametric over region types. For
+instance, following is the definition of region-polymorphic generic
+\C{Pair} class (The symbol $\extends$ should be read \emph{extends}):
 \begin{codejava}[mathescape=true]
 class Pair<$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a 
                       \conj \rho_2 \outlives \rho^a$>
@@ -52,8 +92,8 @@ class Pair<$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a
   }
 }
 \end{codejava}
-Every class definition in \FB is necessarily parameterized over the
-allocation region of its objects. As a rule, allocation region
+Every class definition in \FB is necessarily polymorphic with respect
+to the allocation region of its objects. As a rule, allocation region
 parameter (denoted $\rho^a$) is the first region parameter of a class.
 Besides the allocation region of its objects, \C{Pair} class is also
 parametric over the regions its first and second elements are
