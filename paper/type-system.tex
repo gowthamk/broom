@@ -22,45 +22,47 @@ which we call \fbname (\FB). The language is seeded with \ObjZ and
 \RgnZ classes. More classes can be defined using the \C{class}
 keyword. Class types in \FB are region-annotated variants of class
 types in FGJ (also called \emph{core types}). This correspondence is
-reflected in the $T@\rgn$ syntax of the region type of an object,
-whose core type is $T$, and which is contained in the region $\rgn$.
-We let $\rgn$ range over static identifiers of regions in \FB. Note
-that all \FB objects are boxed values, hence their \FB types are
-always region-annotated. The only unboxed value in \FB is $\unitval$
-of type \unitZ.
+reflected in the $T@\rgn$ syntax of a region type, which is the
+simplest form of a region type describing an object, of core type $T$
+contained in a region $\rgn$. We let $\rgn$ range over static
+identifiers of regions in \FB. Note that all \FB objects are boxed
+values, hence their \FB types are always region-annotated. The only
+unboxed value in \FB is $\unitval$ of type \unitZ.
 
 The expression language of FGJ is impoverished, lacking, among others,
-an assignment expression. Note that it is possible to \emph{encode}
+an assignment expression. While it is possible to encode
 assignments to instance variables (object fields) in FGJ by creating a
-new object with its fields set to new values. Unfortunately, such
-encoding is not semantics preserving in case of \name, as the new
-object could be allocated in a region different from the allocation
-region of the original object. To avoid such complications, we extend
-the expression language with assignments and local variable
-declarations (via \C{let} expressions). Instead of distinguishing
-between statements (e.g., assignments) and expressions (e.g., method
-calls) in \FB, we consider statements as expressions of \unitZ type.
-Statements that introduce lexical blocks in \name, such as
-\C{letregion} and \C{open} are, are converted to their expression form
-using the \C{in} keyword.
+new object with its fields set to new values, such encoding is not
+semantics preserving in case of \name, as the new object could be
+allocated in a region different from the allocation region of the
+original object. To avoid such complications, we extend the expression
+language with assignments and local variable declarations (via \C{let}
+expressions). Instead of distinguishing between statements (e.g.,
+assignments) and expressions (e.g., method calls) in \FB, we consider
+statements as expressions of \unitZ type.  Statements that introduce
+lexical blocks in \name, such as \C{letregion} and \C{open} are, are
+converted to their expression form using the \C{in} keyword. We let
+$\rgn$ range over static region identifiers introduced by these
+expressions.
 
 The expression language has been equipped with lambda abstraction
 ($\lambdaexp{...}{\xbar : \taubar}{e}$) and application ($e(\bar{e})$)
-expressions to define and apply anonymous functions.  Modulo the angle
-braces containing $\rho$'s and $\phi$'s, whose presence will be
-justified later, these expressions are uncurried variants of
-corresponding expressions from simply typed lambda calculus. Note that
-FGJ formalism does not include higher-order functions, hence the
-syntactic class (\C{T}) of FGJ types needs to be extended with an
-(uncurried) arrow type.
+expressions to define and apply anonymous functions. Modulo the angle
+braces, these expressions are uncurried variants of corresponding
+expressions from System F. Note that FGJ formalism does not include
+higher-order functions, hence the syntactic class (\C{T}) of FGJ types
+needs to be extended with an (uncurried) arrow type.
 
 Informally, \FB class definitions are extensions of FGJ class
 definitions with regions. A class definition in FGJ can be lifted to
 its \FB definition by (a). lifting all core types in the body of the
 class (i.e, fields, constructors and methods) to their
-region-annotated versions, and (b). parameterizing the class over
+region-annotated versions, (b). parameterizing the class over
 region variables that occur free in the region-annotated body of the
-class. Note that in \FB, regions, and their static identifiers
+class, and (c). recording any outlives constraints on the region
+parameters of the class. The later two steps effectively make the
+class region polymorphic (cf. \S\ref{sec:alloc-ctxt}: qualified region
+polymorphism). Note that in \FB, regions, and their static identifiers
 ($\rgn$) are confined to the expression language. Consequently, the
 region annotated types of class fields, constructors and methods do
 not refer to identifiers of concrete regions, but rather their place
@@ -74,7 +76,7 @@ with respect to core types. We say that the class is now a
 region-polymorphic generic class. Region parameterization of a class
 in \FB is independent of its parameterization over core types; they
 are not conflated to make the class parametric over region types. For
-instance, following is the definition of region-polymorphic generic
+instance, following is the region-polymorphic definition of a generic
 \C{Pair} class (The symbol $\extends$ should be read \emph{extends}):
 \begin{codejava}[mathescape=true]
 class Pair<$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a 
@@ -92,20 +94,23 @@ class Pair<$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a
   }
 }
 \end{codejava}
-Every class definition in \FB is necessarily polymorphic with respect
-to the allocation region of its objects. As a rule, allocation region
-parameter (denoted $\rho^a$) is the first region parameter of a class.
-Besides the allocation region of its objects, \C{Pair} class is also
-parametric over the regions its first and second elements are
-allocated in. References between objects allocated in different
-regions are only allowed if the referred object is guaranteed to
-outlive the referring object. In case of \C{Pair} class, this means
-that allocation regions ($\rho_1$ and $\rho_2$) of both objects that
-make up the pair must outlive the allocation region ($\rho^a$) of the
-\C{Pair} object. Such conditions over region parameters of a class
-need to be recorded in its header as region constraints ($\phi$) in
-order for the class to be judged well-formed by the type system
-(Fig.~\ref{fig:fb-morewfrules}). 
+When objects of a class are allocated in a region $\rgn$, it means
+that the class's constructor is run with $\rgn$ as its allocation
+context. Every class definition in \FB is necessarily polymorphic with
+respect to the allocation region of its objects, i.e., the allocation
+context of its constructor. We adopt a convention that requires the
+allocation region parameter (denoted $\rho^a$) to be the first region
+parameter of a class.  Besides the allocation region of its objects,
+\C{Pair} class is also parametric over the regions its first and
+second elements are allocated in. References between objects allocated
+in different regions are only allowed if the referred object is
+guaranteed to outlive the referring object. In case of \C{Pair} class,
+this means that allocation regions ($\rho_1$ and $\rho_2$) of both
+objects that make up the pair must outlive the allocation region
+($\rho^a$) of the \C{Pair} object. Such conditions over region
+parameters of a class need to be recorded in its header as region
+constraints ($\phi$) in order for the class to be judged well-formed
+by the type system (Fig.~\ref{fig:fb-morewfrules}). 
 
 To construct objects of the \C{Pair} class, its type and region
 parameters need to be instantiated with core types ($T$) and concrete
@@ -119,30 +124,60 @@ letregion $\rgn_0$ {
   Object<$\rgn_0$> fst = new Object<$\rgn_0$>();
   letregion $\rgn_1$ {
     Object<$\rgn_1$> snd = new Object<$\rgn_1$>();
-    Pair<Object,Object><$\rgn_1$,$\rgn_0$,$\rgn_1$> p = 
-       new Pair<Object,Object><$\rgn_1$,$\rgn_0$,$\rgn_1$>(fst,snd);
+    let p = new Pair<Object,Object><$\rgn_1$,$\rgn_0$,$\rgn_1$>
+                  (fst,snd);
   }
 }
 \end{codejava}
 Since $\rgn_0 \outlives \rgn_1 \conj \rgn_1 \outlives \rgn_1$, the
-region constraints of the \C{Pair} class are satisfied. Observe that
-the region type of pair object \C{p} conveys the fact that (a). it is
-allocated in region $\rgn_1$, and (b). it holds references to
-object(s) allocated in region $\rgn_0$. On the other hand, if we
-choose to allocate the \C{fst} object also in $\rgn_1$, the region
-type of \C{p} would be
+region constraints of the \C{Pair} class are satisfied, hence the
+instantiation is valid. Observe that the region type of \C{p} conveys
+the fact that (a). it is allocated in region $\rgn_1$, and (b). it
+holds references to objects allocated in region $\rgn_0$ and $\rgn_1$.
+In contrast, if we choose to allocate the \C{fst} object also in
+$\rgn_1$, the region type of \C{p} would be
 \C{Pair<\ObjZ,\ObjZ><$\rgn_1$,$\rgn_1$,$\rgn_1$>}, which can be
 written simply as \C{Pair<\ObjZ,\ObjZ>@$\rgn_1$}. In general, the
 \C{@} notation in a region type of an object \C{x} highlights that
 \C{x}, and all the objects reachable from \C{x} via references are
 allocated in a single region. We say that \C{x} is \emph{contained} in
-the region. The objects of $\ObjZ$ class, by the virtue of
-containing no references to other objects, are always contained in
-their allocation region. Hence the type $\ObjZ@\rgn$ is equivalent to
-the type $\ObjZ\inang{\rgn}$.
+the region. The $\ObjZ$ class in \FB contains no references to other
+objects, hence its objects are always contained in their allocation
+region. Their region type is $\ObjZ\inang{\rgn}$ (or equivalently,
+$\ObjZ@\rgn$), for some region $\rgn$.
 %%An object \emph{allocated} in a region $\rgn$ contains its spine in
 %%$\rgn$, but can refer to objects allocated in other regions.  On the
 %%other hand,
+
+\FB's $\RgnZ$ objects, like $\ObjZ$ objects, have region type of form
+$\RgnZ\inang{\rgn}$. However, $\rgn$ cannot be any region. Recall
+that $\RgnZ$ objects have special semantics in \name - they act as
+handlers to transferable regions. Constructing a new $\RgnZ$ object
+entails the creation of a new transferable region, and it is in this
+region that the new object is allocated in. It follows that $\rgn$ in
+$\RgnZ\inang{\rgn}$ should be the static identifier of the new
+transferable region. But, static identifiers for transferable
+regions are introduced only when such regions are opened for
+allocation via \C{open} expression. What, then, should be the region
+type of a \C{new Region} expression?
+
+\FB resolves this problem by existentially quantifying the allocation
+region of $\RgnZ$ objects when they are created. In other words, the
+type of \C{new Region} expression in \FB is
+$\exists\rho.\RgnZ\inang{\rho}$. Existential quantification in the
+type captures the fact that there now exists a transferable region
+containing the newly constructed $\RgnZ$ object. Elimination of
+existential quantification is facilitated by the \C{open} expression,
+which opens the transferable region and assigns it an identifier
+($\rgn$).  Within the scope of \C{open}, the transferable region is
+identified with $\rgn$, allowing its handler to instantiate the
+existentially bound region variable with $\rgn$, and assume the type
+of $\RgnZ\inang{\rgn}$.
+
+Existentially quantifying the allocation region in the type of $\RgnZ$
+objects is also useful to assign appropriate types to data structures
+of transferable regions. For example, a list of transferable regions
+has the type $\C{List}\inang{??}$ in \FB.
 
 A method definitions ($d$) in \fbname can be region polymorphic with
 respect to (a). its allocation context (Sec.~\ref{sec:alloc-ctxt}),
