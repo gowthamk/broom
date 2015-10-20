@@ -47,11 +47,11 @@ expressions.
 
 The expression language has been equipped with lambda abstraction
 ($\lambdaexp{...}{\xbar : \taubar}{e}$) and application ($e(\bar{e})$)
-expressions to define and apply anonymous functions. Modulo the angle
-braces, these expressions are uncurried variants of corresponding
-expressions from System F. Note that FGJ formalism does not include
-higher-order functions, hence the syntactic class (\C{T}) of FGJ types
-needs to be extended with an (uncurried) arrow type.
+expressions to define and apply anonymous functions. These expressions
+are uncurried variants of the corresponding expressions from System F.
+Note that FGJ formalism does not include higher-order functions, hence
+the syntactic class (\C{T}) of FGJ types needs to be extended with an
+(uncurried) arrow type.
 
 Informally, \FB class definitions are extensions of FGJ class
 definitions with regions. A class definition in FGJ can be lifted to
@@ -68,7 +68,7 @@ region annotated types of class fields, constructors and methods do
 not refer to identifiers of concrete regions, but rather their place
 holders called \emph{region variables} ($\rho$). Informally, region
 variables ($\rho$) are to region identifiers ($\rgn$) as type
-variables ($a$) are to types ($T$). 
+variables ($a$) are to core types ($T$). 
 
 Note that when a generic class definition in FGJ is lifted to a
 region-polymorphic definition in \FB, it nonetheless remains generic
@@ -150,13 +150,14 @@ $\ObjZ@\rgn$), for some region $\rgn$.
 %%other hand,
 
 \FB's $\RgnZ$ objects, like $\ObjZ$ objects, have region type of form
-$\RgnZ\inang{\rgn}$. However, $\rgn$ cannot be any region. Recall
-that $\RgnZ$ objects have special semantics in \name - they act as
-handlers to transferable regions. Constructing a new $\RgnZ$ object
-entails the creation of a new transferable region, and it is in this
-region that the new object is allocated in. It follows that $\rgn$ in
-$\RgnZ\inang{\rgn}$ should be the static identifier of the new
-transferable region. But, static identifiers for transferable
+$\RgnZ\inang{\rgn}$. However, unlike the $\rgn$ in
+$\ObjZ\inang{\rgn}$, $\rgn$ in $\RgnZ\inang{\rgn}$ cannot be any
+region. Recall that $\RgnZ$ objects have special semantics in \name -
+they act as handlers to transferable regions.  Constructing a new
+$\RgnZ$ object entails the creation of a new transferable region, and
+it is in this region that the new object is allocated in. It follows
+that $\rgn$ in $\RgnZ\inang{\rgn}$ should be the static identifier of
+the new transferable region. But, static identifiers for transferable
 regions are introduced only when such regions are opened for
 allocation via \C{open} expression. What, then, should be the region
 type of a \C{new Region} expression?
@@ -174,56 +175,59 @@ identified with $\rgn$, allowing its handler to instantiate the
 existentially bound region variable with $\rgn$, and assume the type
 of $\RgnZ\inang{\rgn}$.
 
-Existentially quantifying the allocation region in the type of $\RgnZ$
-objects is also useful to assign appropriate types to data structures
-of transferable regions. For example, a list of transferable regions
-has the type $\C{List}\inang{??}$ in \FB.
+A method definition ($d$) can be region polymorphic with respect to
+(a). its allocation context (Sec.~\ref{sec:alloc-ctxt}), and (b). the
+regions occuring in the region types of its arguments.  Region
+parameters on the methods, like those on classes, are accompanied by
+constraints ($\phi$) capturing the conditions that the parameters need
+to satisfy for the method to be considered well-formed
+(Fig.~\ref{fig:fb-morewfrules}). Allocation context (usually $\rho^a$
+or $\rho^a_m$) is the first and inevitable region parameter of every
+method in \FB. If a method is not intended to be polymorphic with
+respect to its allocation context (for example, if its allocation
+context needs to be same as the allocation region of its object), then
+the monomorphism needs to be encoded as an explicit equality
+constraint in $\phi$.  
 
-A method definitions ($d$) in \fbname can be region polymorphic with
-respect to (a). its allocation context (Sec.~\ref{sec:alloc-ctxt}),
-and (b). the regions occuring in the region types of its arguments.
-Region parameters on the methods, like those on classes, are
-accompanied by constraints ($\phi$) capturing the conditions that the
-parameters need to satisfy for the method to be considered well-formed
-(Fig.~\ref{fig:fb-morewfrules}). Allocation context ($\rho^a$ or
-$\rho^a_m$) is the first and inevitable region parameter of every
-method in \FB. If a method is not polymorphic with respect to its
-allocation context (for example, if its allocation context needs to be
-same as the allocation region of its class), then the monomorphism
-needs to be encoded as an explicit equality constraint in $\phi$.  
+Like methods, anonymous functions can also be region-polymorphic. 
+% A lambda expression defines a region-polymorphic
+% multi-argument function closure parameterized over function's
+% allocation context parameter. 
+The angle braces in the lambda expression ($\inang{\rho^a\rhobar \,|\,
+\phi}$) serve the same purpose as they do in a method definition - to
+capture region parameters along with their constraints. Region
+parameters also appear in the arrow type of the lambda expression 
+($\inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau} \xrightarrow{\rgn} 
+\tau$) at the prenex position, similar to ML type schemes. However,
+unlike ML, we don't distinguish between region types and region type
+schemes; any of the $\tau$'s in the arrow type can themselves be
+region-parametric arrow types. In this respect, our region type system
+is more like System F's type system, which admits higher-rank
+parametric polymorphism. Like System F, \FB provides a region
+instantiation expression ($e\inang{\ralloc\rbar}$), and a region
+generalization expression ($\Lambdaexp{\rhoalloc\rhobar \,|\,
+\phi}{e}$) to instantiate and generalize region variables. 
 
-\fbname supports first-class functions via lambda expressions and
-arrow types. A lambda expression defines a region-polymorphic
-multi-argument function closure parameterized over function's
-allocation context parameter. The arrow type of a function closure is
-prenex-quantified over its constrained region arguments
-($\inang{\rho^a\rhobar \,|\, \phi}$). Since closures can escape the
-context in which they are created, it is important to keep track of
-the regions where closures are allocated in order to prevent unsafe
-dereferences. The $\rgn^a$ annotation above the arrow in the arrow
+Note that a lambda expression creates a closure, which can escape the
+context in which it is created. It is therefore important to keep track of
+the region in which a closure is allocated in order to avoid unsafe
+dereferences. The $\rgn$ annotation above the arrow in the arrow
 type denotes the allocation region of the corresponding closure. Note
 that it is important to distinguish between the allocation context
-argument of a function and the allocation region of its closure. For
-instance, in the following example:
-\begin{codejava}
-letregion $\rgn$ {
-  let f = $\lambda{\inang{\rho^a}}$()$\,\Rightarrow\,$new Object$\inang{\rho^a}$() 
-  in f
-}
-\end{codejava}
-The type of \C{f} is $\inang{\rho^a}\unitZ \xrightarrow{\rgn}
-\ObjZ\inang{\rho^a}$, coveying that (a). \C{f}'s closure is allocated
-in $\rgn$, and (b). when executed under an allocation context
-$\rho^a$, the closure returns an object allocated in $\rho^a$.
+argument ($\rhoalloc$) of a function and the allocation region
+($\rgn$) of its closure. In \name, the later corresponds to the region where
+a \C{Func} object is allocated, while the former corresponds to the
+region where it is applied. 
+% For instance, in the following example:
+% \begin{codejava}
+% letregion $\rgn$ {
+%   let f = $\lambda{\inang{\rho^a}}$().$\,$new Object$\inang{\rho^a}$() 
+%   in f
+% }
+% \end{codejava}
+% The type of \C{f} is $\inang{\rho^a}\unitZ \xrightarrow{\rgn}
+% \ObjZ\inang{\rho^a}$, coveying that (a). \C{f}'s closure is allocated
+% in $\rgn$, and (b). when executed under an allocation context
+% $\rho^a$, the closure returns an object allocated in $\rho^a$.
 
-The expression language admits expressions to instantiate
-($e\inang{\ralloc\rbar}$) region parameters, and to apply
-($e(\bar{e})$) functions. For a method call, however, region parameter
-instantiation and method application are captured in a single
-expression ($e.mn\inang{\ralloc \rbar}(\ebar)$). The language also
-admits a big-lambda expression, which, when used in conjunction with
-the instantiation expression, serves the bureaucratic purpose of
-renaming bound region variables in the type of a function closure. 
-
-The 
 
