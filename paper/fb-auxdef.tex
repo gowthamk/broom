@@ -1,36 +1,40 @@
-\begin{figure*}[t]
+% \begin{figure*}[t]
 %
-\begin{minipage}{2.25in}
+% \begin{minipage}{2.25in}
+% \begin{smathpar}
+% \begin{array}{lcl}
+% % shape(A\inang{\rhoalloc\rhobar}\inang{\tbar}) & = & A\inang{\tbar}\\
+% % bound_{\aenv}(\tyvar@\rgn) & = & \aenv(\tyvar)@\rgn\\
+% % bound_{\aenv}(\fbN) & = & \fbN\\
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+%
+\begin{minipage}{3in}
 \begin{smathpar}
 \begin{array}{lcl}
+\multicolumn{3}{l}{
+  \rhoset,\rhoenv \in 2^{\rgn} \qquad
+  \aenv \in \tyvar \mapsto \fgjN \qquad
+  \A = (\subtypcx)
+}\\
+  ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
+  ctype(B\inang{\ralloc\rbar}\inang{\tbar}) & = & 
+    fields(B\inang{\ralloc\rbar}\inang{\tbar})\\
   allocRgn(A\inang{\ralloc\rbar}\inang{\tbar}) & = & \ralloc\\
   allocRgn(\inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau^1}
       \xrightarrow{\ralloc} \tau^2) & = & \ralloc\\
-  shape(A\inang{\rhoalloc\rhobar}\inang{\tbar}) & = & A\inang{\tbar}\\
-  bound_{\aenv}(\tyvar@\rgn) & = & \aenv(\tyvar)@\rgn\\
-  bound_{\aenv}(\fbN) & = & \fbN\\
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{1.8in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \\
-    B \in \{\ObjZ,\RgnZ\}
-  }
-  {
-    fields(B\inang{\ralloc\rbar}\inang{\tbar}) \;=\; \bullet
-  }
 \end{array}
 \end{smathpar}
 \end{minipage}
 %
 \begin{minipage}{3in}
 \begin{smathpar}
+\begin{array}{lcl}
+  fields(\ObjZ\inang{\ralloc\rbar}\inang{\tbar}) & = & \bullet\\
+  fields(\RgnZ\inang{\ralloc\rbar}\inang{\tbar}) & = & \bullet\\
+\end{array}
+
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
@@ -49,98 +53,96 @@
 %
 \bigskip
 
-\begin{minipage}{3.5in}
-\begin{smathpar}
-\begin{array}{lcl}
-  ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
-% ctype(\RgnZ\inang{\rgn}\inang{T}) & = & \inang{\rhoalloc}
-%   {\unitZ}\rightarrow{T@\rhoalloc}\\
-  ctype(B\inang{\ralloc\rbar}\inang{\tbar}) & = & 
-    fields(B\inang{\ralloc\rbar}\inang{\tbar})\\
-  mtype(\C{transfer}, \exists\rho.\RgnZ\inang{\rho}\inang{T}) & = & 
-    \inang{\rhoalloc} {\unitZ}\rightarrow{\unitZ}\\
-  mtype(\C{free}, \exists\rho.\RgnZ\inang{\rho}\inang{T}) & = & 
-    \inang{\rhoalloc} {\unitZ}\rightarrow{\unitZ}\\
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{3in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\\
-    m \notin \bar{d} \qquad 
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
-  }
-  {
-    mtype (m,B\inang{\ralloc\rbar}\inang{\tbar}) \;=\;
-    mtype (m, \substFn(\fbN))
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\bigskip
+% \begin{minipage}{3.5in}
+% \begin{smathpar}
+% \begin{array}{lcl}
+%   ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
+% % ctype(\RgnZ\inang{\rgn}\inang{T}) & = & \inang{\rhoalloc}
+% %   {\unitZ}\rightarrow{T@\rhoalloc}\\
+%   ctype(B\inang{\ralloc\rbar}\inang{\tbar}) & = & 
+%     fields(B\inang{\ralloc\rbar}\inang{\tbar})\\
+%   mtype(\C{transfer}, \exists\rho.\RgnZ\inang{\rho}\inang{T}) & = & 
+%     \inang{\rhoalloc} {\unitZ}\rightarrow{\unitZ}\\
+%   mtype(\C{free}, \exists\rho.\RgnZ\inang{\rho}\inang{T}) & = & 
+%     \inang{\rhoalloc} {\unitZ}\rightarrow{\unitZ}\\
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+% %
+% \begin{minipage}{3in}
+% \begin{smathpar}
+% \begin{array}{c}
+% \renewcommand*{\arraystretch}{1.2}
+% \RULE
+%   {
+%     CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\\
+%     m \notin \bar{d} \qquad 
+%     \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
+%   }
+%   {
+%     mtype (m,B\inang{\ralloc\rbar}\inang{\tbar}) \;=\;
+%     mtype (m, \substFn(\fbN))
+%   }
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+% %
+% \bigskip
 
-\begin{minipage}{3.25in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\\
-    \tau^2 \; m\mang (\bar{\tau^1}\;\bar{x})\{...\} \in \bar{d} \qquad
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
-  }
-  {
-    mtype (m,B\inang{\ralloc\rbar}\inang{\tbar}) \;=\;
-    \substFn(\mang\bar{\tau^1} \rightarrow \tau^2)
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{3.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
+% \begin{minipage}{3.25in}
+% \begin{smathpar}
+% \begin{array}{c}
+% \renewcommand*{\arraystretch}{1.2}
+% \RULE
+%   {
+%     CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\\
+%     \tau^2 \; m\mang (\bar{\tau^1}\;\bar{x})\{...\} \in \bar{d} \qquad
+%     \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
+%   }
+%   {
+%     mtype (m,B\inang{\ralloc\rbar}\inang{\tbar}) \;=\;
+%     \substFn(\mang\bar{\tau^1} \rightarrow \tau^2)
+%   }
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+% %
+% \begin{minipage}{3.5in}
+% \begin{smathpar}
+% \begin{array}{c}
+% \renewcommand*{\arraystretch}{1.2}
+% \RULE
+%   {
 
-    \substFn = \subst{\bar{\rho_2}}{\bar{\rho_1}}
-               \subst{\rhoalloc_2}{\rhoalloc_1} \spc
-    mtype(m,\fbN) = \inang{\rhoalloc_1\bar{\rho_1},|\, \phi_1}\bar{\tau^{11}} 
-                      \rightarrow \tau^{12} \spc \texttt{implies}\\
-    \isvalid{\A.\phicx}{\phi_2 \Leftrightarrow \substFn(\phi_1)} 
-        \spc \texttt{and} \spc
-    \bar{\tau^{21}} = \substFn(\bar{\tau^{11}}) \spc \texttt{and} \spc
-    \subtyp{\A}{\tau^{22}} {\substFn(\tau^{12})}
-    %\substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
-  }
-  {
-    override(\A,\fbN,\inang{\rhoalloc_2\bar{\rho_2},|\, \phi_1}
-              \bar{\tau^{21}} \rightarrow \tau^{22})
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\bigskip
-
-\begin{minipage}{5in}
-\begin{smathpar}
-\begin{array}{c}
-  \rhoset,\rhoenv \in 2^{\rho} \qquad
-  \aenv \in \tyvar \rightarrow \fgjN \qquad
-  \A = (\subtypcx)\\
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-
-\caption{\fbname: Auxiliary Definitions}
-\label{fig:fb-auxdef}
-\end{figure*}
+%     \substFn = \subst{\bar{\rho_2}}{\bar{\rho_1}}
+%                \subst{\rhoalloc_2}{\rhoalloc_1} \spc
+%     mtype(m,\fbN) = \inang{\rhoalloc_1\bar{\rho_1},|\, \phi_1}\bar{\tau^{11}} 
+%                       \rightarrow \tau^{12} \spc \texttt{implies}\\
+%     \isvalid{\A.\phicx}{\phi_2 \Leftrightarrow \substFn(\phi_1)} 
+%         \spc \texttt{and} \spc
+%     \bar{\tau^{21}} = \substFn(\bar{\tau^{11}}) \spc \texttt{and} \spc
+%     \subtyp{\A}{\tau^{22}} {\substFn(\tau^{12})}
+%     %\substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
+%   }
+%   {
+%     override(\A,\fbN,\inang{\rhoalloc_2\bar{\rho_2},|\, \phi_1}
+%               \bar{\tau^{21}} \rightarrow \tau^{22})
+%   }
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+% %
+% \bigskip
+% \begin{minipage}{5in}
+% \begin{smathpar}
+% \begin{array}{c}
+%   \rhoset,\rhoenv \in 2^{\rho} \qquad
+%   \aenv \in \tyvar \rightarrow \fgjN \qquad
+%   \A = (\subtypcx)\\
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+% %
+% \caption{\fbname: Auxiliary Definitions}
+% \label{fig:fb-auxdef}
+% \end{figure*}

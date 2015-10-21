@@ -2,9 +2,6 @@
 \label{sec:type-system}
 
 \input{fb-syntax}
-\input{fb-auxdef}
-\input{fb-staticsem}
-\input{fb-morewfrules}
 
 \subsection{Syntax}
 \label{sec:fb-syntax}
@@ -47,8 +44,9 @@ expressions.
 
 The expression language has been equipped with lambda abstraction
 ($\lambdaexp{...}{\xbar : \taubar}{e}$) and application ($e(\bar{e})$)
-expressions to define and apply anonymous functions. These expressions
-are uncurried variants of the corresponding expressions from System F.
+expressions to define and apply anonymous functions. Module the angle
+braces (whose presence will be justified later), these expressions are
+uncurried variants of the corresponding expressions from System F.
 Note that FGJ formalism does not include higher-order functions, hence
 the syntactic class (\C{T}) of FGJ types needs to be extended with an
 (uncurried) arrow type.
@@ -230,4 +228,26 @@ region where it is applied.
 % in $\rgn$, and (b). when executed under an allocation context
 % $\rho^a$, the closure returns an object allocated in $\rho^a$.
 
+\input{fb-staticsem}
+\subsection{Types and Well-formedness}
+
+Static semantics of \fbname is defined by the rules to establish
+well-formedness of region types and region constraints, check
+subtyping between a pair of region types, and type-check expressions
+against region types. Fig.~\ref{fig:fb-staticsem} contains an
+illustrative subset of such rules\footnote{The full formal development
+can be found in our technical report~\cite{techrep}}, along with some
+auxiliary definitions. The judgments defined by these rules make use
+of a context ($\A$), which is a tuple of:
+\begin{itemize}
+\item A set ($\rhoenv \in 2^\rgn$) of static identifiers of regions
+that are estimated to be live,
+\item A finite map ($\aenv \in \tyvar \mapsto \fgjN$) of type
+variables to their bounds\footnote{A bound of a type variable in
+FGJ~\cite{fgj} is the class that type variable was declared to extend.
+The map from type variables to their bounds is denoted as $\Delta$
+in FGJ formalism}.
+\item A constraint formula ($\phicx$) that captures the outlives
+constraints on regions in $\rhoenv$.
+\end{itemize}
 
