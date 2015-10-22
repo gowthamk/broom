@@ -390,3 +390,21 @@ Fig.~\ref{fig:region-fsm}, then it is reduced to a value called
 \invalidexn. The accompanying technical report~\cite{techrep} contains
 full operational semantics of \fbname. 
 
+To help state the type safety theorem, we define the syntactic class
+of values in \FB as following:
+\begin{smathpar}
+\begin{array}{lclcl}
+v & \in & \mathtt{values} & \coloneqq & \C{new}\; cn\inang{\tbar}
+      \inang{\ralloc\rbar} \ALT \invalidexn \\
+\end{array}
+\end{smathpar}
+Type safety theorem is stated thus:
+\begin{theorem}
+\emph{(\textbf{Type Safety})}
+\label{thm:core-safety}
+Let $\A_{\emptyset} = (\emptyset,\cdot,true)$ denote an empty context.
+If $\hastyp{\A_{\emptyset}, \toprgn, \cdot}{e}{\tau}$, then either $e$
+is a value, or there exists an $e'$ such that $e \redsto
+e'$ and $\hastyp{\A_{\emptyset}, \toprgn, \cdot}{e'}{\tau}$.
+\end{theorem}
+
