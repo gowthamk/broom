@@ -5,47 +5,45 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \ralloc \in \A.\rhoenv
+    \rgn \in \A.\rhoenv
   }
   {
-    \tywf{\A}{\ObjZ\inang{\ralloc}}
+    \tywf{\A}{\ObjZ\inang{\rgn}}
   }
 \end{array}
 \end{smathpar}
 \end{minipage}
-%
-\begin{minipage}{1.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \fgjsubtyp{\A.\aenv}{T}{\ObjZ}\\
-    \fgjtywf{\A.\aenv}{T}\spc
-    \rgn \in \A.\rhoset
-  }
-  {
-    \tywf{\A}{\RgnZ\inang{\rgn}\inang{T}}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{1.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \fgjtywf{\A.\aenv}{T} \\
-    \fgjsubtyp{\A.\aenv}{T}{\ObjZ}
-  }
-  {
-    \tywf{\A}{\exists\rho.\RgnZ\inang{\rho}\inang{T}}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
+% %
+% \begin{minipage}{1.5in}
+% \begin{smathpar}
+% \begin{array}{c}
+% \renewcommand*{\arraystretch}{1.2}
+% \RULE
+%   {
+%     \rgn \in \A.\rhoenv\\
+%     \fgjtywf{\A.\aenv}{\RgnZ\inang{T}}
+%   }
+%   {
+%     \tywf{\A}{\RgnZ\inang{\rgn}\inang{T}}
+%   }
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+% %
+% \begin{minipage}{1.5in}
+% \begin{smathpar}
+% \begin{array}{c}
+% \renewcommand*{\arraystretch}{1.2}
+% \RULE
+%   {
+%     \fgjtywf{\A.\aenv}{\RgnZ\inang{T}}
+%   }
+%   {
+%     \tywf{\A}{\exists\rho.\RgnZ\inang{\rho}\inang{T}}
+%   }
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
 %
 \begin{minipage}{2.5in}
 \begin{smathpar}
@@ -53,17 +51,17 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \A = (\subtypcx)\\
-    \A' = (\rhoset \cup \{\rhoalloc,\rhobar\}, 
-           \rhoenv \cup \{\rhoalloc,\rhobar\}, 
-           \aenv, \phicx \conj \phi) \\
+    \{\rhoalloc,\rhobar\} \notin \A.\rhoenv \spc
+    \A' = (\A.\rhoenv \cup \{\rhoalloc,\rhobar\}, 
+           \A.\aenv, \A.\phicx \conj \phi) \\
+    \rgn \in \A.\rhoenv \spc
     \tywf{\A'.\rhoenv}{\phi}\spc 
     \tywf{\A'}{\bar{\tau^1}} \spc
     \tywf{\A'}{\tau^2}
   }
   {
     \tywf{\A}{\inang{\rhoalloc\rhobar \,|\, \phi}
-              \bar{\tau^1} \rightarrow \tau^2}
+              \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
   }
 \end{array}
 \end{smathpar}
@@ -78,13 +76,11 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,k\;\bar{d}\}\\
-    \fgjtywf{\A.\aenv}{\tbar}\spc
-    \fgjsubtyp{\A.\aenv}{\tbar}{\bar{\fgjN}}\spc
+    CT(B) = \headerOf{B}\{...\}\spc
     \ralloc,\rbar \in \A.\rhoenv \\
+    \fgjtywf{\A.\aenv}{B\inang{\tbar}}\spc
     \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}] \spc
-    \isvalid{\A.\phicx}{\substFn(\phi)} \spc
-    \tywf{\A}{\substFn(\fbN)} 
+    \isvalid{\A.\phicx}{\substFn(\phi)}
   }
   {
     \tywf{\A}{B\inang{\ralloc\rbar}\inang{\tbar}}

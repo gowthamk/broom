@@ -7,28 +7,56 @@
   allocRgn(\inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau^1}
       \xrightarrow{\ralloc} \tau^2) & = & \ralloc\\
   shape(A\inang{\rhoalloc\rhobar}\inang{\tbar}) & = & A\inang{\tbar}\\
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.25in}
+\begin{smathpar}
+\begin{array}{lcl}
   bound_{\aenv}(\tyvar@\rgn) & = & \aenv(\tyvar)@\rgn\\
   bound_{\aenv}(\fbN) & = & \fbN\\
+  fields(\ObjZ\inang{\rgn}) & = & \bullet \\
 \end{array}
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.8in}
+\begin{minipage}{2.25in}
 \begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \\
-    B \in \{\ObjZ,\RgnZ\}
-  }
-  {
-    fields(B\inang{\ralloc\rbar}\inang{\tbar}) \;=\; \bullet
-  }
+\begin{array}{lcl}
+  ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
+% ctype(\RgnZ\inang{\rgn}\inang{T}) & = & \inang{\rhoalloc}
+%   {\unitZ}\rightarrow{T@\rhoalloc}\\
+  ctype(B\inang{\tbar}\inang{\ralloc\rbar}) & = & 
+    fields(B\inang{\tbar}\inang{\ralloc\rbar})\\
+%% ---- The following are no longer needed since
+%% ---- \exists\rho.\RgnZ<\rho> = \RgnZ<\rgn_\top>
+% mtype(\C{transfer}, \exists\rho.\RgnZ\inang{\rho}\inang{T}) & = & 
+%   \inang{\rhoalloc} {\unitZ}\rightarrow{\unitZ}\\
+% mtype(\C{free}, \exists\rho.\RgnZ\inang{\rho}\inang{T}) & = & 
+%   \inang{\rhoalloc} {\unitZ}\rightarrow{\unitZ}\\
 \end{array}
 \end{smathpar}
 \end{minipage}
 %
+\bigskip
+
+% \begin{minipage}{1.8in}
+% \begin{smathpar}
+% \begin{array}{c}
+% \renewcommand*{\arraystretch}{1.2}
+% \RULE
+%   {
+%     \\
+%     B \in \{\ObjZ,\RgnZ\}
+%   }
+%   {
+%     fields(B\inang{\tbar}\inang{\ralloc\rbar}) \;=\; \bullet
+%   }
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+% %
 \begin{minipage}{3in}
 \begin{smathpar}
 \begin{array}{c}
@@ -40,27 +68,9 @@
     fields(\substFn(\fbN)) = \bar{g}:\bar{\tau^g}
   }
   {
-    fields(B\inang{\ralloc\rbar}\inang{\tbar}) \;=\;
+    fields(B\inang{\tbar}\inang{\ralloc\rbar}) \;=\;
       \bar{g}:\bar{\tau^g},\,\bar{f}:\substFn(\bar{\tau^f})
   }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\bigskip
-
-\begin{minipage}{3.5in}
-\begin{smathpar}
-\begin{array}{lcl}
-  ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
-% ctype(\RgnZ\inang{\rgn}\inang{T}) & = & \inang{\rhoalloc}
-%   {\unitZ}\rightarrow{T@\rhoalloc}\\
-  ctype(B\inang{\ralloc\rbar}\inang{\tbar}) & = & 
-    fields(B\inang{\ralloc\rbar}\inang{\tbar})\\
-  mtype(\C{transfer}, \exists\rho.\RgnZ\inang{\rho}\inang{T}) & = & 
-    \inang{\rhoalloc} {\unitZ}\rightarrow{\unitZ}\\
-  mtype(\C{free}, \exists\rho.\RgnZ\inang{\rho}\inang{T}) & = & 
-    \inang{\rhoalloc} {\unitZ}\rightarrow{\unitZ}\\
 \end{array}
 \end{smathpar}
 \end{minipage}
@@ -76,7 +86,7 @@
     \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
   }
   {
-    mtype (m,B\inang{\ralloc\rbar}\inang{\tbar}) \;=\;
+    mtype (m,B\inang{\tbar}\inang{\ralloc\rbar}) \;=\;
     mtype (m, \substFn(\fbN))
   }
 \end{array}
@@ -96,7 +106,7 @@
     \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
   }
   {
-    mtype (m,B\inang{\ralloc\rbar}\inang{\tbar}) \;=\;
+    mtype (m,B\inang{\tbar}\inang{\ralloc\rbar}) \;=\;
     \substFn(\mang\bar{\tau^1} \rightarrow \tau^2)
   }
 \end{array}
@@ -130,15 +140,15 @@
 %
 \bigskip
 
-\begin{minipage}{5in}
-\begin{smathpar}
-\begin{array}{c}
-  \rhoset,\rhoenv \in 2^{\rho} \qquad
-  \aenv \in \tyvar \rightarrow \fgjN \qquad
-  \A = (\subtypcx)\\
-\end{array}
-\end{smathpar}
-\end{minipage}
+% \begin{minipage}{5in}
+% \begin{smathpar}
+% \begin{array}{c}
+%   \rhoset,\rhoenv \in 2^{\rho} \qquad
+%   \aenv \in \tyvar \rightarrow \fgjN \qquad
+%   \A = (\subtypcx)\\
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
 %
 
 \caption{\fbname: Auxiliary Definitions}
