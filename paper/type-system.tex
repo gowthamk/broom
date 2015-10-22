@@ -195,16 +195,16 @@ The angle braces in the lambda expression ($\inang{\rho^a\rhobar \,|\,
 \phi}$) serve the same purpose as they do in a method definition - to
 capture region parameters along with their constraints. Region
 parameters also appear in the arrow type of the lambda expression 
-($\inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau} \xrightarrow{\rgn} 
+($\inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau} \xrightarrow{\rgn}
 \tau$) at the prenex position, similar to ML type schemes. However,
-unlike ML, we don't distinguish between region types and region type
-schemes; any of the $\tau$'s in the arrow type can themselves be
-region-parametric arrow types. In this respect, our region type system
-is more like System F's type system, which admits higher-rank
-parametric polymorphism. Like System F, \FB provides a region
-instantiation expression ($e\inang{\ralloc\rbar}$), and a region
-generalization expression ($\Lambdaexp{\rhoalloc\rhobar \,|\,
-\phi}{e}$) to instantiate and generalize region variables. 
+unlike ML, we don't distinguish between types and type schemes; any of
+the $\tau$'s in the arrow type can themselves be region-parametric
+arrow types. In this respect, our region type system is more like
+System F's type system, which admits higher-rank parametric
+polymorphism. Like System F, \FB provides a region instantiation
+expression ($e\inang{\ralloc\rbar}$), and a region generalization
+expression ($\Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}$) to
+instantiate and generalize region variables. 
 
 Note that a lambda expression creates a closure, which can escape the
 context in which it is created. It is therefore important to keep track of
@@ -243,11 +243,150 @@ of a context ($\A$), which is a tuple of:
 \item A set ($\rhoenv \in 2^\rgn$) of static identifiers of regions
 that are estimated to be live,
 \item A finite map ($\aenv \in \tyvar \mapsto \fgjN$) of type
-variables to their bounds\footnote{A bound of a type variable in
-FGJ~\cite{fgj} is the class that type variable was declared to extend.
-The map from type variables to their bounds is denoted as $\Delta$
-in FGJ formalism}.
+variables to their bounds\footnote{A bound of a type variable
+($\tyvar$) in FGJ~\cite{fgj} is the class ($\fgjN$) that type variable
+was declared to extend.  The map $\tyvar \mapsto \fgjN$ is denoted
+$\Delta$ in FGJ formalism}, and
 \item A constraint formula ($\phicx$) that captures the outlives
 constraints on regions in $\rhoenv$.
 \end{itemize}
+The context for the expression typing judgment also includes:
+\begin{itemize}
+\item A type environment ($\env \in x \mapsto \tau$) that contains the
+type bindings for variables in scope, and 
+\item The static identifier ($\rgn^a$) of the allocation context for
+the expression is being type-checked.  
+\end{itemize}
+
+\noindent The well-formedness judgment on region types
+($\tywf{\A}{\tau}$) makes use of the well-formedness and subtyping
+judgments on core types \footnote{We use a double-piped turnstile
+($\Vdash$) for judgments in FGJ~\cite{fgj}, and a simple turnstile
+($\vdash$) for those in \FB.}.  An existentially quantified type of a
+region handler is well-formed if, effectively, $\RgnZ\inang{T}$ is a
+well-formed FGJ type. A region type
+($B\inang{\ralloc\rbar}\inang{\tbar}$) of an object of class $B$ is
+well-formed if and only if (a). its region-erased variant
+($B\inang{\tbar}$) is well-formed, and (b). its regions arguments
+($\ralloc\rbar$) are live, and satisfy the outlives constraints
+($\phi$) required by the class $B$. Well-formedness of region
+constraints is straightforward.
+
+The subtype relation between region types of objects
+($B\inang{\ralloc\rbar}\inang{\tbar}$) follows straightforwardly from
+the subclass relation between their class types. Conspicuous by its
+absence among the rules that define subtype relation is a rule that
+lifts outlives relation between regions to subtype relation between
+types of objects allocated in those regions: 
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.1}
+\RULE
+  {
+    \isvalid{\A.\phicx}{\rgn_1 \outlives \rgn_2}
+  }
+  {
+    \subtyp{\A}{T@{\rgn_1}}{T@{\rgn_2}}
+  }
+\end{array}
+\end{smathpar}
+Such a rule is unsound for it allows an object in a region ($\rgn_1$)
+to be treated as an object in a shorter living region ($\rgn_2
+\underlives \rgn_1$), thus allowing it to refer to shorter living
+objects in $\rgn_2$. The type system should prevent such unsafe
+references by restricting subtype relation to only those region types
+that are invariant in their allocation region. For instance, assuming
+that class $A$ is a subclass of $\ObjZ$ (as per FGJ), the subtype
+relation $A@\rgn <: \ObjZ@\rgn$ should be allowed, but not the
+relation $A@\rgn <: \ObjZ@\rgn'$, for any $\rgn' \neq \rgn$. \FB's
+type system enforces this not by restricting the subtype rule, but by
+constraining the subclass relation between region-annotated classes.
+In particular, it lets a class $A\inang{\rhoalloc}$ to be declared to
+extend $\ObjZ\inang{\rhoalloc}$, but never to extend
+$\ObjZ\inang{\rhoalloc_1}$, where $\rhoalloc_1 \neq \rhoalloc$. The
+well-formedness rule on class definitions (not shown) captures this
+restriction.
+
+As expected, subtyping between arrow types is contravariant in
+argument types and covariant in return types. It is also contravariant
+in the region constraints that the region parameters have to satisfy.
+For example, the type $\inang{\rhoalloc\rho} A@\rho \xrightarrow{\rgn}
+\unitZ$ is a subtype of $\inang{\rhoalloc\rho \,|\, \rho =  \rhoalloc}
+A@\rho \xrightarrow{\rgn} \unitZ$, for the former's precondition is
+weaker than the later's. Note that, like other types, the subtype
+relation between function types is invariant with respect to the
+allocation region ($\rgn$) of their closures. This subtype rule
+assumes that both arrow types have same set of region parameters.
+However, this is not restrictive as (a). it is possible to add more
+region parameters to a function type and declare them to be equal to
+existing ones (as the arrow type above does), and (b). it is possible
+to rename region parameters by composing instantiation and
+generalization (big-lambda) expressions together.
+
+The type rule for \C{letregion} expression requires that the static
+identifier introduced by the expression be unique under the current
+context (i.e., $\rgn \notin \rhoenv$). This condition is needed in
+order to prevent the new region from incorrectly assuming any existing
+outlives relationships on an eponymus region. Provided this is
+satisfied, the expression ($e$) under \C{letregion} is then
+type-checked against $\unitZ$ assuming that the new region is live
+($\rgn \in \rhoset$) and that it underlives all existing live regions
+($\rhoset \outlives \rgn$).
+
+The \C{new} $\RgnZ\inang{T}$ expression creates a new transferable
+region, whose root object is of (core) type $T$, and constructs a new
+$\RgnZ$ object to serve as a handler to the region. The corresponding
+type rule requires that the type $\RgnZ\inang{T}$ be well-formed as
+per FGJ semantics. Furthermore, the constructor is expected to be
+passed a thunk that returns an object of type $T$ contained in its
+allocation context. For the reasons described earlier, the allocation
+region of a new $\RgnZ$ object is existentially quantified. 
+
+Like the rule for \C{letregion}, the type rule for the \C{open}
+expression requires that the static identifier ($\rgn$) introduced to
+refer to the transferable region being opened be unique. However,
+unlike the \C{letregion} rule, the rule for \C{open} does not
+introduce any outlives relationship between the newly opened region
+and any pre-existing region while checking the type of the expression
+($e$) under \C{open}. This effectively preempts the possibility of any
+references from objects inside the transferable region to those
+outside. Environment ($\env$) is extended with binding for the type of
+root object while type-checking $e$. The type of region handler ($x$)
+is also updated to reflect the elimination of existentially quantified
+region variable ($\rho$) in favor of concrete identifier ($\rgn$).
+
+The type rule for lamdba expression requires that its region
+parameters ($\rhoalloc\rhobar$) be unique under the current context,
+and that the constraints ($\phi$) over region parameters be
+well-formed. The lambda-bound expression ($e$) is checked under an
+extended type environment containing bindings for function's
+arguments, assuming that region parameters are live, and that declared
+constraints over region parameters hold. Note that the closure is
+always allocated in the current allocation context ($\rgn^a$). This
+prevents the closure from escaping the context in which it is created
+(cf. the following paragraph), thus trivially ensuring the safety of
+any dereferences inside the closure.
+
+The type rule for assignment expression ($e_1 := e_2$) ensures that a
+(local or instance) variable is only assigned objects of either the
+same type or a subtype. Recall that subtyping between region types is
+invariant with respect to the allocation regions of their objects. It
+follows that if a variable is declared to refer to objects in a region
+$\rgn$, then it is only ever assigned objects that allocated in
+$\rgn$. This prevents, for example, a temporary object allocated
+inside a stack region within a method from escaping the region's scope
+via an assignment to an instance variable.
+
+\subsection{Operational Semantics and Type Safety}
+
+Operational semantics of \fbname defines an evaluation relation
+($\redsto$) over its expression language. In particular, the
+evaluation gets stuck if an expression attempts to dereference a
+pointer into a region that has either been deallocated, freed or
+transferred. On the other hand, if expression attempts to commit an
+operation on a transferable region handler (a $\RgnZ$ object) that is
+not sanctioned by the state transition discipline in
+Fig.~\ref{fig:region-fsm}, then it is reduced to a value called
+\invalidexn. The accompanying technical report~\cite{techrep} contains
+full operational semantics of \fbname. 
 
