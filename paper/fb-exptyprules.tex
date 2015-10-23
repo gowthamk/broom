@@ -1,35 +1,37 @@
 %
 \begin{minipage}{1in}
 \begin{smathpar}
-\begin{array}{c}
+\begin{array}{l}
 \renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \\
-    \env(x) = \tau
-  }
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}{x}{\tau}
-  }
+\hastyp{\exptycx{\ralloc}{\env}}{\unitval}{\unitZ}\\
+\hastyp{\exptycx{\ralloc}{\env}}{x}{\env(\tau)}
+% \RULE
+%   {
+%     \\
+%     \env(x) = \tau
+%   }
+%   {
+%     \hastyp{\exptycx{\ralloc}{\env}}{x}{\tau}
+%   }
 \end{array}
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.2in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \\
-    \\
-  }
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}{\unitval}{\unitZ}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
+% \begin{minipage}{1.2in}
+% \begin{smathpar}
+% \begin{array}{c}
+% \renewcommand*{\arraystretch}{1.2}
+% \RULE
+%   {
+%     \\
+%     \\
+%   }
+%   {
+%     \hastyp{\exptycx{\ralloc}{\env}}{\unitval}{\unitZ}
+%   }
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
 %
 \begin{minipage}{2in}
 \begin{smathpar}
@@ -334,22 +336,22 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.1in}
-\begin{smathpar}
-\begin{array}{c}
-% UPCAST
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}{e}{\tau_1}\\
-    \subtyp{\A}{\tau_1}{\tau}
-  }
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}{(\tau)\,e}{\tau}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
+% \begin{minipage}{1.1in}
+% \begin{smathpar}
+% \begin{array}{c}
+% % --- UPCAST removed ---
+% \renewcommand*{\arraystretch}{1.2}
+% \RULE
+%   {
+%     \hastyp{\exptycx{\ralloc}{\env}}{e}{\tau_1}\\
+%     \subtyp{\A}{\tau_1}{\tau}
+%   }
+%   {
+%     \hastyp{\exptycx{\ralloc}{\env}}{(\tau)\,e}{\tau}
+%   }
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
 % % --- No UNPACK expression ---
 % \begin{minipage}{3.25in}
 % \begin{smathpar}
