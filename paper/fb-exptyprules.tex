@@ -25,12 +25,13 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
     \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\bar{\tau'}} \spc
     \subtyp{\A}{\bar{\tau'}}{\taubar}\\
     \tywf{\exptycx{\ralloc}{\env}}{\fbN} \spc
     fields(\fbN) = \taubar \\
-    \isvalid{\A.\phicx}{\rgn \outlives \ralloc}\spc
-    allocRgn(\fbN) = \rgn \\
+%   allocRgn(\fbN) = \rgn \spc
+%   \isvalid{\A.\phicx}{\rgn \outlives \ralloc}
   }
   {
     \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\; \fbN(\bar{e})}{\fbN}

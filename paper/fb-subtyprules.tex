@@ -5,8 +5,8 @@
 \renewcommand*{\arraystretch}{1.2}
   \subtyp{\A}{\tau}{\tau} \\
   \subtyp{\A}{\tyvar @\rho}{\aenv(\tyvar) @\rho}\\
- \subtyp{\A}{\RgnZ\inang{\rgn}}{\RgnZ\inang{\toprgn}}\\
- \subtyp{\A}{\RgnZ\inang{\toprgn}}{\RgnZ\inang{\rgn}}
+  \subtyp{\A}{\RgnZ\inang{\rgn}}{\RgnZ\inang{\toprgn}}\\
+% \subtyp{\A}{\RgnZ\inang{\toprgn}}{\RgnZ\inang{\rgn}}
 \end{array}
 \end{smathpar}
 \end{minipage}
@@ -17,12 +17,14 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    CT(B) = \headerOf{B}\{...\}\\
-    \tywf{\A}{B\inang{\tbar}\inang{\pi^a\bar{\pi}}}\spc
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
+    \\
+    CT(B) = \headerOf{B}\{...\}
+%   \tywf{\A}{B\inang{\tbar}\inang{\pi^a\bar{\pi}}}\spc
+%   \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
   }
   {
-    \subtyp{\A}{B\inang{\tbar}\inang{\pi^a\bar{\pi}}}{\substFn(\fbN)}
+    \subtyp{\A}{B\inang{\tbar}\inang{\pi^a\bar{\pi}}}
+              {[\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}](\fbN)}
   }
 \end{array}
 \end{smathpar}

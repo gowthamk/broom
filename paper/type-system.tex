@@ -10,76 +10,56 @@ We build on the Featherweight Generic Java (FGJ)~\cite{fgj} formalism
 to formalize \name and its region type system. Our development reuses
 notations from~\cite{fgj}, and relies on several of its definitions,
 such as the definition of type well-formedness for the core
-(region-free) language. Due to space constraints, we are unable to
-reproduce them here, and instead encourage the reader to refer
-to~\cite{fgj}.
+(region-free) language. We refrain from reproducing them here, and
+instead encourage the reader to refer to~\cite{fgj,techrep}.
 
 Fig~\ref{fig:fb-syntax} describes the syntax of our formal language,
-which we call \fbname (\FB). The language is seeded with \ObjZ and
-\RgnZ classes. More classes can be defined using the \C{class}
-keyword. Class types in \FB are region-annotated variants of class
-types in FGJ (also called \emph{core types}). This correspondence is
-reflected in the $T@\rgn$ syntax of a region type, which is the
-simplest form of a region type describing an object, of core type $T$
-contained in a region $\rgn$. We let $\rgn$ range over static
-identifiers of regions in \FB. Note that all \FB objects are boxed
-values, hence their \FB types are always region-annotated. The only
-unboxed value in \FB is $\unitval$ of type \unitZ.
+which we call \fbname (\FB). Class types in \FB are region-annotated
+variants of class types in FGJ (also called \emph{core types}). This
+correspondence is reflected in the $T@\rgn$ syntax of a region type,
+which is the simplest form of a region type describing an object of
+core type $T$ contained in a region $\rgn$. We let $\rgn$ range over
+static identifiers of regions in \FB. The only unboxed value in \FB is
+$\unitval$ of type \unitZ. Rest are objects.
 
-The expression language of FGJ is impoverished, lacking, among others,
-an assignment expression. While it is possible to encode
-assignments to instance variables (object fields) in FGJ by creating a
-new object with its fields set to new values, such encoding is not
-semantics preserving in case of \name, as the new object could be
-allocated in a region different from the allocation region of the
-original object. To avoid such complications, we extend the expression
-language with assignments and local variable declarations (via \C{let}
-expressions). Instead of distinguishing between statements (e.g.,
-assignments) and expressions (e.g., method calls) in \FB, we consider
-statements as expressions of \unitZ type.  Statements that introduce
-lexical blocks in \name, such as \C{letregion} and \C{open} are, are
-converted to their expression form using the \C{in} keyword. We let
-$\rgn$ range over static region identifiers introduced by these
-expressions.
-
-The expression language has been equipped with lambda abstraction
-($\lambdaexp{...}{\xbar : \taubar}{e}$) and application ($e(\bar{e})$)
-expressions to define and apply anonymous functions. Module the angle
-braces (whose presence will be justified later), these expressions are
+\FB extends FGJ's expression language with assignments, local variable
+declarations (via \C{let} expressions), region constructs
+(\C{letregion} and \C{open}), lambda abstraction
+($\lambdaexp{...}{\xbar : \taubar}{e}$) and application
+($e\inang{...}(\bar{e})$) expressions. Assignments and region
+constructs, which are statements in \name, are treated as effectful
+expressions in \FB. Lambda abstraction and application expressions are
+to define and apply anonymous functions. Modulo the angle braces
+(whose presence will be justified later), these expressions are
 uncurried variants of the corresponding expressions from System F.
-Note that FGJ formalism does not include higher-order functions, hence
-the syntactic class (\C{T}) of FGJ types needs to be extended with an
-(uncurried) arrow type.
+Since FGJ formalism does not include higher-order functions, we extend
+the syntactic class (\C{T}) of FGJ types with an (uncurried) arrow
+type.
 
-Informally, \FB class definitions are extensions of FGJ class
-definitions with regions. A class definition in FGJ can be lifted to
-its \FB definition by (a). lifting all core types in the body of the
-class (i.e, fields, constructors and methods) to their
-region-annotated versions, (b). parameterizing the class over
-region variables that occur free in the region-annotated body of the
-class, and (c). recording any outlives constraints on the region
-parameters of the class. The later two steps effectively make the
-class region polymorphic (cf. \S\ref{sec:alloc-ctxt}: qualified region
-polymorphism). Note that in \FB, regions, and their static identifiers
-($\rgn$) are confined to the expression language. Consequently, the
-region annotated types of class fields, constructors and methods do
-not refer to identifiers of concrete regions, but rather their place
-holders called \emph{region variables} ($\rho$). Informally, region
-variables ($\rho$) are to region identifiers ($\rgn$) as type
-variables ($a$) are to core types ($T$). 
-
-Note that when a generic class definition in FGJ is lifted to a
-region-polymorphic definition in \FB, it nonetheless remains generic
-with respect to core types. We say that the class is now a
-region-polymorphic generic class. Region parameterization of a class
-in \FB is independent of its parameterization over core types; they
-are not conflated to make the class parametric over region types. For
-instance, following is the region-polymorphic definition of a generic
-\C{Pair} class (The symbol $\extends$ should be read \emph{extends}):
+Class definitions in \FB extend Java's with region parameters
+($\rho$). Informally, region variables ($\rho$) are to region
+identifiers ($\rgn$) as type variables ($a$) are to core types ($T$);
+they can be instantiated with region identifiers, as needed. A class
+in \FB is necessarily parameterized over the allocation region of its
+objects. We use $\rho^a$ to denote this parameter, and often refer to
+it as \emph{class}'s allocation region, although it is really the
+allocation region of its objects. An Object in \FB can contain fields
+referring to objects allocated in regions ($\rhobar$) other than its
+own allocation region ($\rhoalloc$), provided that the former outlive
+the later (i.e., $\rhobar \outlives \rho$). In such cases, the
+definition of object's class needs to be parametric over allocation
+regions of its fields (i.e., their classes). Furthermore, the
+constraint that such regions must outlive the allocation region of the
+class needs to be made explicit in the definition. For instance, a
+\C{Pair} object allocated in a region ${\rhoalloc}$ can have its first
+component coming from ${\rho_1}$ and second from $\rho_2$, where all
+the $\rho$'s are distinct, and $\rho_1, \rho_2$ outlive
+$\rhoalloc$. The corresponding definition of the \C{Pair} class is as
+follows(The symbol $\extends$ should be read \emph{extends}):  
 \begin{codejava}[mathescape=true]
-class Pair<$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a 
-                      \conj \rho_2 \outlives \rho^a$>
-          <a $\extends$ Object, b $\extends$ Object> {
+class Pair<a $\extends$ Object, b $\extends$ Object>
+          <$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a \conj \rho_2 \outlives \rho^a$>
+           {
   a@$\rho_1$ fst; 
   b@$\rho_2$ snd;
   Pair(a@$\rho_1$ fst, b@$\rho_2$ snd) {
@@ -92,102 +72,118 @@ class Pair<$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a
   }
 }
 \end{codejava}
-When objects of a class are allocated in a region $\rgn$, it means
-that the class's constructor is run with $\rgn$ as its allocation
-context. Every class definition in \FB is necessarily polymorphic with
-respect to the allocation region of its objects, i.e., the allocation
-context of its constructor. We adopt a convention that requires the
-allocation region parameter (denoted $\rho^a$) to be the first region
-parameter of a class.  Besides the allocation region of its objects,
-\C{Pair} class is also parametric over the regions its first and
-second elements are allocated in. References between objects allocated
-in different regions are only allowed if the referred object is
-guaranteed to outlive the referring object. In case of \C{Pair} class,
-this means that allocation regions ($\rho_1$ and $\rho_2$) of both
-objects that make up the pair must outlive the allocation region
-($\rho^a$) of the \C{Pair} object. Such conditions over region
-parameters of a class need to be recorded in its header as region
-constraints ($\phi$) in order for the class to be judged well-formed
-by the type system (Fig.~\ref{fig:fb-morewfrules}). 
-
 To construct objects of the \C{Pair} class, its type and region
 parameters need to be instantiated with core types ($T$) and concrete
-region identifiers ($\rgn$), respectively. Region instantiation has to
-satisfy the stated constraints over region parameters. For example,
-the following code snippet appropriately instantiates region
-parameters of the \C{Pair} class to construct a \C{Pair} of
-{\ObjZ}{\!}s, each allocated in different regions:
+region identifiers ($\rgn$), respectively. For example:
 \begin{codejava}
 letregion $\rgn_0$ {
-  Object<$\rgn_0$> fst = new Object<$\rgn_0$>();
+  Object<$\rgn_0$> snd = new Object<$\rgn_0$>();
   letregion $\rgn_1$ {
-    Object<$\rgn_1$> snd = new Object<$\rgn_1$>();
+    Object<$\rgn_1$> fst = new Object<$\rgn_1$>();
     let p = new Pair<Object,Object><$\rgn_1$,$\rgn_0$,$\rgn_1$>
                   (fst,snd);
   }
 }
 \end{codejava}
-Since $\rgn_0 \outlives \rgn_1 \conj \rgn_1 \outlives \rgn_1$, the
-region constraints of the \C{Pair} class are satisfied, hence the
-instantiation is valid. Observe that the region type of \C{p} conveys
+In the above code, the instantiation of $\rhoalloc$ and $\rho_1$ with
+$\rgn_0$, and $\rho_2$ with $\rgn_1$ is allowed because (a) $\rgn_0$
+and $\rgn_1$ are live during the instantation, and (b). $\rgn_0
+\outlives \rgn_1$ and $\rgn_1 \outlives \rgn_1$ (since outlives is
+reflexive). Observe that the region type of \C{p} conveys
 the fact that (a). it is allocated in region $\rgn_1$, and (b). it
 holds references to objects allocated in region $\rgn_0$ and $\rgn_1$.
-In contrast, if we choose to allocate the \C{fst} object also in
+In contrast, if we choose to allocate the \C{snd} object also in
 $\rgn_1$, the region type of \C{p} would be
-\C{Pair<\ObjZ,\ObjZ><$\rgn_1$,$\rgn_1$,$\rgn_1$>}, which can be
-written simply as \C{Pair<\ObjZ,\ObjZ>@$\rgn_1$}. In general, the
-\C{@} notation in a region type of an object \C{x} highlights that
-\C{x}, and all the objects reachable from \C{x} via references are
-allocated in a single region. We say that \C{x} is \emph{contained} in
-the region. The $\ObjZ$ class in \FB contains no references to other
-objects, hence its objects are always contained in their allocation
-region. Their region type is $\ObjZ\inang{\rgn}$ (or equivalently,
-$\ObjZ@\rgn$), for some region $\rgn$.
+\C{Pair<\ObjZ,\ObjZ><$\rgn_1$,$\rgn_1$,$\rgn_1$>}, which we abbreviate
+as \C{Pair<\ObjZ,\ObjZ>@$\rgn_1$}\footnote{In general, we treat
+$B\inang{\tbar}@\rgn$ as an abbreviation of
+$B\inang{\tbar}\inang{\rbar}$}. The $\ObjZ$ class in \FB has no
+fields, hence its region type is of form $\ObjZ@\rgn$.
+% In general, the \C{@} notation in a
+% region type of an object \C{x} highlights that
+% \C{x}, and all the objects reachable from \C{x} via references are
+% allocated in a single region. We say that \C{x} is \emph{contained} in
+% the region. The $\ObjZ$ class in \FB contains no references to other
+% objects, hence its objects are always contained in their allocation
+% region. Their region type is $\ObjZ\inang{\rgn}$ (or equivalently,
+% $\ObjZ@\rgn$), for some region $\rgn$.
+
+% Note that when a generic class definition in FGJ is lifted to a
+% region-polymorphic definition in \FB, it nonetheless remains generic
+% with respect to core types. We say that the class is now a
+% region-polymorphic generic class. Region parameterization of a class
+% in \FB is independent of its parameterization over core types; they
+% are not conflated to make the class parametric over region types. For
+% instance, following is the region-polymorphic definition of a generic
+% \C{Pair} class (The symbol $\extends$ should be read \emph{extends}):
+
+% When objects of a class are allocated in a region $\rgn$, it means
+% that the class's constructor is run with $\rgn$ as its allocation
+% context. Every class definition in \FB is necessarily polymorphic with
+% respect to the allocation region of its objects, i.e., the allocation
+% context of its constructor. We adopt a convention that requires the
+% allocation region parameter (denoted $\rho^a$) to be the first region
+% parameter of a class.  Besides the allocation region of its objects,
+% \C{Pair} class is also parametric over the regions its first and
+% second elements are allocated in. References between objects allocated
+% in different regions are only allowed if the referred object is
+% guaranteed to outlive the referring object. In case of \C{Pair} class,
+% this means that allocation regions ($\rho_1$ and $\rho_2$) of both
+% objects that make up the pair must outlive the allocation region
+% ($\rho^a$) of the \C{Pair} object. Such conditions over region
+% parameters of a class need to be recorded in its header as region
+% constraints ($\phi$) in order for the class to be judged well-formed
+% by the type system (Fig.~\ref{fig:fb-morewfrules}). 
+
 %%An object \emph{allocated} in a region $\rgn$ contains its spine in
 %%$\rgn$, but can refer to objects allocated in other regions.  On the
 %%other hand,
 
-\FB's $\RgnZ$ objects, like $\ObjZ$ objects, have region type of form
-$\RgnZ\inang{\rgn}$. However, unlike the $\rgn$ in
-$\ObjZ\inang{\rgn}$, $\rgn$ in $\RgnZ\inang{\rgn}$ cannot be any
-region. Recall that $\RgnZ$ objects have special semantics in \name -
-they act as handlers to transferable regions.  Constructing a new
-$\RgnZ$ object entails the creation of a new transferable region, and
-it is in this region that the new object is allocated in. It follows
-that $\rgn$ in $\RgnZ\inang{\rgn}$ should be the static identifier of
-the new transferable region. But, static identifiers for transferable
-regions are introduced only when such regions are opened for
-allocation via \C{open} expression. What, then, should be the region
-type of a \C{new Region} expression?
+% \FB's $\RgnZ$ objects, like $\ObjZ$ objects, have region type of form
+% $\RgnZ\inang{\rgn}$. However, unlike the $\rgn$ in
+% $\ObjZ\inang{\rgn}$, $\rgn$ in $\RgnZ\inang{\rgn}$ cannot be any
+% region. Recall that $\RgnZ$ objects have special semantics in \name -
+% they act as handlers to transferable regions.  Constructing a new
+% $\RgnZ$ object entails the creation of a new transferable region, and
+% it is in this region that the new object is allocated in. It follows
+% that $\rgn$ in $\RgnZ\inang{\rgn}$ should be the static identifier of
+% the new transferable region. But, static identifiers for transferable
+% regions are introduced only when such regions are opened for
+% allocation via \C{open} expression. What, then, should be the region
+% type of a \C{new Region} expression?
 
-\FB resolves this problem by existentially quantifying the allocation
-region of $\RgnZ$ objects when they are created. In other words, the
-type of \C{new Region} expression in \FB is
-$\exists\rho.\RgnZ\inang{\rho}$. Existential quantification in the
-type captures the fact that there now exists a transferable region
-containing the newly constructed $\RgnZ$ object. Elimination of
-existential quantification is facilitated by the \C{open} expression,
-which opens the transferable region and assigns it an identifier
-($\rgn$).  Within the scope of \C{open}, the transferable region is
-identified with $\rgn$, allowing its handler to instantiate the
-existentially bound region variable with $\rgn$, and assume the type
-of $\RgnZ\inang{\rgn}$.
+% \FB resolves this problem by existentially quantifying the allocation
+% region of $\RgnZ$ objects when they are created. In other words, the
+% type of \C{new Region} expression in \FB is
+% $\exists\rho.\RgnZ\inang{\rho}$. Existential quantification in the
+% type captures the fact that there now exists a transferable region
+% containing the newly constructed $\RgnZ$ object. Elimination of
+% existential quantification is facilitated by the \C{open} expression,
+% which opens the transferable region and assigns it an identifier
+% ($\rgn$).  Within the scope of \C{open}, the transferable region is
+% identified with $\rgn$, allowing its handler to instantiate the
+% existentially bound region variable with $\rgn$, and assume the type
+% of $\RgnZ\inang{\rgn}$.
 
-A method definition ($d$) can be region polymorphic with respect to
-(a). its allocation context (Sec.~\ref{sec:alloc-ctxt}), and (b). the
-regions occuring in the region types of its arguments.  Region
-parameters on the methods, like those on classes, are accompanied by
-constraints ($\phi$) capturing the conditions that the parameters need
-to satisfy for the method to be considered well-formed
-(Fig.~\ref{fig:fb-morewfrules}). Allocation context (usually $\rho^a$
-or $\rho^a_m$) is the first and inevitable region parameter of every
-method in \FB. If a method is not intended to be polymorphic with
-respect to its allocation context (for example, if its allocation
-context needs to be same as the allocation region of its object), then
-the monomorphism needs to be encoded as an explicit equality
-constraint in $\phi$.  
+Like classes, methods can also exhibit qualified region polymorphism.
+A method definition in \FB is necessarily polymorphic over its
+allocation context (Sec.~\ref{sec:alloc-ctxt}), and optionally
+polymorphic with respect to the regions containing its arguments.
+Region parameters, like those on classes, are qualified with
+constraints ($\phi$).
+% Region parameters on the methods, like those on classes, are
+% accompanied by constraints ($\phi$) capturing the conditions that the
+% parameters need to satisfy for the method to be considered well-formed
+% (Fig.~\ref{fig:fb-morewfrules}). Allocation context (usually $\rho^a$
+% or $\rho^a_m$) is the first and inevitable region parameter of every
+% method in \FB. 
+Note that if a method is not intended to be polymorphic with respect
+to its allocation context (for example, if its allocation context
+needs to be same as the allocation region of its \emph{this}
+argument), then the required monomorphism can be captured as an
+equality constraint in $\phi$.  
 
-Like methods, anonymous functions can also be region-polymorphic. 
+% Like methods, functions can also be region-polymorphic. 
 % A lambda expression defines a region-polymorphic
 % multi-argument function closure parameterized over function's
 % allocation context parameter. 
@@ -199,14 +195,16 @@ parameters also appear in the arrow type of the lambda expression
 \tau$) at the prenex position, similar to ML type schemes. However,
 unlike ML, we don't distinguish between types and type schemes; any of
 the $\tau$'s in the arrow type can themselves be region-parametric
-arrow types. In this respect, our region type system is more like
-System F's type system, which admits higher-rank parametric
-polymorphism. Like System F, \FB provides a region instantiation
-expression ($e\inang{\ralloc\rbar}$), and a region generalization
-expression ($\Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}$) to
-instantiate and generalize region variables. 
+arrow types. Like with methods, region parameters on functions can be
+instantiated when they are applied.
+% In this respect, our region type system is more like
+% System F's type system, which admits higher-rank parametric
+% polymorphism. Like System F, \FB provides a region instantiation
+% expression ($e\inang{\ralloc\rbar}$), and a region generalization
+% expression ($\Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}$) to
+% instantiate and generalize region variables. 
 
-Note that a lambda expression creates a closure, which can escape the
+A lambda expression creates a closure, which can escape the
 context in which it is created. It is therefore important to keep track of
 the region in which a closure is allocated in order to avoid unsafe
 dereferences. The $\rgn$ annotation above the arrow in the arrow
@@ -215,7 +213,7 @@ that it is important to distinguish between the allocation context
 argument ($\rhoalloc$) of a function and the allocation region
 ($\rgn$) of its closure. In \name, the later corresponds to the region where
 a \C{Func} object is allocated, while the former corresponds to the
-region where it is applied. 
+region where it is applied ($e\inang{\ralloc\rbar}(\bar{e})$). 
 % For instance, in the following example:
 % \begin{codejava}
 % letregion $\rgn$ {
@@ -258,54 +256,111 @@ type bindings for variables in scope, and
 the expression is being type-checked.  
 \end{itemize}
 
+\begin{figure}
+
+\begin{codejava}
+class Region<a $\extends$ Object><${\rhoalloc}$> {
+  <${\rho}$>unit$\xrightarrow{\rhoalloc}$a@$\rho$ thunk;
+  Region(<${\rho}$>unit$\xrightarrow{\rhoalloc}$a@$\rho$ thunk) {
+    super(); 
+    this.thunk = thunk;
+  }
+  unit transfer$\inang{\rho}$(unit u) {
+    return u;
+  }
+}
+\end{codejava}
+
+\caption{The stub used for $\RgnZ$ class}
+\label{fig:region-stub}
+\end{figure}
+
 \noindent The well-formedness judgment on region types
 ($\tywf{\A}{\tau}$) makes use of the well-formedness and subtyping
 judgments on core types \footnote{We use a double-piped turnstile
 ($\Vdash$) for judgments in FGJ~\cite{fgj}, and a simple turnstile
-($\vdash$) for those in \FB.}.  An existentially quantified type of a
-region handler is well-formed if, effectively, $\RgnZ\inang{T}$ is a
-well-formed FGJ type. A region type
-($B\inang{\ralloc\rbar}\inang{\tbar}$) of an object of class $B$ is
-well-formed if and only if (a). its region-erased variant
-($B\inang{\tbar}$) is well-formed, and (b). its regions arguments
-($\ralloc\rbar$) are live, and satisfy the outlives constraints
-($\phi$) required by the class $B$. Well-formedness of region
-constraints is straightforward.
+($\vdash$) for those in \FB.}. All judgments are implicitly
+parameterized on a class table ($CT \in cn \mapsto C$) that maps class
+names to their definitions in \FB. For judgments in FGJ, we use a
+class table that maps class names to their region-erased definitions.
+We denote the region-erased class table as ($\absof{CT}$). The precise
+semantics of region erasure ($\absof{\cdot}$) are defined
+in~\cite{techrep}, but it can be understood as an operation that
+erases region annotations on types. The class table is assumed to bind
+the name $\RgnZ$ to the stub shown in Fig.~\ref{fig:region-stub}.
+This mostly eliminates the need to treat $\RgnZ$ objects, which double
+up as transferable region handlers, as a special case in semantics.
+
+The well-formedness rule for region instantiation in class types
+($B\inang{\tbar}\inang{\ralloc\rbar}$) requires that the region-erased
+(core) type be well-formed, instantiated regions be live, and that
+they satisfy the constraints ($\phi$) imposed by the class on its
+region parameters. The later is enforced by checking the validity of
+$\phi$, with actual region arguments substituted\footnote{The notation
+$[a/b](e)$ stands for "$a$ is substituted for $b$ in $e$"} for formal
+region parameters, under the conditions ($\A.\phicx$) guaranteed by
+the context. The semantics of this sequent is straightforward, and
+follows directly from the properties of outlives and equality
+relations. For any well-formed core type $T$, $T@\rgn$ is a
+well-formed region type if $\rgn$ is a valid region. Well-formedness
+of region constraints requires that the regions referred by the
+constraints be live.
 
 The subtype relation between region types of objects
-($B\inang{\ralloc\rbar}\inang{\tbar}$) follows straightforwardly from
-the subclass relation between their class types. Conspicuous by its
-absence among the rules that define subtype relation is a rule that
-lifts outlives relation between regions to subtype relation between
-types of objects allocated in those regions: 
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.1}
-\RULE
-  {
-    \isvalid{\A.\phicx}{\rgn_1 \outlives \rgn_2}
-  }
-  {
-    \subtyp{\A}{T@{\rgn_1}}{T@{\rgn_2}}
-  }
-\end{array}
-\end{smathpar}
-Such a rule is unsound for it allows an object in a region ($\rgn_1$)
-to be treated as an object in a shorter living region ($\rgn_2
-\underlives \rgn_1$), thus allowing it to refer to shorter living
-objects in $\rgn_2$. The type system should prevent such unsafe
-references by restricting subtype relation to only those region types
-that are invariant in their allocation region. For instance, assuming
-that class $A$ is a subclass of $\ObjZ$ (as per FGJ), the subtype
-relation $A@\rgn <: \ObjZ@\rgn$ should be allowed, but not the
-relation $A@\rgn <: \ObjZ@\rgn'$, for any $\rgn' \neq \rgn$. \FB's
-type system enforces this not by restricting the subtype rule, but by
-constraining the subclass relation between region-annotated classes.
-In particular, it lets a class $A\inang{\rhoalloc}$ to be declared to
-extend $\ObjZ\inang{\rhoalloc}$, but never to extend
-$\ObjZ\inang{\rhoalloc_1}$, where $\rhoalloc_1 \neq \rhoalloc$. The
-well-formedness rule on class definitions (not shown) captures this
-restriction.
+($B\inang{\ralloc\rbar}\inang{\tbar}$) follows directly from the
+subclass relation between their class types. Note that, in general, we
+don't lift outlives relation between regions to subtype relation
+between objects (of same core type) allocated in those regions. Such
+lifting is unsound for the same reason as covariant/contravariant
+subtyping between mutable references is unsound. However, we make a
+special case for $\RgnZ$ objects: we allow $\RgnZ$ objects allocated
+in any region to be considered as objects allocated in an eternal
+region ($\toprgn$) that outlives every other region. This lets $\RgnZ$
+objects escape the context they are created in (as required by the
+\C{transfer} operation), and also facilitates data structures of
+regions created in different contexts (for e.g., a list of $\RgnZ$
+objects, whose root objects are of (core) type $T$, can be typed
+$\C{List}\inang{\RgnZ\inang{T}}\inang{\rgn,\toprgn}$, where $\rgn$ is
+the region where the spine of the list is allocated). As described in
+\S\ref{sec:memory-safety}, runtime checks are used to prevent the
+unsound subtyping rule on region objects from effecting the memory safety.
+% \begin{smathpar}
+% \begin{array}{c}
+% \renewcommand*{\arraystretch}{1.1}
+% \RULE
+%   {
+%     \isvalid{\A.\phicx}{\rgn_1 \outlives \rgn_2}
+%   }
+%   {
+%     \subtyp{\A}{T@{\rgn_1}}{T@{\rgn_2}}
+%   }
+% \end{array}
+% \end{smathpar}
+
+The actual implementations of region-based memory management for \name
+may choose to realize the $\toprgn$ as a garbage-collected region, but
+this is not required. Our operational semantics
+(\S\ref{sec:fb-opsem}), for example, does not even associate a region
+with $\toprgn$, instead opting to allocate $\RgnZ$ objects in the same
+transferable regions that they represent. Our type safety result
+nonetheless guarantees memory safety in this implementation.
+
+% Such a rule is unsound for it allows an object in a region ($\rgn_1$)
+% to be treated as an object in a shorter living region ($\rgn_2
+% \underlives \rgn_1$), thus allowing it to refer to shorter living
+% objects in $\rgn_2$. The type system should prevent such unsafe
+% references by restricting subtype relation to only those region types
+% that are invariant in their allocation region. For instance, assuming
+% that class $A$ is a subclass of $\ObjZ$ (as per FGJ), the subtype
+% relation $A@\rgn <: \ObjZ@\rgn$ should be allowed, but not the
+% relation $A@\rgn <: \ObjZ@\rgn'$, for any $\rgn' \neq \rgn$. \FB's
+% type system enforces this not by restricting the subtype rule, but by
+% constraining the subclass relation between region-annotated classes.
+% In particular, it lets a class $A\inang{\rhoalloc}$ to be declared to
+% extend $\ObjZ\inang{\rhoalloc}$, but never to extend
+% $\ObjZ\inang{\rhoalloc_1}$, where $\rhoalloc_1 \neq \rhoalloc$. The
+% well-formedness rule on class definitions (not shown) captures this
+% restriction.
 
 As expected, subtyping between arrow types is contravariant in
 argument types and covariant in return types. It is also contravariant
@@ -313,15 +368,14 @@ in the region constraints that the region parameters have to satisfy.
 For example, the type $\inang{\rhoalloc\rho} A@\rho \xrightarrow{\rgn}
 \unitZ$ is a subtype of $\inang{\rhoalloc\rho \,|\, \rho =  \rhoalloc}
 A@\rho \xrightarrow{\rgn} \unitZ$, for the former's precondition is
-weaker than the later's. Note that, like other types, the subtype
-relation between function types is invariant with respect to the
-allocation region ($\rgn$) of their closures. This subtype rule
-assumes that both arrow types have same set of region parameters.
-However, this is not restrictive as (a). it is possible to add more
-region parameters to a function type and declare them to be equal to
-existing ones (as the arrow type above does), and (b). it is possible
-to rename region parameters by composing instantiation and
-generalization (big-lambda) expressions together.
+weaker than the later's. Finally, the subtyping is invariant with
+respect to the allocation region ($\rgn$) of closures. 
+% This subtype rule assumes that both arrow types have same set of
+% region parameters.  However, this is not restrictive as (a). it is
+% possible to add more region parameters to a function type and declare
+% them to be equal to existing ones (as the arrow type above does), and
+% (b). it is possible to rename region parameters by composing
+% instantiation and generalization (big-lambda) expressions together.
 
 The type rule for \C{letregion} expression requires that the static
 identifier introduced by the expression be unique under the current
@@ -330,17 +384,8 @@ order to prevent the new region from incorrectly assuming any existing
 outlives relationships on an eponymus region. Provided this is
 satisfied, the expression ($e$) under \C{letregion} is then
 type-checked against $\unitZ$ assuming that the new region is live
-($\rgn \in \rhoset$) and that it underlives all existing live regions
-($\rhoset \outlives \rgn$).
-
-The \C{new} $\RgnZ\inang{T}$ expression creates a new transferable
-region, whose root object is of (core) type $T$, and constructs a new
-$\RgnZ$ object to serve as a handler to the region. The corresponding
-type rule requires that the type $\RgnZ\inang{T}$ be well-formed as
-per FGJ semantics. Furthermore, the constructor is expected to be
-passed a thunk that returns an object of type $T$ contained in its
-allocation context. For the reasons described earlier, the allocation
-region of a new $\RgnZ$ object is existentially quantified. 
+($\rgn \in \rhoenv$) and that it is outlived by all existing live
+regions ($\rhoenv \outlives \rgn$).
 
 Like the rule for \C{letregion}, the type rule for the \C{open}
 expression requires that the static identifier ($\rgn$) introduced to
@@ -351,9 +396,7 @@ and any pre-existing region while checking the type of the expression
 ($e$) under \C{open}. This effectively preempts the possibility of any
 references from objects inside the transferable region to those
 outside. Environment ($\env$) is extended with binding for the type of
-root object while type-checking $e$. The type of region handler ($x$)
-is also updated to reflect the elimination of existentially quantified
-region variable ($\rho$) in favor of concrete identifier ($\rgn$).
+root object while type-checking $e$. 
 
 The type rule for lamdba expression requires that its region
 parameters ($\rhoalloc\rhobar$) be unique under the current context,
@@ -363,48 +406,52 @@ extended type environment containing bindings for function's
 arguments, assuming that region parameters are live, and that declared
 constraints over region parameters hold. Note that the closure is
 always allocated in the current allocation context ($\rgn^a$). This
-prevents the closure from escaping the context in which it is created
-(cf. the following paragraph), thus trivially ensuring the safety of
-any dereferences inside the closure.
+prevents the closure from escaping the context in which it is created,
+thus trivially ensuring the safety of any dereferences inside the
+closure.
 
-The type rule for assignment expression ($e_1 := e_2$) ensures that a
-(local or instance) variable is only assigned objects of either the
-same type or a subtype. Recall that subtyping between region types is
-invariant with respect to the allocation regions of their objects. It
-follows that if a variable is declared to refer to objects in a region
-$\rgn$, then it is only ever assigned objects that allocated in
-$\rgn$. This prevents, for example, a temporary object allocated
-inside a stack region within a method from escaping the region's scope
-via an assignment to an instance variable.
+The type rule for the \C{new} expression is a straightforward
+adaptation of corresponding FGJ rule to the the region type setting.
+
+% The type rule for assignment expression ($e_1 := e_2$) ensures that a
+% (local or instance) variable is only assigned objects of either the
+% same type or a subtype. Recall that subtyping between region types is
+% invariant with respect to the allocation regions of their objects. It
+% follows that if a variable is declared to refer to objects in a region
+% $\rgn$, then it is only ever assigned objects that allocated in
+% $\rgn$. This prevents, for example, a temporary object allocated
+% inside a stack region within a method from escaping the region's scope
+% via an assignment to an instance variable.
 
 \subsection{Operational Semantics and Type Safety}
+\label{sec:fb-opsem}
 
 Operational semantics of \fbname defines an evaluation relation
 ($\redsto$) over its expression language. In particular, the
 evaluation gets stuck if an expression attempts to dereference a
-pointer into a region that has either been deallocated, freed or
-transferred. On the other hand, if expression attempts to commit an
-operation on a transferable region handler (a $\RgnZ$ object) that is
-not sanctioned by the state transition discipline in
-Fig.~\ref{fig:region-fsm}, then it is reduced to a value called
-\invalidexn. The accompanying technical report~\cite{techrep} contains
-full operational semantics of \fbname. 
+pointer into a region that has either been deallocated or transferred.
+On the other hand, if expression attempts to commit an operation on a
+transferable region handler (a $\RgnZ$ object) that is not sanctioned
+by the state transition discipline in Fig.~\ref{fig:region-fsm}, then
+it is reduced to a value called $\invalidexn$. The accompanying
+technical report~\cite{techrep} contains full operational semantics of
+\fbname. 
 
-To help state the type safety theorem, we define the syntactic class
-of values in \FB as following:
+To help state the type safety theorem, we extend \FB's expressions
+with $\invalidexn$, and define the syntactic class of values:
 \begin{smathpar}
 \begin{array}{lclcl}
-v & \in & \mathtt{values} & \coloneqq & \C{new}\; cn\inang{\tbar}
-      \inang{\ralloc\rbar} \ALT \invalidexn \\
+v & \in & \mathtt{values} & \coloneqq & \C{new}\; \fbN(\bar{v}) \\
 \end{array}
 \end{smathpar}
-Type safety theorem is stated thus:
+Type safety theorem is now stated thus:
 \begin{theorem}
 \emph{(\textbf{Type Safety})}
 \label{thm:core-safety}
 Let $\A_{\emptyset} = (\emptyset,\cdot,true)$ denote an empty context.
 If $\hastyp{\A_{\emptyset}, \toprgn, \cdot}{e}{\tau}$, then either $e$
-is a value, or there exists an $e'$ such that $e \redsto
-e'$ and $\hastyp{\A_{\emptyset}, \toprgn, \cdot}{e'}{\tau}$.
+is a value, or $e \redsto \invalidexn$, or there exists an $e'$ such
+that $e \redsto e'$ and $\hastyp{\A_{\emptyset}, \toprgn,
+\cdot}{e'}{\tau}$.
 \end{theorem}
 
