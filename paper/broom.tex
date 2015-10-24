@@ -79,6 +79,7 @@
 \newcommand{\hassort}[3]{#1\,\vdash\,#2\,::\,#3}
 \newcommand{\subtyp}[3]{#1\,\vdash\,#2 <: #3}
 \newcommand{\fgjsubtyp}[3]{#1\,\Vdash\,#2 <: #3}
+\newcommand{\eqtyp}[3]{#1\,\vdash\,#2 \equiv #3}
 \newcommand{\generalizes}[3]{#1\,\vdash\,#2 \succ #3}
 \newcommand{\msfolsig}[0]{{\Lambda \equiv}}
 %\newcommand{\msentails}[2]{#1\,\models_L\,#2}
@@ -152,14 +153,14 @@
 \newcommand{\angAlpha}{\inang{\bar{\tyvar} \extends \bar{\fgjN}}}
 \newcommand{\fgjN}{K}
 \newcommand{\fbN}{N}
-\newcommand{\headerOf}[1]{\C{class}\; #1\angR\angAlpha \extends \fbN}
+\newcommand{\headerOf}[1]{\C{class}\; #1\angAlpha\angR \extends \fbN}
 \newcommand{\substFn}{\mathcal{S}}
 \newcommand{\mang}{\inang{\rhoalloc_m\bar{\rho_m} \,|\, \phi_m}}
 \newcommand{\rhoset}{\Sigma}
 \newcommand{\rhoenv}{\Delta}
 \newcommand{\aenv}{\Theta}
 \newcommand{\phicx}{\Phi}
-\newcommand{\subtypcx}{\rhoset,\rhoenv,\aenv,\phicx}
+\newcommand{\subtypcx}{\rhoenv,\aenv,\phicx}
 \newcommand{\A}{{\mathcal{A}}}
 \newcommand{\exptycx}[2]{\A,#1,#2}
 \newcommand{\void}{\C{void}}
@@ -179,6 +180,7 @@
 \newcommand{\unpackexp}[4]{\C{let}\;(#1,\,#2)\,=\,\C{unpack}\;#3\;\C{in}\;#4}
 \newcommand{\invalidexn}{\C{InvalidOpnException}}
 \newcommand{\toprgn}{\rgn_{\top}}
+%\newcommand{\smallskip}{\vspace*{0.1in}}
 
 %Rules
 %-----

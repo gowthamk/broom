@@ -13,28 +13,16 @@
 \begin{minipage}{3in}
 \begin{smathpar}
 \begin{array}{lcl}
-\multicolumn{3}{l}{
-  \rhoset,\rhoenv \in 2^{\rgn} \qquad
-  \aenv \in \tyvar \mapsto \fgjN \qquad
-  \A = (\subtypcx)
-}\\
-  ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
-  ctype(B\inang{\ralloc\rbar}\inang{\tbar}) & = & 
-    fields(B\inang{\ralloc\rbar}\inang{\tbar})\\
   allocRgn(A\inang{\ralloc\rbar}\inang{\tbar}) & = & \ralloc\\
   allocRgn(\inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau^1}
       \xrightarrow{\ralloc} \tau^2) & = & \ralloc\\
+  fields(\ObjZ\inang{\ralloc\rbar}\inang{\tbar}) & = & \bullet\\
 \end{array}
 \end{smathpar}
 \end{minipage}
 %
 \begin{minipage}{3in}
 \begin{smathpar}
-\begin{array}{lcl}
-  fields(\ObjZ\inang{\ralloc\rbar}\inang{\tbar}) & = & \bullet\\
-  fields(\RgnZ\inang{\ralloc\rbar}\inang{\tbar}) & = & \bullet\\
-\end{array}
-
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
@@ -44,14 +32,12 @@
     fields(\substFn(\fbN)) = \bar{g}:\bar{\tau^g}
   }
   {
-    fields(B\inang{\ralloc\rbar}\inang{\tbar}) \;=\;
+    fields(B\inang{\tbar}\inang{\ralloc\rbar}) \;=\;
       \bar{g}:\bar{\tau^g},\,\bar{f}:\substFn(\bar{\tau^f})
   }
 \end{array}
 \end{smathpar}
 \end{minipage}
-%
-\bigskip
 
 % \begin{minipage}{3.5in}
 % \begin{smathpar}

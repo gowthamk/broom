@@ -1,196 +1,15 @@
-% %
-% \begin{minipage}{1in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \\
-%     \env(x) = \tau
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{x}{\tau}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \begin{minipage}{1.2in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \\
-%     \\
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{\unitval}{\unitZ}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \begin{minipage}{2in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{x}{\tau'}\\
-%     f:\tau \,\in\, fields(bound_{\A.\aenv}(\tau'))
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e.f}{\tau}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \begin{minipage}{1.75in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \tywf{\A}{\exists\rho.\tau}\\
-%     \hastyp{\exptycx{\ralloc}{\env}}{e}{[\rho_0/\rho]\tau}
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}
-%            {\C{pack} \; (\rho_0,e) \; \C{as} \; \exists\rho.\tau}
-%            {\exists\rho.\tau}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \bigskip
-
-\begin{minipage}{2.1in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    e_1 \in \{x,\,e.f\}\spc
-    \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\tau_1}\\
-    \hastyp{\exptycx{\ralloc}{\env}}{e_2}{\tau_2}\spc
-    \subtyp{\A}{\tau_2}{\tau_1}
-  }
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}{e_1\,:=\,e_2}{\unitZ}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
 %
-% \begin{minipage}{2in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \tywf{\exptycx{\ralloc}{\env}}{\fbN} \spc
-%     ctype(\fbN) = \taubar \\
-%     \isvalid{\A.\phicx}{\rgn \outlives \ralloc}\spc
-%     allocRgn(\fbN) = \rgn \\
-%     \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\bar{\tau'}} \spc
-%     \subtyp{\A}{\bar{\tau'}}{\taubar}
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\; \fbN(\bar{e})}{\fbN}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-%
-\begin{minipage}{2in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}{e}{\tau} \\
-    \subtyp{\A}{\tau}{\inang{\rhoalloc}
-    {\unitZ}\rightarrow{T@\rhoalloc}}
-  }
-  {
-    {\exptycx{\ralloc}{\env}}\,\vdash\,
-          {\C{new}\; \RgnZ\inang{\rho}\inang{T}(e)}\\
-           \hspace*{0.5in}{:\exists\rho.\RgnZ\inang{\rho}\inang{T}}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-% \begin{minipage}{2.75in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_0}{\tau} \spc
-%     \rbar \in \A.\aenv \\
-%     mtype(m,bound_{\A.\aenv}(\tau)) = \inang{\rhoalloc\rhobar \,|\, 
-%         \phi}\bar{\tau^1}\rightarrow{\tau^2} \\
-%     \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc] \spc
-%     \tywf{\A}{\substFn(\bar{\tau^1})} \spc
-%     \tywf{\A}{\substFn(\tau^2)} \\
-%     \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\bar{\tau'}} \spc
-%     \subtyp{\A}{\bar{\tau'}}{\substFn(\bar{\tau^1})} \spc
-%     \isvalid{\A}{\substFn(\phi)}
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_0.m\inang{\ralloc\rbar}(\bar{e})} 
-%            {\substFn(\tau^2)}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-%
-% \bigskip
-%
-\begin{minipage}{3.1in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \A = (\subtypcx)\spc
-    \rhoalloc,\rhobar \notin \rhoset \spc
-    \rhoset' = \rhoset \cup \{\rhoalloc,\rhobar\} \\
-    \rhoenv' = \rhoenv \cup \{\rhoalloc,\rhobar\}\spc
-    \A' = (\rhoset', \rhoenv', \aenv, \phicx \conj \phi)\\
-    \tywf{\rhoenv'}{\phi}\spc
-    \tywf{\A'}{\bar{\tau^1}}\spc
-    \hastyp{\A',\rhoalloc,\env[\xbar \mapsto \bar{\tau^1}]}{e}{\tau^2}
-  }
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}
-           {\lambdaexp{\rhoalloc\rhobar}{\xbar:\bar{\tau^1}}{e}}
-           {\inang{\rhoalloc\rhobar \,|\, \phi}
-            \bar{\tau^1} \xrightarrow{\ralloc} \tau^2}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\bigskip
-
-%
-\begin{minipage}{3in}
+\begin{minipage}{2.2in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
     \A = (\subtypcx) \spc
-    \rgn \notin \rhoset \\
-    \rhoset' = \rhoset \cup \{\rgn\} \spc
-    \rhoenv' = \rhoenv \cup \{\rgn\} 
+    \rgn \notin \rhoenv \\
+    \rhoenv' = \rhoenv \cup \{\rgn\} \spc
     \phicx' = \phicx \conj \rhoenv \outlives \rgn\\
-    \A' = (\rhoset', \rhoenv', \aenv, \phicx')\spc
+    \A' = (\rhoenv', \aenv, \phicx')\spc
     \hastyp{\A',\rgn,\env}{e}{\unitZ}
   }
   {
@@ -200,18 +19,67 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{3.4in}
+\begin{minipage}{2in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{x}{\exists\rho.\RgnZ\inang{\rho}\inang{T}}\\
+    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\bar{\tau'}} \spc
+    \subtyp{\A}{\bar{\tau'}}{\taubar}\\
+    \tywf{\exptycx{\ralloc}{\env}}{\fbN} \spc
+    fields(\fbN) = \taubar \\
+    \isvalid{\A.\phicx}{\rgn \outlives \ralloc}\spc
+    allocRgn(\fbN) = \rgn \\
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\; \fbN(\bar{e})}{\fbN}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rbar \in \A.\rhoenv \spc
+    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}
+        {\bar{\tau}}\spc\\
+    \hastyp{\exptycx{\ralloc}{\env}}{e}
+        {\inang{\rhoalloc\rhobar \,|\, \phi}
+            \bar{\tau^1} \xrightarrow{\rgn} \tau^2}\\
+    \substFn = \subst{\rbar}{\rhobar}
+               \subst{\ralloc}{\rhoalloc} \spc
+    \isvalid{\A.\phicx}{\substFn(\phi)} \spc
+    \subtyp{\A}{\taubar}{\bar{\tau^1}}
+  }
+  {
+    \hastyp{\A,\ralloc,\env}{e\inang{\ralloc\rbar}(\bar{e})}
+           {\substFn(\tau^2)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\smallskip
+
+%
+\begin{minipage}{3.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+   \hastyp{\exptycx{\ralloc}{\env}}{x}
+            {\RgnZ\inang{T}\inang{\rgn'}}\spc
     \A = (\subtypcx) \spc
-    \rgn \notin \rhoset \spc
-    \A' = (\rhoset \cup \{\rgn\},\rhoenv \cup \{\rgn\},\aenv,\phicx) \\
-    \env' =  \env[x\mapsto \RgnZ\inang{\rgn}][y\mapsto T@\rgn]\spc
-    \hastyp{\A',\ralloc,\env'}{e}{\unitZ}
+    \rgn \notin \rhoenv \\
+    \A' = (\rhoenv \cup \{\rgn\},\aenv,\phicx) \spc
+    \env' =  \env[y\mapsto T@\rgn]\spc
+    \hastyp{\A',\ralloc,\env'}{e}{\unitZ} 
   }
   {
     \hastyp{\exptycx{\ralloc}{\env}}{\open{x}{\rgn}{y}{e}}
@@ -221,188 +89,29 @@
 \end{smathpar}
 \end{minipage}
 %
-
-% \begin{minipage}{3.25in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \A = (\subtypcx) \spc
-%     \A' = (\rhoset,\rhoenv \cup \{\rgn\},\aenv,\phicx) \\
-%     \hastyp{\exptycx{\ralloc}{\env}}{x}{\RgnZ\inang{\rgn}\inang{T}}\spc
-%     \hastyp{\A',\rgn,\env[y\mapsto T@\rgn]}{e}{\unitZ}
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{\openalloc{x}{y}{e}}
-%             {\unitZ}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \bigskip
-
-% %
-% \begin{minipage}{3.75in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \A = (\subtypcx)\spc
-%     \rhoalloc,\rhobar \notin \rhoset \spc
-%     \rhoset' = \rhoset \cup \{\rhoalloc,\rhobar\} \spc
-%     \rhoenv' = \rhoenv \cup \{\rhoalloc,\rhobar\}\\
-%     \A' = (\rhoset', \rhoenv', \aenv, \phicx \conj \phi)\spc
-%     \tywf{\rhoenv'}{\phi}\spc
-%     \hastyp{\A',\ralloc,\env}{e}{\bar{\tau^1} \xrightarrow
-%             {\rgn} \tau^2}
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}
-%            {\Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}}
-%            {\inang{\rhoalloc\rhobar \,|\, \phi}
-%             \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \begin{minipage}{2in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \ralloc,\rbar \in \A.\rhoenv \spc
-%     \hastyp{\exptycx{\ralloc}{\env}}{e}
-%         {\inang{\rhoalloc\rhobar \,|\, \phi}
-%             \bar{\tau^1} \xrightarrow{\rgn} \tau^2}\\
-%     \substFn = \subst{\rbar}{\rhobar}
-%                \subst{\ralloc}{\rhoalloc} \spc
-%     \isvalid{\A.\phicx}{\substFn(\phi)}
-%   }
-%   {
-%     \hastyp{\A,\ralloc,\env}{e\inang{\ralloc\rbar}}
-%            {\substFn(\bar{\tau^1}) \xrightarrow{\rgn} \substFn(\tau^2)}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \bigskip
-
-% %
-% \begin{minipage}{2in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_0}
-%         {\bar{\tau^1} \xrightarrow{\rgn} \tau^2}\\
-%     \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}
-%         {\bar{\tau}}\spc
-%     \subtyp{\A}{\taubar}{\bar{\tau^1}}
-%   }
-%   {
-%     \hastyp{\A,\ralloc,\env}{e_0(\bar{e})}
-%            {\tau^2}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \begin{minipage}{2in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\tau_1}\\
-%     \hastyp{\exptycx{\ralloc}{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}\\
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{\letexp{x}{e_1}{e_2}}{\tau_2}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \begin{minipage}{2.1in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     e_1 \in \{x,\,e.f\}\spc
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\tau_1}\\
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_2}{\tau_2}\spc
-%     \subtyp{\A}{\tau_2}{\tau_1}
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_1\,:=\,e_2}{\unitZ}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \bigskip
-
-% %
-% \begin{minipage}{1.75in}
-% \begin{smathpar}
-% \begin{array}{c}
-% % UPCAST
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \\
-%     \hastyp{\exptycx{\ralloc}{\env}}{e}{\tau_1}\spc
-%     \subtyp{\A}{\tau_1}{\tau}
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{(\tau)\,e}{\tau}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \begin{minipage}{3.25in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\exists \rho.\tau}\spc
-%     \A = (\subtypcx) \spc
-%     \rgn \notin \rhoset \\
-%     \A' = (\rhoset \cup \{\rgn\},\rhoenv,\aenv,\phicx) \spc
-%     \hastyp{\A',\ralloc,\env[x \mapsto \subst{\rgn}{\rho}\tau]}
-%            {e_2}{\tau_2}\spc
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{\unpackexp{\rgn}{x}{e_1}{e_2}}
-%             {\tau_2}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-% \begin{minipage}{1.5in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\unitZ}\\
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_2}{\tau}\spc
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_1\,;\,e_2}{\tau}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
+\begin{minipage}{3.25in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+%   \A = (\subtypcx)\spc
+    \rhoalloc,\rhobar \notin \A.\rhoenv \spc
+%   \rhoenv' = \rhoenv \cup \{\rhoalloc,\rhobar\}\spc
+    \A' = (\A.\rhoenv \cup \{\rhoalloc,\rhobar\}, \A.\aenv, 
+          \A.\phicx \conj \phi)\\
+    \tywf{\A'.\rhoenv}{\phi}\spc
+    \tywf{\A'}{\bar{\tau^1}}\spc
+    \hastyp{\A',\rhoalloc,\env[\xbar \mapsto \bar{\tau^1}]}{e}{\tau^2}
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}
+           {\lambdaexp{\rhoalloc\rhobar \,|\, \phi}
+                      {\xbar:\bar{\tau^1}}{e}}
+           {\inang{\rhoalloc\rhobar \,|\, \phi}
+            \bar{\tau^1} \xrightarrow{\ralloc} \tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
