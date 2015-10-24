@@ -49,12 +49,14 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    CT(B) = \headerOf{B}\{...\}\\
-    \tywf{\A}{B\inang{\tbar}\inang{\pi^a\bar{\pi}}}\spc
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
+    \\
+    CT(B) = \headerOf{B}\{...\}
+%   \tywf{\A}{B\inang{\tbar}\inang{\pi^a\bar{\pi}}}\spc
+%   \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
   }
   {
-    \subtyp{\A}{B\inang{\tbar}\inang{\pi^a\bar{\pi}}}{\substFn(\fbN)}
+    \subtyp{\A}{B\inang{\tbar}\inang{\pi^a\bar{\pi}}}
+        {[\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}](\fbN)}
   }
 \end{array}
 \end{smathpar}
