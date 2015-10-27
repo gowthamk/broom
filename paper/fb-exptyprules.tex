@@ -10,10 +10,10 @@
     \rhoenv' = \rhoenv \cup \{\rgn\} \spc
     \phicx' = \phicx \conj \rhoenv \outlives \rgn\\
     \A' = (\rhoenv', \aenv, \phicx')\spc
-    \hastyp{\A',\rgn,\env}{e}{\unitZ}
+    \hastyp{\A',\rgn,\env}{e}{\tau}
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{\letregion{\rgn}{e}}{\unitZ}
+    \hastyp{\exptycx{\ralloc}{\env}}{\letregion{\rgn}{e}}{\tau}
   }
 \end{array}
 \end{smathpar}
@@ -28,7 +28,7 @@
     \\
     \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\bar{\tau'}} \spc
     \subtyp{\A}{\bar{\tau'}}{\taubar}\\
-    \tywf{\exptycx{\ralloc}{\env}}{\fbN} \spc
+    \tywf{\A}{\fbN} \spc
     fields(\fbN) = \taubar \\
 %   allocRgn(\fbN) = \rgn \spc
 %   \isvalid{\A.\phicx}{\rgn \outlives \ralloc}
@@ -80,11 +80,11 @@
     \rgn \notin \rhoenv \\
     \A' = (\rhoenv \cup \{\rgn\},\aenv,\phicx) \spc
     \env' =  \env[y\mapsto T@\rgn]\spc
-    \hastyp{\A',\ralloc,\env'}{e}{\unitZ} 
+    \hastyp{\A',\ralloc,\env'}{e}{\tau} 
   }
   {
     \hastyp{\exptycx{\ralloc}{\env}}{\open{x}{\rgn}{y}{e}}
-            {\unitZ}
+            {\tau}
   }
 \end{array}
 \end{smathpar}

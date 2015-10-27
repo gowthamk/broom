@@ -180,6 +180,16 @@
 \newcommand{\unpackexp}[4]{\C{let}\;(#1,\,#2)\,=\,\C{unpack}\;#3\;\C{in}\;#4}
 \newcommand{\invalidexn}{\C{InvalidOpnException}}
 \newcommand{\toprgn}{\rgn_{\top}}
+\newcommand{\csolvestar}{{\sc CSolve*}\xspace}
+\newcommand{\elabExpr}{{\sf elabExpr}}
+\newcommand{\fields}{{\sf fields}}
+\newcommand{\mtype}{{\sf mtype}}
+\newcommand{\bound}{{\sf bound}}
+\newcommand{\fresh}{{\sf fresh}}
+\newcommand{\typeOk}{{\sf typeOk}}
+\newcommand{\subtypeOk}{{\sf subtypeOk}}
+\newcommand{\templateTy}{{\sf templateTy}}
+\newcommand{\allocRgn}{{\sf allocRgn}}
 %\newcommand{\smallskip}{\vspace*{0.1in}}
 
 %Rules
@@ -258,6 +268,33 @@ morekeywords={letregion, let, in, as, openalloc, open, withroot, not, : , /\\}
     { %\centering
       \csname lst@savefirstlabel\endcsname}
 
+\newcommand{\lstml}{\lstset{ %
+language=[Objective]Caml, % choose the language of the code
+basicstyle=\small\ttfamily,       % the size of the fonts that are used for the code
+keywordstyle=\color{Bittersweet},
+% numbers=left,                   % where to put the line-numbers
+numberstyle=\tiny,      % the size of the fonts that are used for the line-numbers
+stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
+numbersep=5pt,                  % how far the line-numbers are from the code
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+% frame=single,                   % adds a frame around the code
+tabsize=2,                      % sets default tabsize to 2 spaces
+captionpos=b,                   % sets the caption-position to bottom
+breaklines=true,                % sets automatic line breaking
+breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+commentstyle=\itshape\color{MidnightBlue},
+escapeinside={\%*}{*)},         % if you want to add a comment within your code
+morekeywords={relation, not, : , /\\}
+}}
+\lstnewenvironment{codeml}
+    { % \centering
+			\lstml
+      \lstset{mathescape=true}%
+      \csname lst@setfirstlabel\endcsname}
+    { %\centering
+      \csname lst@savefirstlabel\endcsname}
 
 \begin{document}
 
@@ -329,6 +366,8 @@ nevertheless judged to be safe by our type system.
 \input{overview}
 
 \input{type-system}
+
+\input{type-inference}
 
 % \appendix
 % \section{Appendix Title}
