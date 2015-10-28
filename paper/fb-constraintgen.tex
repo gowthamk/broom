@@ -13,42 +13,46 @@ $\elabExpr(\A,\ralloc,\env,e)$ =
     let ($e_a':\tau_a$,$C_1$) = $\elabExpr(\A,\ralloc,\env,e_a)$ in
     let $\inang{\rhoalloc\rhobar\,|\,\phi}\taubar \rightarrow \tau$ = $\mtype(m,\bound(\tau_a))$ in
     let $\bar{\rho'}$ = $\fresh({\sf length}(\rhobar))$ in
-    let $C_2$ = $\bar{\rho'} \in \A.\rhoenv$ in
     let $\substFn$ = $[\bar{\rho'}/\rhobar][\ralloc/\rhoalloc]$ in
-    let $C_3$ = $\substFn(\phi)$ in
+    let $C_2$ = $\{\bar{\rho'} \in \A.\rhoenv\}$ in
+    let $C_3$ = $\{\isvalid{\A}{\substFn(\phi)}\}$ in
 %*   %let $(C_3,C_4)$ = $(\typeOk(\substFn(\taubar)), \typeOk(\substFn(\tau)))$ in 
 *)   let $(\bar{e'}:\bar{\tau'}, C_4)$ = $\elabExpr(\A,\ralloc,\env,\bar{e})$ in
-    let $C_5$ = $\subtyp{\A}{\bar{\tau'}}{\bar{\substFn(\tau)}}$ in
-      ($e_a'.m\inang{\ralloc\bar{\rho'}}(\bar{e'}):\substFn(\tau)$,$\bigwedge_{i=1}^5 C_i$)
+    let $C_5$ = $\subtypeOk({\A},{\bar{\tau'}},{\bar{\substFn(\tau)}})$ in
+      ($e_a'.m\inang{\ralloc\bar{\rho'}}(\bar{e'}):\substFn(\tau)$,$\bigcup_{i=1}^4 \{C_i\}$)
   | $\C{new} \fgjN(\bar{e})$ $\longrightarrow$ 
     let $\fbN$ = $\templateTy(\fbN)$ in
-    let ($C_1$,$C_2$) = ($\tywf{\A}{\fbN}$,$\allocRgn(\fbN)=\ralloc$) in
-    let ($_:\taubar$) = $\fields(\fbN)$
+    let $C_1$ = $\typeOk({\A},{\fbN})$ in
+    let $C_2$ = $\{\isvalid{\A}{\allocRgn(\fbN)=\ralloc}\}$ in
+    let ($\_:\taubar$) = $\fields(\fbN)$
     let $(\bar{e'}:\bar{\tau'}, C_3)$ = $\elabExpr(\A,\ralloc,\env,\bar{e})$ in
-    let $C_4$ = $\subtyp{\A}{\bar{\tau'}}{\taubar}$ in
-      ($\C{new} \fbN(\bar{e'}) : \fbN$,$\bigwedge_{i=1}^4 C_i$)
+    let $C_4$ = $\subtypeOk({\A},{\bar{\tau'}},{\taubar})$ in
+      ($\C{new} \fbN(\bar{e'}) : \fbN$,$\bigcup_{i=1}^4 C_i$)
   | $e_a(\bar{e})$ $\longrightarrow$ 
     let ($e_a':\inang{\rhoalloc\rhobar\,|\,\phi}\taubar \xrightarrow{\rgn} \tau$,$C_1$) = 
                 $\elabExpr(\A,\ralloc,\env,e_a)$ in
     let $\bar{\rho'}$ = $\fresh({\sf length}(\rhobar))$ in
-    let $C_2$ = $\bar{\rho'} \in \A.\rhoenv$ in
+    let $C_2$ = $\{\bar{\rho'} \in \A.\rhoenv\}$ in
     let $\substFn$ = $[\bar{\rho'}/\rhobar][\ralloc/\rhoalloc]$ in
-    let $C_3$ = $\substFn(\phi)$ in
+    let $C_3$ = $\{\isvalid{\A}{\substFn(\phi)}\}$ in
 %*   %let $(C_3,C_4)$ = $(\typeOk(\substFn(\taubar)), \typeOk(\substFn(\tau)))$ in 
 *)   let $(\bar{e'}:\bar{\tau'}, C_4)$ = $\elabExpr(\A,\ralloc,\env,\bar{e})$ in
-    let $C_5$ = $\subtyp{\A}{\bar{\tau'}}{\bar{\substFn(\tau)}}$ in
-      ($e_a'\inang{\ralloc\bar{\rho'}}(\bar{e'}):\substFn(\tau)$,$\bigwedge_{i=1}^5 C_i$)
+    let $C_5$ = $\subtypeOk({\A},{\bar{\tau'}},{\bar{\substFn(\tau)}})$ in
+      ($e_a'\inang{\ralloc\bar{\rho'}}(\bar{e'}):\substFn(\tau)$,$\bigcup_{i=1}^5 C_i$)
   | $\letregion{\rgn}{e_a}$ $\longrightarrow$
     let _ = ${\sf assert}(\rgn \notin \A.\rhoenv)$ in
     let $(\rhoenv,\aenv,\phicx)$ = $\A$ in
     let $\A'$ = ($\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn)$) in
-      $\elabExpr(\A',\rgn,\env,e_a)$ 
+    let ($e_a':\tau$,$C_1$) = $\elabExpr(\A',\rgn,\env,e_a)$ in
+      ($\letregion{\rgn}{e_a'}:\tau$,$C_1$)
   | $\open{e_a}{\rgn}{y}{e_b}$ $\longrightarrow$ 
     let ($e_a':\RgnZ\inang{T}\inang{\rgn'}$,$C_1$) = 
                 $\elabExpr(\A,\ralloc,\env,e_a)$ in
     let _ = ${\sf assert}(\rgn \notin \A.\rhoenv)$ in
     let $(\rhoenv,\aenv,\phicx)$ = $\A$ in
-      $\elabExpr((\rhoenv \cup \{\rgn\},\aenv,\phicx),\rgn,\env[y\mapsto T@\rgn],e_a)$ 
+    let $\A'$ = $(\rhoenv \cup \{\rgn\},\aenv,\phicx)$ in
+    let ($e_b':\tau$,$C_2$) = $\elabExpr(\A',\rgn,\env[y\mapsto T@\rgn],e_a)$ in
+      ($\open{e_a'}{\rgn}{y}{e_b'} : \tau$, $C_1 \cup C_2$)
 \end{codeml}
 
 \caption{Constraint generation for expressions in $\absof{\FB}$}
