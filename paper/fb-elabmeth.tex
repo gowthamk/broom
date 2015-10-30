@@ -1,0 +1,25 @@
+\begin{figure}
+
+\begin{codeml}
+$\elabMeth(B,d)$ = 
+  let $\headerOf{B}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}\}$ = $CT(B)$ in
+  let $T \; m(\tbar \; \xbar)\{\C{return} e;\}$ = $d$ in
+  let $(\tau,\taubar)$ = $(\templateTy(T),\templateTy(\tbar))$ in
+  let $(\rhoalloc_m,\rhobarm,\varphi)$ = $(\fresh_\rho(),\frv(\tau\taubar),\fresh_\varphi())$ in
+  let ($\rhoenv$,$\aenv$,$\phicx$) = $(\{\rhoalloc,\rhobar,\rhoalloc_m,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN},\phi \conj \varphi)$ in
+  let $\env$ = $\cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhoalloc\rhobar}][\xbar \mapsto \taubar]$ in
+  let $d_m$ = $\tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi} (\taubar \; \xbar)\{\C{return} \unitval;\}$ in
+  let $C_B$ = $\headerOf{B}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}d_m\}$ in
+  let _ = $CT := CT[B \mapsto C_B]$ in
+  let ($e':\tau'$,$C_1$) = $\elabExpr (\A,\rhoalloc_m,\env,e)$ in
+  let $C_2$ = $\subtypeOk({\A},{\tau'},{\tau})$ in
+  let ($\substFn_\rho$,$\phi_{sol}$) = $\solve(C_1 \cup C_2,\{\rhoalloc,\rhobar,\rhoallocm,\rhobarm\})$ in
+  let $d_m'$ = $\tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \phi_{sol}} (\taubar \; \xbar)\{\C{return} \substFn_\rho(e');\}$ in
+  let $C_B'$ = $\headerOf{B}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}d_m'\}$ in
+  let _ = $CT := CT[B \mapsto C_B']$ in
+    $d_m'$
+\end{codeml}
+
+\caption{Method elaboration in $\absof{\FB}$}
+\label{fig:fb-elabmeth}
+\end{figure}
