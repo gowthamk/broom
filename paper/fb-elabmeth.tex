@@ -1,25 +1,42 @@
+\newcommand{\hdOf}[2]{\C{class}\; #1\angAlpha\inang{\rhoalloc\rhobar \,|\, #2} \extends \fbN}
 \begin{figure}
 
 \begin{codeml}
-$\elabMeth(B,d)$ = 
-  let $\headerOf{B}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}\}$ = $CT(B)$ in
-  let $T \; m(\tbar \; \xbar)\{\C{return} e;\}$ = $d$ in
-  let $(\tau,\taubar)$ = $(\templateTy(T),\templateTy(\tbar))$ in
-  let $(\rhoalloc_m,\rhobarm,\varphi)$ = $(\fresh_\rho(),\frv(\tau\taubar),\fresh_\varphi())$ in
-  let ($\rhoenv$,$\aenv$,$\phicx$) = $(\{\rhoalloc,\rhobar,\rhoalloc_m,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN},\phi \conj \varphi)$ in
+$\elabMeth(B,\tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \; \xbar)\{\C{return} e;\})$ = 
+  let $\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}\}$ = $CT(B)$ in
+  let ($\rhoenv$,$\aenv$,$\phicx$) as $\A$ = 
+            $(\{\rhoalloc,\rhobar,\rhoalloc_m,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN},\varphi \conj \varphi_m)$ in
   let $\env$ = $\cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhoalloc\rhobar}][\xbar \mapsto \taubar]$ in
-  let $d_m$ = $\tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi} (\taubar \; \xbar)\{\C{return} \unitval;\}$ in
-  let $C_B$ = $\headerOf{B}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}d_m\}$ in
-  let _ = $CT := CT[B \mapsto C_B]$ in
   let ($e':\tau'$,$C_1$) = $\elabExpr (\A,\rhoalloc_m,\env,e)$ in
   let $C_2$ = $\subtypeOk({\A},{\tau'},{\tau})$ in
-  let ($\substFn_\rho$,$\phi_{sol}$) = $\solve(C_1 \cup C_2,\{\rhoalloc,\rhobar,\rhoallocm,\rhobarm\})$ in
-  let $d_m'$ = $\tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \phi_{sol}} (\taubar \; \xbar)\{\C{return} \substFn_\rho(e');\}$ in
-  let $C_B'$ = $\headerOf{B}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}d_m'\}$ in
-  let _ = $CT := CT[B \mapsto C_B']$ in
-    $d_m'$
+    ($\tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \; \xbar)\{\C{return} e';\}$, $C_1 \cup C_2$)
 \end{codeml}
 
-\caption{Method elaboration in $\absof{\FB}$}
+\begin{codeml}
+$\elabClass(B)$ = 
+  let $\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}\}$ = $CT(B)$ in
+  let ($\rhoenv$,$\aenv$,$\phicx$) as $\A$= $(\{\rhoalloc,\rhobar\},\bar{\tyvar} \extends \bar{\fgjN},\varphi)$ in
+  let $C_1$ = $\typeOk({\A},{\fbN})$
+  let $C_2$ = $\typeOk({\A},{\bar{\tau^f}})$
+  let $C_3$ = $\{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc}\}$ in
+  let ($k'$,$C_4$) = $\elabCons(B,k)$ in
+  let ($\bar{d'}$,$C_5$) = $\elabMeth(B,\bar{d})$ in
+    ($\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;k'\;\bar{d'}\}$, $\bigcup_{i=1}^5 C_i$)
+\end{codeml}
+
+\begin{codeml}
+$\elabClassTable(CT)$ = 
+  let ($CT'$,$C$) = (ref $\cdot$, ref $\emptyset$) in
+  let _ = foreach $B \in dom(CT)$ do
+            let ($D_B$,$C_B$) = $\elabClass(CT,B)$ in
+              $CT'$ := $CT'[B \mapsto D_B]$;
+              $C$ := $C \cup C_B$
+           done in
+  let ($\substFn_\rho$,$\substFn_\varphi$) = $\solve(C)$ in
+    $\substFn_\varphi(\substFn_\rho(CT')) $
+      
+\end{codeml}
+
+\caption{Method, class and class table elaboration}
 \label{fig:fb-elabmeth}
 \end{figure}

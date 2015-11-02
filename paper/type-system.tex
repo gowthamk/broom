@@ -36,7 +36,7 @@ Since FGJ formalism does not include higher-order functions, we extend
 the syntactic class (\C{T}) of FGJ types with an (uncurried) arrow
 type.
 
-Class definitions in \FB extend Java's with region parameters
+Class definitions in \FB extend FGJ's with region parameters
 ($\rho$). Informally, region variables ($\rho$) are to region
 identifiers ($\rgn$) as type variables ($a$) are to core types ($T$);
 they can be instantiated with region identifiers, as needed. A class
@@ -280,7 +280,7 @@ class Region<a $\extends$ Object><${\rhoalloc}$> {
 judgments on core types \footnote{We use a double-piped turnstile
 ($\Vdash$) for judgments in FGJ~\cite{fgj}, and a simple turnstile
 ($\vdash$) for those in \FB.}. All judgments are implicitly
-parameterized on a class table ($CT \in cn \mapsto C$) that maps class
+parameterized on a class table ($CT \in cn \mapsto D$) that maps class
 names to their definitions in \FB. For judgments in FGJ, we use a
 class table that maps class names to their region-erased definitions.
 We denote the region-erased class table as ($\absof{CT}$). The precise
