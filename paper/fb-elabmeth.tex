@@ -2,7 +2,7 @@
 \begin{figure}
 
 \begin{codeml}
-$\elabMeth(B,\tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \; \xbar)\{\C{return} e;\})$ = 
+$\elabMeth(CT, B, \tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \; \xbar)\{\C{return} e;\})$ = 
   let $\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}\}$ = $CT(B)$ in
   let ($\rhoenv$,$\aenv$,$\phicx$) as $\A$ = 
             $(\{\rhoalloc,\rhobar,\rhoalloc_m,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN},\varphi \conj \varphi_m)$ in
@@ -13,12 +13,11 @@ $\elabMeth(B,\tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \; \x
 \end{codeml}
 
 \begin{codeml}
-$\elabClass(B)$ = 
+$\elabClass(CT,B)$ = 
   let $\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}\}$ = $CT(B)$ in
   let ($\rhoenv$,$\aenv$,$\phicx$) as $\A$= $(\{\rhoalloc,\rhobar\},\bar{\tyvar} \extends \bar{\fgjN},\varphi)$ in
-  let $C_1$ = $\typeOk({\A},{\fbN})$
-  let $C_2$ = $\typeOk({\A},{\bar{\tau^f}})$
-  let $C_3$ = $\{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc}\}$ in
+  let ($C_1$,$C_2$) = ($\typeOk({\A},{\fbN})$,$\typeOk({\A},{\bar{\tau^f}})$) in
+  let $C_3$ = $\{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allocRgn(\fbN) = \rhoalloc}\}$ in
   let ($k'$,$C_4$) = $\elabCons(B,k)$ in
   let ($\bar{d'}$,$C_5$) = $\elabMeth(B,\bar{d})$ in
     ($\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;k'\;\bar{d'}\}$, $\bigcup_{i=1}^5 C_i$)

@@ -1,7 +1,7 @@
 \begin{figure}
 
 \begin{codeml}
-$\elabExpr(\A,\ralloc,\env,e)$ = 
+$\elabExpr(CT, \A, \ralloc, \env, e)$ = 
   match $e$ with
   | $\unitval$ $\longrightarrow$ ($\unitval:\unitZ$,$\top$)
   | $x$ $\longrightarrow$ ($x:\env(x)$,$\top$)

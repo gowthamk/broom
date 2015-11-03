@@ -58,7 +58,7 @@ $\rhoalloc$. The corresponding definition of the \C{Pair} class is as
 follows(The symbol $\extends$ should be read \emph{extends}):  
 \begin{codejava}[mathescape=true]
 class Pair<a $\extends$ Object, b $\extends$ Object>
-          <$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a \conj \rho_2 \outlives \rho^a$>
+          <$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a \conj \rho_2 \outlives \rho^a$> $\extends$ Object<$\rho^a$>
            {
   a@$\rho_1$ fst; 
   b@$\rho_2$ snd;
@@ -259,7 +259,7 @@ the expression is being type-checked.
 \begin{figure}
 
 \begin{codejava}
-class Region<a $\extends$ Object><${\rhoalloc}$> {
+class Region<a $\extends$ Object><${\rhoalloc}$> $\extends$ Object<$\rhoalloc$>{
   <${\rho}$>unit$\xrightarrow{\rhoalloc}$a@$\rho$ thunk;
   Region(<${\rho}$>unit$\xrightarrow{\rhoalloc}$a@$\rho$ thunk) {
     super(); 
