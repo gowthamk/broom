@@ -367,8 +367,8 @@ expression or type, whose region elaboration is constrained by $c_2$
 refers to a method or a class, whose unknown precondition is
 constrained by $c_1$. The common predicate variable ($\varphi$)
 represents the unknown precondition in this case. The dependency from
-$c_2$ to $c_1$ means that $c_2$ must be solved to compute $\varphi$
-before $c_1$ is solved, thus enforcing the rule that the precondition
+$c_2$ to $c_1$ means that $c_1$ must be solved to compute $\varphi$
+before $c_2$ is solved, thus enforcing the rule that the precondition
 of a method must not depend on its calling context. Since mutually
 recursive definitions refer each other, the first condition also
 results in bidirectional dependencies between mutually recursive
@@ -384,8 +384,8 @@ this possibility). The second condition also adds bidirectional
 dependencies between two validity constraints over same set of
 predicate variables, thus requiring them to be solved simultaneously. 
 
-In the second step, we convert the dependency graph over constraints
-into a dependency DAG ($G_C$) over sets of constraints, where each set
+Next, we convert the dependency graph over constraints into a
+dependency DAG ($G_C$) over sets of constraints, where each set
 represents a strongly connected component in the dependency graph.
 Constraints in each set are mutually dependent, and need to be solved
 simultaneously, whereas constraints in different sets can be solved as
@@ -410,8 +410,8 @@ constraints is as following:
   \}
 \)
 \end{center}
-The solution to the above set of constraints is a tuple $(\substFn,)$
-problem is to find a map $$
+% The solution to the above set of constraints is a tuple $(\substFn,)$
+% problem is to find a map
 
 % After solving all the dependencies and applying solutions, the most
 % general form of a set of constraints is the following:

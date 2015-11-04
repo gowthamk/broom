@@ -1,5 +1,5 @@
 %
-\begin{minipage}{2.2in}
+\begin{minipage}{1.9in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -19,17 +19,18 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{2in}
+\begin{minipage}{2.3in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \\
-    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\bar{\tau'}} \spc
-    \subtyp{\A}{\bar{\tau'}}{\taubar}\\
     \tywf{\A}{\fbN} \spc
     fields(\fbN) = \taubar \\
+    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\bar{\tau'}} \spc
+    \subtyp{\A}{\bar{\tau'}}{\taubar}\\
+    \absof{\fbN} = \RgnZ\inang{T} \; \Rightarrow \;
+    \allocRgn(\fbN)=\toprgn\\
 %   allocRgn(\fbN) = \rgn \spc
 %   \isvalid{\A.\phicx}{\rgn \outlives \ralloc}
   }

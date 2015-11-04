@@ -109,7 +109,8 @@
 \newcommand{\hspa}[0]{\hspace*{-0.08in}}
 % removable:
 \newcommand{\subst}[2]{\lbrack #1/#2 \rbrack}
-\newcommand{\absof}[1]{\left\| #1 \right\| }
+%\newcommand{\absof}[1]{\left\| #1 \right\| }
+\newcommand{\absof}[1]{\thesemof{#1}}
 \newcommand{\broom}{{\sc Broom}\xspace}
 \newcommand{\name}{{\sc Broom}\xspace}
 \newcommand{\fbname}{{\sc Featherweight Broom}\xspace}
@@ -147,7 +148,7 @@
 \newcommand{\extends}{\triangleleft}
 \newcommand{\rextends}{\blacktriangleleft}
 \renewcommand{\bar}[1]{\overline{#1}}
-\newcommand{\angR}{\inang{\rhoalloc\rhobar \,|\, \phi}}
+\newcommand{\angR}{\inang{\rhoalloc,\rhobar \,|\, \phi}}
 \newcommand{\angT}{\inang{\tbar}}
 \newcommand{\tyvar}{a}
 \newcommand{\tyvarb}{b}
@@ -156,7 +157,7 @@
 \newcommand{\fbN}{N}
 \newcommand{\headerOf}[1]{\C{class}\; #1\angAlpha\angR \extends \fbN}
 \newcommand{\substFn}{\mathcal{S}}
-\newcommand{\mang}{\inang{\rhoalloc_m\bar{\rho_m} \,|\, \phi_m}}
+\newcommand{\mang}{\inang{\rhoalloc_m,\bar{\rho_m} \,|\, \phi_m}}
 \newcommand{\rhoset}{\rhoenv}
 \newcommand{\rhoenv}{\Delta}
 \newcommand{\aenv}{\Theta}
@@ -194,6 +195,7 @@
 \newcommand{\subtypeOk}{{\sf subtypeOk}}
 \newcommand{\templateTy}{{\sf templateTy}}
 \newcommand{\allocRgn}{{\sf allocRgn}}
+\newcommand{\shape}{{\sf shape}}
 %\newcommand{\smallskip}{\vspace*{0.1in}}
 \newcommand{\elabMeth}{{\sf elabMeth}}
 \newcommand{\frv}{{\sf frv}}
