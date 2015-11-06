@@ -1,0 +1,328 @@
+\newcommand{\redstoo}[2]{\redsto{\rhoenv}{#1}{#2}}
+\newcommand{\anobjty}[0]{B\inang{\tbar}\inang{\ralloc\rbar}}
+\newcommand{\anobj}[0]{\C{new} \; \anobjty(\bar{v})}
+\begin{figure*}[t!]
+
+%
+\fbox {\(\redstoo{(e,\rhomap)}{(e',\rhomap')}\)}\\
+
+%
+\begin{minipage}{2.7in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \ralloc \in \rhoenv \spc
+    \fields(\anobj) = \taubar\;\bar{f}
+  }
+  {
+    \redstoo{((\anobj).f_i,\rhomap)}{(v_i,\rhomap)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \ralloc \in \rhoenv \spc
+    \redstoo{(e_i,\rhomap)}{(e_i',\rhomap')}
+  }
+  {
+    \redstoo{(\C{new} \; \anobjty(...,e_i,...),\rhomap)}
+            {(\C{new} \; \anobjty(...,e_i',...),\rhomap')}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3.2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn \notin \rhoenv \spc
+    \redsto{\rhoenv \cup \{\rgn\}}{(e,\rhomap)}{(e',\rhomap')}
+  }
+  {
+    \redstoo{(\letregion{\rgn}{e},\rhomap)}{(\letregion{\rgn}{e'},\rhomap')}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn \notin \rhoenv
+  }
+  {
+    \redstoo{(\letregion{\rgn}{v},\rhomap)}{(v,\rhomap)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3.3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \ralloc \in \rhoenv \spc 
+    \rhoalloc \notin \rhoenv \spc
+    \redsto{\rhoenv \cup \{\rhoalloc\}}{(e,\rhomap)}{(e',\rhomap')}
+  }
+  {
+    \redstoo{(\C{new} \; \RgnZ\inang{T}\inang{\rgn}
+                (\lambdaexp{\ralloc}{\rhoalloc}{}{e}),\rhomap)}
+            {(\C{new} \; \RgnZ\inang{T}\inang{\rgn}
+                (\lambdaexp{\ralloc}{\rhoalloc}{}{e'}),\rhomap')}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3.3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \ralloc \in \rhoenv \spc 
+    \rho \notin dom(\rhomap) \spc
+    \rhomap' = \rhomap[\rho \mapsto \CLOSED]
+  }
+  {
+    \redstoo{(\C{new} \; \RgnZ\inang{T}\inang{\rgn}
+                (\lambdaexp{\ralloc}{\rhoalloc}{}{v}),\rhomap)}
+            {(\C{new} \; \RgnZ\inang{T}\inang{\rho}
+                (\lambdaexp{\ralloc}{\rhoalloc}{}{v}),\rhomap')}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3.3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \ralloc \in \rhoenv \spc 
+    \rhomap(\rho) \neq \XFERRED \spc
+    \rgn \notin \rhoenv \spc
+    \redsto{\rhoenv \cup \{\rgn\}}
+           {([[\rho/\rhoalloc]v_r/x]e,\rhomap[\rho \mapsto \OPEN])}
+           {(e',\rhomap')}
+  }
+  {
+    \redstoo{(\open{(\C{new} \; \RgnZ\inang{T}\inang{\rho}
+                      (\lambdaexp{\ralloc}{\rhoalloc}{}{v_r}))}
+                   {\rgn}{x}{e},\rhomap)}
+            {\\ \hspace*{0.2in} (\open{(\C{new} \; \RgnZ\inang{T}\inang{\rho}
+                      (\lambdaexp{\ralloc}{\rhoalloc}{}{v_r}))}
+                    {\rgn}{x}{e'},\rhomap'[\rho \mapsto \rhomap(\rho)])}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3.3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rhomap(\rho) \neq \XFERRED \spc
+    \rgn \notin \rhoenv \spc
+  }
+  {
+    \redstoo{(\open{(\C{new} \; \RgnZ\inang{T}\inang{\rho}
+                  (\lambdaexp{\rhoalloc}{}{v_r}))}{\rgn}{x}{v},\rhomap)}
+            {(v,\rhomap)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3.3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \ralloc \in \rhoenv \spc 
+    \rhomap(\rho) = \XFERRED \spc
+    \rgn \notin \rhoenv \spc
+    \redsto{\rhoenv \cup \{\rgn\}}{([[\rho/\rhoalloc]v_r/x]e,\rhomap)}
+           {(e',\rhomap')}
+  }
+  {
+    \redstoo{(\open{(\C{new} \; \RgnZ\inang{T}\inang{\rho}
+                      (\lambdaexp{\ralloc}{\rhoalloc}{}{v_r}))}
+                   {\rgn}{x}{e},\rhomap)}
+            {(\invalidexn,\rhomap)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \redstoo{(e_i,\rhomap)}{(e_i',\rhomap')}
+  }
+  {
+    \redstoo{((\C{new}\;\fbN(\bar{v})).m\inang{\ralloc\rbar}
+                      (...,e_i,...),\rhomap)}
+            {(\C{new}\;\fbN(\bar{v})).m\inang{\ralloc\rbar}
+                      (...,e_i',...),\rhomap')}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3.6in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \allocRgn(\fbN),\ralloc \in \rhoenv \spc
+    \mbody(m\inang{\ralloc \rbar},\fbN) = \bar{x}.e 
+%   \redstoo{(, \rhomap)}{(e',\rhomap')}
+  }
+  {
+    \redstoo{((\C{new}\;\fbN(\bar{v})).m\inang{\ralloc \rbar}
+                      (\bar{v'}),\rhomap)}
+            {([\bar{v'}/\xbar][\C{new} \; \fbN(\bar{v})/\thisZ]\,e,\rhomap)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3.25in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \ralloc \in \rhoenv \spc
+%   \redstoo{(, \rhomap)}{(e',\rhomap')}
+    \rhomap(\rho) \neq \OPEN \spc
+    \rhomap' = \rhomap[\rho \mapsto \XFERRED]
+  }
+  {
+    \redstoo{((\C{new}\;\RgnZ\inang{\rho}(v)).\transfer\inang{\ralloc}
+                      (),\rhomap)}
+            {(\unitval,\rhomap')}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3.25in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \ralloc \in \rhoenv \spc
+%   \redstoo{(, \rhomap)}{(e',\rhomap')}
+    \rhomap(\rho) = \OPEN \spc
+  }
+  {
+    \redstoo{((\C{new}\;\RgnZ\inang{\rho}(v)).\transfer\inang{\ralloc}
+                      (),\rhomap)}
+            {(\invalidexn,\rhomap)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3.3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn,\ralloc \in \rhoenv \spc 
+  }
+  {
+    \redstoo{((\lambdaexp{\rgn}{\rhoalloc\rhobar}
+                        {\taubar \; \xbar}{e})
+                        \inang{\ralloc\rbar}(\bar{v}) ,\rhomap)}
+            {([\bar{v}/\xbar][\rbar/\rhobar][\ralloc/\rhoalloc]\,e,\rhomap)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+%
+\begin{minipage}{3.3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn,\ralloc \in \rhoenv \spc 
+    \redstoo{(e_i,\rhomap)}{(e_i',\rhomap')}
+  }
+  {
+    \redstoo{((\lambdaexp{\rgn}{\rhoalloc\rhobar}
+                        {\taubar \; \xbar}{e})
+                        \inang{\ralloc\rbar}(...,e_i,...) ,\rhomap)}
+            {((\lambdaexp{\rgn}{\rhoalloc\rhobar}
+                        {\taubar \; \xbar}{e})
+                        \inang{\ralloc\rbar}(...,e_i',...),\rhomap')}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+
+\caption{\fbname: Operational Semantics}
+\label{fig:fb-opsem}
+\end{figure*}

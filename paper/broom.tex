@@ -65,7 +65,7 @@
 \newcommand{\U}[0]{\cup}
 \newcommand{\X}[0]{\times}
 \newcommand{\xn}[0]{\cap}
-\newcommand{\redsto}[0]{\longrightarrow}
+\newcommand{\redsto}[3]{#1 \vdash #2 \longrightarrow #3}
 \newcommand{\rredsto}[0]{\rightsquigarrow_r }
 \newcommand{\evalsto}[0]{\longrightarrow }
 \newcommand{\env}[0]{\Gamma}
@@ -156,6 +156,7 @@
 \newcommand{\substFn}{\mathcal{S}}
 \newcommand{\mang}{\inang{\rhoalloc_m\bar{\rho_m} \,|\, \phi_m}}
 \newcommand{\rhoset}{\Sigma}
+\newcommand{\rhomap}{\Sigma}
 \newcommand{\rhoenv}{\Delta}
 \newcommand{\aenv}{\Theta}
 \newcommand{\phicx}{\Phi}
@@ -170,15 +171,38 @@
 \newcommand{\sredsto}{\Rightarrow}
 \newcommand{\stmtsem}[4]{#1 \, \vdash \, #2 \,/\, #3 \sredsto #4}
 \newcommand{\okin}[2]{#1 \; \texttt{ok} \; \texttt{in} \; #2}
-\newcommand{\lambdaexp}[3]{\lambda\inang{#1}(#2). #3}
+\newcommand{\lambdaexp}[4]{\lambda@#1\inang{#2}(#3). #4}
 \newcommand{\Lambdaexp}[2]{\Lambda\inang{#1}.#2}
 \newcommand{\letexp}[3]{\C{let}\;#1\,=\,#2\;\C{in}\;#3}
 \newcommand{\letregion}[2]{\C{letregion}\;#1\;\C{in}\;#2}
 \newcommand{\open}[4]{\C{open}\;#1\;\C{as}\;#2\;\C{withroot}\;#3\;\C{in}\;#4}
 \newcommand{\openalloc}[3]{\C{openalloc}\;#1\;\C{withroot}\;#2\;\C{in}\;#3}
 \newcommand{\unpackexp}[4]{\C{let}\;(#1,\,#2)\,=\,\C{unpack}\;#3\;\C{in}\;#4}
-\newcommand{\invalidexn}{\C{InvalidOpnException}}
+\newcommand{\invalidexn}{\bot}
 \newcommand{\toprgn}{\rgn_{\top}}
+\newcommand{\csolvestar}{{\sc CSolve*}\xspace}
+\newcommand{\elabExpr}{{\sf elabExpr}}
+\newcommand{\fields}{{\sf fields}}
+\newcommand{\mtype}{{\sf mtype}}
+\newcommand{\mbody}{{\sf mbody}}
+\newcommand{\bound}{{\sf bound}}
+\newcommand{\fresh}{{\sf fresh}}
+\newcommand{\typeOk}{{\sf typeOk}}
+\newcommand{\subtypeOk}{{\sf subtypeOk}}
+\newcommand{\templateTy}{{\sf templateTy}}
+\newcommand{\allocRgn}{{\sf allocRgn}}
+\newcommand{\shape}{{\sf shape}}
+%\newcommand{\smallskip}{\vspace*{0.1in}}
+\newcommand{\elabMeth}{{\sf elabMeth}}
+\newcommand{\frv}{{\sf frv}}
+\newcommand{\solve}{{\sf solve}}
+\newcommand{\elabClass}{{\sf elabClass}}
+\newcommand{\elabCons}{{\sf elabCons}}
+\newcommand{\elabClassTable}{{\sf elabClassTable}}
+\newcommand{\CLOSED}{\mathtt{C}}
+\newcommand{\OPEN}{\mathtt{O}}
+\newcommand{\XFERRED}{\mathtt{X}}
+\newcommand{\transfer}{{\sf transfer}}
 
 %Rules
 %-----
