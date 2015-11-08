@@ -1,0 +1,62 @@
+\section{Related Work}
+\label{sec:related-work}
+
+% Tofte and Talpin, A Theory of Stack Allocation in Polymorphically
+%     Typed Languages, 
+% Tofte and Talpin, Implementation of the Typed Call-by-Value
+%     λ-calculus using a Stack of Regions, POPL'94
+% Tofte and Talpin, Region-Based Memory Management, IC'97
+% Tofte, Birkedal, Elsman, Hallenberg, A Retrospective on Region-based
+%     Memory Management, HOSC'2004.
+% Yates, A Type-And-Effect System for Encapsulating Memory In Java, 1999
+% Salcianu et al, Ownership Types for Safe Region-Based Memory Management in 
+%     Real-Time Java, PLDI'03
+% Bacchino et al, A Type and Effect System for Deterministic Parallel Java,
+%     OOPSLA'09.
+% Calcagno et al, Stratified operational semantics for safety and correctness
+%     of the region calculus, POPL'01
+% Hicks et al, Experience With Safe Manual Memory-Management in
+%     Cyclone, ISMM'04
+% Grossman et al, Region-based Memory Management in Cyclone, PLDI'02
+% Henglein, Makholm, & Niss, A direct approach to control-flow sensitive
+%     region-based memory management, PPDP'01.
+% Talpin & Jouvelot, Polymorphic Type, Region and Effect Inference, JFP'92.
+% Tofte & Birkedal, A Region Inference Algorithm, TOPLAS'98.
+
+Tofte and Talpin in~\cite{tofte93,tofte94,tofte97} introduce the
+concept of a region type system to statically ensure the safety of
+region-based memory management in ML. Following their seminal work,
+static type systems for safe region-based memory management have been
+extensively studied in the context of various languages and problem
+settings~\cite{cyclone02, cyclone04, yates99, MIT03, DPJ09, HMN01,
+WW01, rust}. Our work differs from the existing proposals in a number
+of ways. Firstly, our problem setting includes lexically scoped stack
+regions and dynamic transferable regions (both programmer-managed) in
+context of an object-oriented programming language equipped with
+higher-order functions. Second, we adopt a two-pronged approach to
+memory safety that relies on a combination of a simple static type
+system and lightweight runtime checks. The type system reduces the
+problem of ensuring safety of all memory accesses in a program into a
+problem of enforcing a state-transition discipline on memory accesses
+over a small subset of objects in the program. The later can be done
+efficiently at runtime. his lets us guarantee safety in presence of
+dynamic memory allocations and deallocations without requiring either
+restrictive static mechanisms (e.g., linear types and borrow checker)
+or expensive runtime mechanisms (e.g., garbage collection and
+reference counting). Lastly, our region type system comes equipped
+with full type inference that completely eliminates the need to write
+region annotations on types to convince the type checker that the
+program is safe. 
+
+% In contrast, ~\cite{tofte97} proposes to
+% extend Standard ML, a higher-order functional language, with
+% lexically-scoped stack regions. Cyclone~\cite{cyclone02} 
+
+
+% and defines an elaboration from
+% Standard ML to the extended version of Standard ML. The aim of the
+% elaboration is to introduce stack regions and do away with GC in a
+% transparent fashion without jeopardizing memory safety. We too define
+% an elaboration, but our focus is on introducing region annotations
+% necessary to prove the safety of an object-oriented program with
+% (stack and dynamic) regions. Cyclone

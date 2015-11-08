@@ -7,7 +7,7 @@
   {\rgn} \in \mathtt{Static \; region \; ids} \qquad
   {\rho} \in \mathtt{Region \; variables} \qquad
   {\tyvar, \tyvarb} \in \mathtt{Type \; variables} \qquad
-  {mn} \in \mathtt{Method \; names} \qquad
+  {m} \in \mathtt{Method \; names} \qquad
   {x,y,f} \in \mathtt{Variables \; and \; fields} }\\
 cn & \in & \M{Class \; names} & \coloneqq & \ObjZ \ALT \RgnZ \ALT A \ALT B\\
      \fgjN & \in & \M{FGJ \; class \; types} & \coloneqq & cn\inang{\tbar}\\
@@ -27,13 +27,13 @@ k  & \in & \M{Constructors} & \coloneqq &
      cn(\bar{\tau} \; \bar{x})\{\C{super}(\bar{x}); \;
                                 \C{this}.\bar{f}\,=\,\bar{x};\}\\
 d  & \in & \M{Methods} & \coloneqq & 
-     \tau \; mn\inang{\rhoalloc \rhobar \,|\, \phi} (\taubar \; \xbar)
+     \tau \; m\inang{\rhoalloc \rhobar \,|\, \phi} (\taubar \; \xbar)
      \{\C{return}\;e;\}\\
 \phi,\phicx &\in& \M{Region\;constraints} & \coloneqq & true 
       \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi\\
 % v  & \in & \M{Value\;expressions} & \coloneqq & x \ALT \C{new} \; \fbN(\vbar)\\
 e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f 
-     \ALT e.mn\inang{\ralloc \rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar) \\
+     \ALT e.m\inang{\ralloc \rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar) \\
 %    \ALT (\tau)\, e\\
    & & & & \ALT \lambdaexp{\rhoalloc\rhobar \,|\, \phi}{\xbar:\taubar} {e}
 %          \ALT \Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}
