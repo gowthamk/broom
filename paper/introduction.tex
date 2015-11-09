@@ -1,4 +1,5 @@
 \newcommand{\TODO}[1]{\textbf{TODO: #1}}
+\newcommand{\eg}{\emph{e.g.}}
 
 \section{Introduction}
 \label{sec:introduction}
@@ -66,25 +67,26 @@ Furthermore, this is quite analogous, from a performance perspective, to the cop
 when a garbage collector promotes an object from a lower generation to a higher generation.
 From this perspective, a region may be seen as a user-controlled generation.)
 
+This ensures that we can safely free one dynamic region (\eg, the input-message in our example)
+without affecting the validity of pointers in another dynamic region (\eg, the output-message).
+However, this is not sufficient! When processing the input-message $D$, we necessarily will have to create
+pointers that point to objects that are internal to $D$. Such pointers may be stack-allocated or even reside
+in the heap (\eg, consider the iterator object used to iterate over the list in the input-message).
+How do we ensure the safety of these pointers?
+
+We combine \emph{static} regions with the following protocol to ensure safety in these cases.
+To work with a dynamic region $D$, we must first \emph{open} region D1,
+to indicate that $D$ should not be freed during this period.
+When the processing of the region is complete, we close the region $D$,
+to indicate that it is safe to free $D$.
+Our type-system permits the creation of pointers to internal objects of \emph{open dynamic} regions,
+but uses lexical scoping to ensure that such pointers are no longer live when the region is closed.
+Thus, such pointers may be either stack-allocated or reside in a region whose lifetime is statically
+guaranteed to be contained within the interval when $D$ is open.
+As a consequence, the system ensures the strong invariant that for a \emph{closed dynamic} region $D$
+no pointer from outside $D$ points to an internal object of $D$.
+
 \begin{itemize}
-
-
-\item
-Each such region represents a data-structure D1 that can be used independent of any other data-structure D2, from a memory management perspective: in other words, we should be able to deallocate D2, without affecting our ability to use D1 and vice-versa. This more-or-less reduces to the restriction that objects in D1 cannot point to objects in D2 and vice-versa.
-\item
-In our system, a transferable region with this strong property [invariant] is referred to as a closed transferable region.  
-
-\item
-We cannot always ensure that a transferable region D1 has this property. For example, while working with such a region (either during its production stage or consumption stage), we may need to create temporary objects (constituting working storage, so to speak) that point to internal objects of D1. We use the following idiom to handle such situations: we open a transferable region D1, to indicate that we are going to be working D1 and that D1 cannot be freed during this period; when we are done with this processing, we close the region D1. At this point we should regain the strong invariant that no pointer crosses the boundary of D1. [The goal of our type-system is to ensure this.]
-
-\item
-Re-establishing the desired invariant when a region D1 is closed requires that all temporary objects created while processing the region [that contain pointers into the region D1] be necessarily freed by the time D1 is closed. We ensure this by allocating such objects in a static-region S1 that is guaranteed to be deallocated before D1 is closed. We ensure this by statically ensuring that S1's scope is statically nested within the open-close scope for D1.
-
-\item
-The same technique also ensures that stack variables that may point to objects inside D1 are out-of-scope by the time D1 is closed.
-
-\item
-Note that in this section we introduce dynamic regions first, which are our primary goal (and which are the primary novel aspect of this paper). Static regions arise as a necessary and useful (but not novel) ingredient to support working with dynamic regions.
 
 \item
 This reduces the problem of ensuring memory safety to two sub-problems: the first one, to ensure the inter-region pointer invariants about which objects in which regions can point to which objects in which regions, and the second one, ensuring the correct usage protocol for pointers (handles) to regions themselves. In particular, the second one includes the constraints such as: do not free an open region, do not open a freed region, etc.
