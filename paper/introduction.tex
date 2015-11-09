@@ -1,6 +1,54 @@
 \section{Introduction}
 \label{sec:introduction}
 
+\subsection*{Outline}
+
+\begin{itemize}
+\item
+Setting: Consider a producer that creates a data-structure and passes it to a consumer to process. Suppose that the data-structure is very large, and it takes some time to produce it. A GC that occurs during this phase will [potentially, depending on generations] scan the partially constructed data-structure, but this scan is useless since the entire data-structure is alive. In a system, where most of the work takes this form, with producers producing really large data-structures, the GC overheads become significant and better performance can be achieved using alternative memory management techniques. (We could present the Ci\# version of one of motivating Naiad examples here. E.g., it could be the Select example. But when I look at this example, it lacks one of the complicating aspects, namely that a dynamic region may be created in one call of the OnReceive method, updated in several subsequent invocations of the OnReceive method, and finally be transferred in some invocation.)
+
+\item
+The goal of this work is to enable transferable regions: essentially a data-structure such as the above. It is best to consider a transferable region as representing a single data-structure (that is, a composite object), and not a collection of unrelated individual objects.
+
+\item
+Each such region represents a data-structure D1 that can be used independent of any other data-structure D2, from a memory management perspective: in other words, we should be able to deallocate D2, without affecting our ability to use D1 and vice-versa. This more-or-less reduces to the restriction that objects in D1 cannot point to objects in D2 and vice-versa.
+\item
+In our system, a transferable region with this strong property [invariant] is referred to as a closed transferable region.  
+
+\item
+We cannot always ensure that a transferable region D1 has this property. For example, while working with such a region (either during its production stage or consumption stage), we may need to create temporary objects (constituting working storage, so to speak) that point to internal objects of D1. We use the following idiom to handle such situations: we open a transferable region D1, to indicate that we are going to be working D1 and that D1 cannot be freed during this period; when we are done with this processing, we close the region D1. At this point we should regain the strong invariant that no pointer crosses the boundary of D1. [The goal of our type-system is to ensure this.]
+
+\item
+Re-establishing the desired invariant when a region D1 is closed requires that all temporary objects created while processing the region [that contain pointers into the region D1] be necessarily freed by the time D1 is closed. We ensure this by allocating such objects in a static-region S1 that is guaranteed to be deallocated before D1 is closed. We ensure this by statically ensuring that S1's scope is statically nested within the open-close scope for D1.
+
+\item
+The same technique also ensures that stack variables that may point to objects inside D1 are out-of-scope by the time D1 is closed.
+
+\item
+Note that in this section we introduce dynamic regions first, which are our primary goal (and which are the primary novel aspect of this paper). Static regions arise as a necessary and useful (but not novel) ingredient to support working with dynamic regions.
+
+\item
+This reduces the problem of ensuring memory safety to two sub-problems: the first one, to ensure the inter-region pointer invariants about which objects in which regions can point to which objects in which regions, and the second one, ensuring the correct usage protocol for pointers (handles) to regions themselves. In particular, the second one includes the constraints such as: do not free an open region, do not open a freed region, etc.
+
+\item
+We can elaborate on these two categories on invariants.
+
+\item
+We then explain that our type-system statically ensures that the program will satisfy the first set of constraints.
+
+\item
+We explain that we verify that the second set of constraints are satisfied dynamically.
+
+\item
+We justify our choice to do in this fashion: the first set of constraints are expensive to check dynamically, while the second set of constraints is not. In contrast, a static typechecker that rules out the second category of violations would be very restrict from an expressiveness perspective (requiring a linear type system). Finally, the human effort to ensure the second set of invariants is not as burdensome (as these are coarse-grained objects manipulated infrequently), unlike in the case for the first set.
+
+\item
+We can perhaps illustrate the need to create handles/pointers to regions and store them in dynamic data-structures like dictionaries to illustrate why restricting the usage of such pointers would be too constraining.
+
+\end{itemize}
+
+\subsection*{Contributions}
+
 The paper makes the following contributions:
 
 \begin{itemize}
