@@ -92,18 +92,23 @@ However, our language also admits parametric polymorphism (generics)
 and higher-order functions, whose interaction is non-trivial in
 context of a region type system. On the other hand, our type system
 does not admit region kinds and ownership, and is considerably simpler
-than theirs. Moreover, our type system comes with a type
+than theirs. Furthermore, our type system comes with a type
 safety result that formalizes its guarantees with respect to a
 well-defined operational semantics. Like Cyclone, ~\cite{MIT03}'s
-language is explicitly typed, with some support for local type
-inference. Consequently, region types for methods and classes need to
-be written explicitly. In contrast, we support full type inference
-that eliminates such need.
+language is explicitly typed. Although there is some support for local
+type inference, region types for methods and classes need to be
+written explicitly. In contrast, we support full type inference that
+eliminates any such need.
 
 ~\cite{HMN01} proposes a flow-sensitive region-based memory management
 for first-order programs that proposes to overcome some of the
 drawbacks of~\cite{tofte97} by generalizing~\cite{tofte97}'s approach
 to regions with dynamic lifetimes. However, dynamic regions are still
-not first-class values of the language. Nonetheless, due to aliasing
-among region names, ~\cite{HMN01} requires reference counting for
-regions to ensure memory safety.
+not first-class values of the language, and reference counting is
+nonetheless needed to ensure memory safety.~\cite{WW01} extends lambda
+calculus with first-class regions with dynamic lifetimes, and imposes
+restrictive linear typing to control accesses to regions. All type
+annotations need to be written explicitly. Moreover, invariants needed
+to ensure safety under region transfers, such as the absence of
+references that escape a transferable region, cannot be enforced
+under~\cite{WW01}'s type system.
