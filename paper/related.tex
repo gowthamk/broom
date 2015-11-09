@@ -39,24 +39,71 @@ system and lightweight runtime checks. The type system reduces the
 problem of ensuring safety of all memory accesses in a program into a
 problem of enforcing a state-transition discipline on memory accesses
 over a small subset of objects in the program. The later can be done
-efficiently at runtime. his lets us guarantee safety in presence of
+efficiently at runtime. This lets us guarantee safety in presence of
 dynamic memory allocations and deallocations without requiring either
-restrictive static mechanisms (e.g., linear types and borrow checker)
+restrictive static mechanisms (e.g., linear types and unique pointers)
 or expensive runtime mechanisms (e.g., garbage collection and
 reference counting). Lastly, our region type system comes equipped
 with full type inference that completely eliminates the need to write
 region annotations on types to convince the type checker that the
 program is safe. 
 
-% In contrast, ~\cite{tofte97} proposes to
-% extend Standard ML, a higher-order functional language, with
-% lexically-scoped stack regions. Cyclone~\cite{cyclone02} 
+~\cite{tofte97} proposes to extend Standard ML, a higher-order
+functional language, with lexically-scoped stack regions, and defines
+an elaboration from Standard ML to the region-annotated version of
+Standard ML. The aim of the elaboration is to introduce stack regions
+and do away with GC in a transparent fashion without jeopardizing
+memory safety. We too define an elaboration, but our focus is on
+introducing region annotations necessary to prove the safety of an
+object-oriented program that already uses (stack and dynamic) regions.
+Similar to their region inference algorithm, our region type inference
+algorithm can deal with region-polymorphic recursion by computing
+fixed points for recursive constraints. While their inference
+algorithm only ever generates equality constraints, which can be
+solved via unification, our type inference algorithm also generates
+partial order outlives constraints, which are required to capture
+subtle relationships between lifetimes of transferable regions and
+stack regions. Consequently, our constraint solving algorithm is more
+sophisticated, and is capable of inferring unknown outlives
+constraints over region arguments of polymorphic recursive functions.
 
+Cyclone~\cite{cyclone02} equips C with programmer-managed stack
+regions, and a typing discipline that statically guarantees the safety
+of all pointer dereferences. However, types need to be written
+explicitly. While some region annotations can be inferred, type
+inference is purely intraprocedural, and cannot infer region types for
+functions. Later proposal~\cite{cyclone04} extends Cyclone with
+dynamic regions, but has to impose unique pointer restrictions to
+guarantee safety. Objects that need to be shared within data
+structures are allowed to have multiple references, and safety for
+such objects was ensured via runtime reference counting.
 
-% and defines an elaboration from
-% Standard ML to the extended version of Standard ML. The aim of the
-% elaboration is to introduce stack regions and do away with GC in a
-% transparent fashion without jeopardizing memory safety. We too define
-% an elaboration, but our focus is on introducing region annotations
-% necessary to prove the safety of an object-oriented program with
-% (stack and dynamic) regions. Cyclone
+An ownership type system for safe region-based memory management in
+real-time Java has been proposed by~\cite{MIT03}. Like us, they too
+assume a source language with programmer-managed memory regions, and
+focus on proving safety of programs written in that language. Their
+source language admits various kinds of regions in order to support
+shared-memory concurrency. However, all their regions have
+lexically-scoped lifetimes. In contrast, we admit regions with
+dynamically determined lifetimes in order to support message-passing
+concurrency. We borrow outlives relation from their formal
+development, and our type system bears some similarities to their's.
+However, our language also admits parametric polymorphism (generics)
+and higher-order functions, whose interaction is non-trivial in
+context of a region type system. On the other hand, our type system
+does not admit region kinds and ownership, and is considerably simpler
+than theirs. Moreover, our type system comes with a type
+safety result that formalizes its guarantees with respect to a
+well-defined operational semantics. Like Cyclone, ~\cite{MIT03}'s
+language is explicitly typed, with some support for local type
+inference. Consequently, region types for methods and classes need to
+be written explicitly. In contrast, we support full type inference
+that eliminates such need.
+
+~\cite{HMN01} proposes a flow-sensitive region-based memory management
+for first-order programs that proposes to overcome some of the
+drawbacks of~\cite{tofte97} by generalizing~\cite{tofte97}'s approach
+to regions with dynamic lifetimes. However, dynamic regions are still
+not first-class values of the language. Nonetheless, due to aliasing
+among region names, ~\cite{HMN01} requires reference counting for
+regions to ensure memory safety.
