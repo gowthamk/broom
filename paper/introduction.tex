@@ -1,10 +1,12 @@
+\newcommand{\TODO}[1]{\textbf{TODO: #1}}
+
 \section{Introduction}
 \label{sec:introduction}
 
 \subsection*{Outline}
 
 Consider the example shown in Fig.~\ref{fig:motivating-eg}.
-\textbf{TODO: Replace by more complex example where data-structure is updated
+\TODO{Replace by more complex example where data-structure is updated
 over multiple invocations of method and finally transferred.}
 This code represents the logic for a streaming query operator (also known
 as a continuous query). The operator receives a continuous stream of
@@ -46,6 +48,23 @@ We refer to such regions as \emph{dynamic} regions.
 
 The goal of this work is an automatic (memory-safe) region-based memory management technique
 that supports dynamic regions and higher-order functions.
+Though our focus is on memory-safety, dynamic regions also have other side-benefits.
+When a producer transfers a data-structure to a consumer, in a shared-memory context , our approach
+provides an ownership discipline that ensures that the producer cannot subsequently modify
+the data-structure. When the same transfer happens in a distributed setting, the system guarantees
+that the data-structure is self-contained and can be safely transmitted across address spaces.
+\TODO{How accurate is this claim?}
+
+The key memory safety property we wish to ensure is that there are no dangling references:
+i.e., a reference to an object that has been freed.
+\TODO{Or, should we say: no dangling reference is dereferenced}
+A key invariant and restriction that we utilize to achieve this is that no object $o_1$ in one dynamic
+region $D_1$ can contain a pointer to an object $o_2$ in another dynamic region $D_2$.
+(In cases where this is too restrictive, the user has to resort to (deep) copying $o_2$ to $D_1$.
+This is conceptually quite reasonable given the perspective that $D_1$ is a self-contained data-structure.
+Furthermore, this is quite analogous, from a performance perspective, to the copying that happens
+when a garbage collector promotes an object from a lower generation to a higher generation.
+From this perspective, a region may be seen as a user-controlled generation.)
 
 \begin{itemize}
 
