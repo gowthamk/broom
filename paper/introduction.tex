@@ -3,12 +3,52 @@
 
 \subsection*{Outline}
 
-\begin{itemize}
-\item
-Setting: Consider a producer that creates a data-structure and passes it to a consumer to process. Suppose that the data-structure is very large, and it takes some time to produce it. A GC that occurs during this phase will [potentially, depending on generations] scan the partially constructed data-structure, but this scan is useless since the entire data-structure is alive. In a system, where most of the work takes this form, with producers producing really large data-structures, the GC overheads become significant and better performance can be achieved using alternative memory management techniques. (We could present the Ci\# version of one of motivating Naiad examples here. E.g., it could be the Select example. But when I look at this example, it lacks one of the complicating aspects, namely that a dynamic region may be created in one call of the OnReceive method, updated in several subsequent invocations of the OnReceive method, and finally be transferred in some invocation.)
+Consider the example shown in Fig.~\ref{fig:motivating-eg}.
+\textbf{TODO: Replace by more complex example where data-structure is updated
+over multiple invocations of method and finally transferred.}
+This code represents the logic for a streaming query operator (also known
+as a continuous query). The operator receives a continuous stream of
+input messages, which are batched into time-windows associated with a logical
+timestamp. Messages may be delivered out-of-order and multiple messages with
+the same timestamp may be delivered. A timing-message, periodically indicates that
+no more input messages with a timestamp less than a given value $t$ will be subsequently
+delivered. At this point, the operator can create the output message corresponding
+to time $t$ and deliver it to its successors.
 
-\item
-The goal of this work is to enable transferable regions: essentially a data-structure such as the above. It is best to consider a transferable region as representing a single data-structure (that is, a composite object), and not a collection of unrelated individual objects.
+\input{motivating-eg}
+
+This example is an instance of a general pattern, where a producer creates a data-structure
+and passes it to a consumer.
+In a system where most of the computation takes this form and these data-structures are
+very large, as is the case with many streaming big-data analysis systems,
+the garbage collection overheads become significant.
+% as the collector scans these large data-structures
+However, these data-structures have a well-defined lifetime, which can be exploited to
+achieve better performance 
+% using alternative memory management techniques.
+
+Region-based memory management is a good fit for such programs.
+A region is a block of memory (consisting of potentially more than one contiguous
+range of memory locations, permitting a region to grow) that is used to realize
+a data-structure with a well-defined lifetime. In particular, the entire region
+is typically freed in one shot.
+
+Region-based memory management, both manual as well as automatic, has been known for
+a long time. Manual region-based memory management suffers from the usual challenges,
+namely the potential for dangling references and lack of memory safety. Automatic
+region-based memory managements guarantee memory safety, but impose various restrictions.
+Tofte and Talpin's system, for example, requires that the set of all regions (existing
+at a point in time) forms a stack. Specifically, this requires that the lifetimes of
+all regions must be well-nested: it is not possible to have two regions whose lifetimes
+overlap, with neither one's lifetime contained within the other.
+Unfortunately, the data-structures in the above example do not satisfy this restriction.
+We refer to such regions as \emph{dynamic} regions.
+
+The goal of this work is an automatic (memory-safe) region-based memory management technique
+that supports dynamic regions and higher-order functions.
+
+\begin{itemize}
+
 
 \item
 Each such region represents a data-structure D1 that can be used independent of any other data-structure D2, from a memory management perspective: in other words, we should be able to deallocate D2, without affecting our ability to use D1 and vice-versa. This more-or-less reduces to the restriction that objects in D1 cannot point to objects in D2 and vice-versa.
