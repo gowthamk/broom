@@ -5,27 +5,28 @@
 \label{sec:introduction}
 
 Consider the example shown in Fig.~\ref{fig:motivating-eg}.
-\TODO{Replace by more complex example where data-structure is updated
-over multiple invocations of method and finally transferred.}
-This code represents the logic for a streaming query operator (also known
-as a continuous query). The operator receives a continuous stream of
-input messages, which are batched into time-windows associated with a logical
-timestamp. Messages may be delivered out-of-order and multiple messages with
-the same timestamp may be delivered. A timing-message, periodically indicates that
-no more input messages with a timestamp less than a given value $t$ will be subsequently
-delivered. At this point, the operator can create the output message corresponding
-to time $t$ and deliver it to its successors.
+This code represents the logic for a streaming query operator (also
+known as a continuous query). The operator receives a continuous
+stream of input messages, which are processed via a user-defined
+function, and batched into time-windows associated with a logical
+timestamp. Messages may be delivered out-of-order and multiple
+messages with the same timestamp may be delivered. A timing-message,
+periodically indicates that no more input messages with a timestamp
+less than or equalt to a given value $t$ will be subsequently
+delivered. At this point, the operator can create the output message
+corresponding to time $t$ and deliver it to its successors.
 
 \input{motivating-eg}
 
-This example is an instance of a general pattern, where a producer creates a data-structure
-and passes it to a consumer.
-In a system where most of the computation takes this form and these data-structures are
-very large, as is the case with many streaming big-data analysis systems,
-the garbage collection overheads become significant.
+This example is an instance of a general pattern, where a producer
+creates a data-structure and passes it to a consumer.  In a system
+where most of the computation takes this form, and these
+data-structures are very large, as is the case with many streaming
+big-data analysis systems, the garbage collection overheads become
+significant.
 % as the collector scans these large data-structures
-However, these data-structures have a well-defined lifetime, which can be exploited to
-achieve better performance 
+However, these data-structures have a well-defined lifetime, which can
+be exploited to achieve better performance 
 % using alternative memory management techniques.
 
 Region-based memory management is a good fit for such programs.

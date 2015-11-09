@@ -35,18 +35,19 @@ regions and dynamic transferable regions (both programmer-managed) in
 context of an object-oriented programming language equipped with
 higher-order functions. Second, we adopt a two-pronged approach to
 memory safety that relies on a combination of a simple static type
-system and lightweight runtime checks. The type system reduces the
-problem of ensuring safety of all memory accesses in a program into a
-problem of enforcing a state-transition discipline on memory accesses
-over a small subset of objects in the program. The later can be done
-efficiently at runtime. This lets us guarantee safety in presence of
-dynamic memory allocations and deallocations without requiring either
-restrictive static mechanisms (e.g., linear types and unique pointers)
-or expensive runtime mechanisms (e.g., garbage collection and
-reference counting). Lastly, our region type system comes equipped
-with full type inference that completely eliminates the need to write
-region annotations on types to convince the type checker that the
-program is safe. 
+discipline and lightweight runtime checks. 
+% The type system reduces the problem of ensuring safety of all memory
+% accesses in a program into a problem of enforcing a state-transition
+% discipline on memory accesses over a small subset of objects in the
+% program. The later can be done efficiently at runtime. This lets us
+% guarantee safety in presence of
+In particular, our approach requires neither restrictive static
+mechanisms (e.g., linear types and unique pointers) nor expensive
+runtime mechanisms (e.g., garbage collection and reference counting)
+in order to guarantee safety. Lastly, our region type system comes
+equipped with full type inference that completely eliminates the need
+to write region annotations on types to convince the type checker that
+the program is safe. 
 
 ~\cite{tofte97} proposes to extend Standard ML, a higher-order
 functional language, with lexically-scoped stack regions, and defines

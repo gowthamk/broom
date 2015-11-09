@@ -1,25 +1,28 @@
 \begin{figure}[t!]
 \begin{numcodejava}
-class SelectVertex<TIn, TOut> {
-  Func<TIn, TOut> mapFn;
-  Func<TIn, bool> whereFn;
-  SelectVertex(Func<TIn, TOut> mapFn,
-               Func<TIn, bool> whereFn) {
-    this.mapFn = mapFn;
-    this.whereFn = whereFn;
+class MapVertex<TIn, TOut> extends NaiadVertex{
+  Func<TIn, TOut> udf;
+  SortedMap<TTime, List<TOut>> map;
+  ...
+  void onReceive(Time t, TIn inp) {
+    if (!this.map.containsKey(t))
+      this.map.put(t, new List<TOut>());
+    TOut outp = this.udf.apply(inp);
+    this.map.get(t).add(outp);
   }
-  void onReceive(List<TIn> in) {
-    List<TOut> out = new List<TOut>();
-    ListIterator<TIn> iter = in.listIterator();
-    while (iter.hasNext()) {
-       TIn inp = iter.getNext();
-       if (this.whereFn(inp))  {
-          TOut outp = this.mapFn(inp);
-          out.add(outp);
-       }
+  void onNotify(Time t) {
+    List<TOut> outps = new List<TOut>();
+    Iterator<Pair<Time, List<TOut>>> iter = 
+        // entries(0,t):  map entries with keys 
+        // between (and including) 0 & t
+        this.map.entries(0,t).iterator();
+    while(iter.hasNext()) {
+      Pair<Time, List<TOut>> p = iter.getNext();
+      outps.addAll(p.getSnd());
+      this.map.remove(p.getFst());
     }
+    this.transfer(t, outps);
   }
-  outRgn.transfer();
 }
 \end{numcodejava}
 \caption{\C{SELECT} dataflow operator}
