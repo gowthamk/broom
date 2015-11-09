@@ -12,7 +12,7 @@ function, and batched into time-windows associated with a logical
 timestamp. Messages may be delivered out-of-order and multiple
 messages with the same timestamp may be delivered. A timing-message,
 periodically indicates that no more input messages with a timestamp
-less than or equalt to a given value $t$ will be subsequently
+less than or equal to a given value $t$ will be subsequently
 delivered. At this point, the operator can create the output message
 corresponding to time $t$ and deliver it to its successors.
 

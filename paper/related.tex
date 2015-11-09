@@ -29,13 +29,13 @@ region-based memory management in ML. Following their seminal work,
 static type systems for safe region-based memory management have been
 extensively studied in the context of various languages and problem
 settings~\cite{cyclone02, cyclone04, yates99, MIT03, DPJ09, HMN01,
-WW01, rust}. Our work differs from the existing proposals in a number
-of ways. Firstly, our problem setting includes lexically scoped stack
-regions and dynamic transferable regions (both programmer-managed) in
-context of an object-oriented programming language equipped with
-higher-order functions. Second, we adopt a two-pronged approach to
-memory safety that relies on a combination of a simple static type
-discipline and lightweight runtime checks. 
+WW01, rust, gpu14}. Our work differs from the existing proposals in a
+number of ways. Firstly, our problem setting includes lexically scoped
+stack regions and dynamic transferable regions (both
+programmer-managed) in context of an object-oriented programming
+language equipped with higher-order functions. Second, we adopt a
+two-pronged approach to memory safety that relies on a combination of
+a simple static type discipline and lightweight runtime checks. 
 % The type system reduces the problem of ensuring safety of all memory
 % accesses in a program into a problem of enforcing a state-transition
 % discipline on memory accesses over a small subset of objects in the
@@ -92,13 +92,13 @@ development, and our type system bears some similarities to their's.
 However, our language also admits parametric polymorphism (generics)
 and higher-order functions, whose interaction is non-trivial in
 context of a region type system. On the other hand, our type system
-does not admit region kinds and ownership, and is considerably simpler
-than theirs. Furthermore, our type system comes with a type
-safety result that formalizes its guarantees with respect to a
-well-defined operational semantics. Like Cyclone, ~\cite{MIT03}'s
-language is explicitly typed. Although there is some support for local
-type inference, region types for methods and classes need to be
-written explicitly. In contrast, we support full type inference that
+eschews the notions of region kinds and ownership, leading to a more
+succinct formalization. Furthermore, we establish a type safety result
+that formalizes its guarantees with respect to a well-defined
+operational semantics. Like Cyclone, ~\cite{MIT03}'s language is
+explicitly typed. Although there is some support for local type
+inference, region types for methods and classes need to be written
+explicitly. In contrast, we support full type inference that
 eliminates any such need.
 
 ~\cite{HMN01} proposes a flow-sensitive region-based memory management
@@ -108,8 +108,19 @@ to regions with dynamic lifetimes. However, dynamic regions are still
 not first-class values of the language, and reference counting is
 nonetheless needed to ensure memory safety.~\cite{WW01} extends lambda
 calculus with first-class regions with dynamic lifetimes, and imposes
-restrictive linear typing to control accesses to regions. All type
-annotations need to be written explicitly. Moreover, invariants needed
-to ensure safety under region transfers, such as the absence of
-references that escape a transferable region, cannot be enforced
-under~\cite{WW01}'s type system.
+linear typing to control accesses to regions. All type annotations
+need to be written explicitly. Moreover, invariants needed to ensure
+safety under region transfers, such as the absence of references that
+escape a transferable region, cannot be enforced under~\cite{WW01}'s
+type system.
+
+The idea of using region-based memory management to facilitate the
+safe transfer of rich data structures between computational nodes has
+been previously explored by~\cite{gpu14} in the context of Scheme
+language. However, their setting only includes lexically-scoped
+regions for which Tofte and Talpin~\cite{tofte97} style analysis
+suffices. In contrast, our language provides first-class support for
+transferable regions with dynamic lifetimes. We require this
+generality in order to support streaming query operators, such as the
+one shown in Fig.~\ref{fig:motivating-eg}. 
+
