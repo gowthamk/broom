@@ -1,0 +1,27 @@
+\begin{figure}[t!]
+\begin{numcodejava}
+class SelectVertex<TIn, TOut> {
+  Func<TIn, TOut> mapFn;
+  Func<TIn, bool> whereFn;
+  SelectVertex(Func<TIn, TOut> mapFn,
+               Func<TIn, bool> whereFn) {
+    this.mapFn = mapFn;
+    this.whereFn = whereFn;
+  }
+  void onReceive(List<TIn> in) {
+    List<TOut> out = new List<TOut>();
+    ListIterator<TIn> iter = in.listIterator();
+    while (iter.hasNext()) {
+       TIn inp = iter.getNext();
+       if (this.whereFn(inp))  {
+          TOut outp = this.mapFn(inp);
+          out.add(outp);
+       }
+    }
+  }
+  outRgn.transfer();
+}
+\end{numcodejava}
+\caption{\C{SELECT} dataflow operator}
+\label{fig:motivating-eg}
+\end{figure}
