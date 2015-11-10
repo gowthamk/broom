@@ -30,15 +30,16 @@ be exploited to achieve better performance
 % using alternative memory management techniques.
 
 Region-based memory management is a good fit for such programs.
-A region is a block of memory (consisting of potentially more than one contiguous
+A region is a block of memory (consisting of one or more contiguous
 range of memory locations, permitting a region to grow) that is used to realize
-a data-structure with a well-defined lifetime. In particular, the entire region
-is typically freed in one shot.
+a data-structure with a well-defined lifetime. 
+Once a region is created, individual objects may be dynamically allocated within
+the region over time. Finally, the entire region is typically freed in one shot.
 
 Region-based memory management, both manual as well as automatic, has been known for
 a long time. Manual region-based memory management suffers from the usual challenges,
 namely the potential for dangling references and lack of memory safety. Automatic
-region-based memory managements guarantee memory safety, but impose various restrictions.
+region-based memory management systems guarantee memory safety, but impose various restrictions.
 Tofte and Talpin's system, for example, requires that the set of all regions (existing
 at a point in time) forms a stack. Specifically, this requires that the lifetimes of
 all regions must be well-nested: it is not possible to have two regions whose lifetimes
@@ -53,11 +54,9 @@ When a producer transfers a data-structure to a consumer, in a shared-memory con
 provides an ownership discipline that ensures that the producer cannot subsequently modify
 the data-structure. When the same transfer happens in a distributed setting, the system guarantees
 that the data-structure is self-contained and can be safely transmitted across address spaces.
-\TODO{How accurate is this claim?}
 
 The key memory safety property we wish to ensure is that there are no dangling references:
 i.e., a reference to an object that has been freed.
-\TODO{Or, should we say: no dangling reference is dereferenced}
 A key invariant and restriction that we utilize to achieve this is that no object $o_1$ in one dynamic
 region $D_1$ can contain a pointer to an object $o_2$ in another dynamic region $D_2$.
 (In cases where this is too restrictive, the user has to resort to (deep) copying $o_2$ to $D_1$.
@@ -73,8 +72,10 @@ pointers that point to objects that are internal to $D$. Such pointers may be st
 in the heap (\eg, consider the iterator object used to iterate over the list in the input-message).
 How do we ensure the safety of these pointers?
 
-We combine \emph{static} regions with the following protocol to ensure safety in these cases.
-To work with a dynamic region $D$, we must first \emph{open} region D1,
+We use \emph{static regions} (regions with lexically-scoped lifetimes), as well as the stack,
+for such temporary pointers (to objects inside a dynamic region) and use the following protocol
+to ensure safety of such pointers.
+To work with a dynamic region $D$, we must first \emph{open} region $D$,
 to indicate that $D$ should not be freed during this period.
 When the processing of the region is complete, we close the region $D$,
 to indicate that it is safe to free $D$.
@@ -86,10 +87,10 @@ As a consequence, the system ensures the strong invariant that for a \emph{close
 no pointer from outside $D$ points to an internal object of $D$.
 
 The final piece required to ensure memory-safety is ensuring that the program correctly follows the above-mentioned
-protocol for dynamic regions. The protocol is essentially a typestate specification: an open region cannot be freed and,
-dually, a freed region cannot be opened.
+protocol for dynamic regions: \eg, an open region should not be freed and, dually, a freed region should not be opened.
+(A complete typestate specification of the protocol is presented later.)
 
-Dynamic regions are first-class objects in our system: e.g., in our running example,
+Dynamic regions are first-class objects in our system: \eg, in our running example,
 we would like to use a dictionary that stores dynamic regions. However, this means that the program may create multiple
 aliases (pointers) to the same region, which, in turn, means that statically checking if the program correctly follows the
 dynamic region protocol is hard (undecidable, in fact). Safety can be ensured by using, \eg, linear typing to prevent the
@@ -100,7 +101,7 @@ In summary, our approach reduces memory safety to two sub-problems:
 (a) Ensuring  low-level invariants about pointers to (fine-grained) objects inside regions and 
 (b) Ensuring higher-level (typestate) invariants about the regions themselves. 
 We use a type system to statically ensure the first set of invariants. We use a dynamic check to ensure that the
-second set of invariants are satisfied.
+second set of invariants are satisfied at runtime.
 %
 This is a novel aspect of our system. We believe that this is a reasonable choice:
 dynamically checking for the second category of invariants is easy and does not pose a performance concern (unlike, \eg, the first category of constraints);
