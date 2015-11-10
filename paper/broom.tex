@@ -334,38 +334,7 @@ Programs}
 \maketitle
 
 \begin{abstract}
-
-Distributed execution engines, such as MapReduce and Dryad, represent
-a data-parallel computation as a dataflow graph with computational
-vertices connected by communication edges. The computation is run by
-executing the vertices of this graph on a set of available computers,
-while communication edges are materialized as either network
-connections, or appropriate inter-process communication channels.
-Although MapReduce and Dryad can perform optimal distribution the
-computation across available computers, they nevertheless rely on
-language runtimes, such as JVM or C\#.Net, to manage an atomic
-computation on a given machine. 
-
-In this paper, we demonstrate that the general purpose garbage
-collection scheme employed by C\#.Net runtime is not very effective
-for dataflow programs to the extent that the latency due to GC is
-intolerably high in many practical examples. We propose a memory
-management scheme that combines user-managed memory regions with
-automatic garbage collection, and lets programmers exploit specific
-memory behaviours exhibited by dataflow programs. To protect
-programmers from the dangers of manual memory management, we
-supplement our memory management scheme with a region type system that
-statically ensures the memory safety of region-annotated C\# programs,
-even in presence of higher-order stateful functions. Further, we
-describe a type inference algorithm that infers principal region types
-for first-order programs thereby saving programmers the need to write
-region annotations on types. Our inference algorithm is also very
-effective, albeit incomplete, for higher-order programs. As a
-testament to efficacy of our approach, we demonstrate performance
-improvements over a range of realistic dataflow programs that were
-rewritten to use region-based manual memory management, but are
-nevertheless judged to be safe by our type system.
-
+\input{abstract}
 \end{abstract}
 
 % general terms are not compulsory anymore, 

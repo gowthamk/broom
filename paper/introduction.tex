@@ -122,18 +122,18 @@ The paper makes the following contributions:
   destroy static and dynamic memory regions. Dynamic regions are
   first-class values in \name; they manifest as objects of type
   \C{Region}, and are treated on par with other objects. \name is
-  particularly suited for implementing distributed dataflow operators
-  (e.g: \c{SELECT} and \c{JOIN}), whose memory behavior exhibits
-  certain characteristics that admits efficient and \emph{mostly} safe
-  region-based memory management. Experiments demonstrate that
-  \naiad~\cite{naiad} dataflow operators using programmer-managed
+  particularly suited for dataflow programs, such as~\naiad,
+  whose memory behavior exhibits
+  certain characteristics that admits efficient region-based memory management.
+  Experiments demonstrate that   \naiad~\cite{naiad} dataflow program using programmer-managed
   memory regions outperform their GC counterparts by a margin of upto
   59\%. 
 
   \item \name is equipped with a region type system that statically
-  guarantees safety all memory accesses in a well-typed program,
+  guarantees safety of all memory accesses in a well-typed program,
   subject to some conditions that can be checked efficiently at
-  run-time. The overhead of checking these conditions is less than
+  run-time.
+  The overhead of checking these conditions is less than
   \GK{x\%} in our experiments with \naiad workloads.
 
   \item We define an operational semantics for \name, and a type
