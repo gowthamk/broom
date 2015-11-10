@@ -340,27 +340,43 @@ and (b). it is expensive and an overkill in most practical cases. We
 therefore reclaim the compositionality of type inference by solving
 the constraints in a compositional fashion. In more practical terms
 this means that our constraint solving algorithm visits and solves
-every constraint (or, every set of mutually recursive constraints)
+every constraint (or, every set of mutually dependent constraints)
 only once. It composes computed solutions to solve other constraints
 that depend on the solved constraints. Importantly, the failure to
 solve a dependent constraint does not result in backtracking. We now
-describe our compositional constraint solving algorithm in detail.
+describe our compositional constraint solving algorithm in detail. To
+simplify the presentation of our algorithm, we assume that are no
+mutually recursive definitions in the source program. Recursive
+definitions are nonetheless allowed.
 
-\paragraph{Notation and terminology} In a validity constraint, a
-predicate variable occuring on the left side of the turnstile is said
-to occur negatively. In contrast, a predicate variable occuring on the
-right side is said to occur positively.
+\paragraph{Terminology} In a validity constraint, a predicate variable
+occuring on the left side of the turnstile is said to occur
+negatively, or with \emph{negative polarity}. In contrast, a predicate
+variable occuring on the right side is said to occur positively, or
+with \emph{positive polarity}. A validity constraint
+\emph{constrains} the set of predicate variables that occur
+negatively in the constraint, while it \emph{uses} the set of
+predicate variables that occur positively. A constraint is said to be
+\emph{recursive} if it constrains and uses a predicate variable.
+% A pair of validity
+% constraints are said to be \emph{mutually dependent} if there exists a
+% pair ($\varphi_1$, $\varphi_2$) of predicate variables that occur
+% with opposite polarities in both the constraints. In such case, the
+% pair ($\varphi_1$,$\varphi_2$) of predicate variables are also said to
+% be mutually dependent. We call the transitive closure of mutual
+% dependency relation as \emph{transitive dependency} relation. Like
+% mutual dependency, transitive dependency is also extended to predicate
+% variables.
 
-Given a set of constraints, we first build a dependency graph ($G_c$)
-with validity constraints as nodes, and dependencies between them
-captured as edges. In particular, there exists an edge from a
-constraint $c_2$ to a constraint $c_1$ in the graph if any of the
-following conditions hold:
+Given a set of validity constraints, we first build a dependency graph
+($G_c$) with constraints as nodes, and dependencies between them
+captured as edges. There exists an edge from a constraint $c_2$ to a
+constraint $c_1$ in the graph (i.e., $c_2$ \emph{depends on} $c_1$) if
+any of the following conditions hold:
 \begin{itemize}
-\item $c_2$ and $c_1$ have atleast one common predicate variable
-($\varphi$) that occurs positively in $c_2$ and negatively in $c_1$.
-\item The set of predicate variables that occur negatively in $c_2$ is
-a (non-strict) subset of the corresponding set for $c_1$.
+\item $c_1$ constrains a predicate variable that $c_2$ uses. 
+\item $c_1$ constrains a (non-strict) subset of predicate variables
+that $c_2$ constraint.
 \end{itemize}
 The first condition intuitively corresponds to a case, where
 expression or type, whose region elaboration is constrained by $c_2$
@@ -369,20 +385,22 @@ constrained by $c_1$. The common predicate variable ($\varphi$)
 represents the unknown precondition in this case. The dependency from
 $c_2$ to $c_1$ means that $c_1$ must be solved to compute $\varphi$
 before $c_2$ is solved, thus enforcing the rule that the precondition
-of a method must not depend on its calling context. Since mutually
-recursive definitions refer each other, the first condition also
-results in bidirectional dependencies between mutually recursive
-constraints (and self-loops over recursive constraints). The second
-condition captures two kinds of dependencies. First, the dependency
-from the constraints over a method precondition to the constraints
-over the precondition of the class containing the method. This
-captures our preference that the constraints over a class's region
-parameters should not depend on the idiosyncracies of its methods. Any
-additional constraints required by any of its methods must be captured
-in the precondition of the method itself (well-formedness rules allow
-this possibility). The second condition also adds bidirectional
-dependencies between two validity constraints over same set of
-predicate variables, thus requiring them to be solved simultaneously. 
+of a method must not depend on its calling context. 
+% Note that the first condition results in self-loops over recursive
+% constraints in the dependency graph.  Since mutually recursive
+% definitions refer each other, the first condition also results in
+% bidirectional dependencies between mutually recursive constraints
+% (and self-loops over recursive constraints). 
+The second condition captures two kinds of dependencies. First, the
+dependency from the constraints over a method precondition to the
+constraints over the precondition of the class containing the method.
+This captures our preference that the constraints over a class's
+region parameters should not depend on the idiosyncracies of its
+methods. Any additional constraints required by any of its methods
+must be captured in the precondition of the method itself
+(well-formedness rules allow this possibility). The second condition
+adds bidirectional dependencies between validity constraints that
+constraint the same set of predicate variables. 
 
 Next, we convert the dependency graph over constraints into a
 dependency DAG ($G_C$) over sets of constraints, where each set
@@ -393,7 +411,64 @@ per any valid topological ordering of the graph. Accordingly, we
 obtain a topological ordering of nodes in the graph $G_{{C}}$, and
 solve the sets of constraints in that order. The solutions obtained
 after solving a constraint set are applied to the constraints in
-subsequent sets before attempting to solve them. 
+subsequent sets before attempting to solve them. Consequently, when
+the turn of a constraint set ($C$) arrives during the constraint solving
+process, it satisfies certain properties:
+\begin{itemize}
+\item There exists only one predicate variable that is either
+constrained or used by the constraints in the set ($C$). The variable is
+called set's \emph{subject}. This property follows from (a). the fact
+that all the dependency constraints have already been solved (and
+solutions applied), and (b). the assumption that there are no mutually
+recursive definitions. 
+\item All the constraints that constrain the set's subject are present
+in the set. This follows from our definition of the dependency relation.
+\end{itemize}
+
+Solving the set ($C$) of constraints entails finding an assignment for
+$C$'s subject, and also all the region variables that occur free in
+$C$, such that the solutions satisfy the well-formedness constraints.
+We now formalize the constraint satisfaction problem, and its
+solution.
+
+\begin{definition}
+\emph{(\textbf{Constraint Satisfaction Problem})}
+A constraint satisfaction problem is a tuple
+$(C,\rhoenv,\varphi,\bar{\rho} \in \bar{\rhoenv})$, where $C$, the set
+of validity constraints, is of the form:
+\begin{center}
+\(
+  \bigcup_{i=1}^n \{
+    \isvalid{\phictxt^{i} \conj \varphi}
+            {\phicstr^{i} \conj F_i(\varphi)}
+  \}
+\)
+\end{center}
+The subject of the set is $\varphi$, and its free region variables
+range over $\rhobar$. The solution to the constraint satisfaction
+problem is a pair $(\substFn,\phisol)$, where $\substFn$ is a map from
+region variables to region identifiers such that $\substFn(\rho_j) \in
+\rhoenv_j$, for every $j$, and $\phisol$ is a constraint formula such
+that:
+\begin{itemize}
+\item $\phisol$ is well-formed under $\rhoenv$ (i.e.,
+$\tywf{\rhoenv}{\phisol}$).
+\item $\phisol$ satisfies every validity constraint in $\substFn(C)$.
+That is, the following sequent is valid for every $i$:
+\begin{center}
+\(
+  \isvalid{\substFn(\phictxt^{i}) \conj \phisol}
+          {\substFn(\phicstr^{i}) \conj (\substFn \circ F_i)(\phisol))}
+\)
+\end{center}
+\item $\phisol$ is maximally weak. That is, $\nexists \phisol'$ such
+that $\phisol'$ satisfies every validity constraint in $\substFn(C)$,
+and $\phisol'$ is strictly weaker than $\phisol$ (i.e.,
+$\isvalid{\cdot}{\phisol \Rightarrow \phisol'}$ but
+$\isnotvalid{\cdot}{\phisol' \Rightarrow \phisol}$).
+\end{itemize}
+\end{definition}
+
 
 \subsection{The Constraint Satisfaction Problem}
 
