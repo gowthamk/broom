@@ -43,27 +43,22 @@ unknown region annotations and region constraints, respectively. For
 instance, if a variable $x$ has type $\ObjZ$ in FGJ, its region type
 template is of form $\ObjZ\inang{\rho_0}$, where $\rho_0$ is a fresh
 region variable. Likewise, given the region-annotated definition of
-\C{Pair} class from \S\ref{sec:fb-syntax} a region type template for
-the method \C{mkSnd} shown below is \footnote{In our
-exposition, we assume that classes $\C{A}$ and $\C{B}$ are trivial
-subclasses of $\ObjZ$ with no fields/methods. Like $\ObjZ$, they
-accept one region parameter - the allocation region of their
-objects.}\footnote{We abuse arrow notation to also represent types of
-methods, but unlike function types, there is no allocation region
-annotation atop the arrow in a method type.}
+\C{Pair} class from \S\ref{sec:fb-syntax} a region type template for a
+method with FGJ type $\C{Pair}\inang{\C{A},\C{B}} \rightarrow \C{A}$
+is \footnote{In our exposition, we assume that classes $\C{A}$ and
+$\C{B}$ are trivial subclasses of $\ObjZ$ with no fields/methods. Like
+$\ObjZ$, they accept one region parameter - the allocation region of
+their objects.}\footnote{We abuse arrow notation to also represent
+types of methods, but unlike function types, there is no allocation
+region annotation atop the arrow in a method type.}
 $\inang{\rhoalloc_0,\rho_1,\rho_2,\rho_3 \,|\, \varphi_0}
 \C{Pair}\inang{\C{A},\C{B}} \inang{\rho_1,\rho_2,\rho_3} \rightarrow
 \unitZ$, where $\rhoalloc_0$ and $\rho_{1-3}$ are fresh region
 variables, and $\varphi_0$ is a fresh predicate variable denoting
-unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.  
-\begin{codejava}
-  unit mkSnd(Pair<A,B> p) {
-    return (p.snd = new B());
-  }
-\end{codejava}
-Region type template of a type variable $\C{a}$ is $\C{a}@\rho$, where
-$\rho$ is fresh. For a class, a template is computed in two steps. In
-the first step, we templatize the types of all its fields, constructor
+unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.  Region type
+template of a type variable $\C{a}$ is $\C{a}@\rho$, where $\rho$ is
+fresh. For a class, a template is computed in two steps. In the first
+step, we templatize the types of all its fields, constructor
 arguments, and arguments and return values of all its methods, along
 with the type of its superclass. In the second step, we generalize all
 the free region variables occuring in the templates computed in the
