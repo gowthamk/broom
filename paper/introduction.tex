@@ -5,16 +5,17 @@
 \label{sec:introduction}
 
 Consider the example shown in Fig.~\ref{fig:motivating-eg}.
-This code represents the logic for a streaming query operator (also
-known as a continuous query). The operator receives a continuous
-stream of input messages, which are processed via a user-defined
-function, and batched into time-windows associated with a logical
-timestamp. Messages may be delivered out-of-order and multiple
-messages with the same timestamp may be delivered. A timing-message,
-periodically indicates that no more input messages with a timestamp
-less than or equal to a given value $t$ will be subsequently
-delivered. At this point, the operator can create the output message
-corresponding to time $t$ and deliver it to its successors.
+This code represents the logic for a streaming query operator.
+The operator receives a stream of input messages, each associated
+with a time (window) $t$, processed by method \texttt{onReceive}.
+Each input message contains a list of inputs, each of which is processed
+by applying a user-defined function to create a corresponding output.
+The operator may receive multiple messages with the same timestamp
+(and messages with different timestamps may be delivered out of order).
+A timing-message (an invocation of method \texttt{OnNotify}) indicates that
+no more input messages with a timestamp $t$ will be subsequently delivered.
+At this point, the operator completes the processing for time window $t$ and sends
+a corresponding output message to its successor.
 
 \input{motivating-eg}
 
@@ -22,11 +23,11 @@ This example is an instance of a general pattern, where a producer
 creates a data-structure and passes it to a consumer.  In a system
 where most of the computation takes this form, and these
 data-structures are very large, as is the case with many streaming
-big-data analysis systems, the garbage collection overheads become
+big-data analysis systems, the garbage collection overhead becomes
 significant.
 % as the collector scans these large data-structures
 However, these data-structures have a well-defined lifetime, which can
-be exploited to achieve better performance 
+be exploited to achieve better performance.
 % using alternative memory management techniques.
 
 Region-based memory management is a good fit for such programs.
@@ -35,17 +36,22 @@ range of memory locations, permitting a region to grow) that is used to realize
 a data-structure with a well-defined lifetime. 
 Once a region is created, individual objects may be dynamically allocated within
 the region over time. Finally, the entire region is typically freed in one shot.
+In this example, the output to be constructed for each time window $t$ can be
+implemented using a separate region.
 
 Region-based memory management, both manual as well as automatic, has been known for
 a long time. Manual region-based memory management suffers from the usual challenges,
 namely the potential for dangling references and lack of memory safety. Automatic
 region-based memory management systems guarantee memory safety, but impose various restrictions.
-Tofte and Talpin's system, for example, requires that the set of all regions (existing
-at a point in time) forms a stack. Specifically, this requires that the lifetimes of
+Tofte and Talpin's system~\cite{tofte94,tofte97} , for example, uses lexically scoped regions.
+At runtime, the set of all regions (existing at a point in time) forms a stack. Thus, the lifetimes of
 all regions must be well-nested: it is not possible to have two regions whose lifetimes
 overlap, with neither one's lifetime contained within the other.
-Unfortunately, the data-structures in the above example do not satisfy this restriction.
-We refer to such regions as \emph{dynamic} regions.
+Unfortunately, the data-structures in the above example do not satisfy this restriction
+(as the output messages for multiple time windows may be simultaneously live, without
+any containment relation between their lifetimes).
+We refer to regions with lexically scoped lifetimes as \emph{stack regions} and to regions 
+that do not have such a lexically scoped region as \emph{dynamic} regions.
 
 The goal of this work is an automatic (memory-safe) region-based memory management technique
 that supports dynamic regions (that are first-class objects) and higher-order functions.
@@ -72,13 +78,15 @@ pointers that point to objects that are internal to $D$. Such pointers may be st
 in the heap (\eg, consider the iterator object used to iterate over the list in the input-message).
 How do we ensure the safety of these pointers?
 
-We use \emph{static regions} (regions with lexically-scoped lifetimes), as well as the stack,
+We use \emph{stack regions} (regions with lexically-scoped lifetimes), as well as the stack,
 for such temporary pointers (to objects inside a dynamic region) and use the following protocol
 to ensure safety of such pointers.
 To work with a dynamic region $D$, we must first \emph{open} region $D$,
 to indicate that $D$ should not be freed during this period.
 When the processing of the region is complete, we close the region $D$,
 to indicate that it is safe to free $D$.
+In general, a dynamic region may be opened and closed multiple times before it is finally freed.
+
 Our type-system permits the creation of pointers to internal objects of \emph{open dynamic} regions,
 but uses lexical scoping to ensure that such pointers are no longer live when the region is closed.
 Thus, such pointers may be either stack-allocated or reside in a region whose lifetime is statically
@@ -122,18 +130,18 @@ The paper makes the following contributions:
   destroy static and dynamic memory regions. Dynamic regions are
   first-class values in \name; they manifest as objects of type
   \C{Region}, and are treated on par with other objects. \name is
-  particularly suited for implementing distributed dataflow operators
-  (e.g: \c{SELECT} and \c{JOIN}), whose memory behavior exhibits
-  certain characteristics that admits efficient and \emph{mostly} safe
-  region-based memory management. Experiments demonstrate that
-  \naiad~\cite{naiad} dataflow operators using programmer-managed
+  particularly suited for dataflow programs, such as~\naiad,
+  whose memory behavior exhibits
+  certain characteristics that admits efficient region-based memory management.
+  Experiments demonstrate that   \naiad~\cite{naiad} dataflow program using programmer-managed
   memory regions outperform their GC counterparts by a margin of upto
   59\%. 
 
   \item \name is equipped with a region type system that statically
-  guarantees safety all memory accesses in a well-typed program,
+  guarantees safety of all memory accesses in a well-typed program,
   subject to some conditions that can be checked efficiently at
-  run-time. The overhead of checking these conditions is less than
+  run-time.
+  The overhead of checking these conditions is less than
   \GK{x\%} in our experiments with \naiad workloads.
 
   \item We define an operational semantics for \name, and a type

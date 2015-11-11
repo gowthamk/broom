@@ -30,7 +30,7 @@ The \C{letregion} blocks can be nested, leading to a stack of regions
 that are deallocated in the reverse order in which they are allocated.
 Following ~\cite{cyclonepldi02}, we therefore call regions introduced
 by \C{letregion} expressions as \emph{stack regions}. The stack
-discipline induces \emph{outlives} relationship among regions created
+discipline induces an \emph{outlives} relationship among regions created
 by nested \C{letregion}s, where the region introduced by the outer
 \C{letregion} is guaranteed to outlive the one introduced by the inner
 \C{letregion}. It is therefore safe to refer to an object allocated in
@@ -43,8 +43,8 @@ field \C{x} of type \C{Object}):
     A a0 = new@R0 A();
     letregion R1 {
       A a1 = new@R1 A();
-      a1.x = new@R0 Object();
-      a0.x = new@R1 Object();
+      a1.x = new@R0 Object(); // safe & legal
+      a0.x = new@R1 Object(); // unsafe & illegal
       ...
     }
     ...
@@ -126,10 +126,11 @@ and \C{R1} at line 5.
 \subsection{Allocation Context and Qualified Region Polymorphism}
 \label{sec:alloc-ctxt}
 
-As evident from the examples shown above, the suffix \C{@R} in
-\C{new@R} instructs the \C{new} keyword to allocate the newly created
-object in the region labeled \C{R}. However, \name does not require
-the allocation region to be specified following a \C{new}. In the
+As the preceding examples illustrate, the suffix \C{@R} in
+\C{new@R} indicates that the newly created object should be allocated in the region labeled \C{R}.
+However, \name does not require the allocation region to be specified following a \C{new}.
+This is critical, as it enables \name applications to use existing region-oblivious C\# libraries.
+In the
 absence of explicit specification, \name allocates the newly created
 object in its \emph{allocation context}, which is the region at the
 top of the stack when \C{new} is executed. For instance, the
@@ -173,30 +174,30 @@ specifications, and the ability to infer qualified region-region
 polymorphic types are pivotal to interface region-oblivious standard
 library code with region-aware application code in \name. 
 
-\subsection{Boxed and Unboxed Values}
-
-In \name, like in \csharp, values of some primitive types, such as
-integers and bools, are unboxed, whereas others, such as strings are
-arrays, are boxed. Unlike unboxed values, boxed values are objects,
-hence passed by reference. It is therefore important to be mindful
-of allocation regions for strings and arrays, but not so much for
-integers and bools. For instance, in the following code, the
-assignment to integer variable \C{x} is safe, but the assignment to
-the string variable \C{y} is unsafe, as the allocation region (\C{R0})
-of the string constant has lesser lifetime than \C{y}.
-\begin{center}
-\begin{codejava}
-  int x;
-  string y;
-  letregion R0 {
-    x = 2;
-    y = "Hello, World!";
-  }
-  ...
-\end{codejava}
-\end{center}
-Accordingly, \name's region type system lets the former assignment
-pass by, but flags the later as an error.
+%\subsection{Boxed and Unboxed Values}
+%
+%In \name, like in \csharp, values of some primitive types, such as
+%integers and bools, are unboxed, whereas others, such as strings are
+%arrays, are boxed. Unlike unboxed values, boxed values are objects,
+%hence passed by reference. It is therefore important to be mindful
+%of allocation regions for strings and arrays, but not so much for
+%integers and bools. For instance, in the following code, the
+%assignment to integer variable \C{x} is safe, but the assignment to
+%the string variable \C{y} is unsafe, as the allocation region (\C{R0})
+%of the string constant has lesser lifetime than \C{y}.
+%\begin{center}
+%\begin{codejava}
+%  int x;
+%  string y;
+%  letregion R0 {
+%    x = 2;
+%    y = "Hello, World!";
+%  }
+%  ...
+%\end{codejava}
+%\end{center}
+%Accordingly, \name's region type system lets the former assignment
+%pass by, but flags the later as an error.
 
 \subsection{Dynamic (Transferable) Regions}
 
@@ -269,55 +270,77 @@ following subsection.
 \subsection{Memory Safety}
 \label{sec:memory-safety}
 
-Memory safety in \name is primarily due to its region type system,
-although few runtime checks are needed.
-% However, the type system does not ensure the integrity of a small
-% subset of pointers, called the \emph{unsafe set}, for which runtime
-% verification is needed to guarantee safety. This is more a design
-% decision rather than an unfortunate inevitability, as the following
-% discussion elaborates.
-At a fundamental level, the region type system's approach to memory
-safety involves approximating (a). the set of memory regions that are
-live at any given program location\footnote{We say the type system
-tracks \emph{liveness} of memory regions}, and (b).  \emph{outlives}
-relationships between them, and using this information to preempt
-potentially unsafe references from being created. These include:
-\begin{itemize}
-\item References into dead/non-existing regions,
-\item References from longer-living stack regions to shorter-living ones, and 
-\item References that escape transferable regions.
-\end{itemize}
-Maintaining precise approximation of liveness and outlives information
-for stack regions is easy. However, for dynamic (transferable) regions,
-statically determining liveness is equivalent to determining if a C
-pointer is null in presence of dynamic memory allocation, which is
-undecidable in general. Systems that attempt to ensure full memory
-safety in presence of dynamic memory (e.g., ~\cite{henglein},
-~\cite{rust}) do so by conservatively approximating liveness
-information for memory (regions). Maintaining a good conservative
-approximation requires them to employ techniques such as linear
-types~\cite{wadlerlt} or unique pointers~\cite{rust}, which impose
-restrictions that are often too hard to program
-around\footnote{Internet has many tutorials on how to \emph{fight} the
-borrow checker in Rust.}. This is particularly unacceptable in the
-context of \name, as dataflow programs are often run offline, and the
-concern for performance and developer productivity outweighs the
-concern for safety. 
+The key to memory safety in \name is the following restriction:
+an object $o_1$ in a region $R_1$ is allowed to store a pointer to
+an object $o_2$ in a region $R_2$ only if $R_2$ is guaranteed to outlive $R_1$.
+(A similar restriction applies in the case where $o_1$ is a stack-allocated variable.)
 
-\name's region type system therefore adopts the novel approach of
-overapproximating liveness information for transferable regions, i.e.,
-it might assume that a transferable region is live when, in fact, it
-might have already been transferred or freed. This imprecision should
-be a cause of concern as it can lead to cases where creation of unsafe
-references, and their subsquent dereferencing go unnoticed by the type
-system. Considering that stack regions can contain pointers into
-transferable regions, the worst case cost of overapproximating
-liveness is therefore the integrity of \emph{every} pointer on stack.
+Enforcing this restriction is simple in the case of stack regions since the outlives relation
+between stack regions can be inferred from their lexical nesting. Unfortunately,
+inferring outlives relations between transferable regions is not easy.
+\name imposes the following protocol on the use of transferable regions to help simplify
+this check.
 
-Fortunately, \name avoids this worst case scenario.  \name achieves
-this by imposing a simple state transition discipline on the lifetime
-of a transferable region.  The relevant finite state machine is shown
-in Fig.~\ref{fig:region-fsm}.
+A transferable region (that has not been freed or transferred) can be in one of two possible
+states, \emph{open} or \emph{closed}. A newly created region is in the closed state.
+A region must be opened, using the open construct (explained in detail below), in order
+to read or update or allocate an object within that region.
+An open region cannot be freed or transferred. 
+In particular, an open region is guaranteed to be live for the entire duration of the open construct.
+This allows the type system to infer a valid outlives relation between the opened region
+and any stack region that is nested within the open construct.
+
+%Memory safety in \name is primarily due to its region type system,
+%although few runtime checks are needed.
+%% However, the type system does not ensure the integrity of a small
+%% subset of pointers, called the \emph{unsafe set}, for which runtime
+%% verification is needed to guarantee safety. This is more a design
+%% decision rather than an unfortunate inevitability, as the following
+%% discussion elaborates.
+%At a fundamental level, the region type system's approach to memory
+%safety involves approximating (a). the set of memory regions that are
+%live at any given program location\footnote{We say the type system
+%tracks \emph{liveness} of memory regions}, and (b).  \emph{outlives}
+%relationships between them, and using this information to preempt
+%potentially unsafe references from being created. These include:
+%\begin{itemize}
+%\item References into dead/non-existing regions,
+%\item References from longer-living stack regions to shorter-living ones, and 
+%\item References that escape transferable regions.
+%\end{itemize}
+%Maintaining precise approximation of liveness and outlives information
+%for stack regions is easy. However, for dynamic (transferable) regions,
+%statically determining liveness is equivalent to determining if a C
+%pointer is null in presence of dynamic memory allocation, which is
+%undecidable in general. Systems that attempt to ensure full memory
+%safety in presence of dynamic memory (e.g., ~\cite{henglein},
+%~\cite{rust}) do so by conservatively approximating liveness
+%information for memory (regions). Maintaining a good conservative
+%approximation requires them to employ techniques such as linear
+%types~\cite{wadlerlt} or unique pointers~\cite{rust}, which impose
+%restrictions that are often too hard to program
+%around\footnote{Internet has many tutorials on how to \emph{fight} the
+%borrow checker in Rust.}. This is particularly unacceptable in the
+%context of \name, as dataflow programs are often run offline, and the
+%concern for performance and developer productivity outweighs the
+%concern for safety. 
+%
+%\name's region type system therefore adopts the novel approach of
+%overapproximating liveness information for transferable regions, i.e.,
+%it might assume that a transferable region is live when, in fact, it
+%might have already been transferred or freed. This imprecision should
+%be a cause of concern as it can lead to cases where creation of unsafe
+%references, and their subsquent dereferencing go unnoticed by the type
+%system. Considering that stack regions can contain pointers into
+%transferable regions, the worst case cost of overapproximating
+%liveness is therefore the integrity of \emph{every} pointer on stack.
+
+%Fortunately, \name avoids this worst case scenario.  \name achieves
+%this by imposing a simple state transition discipline on the lifetime
+%of a transferable region.  The relevant finite state machine is shown
+%in Fig.~\ref{fig:region-fsm}.
+
+The protocol for transferable regions is presented as a finite state machine in Fig.~\ref{fig:region-fsm}.
 
 \begin{figure}
 \includegraphics[scale=0.45]{region-fsm.png}
@@ -393,16 +416,28 @@ such references.
 % region type system (\S~\ref{sec:type-system}).
 
 As evident in the above examples, the safety of memory accesses in
-\name is now subject to the condition that the lifetime of every
-transferable region aligns with the state transition discipline shown
-in Fig.~\ref{fig:region-fsm}. If the transition discipline is somehow
+\name is now subject to the condition that every transferable region
+correctly follows the state transition discipline shown
+in Fig.~\ref{fig:region-fsm}. If this is
 guaranteed, then \name's region type system statically guarantees the
 safety of all memory accesses. In other words, the type system reduces
 the problem of ensuring memory safety in \name programs to the problem
-of enforcing state transition discipline on the lifetimes of
-transferable regions. In \name, this enforcement is done at runtime by
-explicitly keeping track \emph{current state} for $\RgnZ$ objects, and
-preventing them from going through invalid transitions.
+of enforcing the state transition discipline for transferable regions.
+
+In \name, this enforcement is done at runtime by explicitly keeping
+track of the \emph{current state} for $\RgnZ$ objects, and
+checking the validity of every open, transfer, or free operation
+and throwing an exception if it is invalid.
+The challenge in enforcing this discipline statically is that transferable regions
+are first-class objects. Hence, the program can create multiple aliases for
+the same region, \eg, open it via one alias and free it via another.
+Typestate verification in the presence of aliases is hard.
+The checking can be done statically by preventing the creation of aliases using, \eg, linear types
+or unique types. However, this would be quite restrictive, in terms of expressiveness.
+
+\name chooses a reasonable tradeoff. Regions are coarse-grained objects, manipulated relatively infrequently,
+in comparison to manipulations of the fine-grained objects that reside inside regions. Hence, the programmer burden
+as well as the runtime overhead of checking the region's state transition discipline is acceptable.
 
 \input{naiad-ex}
 

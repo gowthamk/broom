@@ -1,30 +1,36 @@
 \begin{figure}[t!]
 \begin{numcodejava}
 class MapVertex<TIn, TOut> {
-  Func<TIn, TOut> udf;
-  SortedMap<Time, List<TOut>> map;
+  Func<TIn, TOut> userDefinedFunction;
+  Dictionary<Time, List<TOut>> map;
   ...
-  void onReceive(Time t, TIn inp) {
-    if (!map.containsKey(t))
-       map.put(t, new List<TOut>());
-    TOut outp = udf.apply(inp);
-    map.get(t).add(outp);
+  void onReceive(Time t, List<TIn> inputList) {
+    if (!map.ContainsKey(t))
+       map[t] = new List<TOut>();
+    foreach (TIn input in inputList) {
+      TOut output = userDefinedFunction(input);
+      map[t].add(output);
+    }
   }
   void onNotify(Time t) {
-    List<TOut> outps = new List<TOut>();
-    Iterator<Pair<Time, List<TOut>>> iter = 
-        // entries(0,t):  map entries with keys 
-        // between (and including) 0 & t
-        map.entries(0,t).iterator();
-    while(iter.hasNext()) {
-      Pair<Time, List<TOut>> p = iter.getNext();
-      outps.addAll(p.getSnd());
-      map.remove(p.getFst());
-    }
-    transfer(t, outps);
+     List<TOut> outputList = map[t];
+     map.Remove(t);
+     successor.onReceive(t, outputList); 
   }
 }
 \end{numcodejava}
 \caption{\C{SELECT} dataflow operator}
 \label{fig:motivating-eg}
 \end{figure}
+
+%    List<TOut> outps = new List<TOut>();
+%    Iterator<Pair<Time, List<TOut>>> iter = 
+%        // entries(0,t):  map entries with keys 
+%        // between (and including) 0 & t
+%        map.entries(0,t).iterator();
+%    while(iter.hasNext()) {
+%      Pair<Time, List<TOut>> p = iter.getNext();
+%      outps.addAll(p.getSnd());
+%      map.remove(p.getFst());
+%    }
+%    transfer(t, outps);
