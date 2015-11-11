@@ -43,27 +43,22 @@ unknown region annotations and region constraints, respectively. For
 instance, if a variable $x$ has type $\ObjZ$ in FGJ, its region type
 template is of form $\ObjZ\inang{\rho_0}$, where $\rho_0$ is a fresh
 region variable. Likewise, given the region-annotated definition of
-\C{Pair} class from \S\ref{sec:fb-syntax} a region type template for
-the method \C{mkSnd} shown below is \footnote{In our
-exposition, we assume that classes $\C{A}$ and $\C{B}$ are trivial
-subclasses of $\ObjZ$ with no fields/methods. Like $\ObjZ$, they
-accept one region parameter - the allocation region of their
-objects.}\footnote{We abuse arrow notation to also represent types of
-methods, but unlike function types, there is no allocation region
-annotation atop the arrow in a method type.}
-$\inang{\rhoalloc_0,\rho_1,\rho_2,\rho_3 \,|\, \varphi_0}
-\C{Pair}\inang{\C{A},\C{B}} \inang{\rho_1,\rho_2,\rho_3} \rightarrow
-\unitZ$, where $\rhoalloc_0$ and $\rho_{1-3}$ are fresh region
+\C{Pair} class from \S\ref{sec:fb-syntax} a region type template for a
+method with FGJ type $\C{Pair}\inang{\C{A},\C{B}} \rightarrow \C{A}$
+is \footnote{In our exposition, we assume that classes $\C{A}$ and
+$\C{B}$ are trivial subclasses of $\ObjZ$ with no fields/methods. Like
+$\ObjZ$, they accept one region parameter - the allocation region of
+their objects.}\footnote{We abuse arrow notation to also represent
+types of methods, but unlike function types, there is no allocation
+region annotation atop the arrow in a method type.}
+$\inang{\rhoalloc_0,\rho_{1-4} \,|\, \varphi_0}
+\C{Pair}\inang{\C{A},\C{B}} \inang{\rho_{1-3}} \rightarrow
+\C{A}\inang{\rho_4}$, where $\rhoalloc_0$ and $\rho_{1-3}$ are fresh region
 variables, and $\varphi_0$ is a fresh predicate variable denoting
-unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.  
-\begin{codejava}
-  unit mkSnd(Pair<A,B> p) {
-    return (p.snd = new B());
-  }
-\end{codejava}
-Region type template of a type variable $\C{a}$ is $\C{a}@\rho$, where
-$\rho$ is fresh. For a class, a template is computed in two steps. In
-the first step, we templatize the types of all its fields, constructor
+unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.  Region type
+template of a type variable $\C{a}$ is $\C{a}@\rho$, where $\rho$ is
+fresh. For a class, a template is computed in two steps. In the first
+step, we templatize the types of all its fields, constructor
 arguments, and arguments and return values of all its methods, along
 with the type of its superclass. In the second step, we generalize all
 the free region variables occuring in the templates computed in the
@@ -73,60 +68,64 @@ and introduce a new predicate variable ($\varphi$) to denote unknown
 constraints on region parameters. For example, consider the standard
 FGJ definition of $\C{Pair}\inang{\C{a},\C{b}}$ class, where $\C{a}$
 and $\C{b}$ are the types of $\C{fst}$ and $\C{snd}$ fields,
-respectively. It can be templatized as following:
+respectively. It can be templatized as following (method definitions
+are left intact while templatizing, hence they are elided below):
+\vspace*{-0.1in}
 \begin{center}
 \begin{codejava}
 class Pair$\inang{a\extends\ObjZ, b\extends\ObjZ}$
           $\inang{\rhoalloc_0,\rho_{0-4}\,|\,\varphi_0} \extends \ObjZ\inang{\rho_4}$ {
-  $a@\rho_0$ fst;
-  $b@\rho_1$ snd;
+  $a@\rho_0$ fst; $b@\rho_1$ snd;
   Pair($a@\rho_2$ fst, $b@\rho_3$ snd) { $...$ }
-  $...$
+  a@$\rho_5$ getFst$\inang{\rhoalloc_1,\rho_5}$() { $...$ }
 }
 \end{codejava}
 \end{center}
+\vspace*{-0.1in}
 % \footnote{In reality, the generalized region variables only come
 % from the type templates of class's fields and superclass. Method
 % types do not contain any free region variables.}
-The template elides $\C{Pair}$'s methods, whose region type templates
-contain no free variables. Among the region parameters of the class
-template, $\rho_{0-4}$ are obtained by generalizing free region
-variables in the types of its class's fields, constructor arguments,
-and its superclass type.  The remaining parameter ($\rhoalloc_0$) is a
-fresh region variable denoting the allocation region argument. Fresh
-predicate variable $\varphi_0$ denotes unknown constraints over
-$\rhoalloc_0$ and $\rho_{0-4}$ that need to hold for template to be a
-well-formed region-annotated class definition in $\FB$. 
+% The template elides $\C{Pair}$'s methods, whose region type
+% templates contain no free variables. Among the region parameters of
+% the class template, $\rho_{0-4}$ are obtained by generalizing free
+% region variables in the types of its class's fields, constructor
+% arguments, and its superclass type.  The remaining parameter
+% ($\rhoalloc_0$) is a fresh region variable denoting the allocation
+% region argument. Fresh predicate variable $\varphi_0$ denotes
+% unknown constraints over $\rhoalloc_0$ and $\rho_{0-4}$ that need to
+% hold for template to be a well-formed region-annotated class
+% definition in $\FB$. 
 
 The type template for a recursively defined class is computed in two
 steps. First, all recursive occurances of the class among the types of
 its fields are ignored and the class is templatized as if it is a
 non-recursive class. Next, all the recursive occurances are
 templatized with respect to the class template computed in the first
-step, such that their region annotations are exactly same as the
-region parameters of the class. For example, consider a generic
-$\C{ListNode}\inang{\C{a}}$ class containing two fields: $\C{data}$ of
-type $\C{a}$ and $\C{next}$ of type $\C{ListNode}\inang{\C{a}}$.
-where $\C{a}$ is the type of the data stored in the linked list node.
-To templatize the $\C{ListNode}\inang{a}$ class, we first ignore its
-recursive occurance in the type of $\C{next}$ field, and templatize
-the type $\C{a}$ of $\C{data}$ field as $\C{a}@\rho_0$. Based on this
-type template of $\C{data}$ field, we compute the class's template as
-following:
-\begin{center}
-$\C{ListNode}\inang{\C{a}\extends\ObjZ}
-\inang{\rhoalloc_0,\rho_0\,|\,\varphi_0} \extends \ObjZ \{...\}$
-\end{center}
-Next, we trivially templatize the type of $\C{next}$ field in the body
-of the class as $\C{ListNode}\inang{\C{a}}\inang{\rhoalloc_0,\rho_0}$.
-The resulting class represents a linked list with spine in the region
-$\rhoalloc_0$ and data objects in the region $\rho_0$.
-
+step, such that their region annotations are \emph{exactly} same as
+the region parameters of the class. Applying this technique on a
+recursively defined $\C{LinkedListNode}\inang{\C{a}}$ class, for
+example, results in a template that uses same region variable to
+denote allocation regions of the current node, and the node that the
+current node refers to. 
+% For example, consider a generic $\C{ListNode}\inang{\C{a}}$ class
+% containing two fields: $\C{data}$ of type $\C{a}$ and $\C{next}$ of
+% type $\C{ListNode}\inang{\C{a}}$.  where $\C{a}$ is the type of the
+% data stored in the linked list node.  To templatize the
+% $\C{ListNode}\inang{a}$ class, we first ignore its recursive
+% occurance in the type of $\C{next}$ field, and templatize the type
+% $\C{a}$ of $\C{data}$ field as $\C{a}@\rho_0$. Based on this type
+% template of $\C{data}$ field, we compute the class's template as
+% following: \begin{center} $\C{ListNode}\inang{\C{a}\extends\ObjZ}
+% \inang{\rhoalloc_0,\rho_0\,|\,\varphi_0} \extends \ObjZ \{...\}$
+% \end{center} Next, we trivially templatize the type of $\C{next}$
+% field in the body of the class as
+% $\C{ListNode}\inang{\C{a}}\inang{\rhoalloc_0,\rho_0}$.  The
+% resulting class represents a linked list with spine in the region
+% $\rhoalloc_0$ and data objects in the region $\rho_0$.
 % Observe that our strategy of trivially templatizing the recursive
 % occurances of a class type in its definition ensures that no new
 % region variables are introduced.
-The templatization technique we described above for recursive class
-definitions can be extended to mutually recursive definitions in a
+This technique can be extended to mutually recursive definitions in a
 straightforward manner, by simultaneously templatizing them. Using the
 techniques outlined above, we compute region type templates for all
 classes bound in the class table of the $\absof{\FB}$ program before
@@ -146,58 +145,63 @@ performed with respect to the polymorphic type templates of classes
 and methods computed as per \S\ref{sec:fb-templatization}. 
 
 Function $\elabExpr$, shown in Fig.~\ref{fig:fb-elabexpr}, performs
-this elaboration for a subset of expressions in $\absof{\FB}$, whose
-corresponding $\FB$ expressions have been ascribed static semantics in
-Fig.~\ref{fig:fb-staticsem}. $\elabExpr$ is defined under the same
-context as the expression typing judgment in
-Fig.~\ref{fig:fb-staticsem} with symbols $\A$,$\ralloc$, and $\env$
-retaining their meaning. The function traverses expressions in a
-syntax-directed manner of a type checker, introducing fresh region
-type templates for unknown region types, while generating constraints
-over region and predicate variables. The precise nature of generated
-constraints is explained in \S\ref{sec:fb-constraintsem}, but in
-summary, they capture the relationships between the type templates of
-various subexpressions and their well-formedness. Note that
-$\elabExpr$ returns the region type template of the subexpression,
-which is used to generate constraints for the expression. Functions
-$\typeOk$ and $\subtypeOk$ (definitions not shown) used by $\elabExpr$
-implement type well-formedness and subtype judgments from
-Fig.~\ref{fig:fb-staticsem}, respectively.
+this elaboration for a subset of expressions in $\absof{\FB}$
+%, whose corresponding $\FB$ expressions have been ascribed static
+%semantics in Fig.~\ref{fig:fb-staticsem}. 
+$\elabExpr$ is defined under the same context as the expression typing
+judgment in Fig.~\ref{fig:fb-staticsem} with symbols $\A$,$\ralloc$,
+and $\env$ retaining their meaning. The function traverses expressions
+in a syntax-directed manner of a type checker, introducing fresh
+region type templates for unknown region types, while generating
+constraints over region and predicate variables. The precise nature of
+generated constraints is explained in \S\ref{sec:fb-constraintsem},
+but in summary, they capture the relationships between the type
+templates of various subexpressions and their well-formedness. Note
+that $\elabExpr$ returns the region type template of the
+subexpression, which is used to generate constraints for the
+expression. Functions $\typeOk$ and $\subtypeOk$ (definitions not
+shown) used by $\elabExpr$ implement type well-formedness and subtype
+judgments from Fig.~\ref{fig:fb-staticsem}, respectively.
 
 \subsection{Method and Class Elaboration}
 
 Functions $\elabMeth$ and $\elabClass$ shown in
 Fig.~\ref{fig:fb-elabmeth} lift expression elaboration to method and
 class definitions, respectively. Both functions first build a context
-($\A$) containing a set ($ \rhoenv$) of region variables denoting
-regions that are currently live, a map ($\aenv$) mapping type
-variables to their bounds, and a constraint formula ($\phicx$)
-capturing constraints over live region variables. We use predicate
-variables ($\varphi$ and $\varphi_m$) to capture constraints over
-variables in $\rhoenv$ denoting the fact that such constraints are yet
-to be inferred.
+($\A$) containing a set ($ \rhoenv$) of regions that are currently
+live, a map ($\aenv$) mapping type variables to their bounds, and a
+constraint formula ($\phicx$) capturing constraints over live region
+variables. We use predicate variables ($\varphi$ and $\varphi_m$) to
+capture constraints over variables in $\rhoenv$ denoting the fact that
+such constraints are yet to be inferred. Both elaboration functions
+generate new constraints by checking well-formedness and subtype
+relationships among types of their constituents. A fresh constraint
+($C_4$) generated by $\elabClass$ captures a couple of safety
+conditions: first, the allocation regions of objects referred by the
+instance variables should outlive the allocation region of the
+instance itself, and second, the allocation regions of a class type
+and its superclass type must be the same.
 
-Function $\elabMeth$ elaborates a method definition of class $B$. It
-calls $\elabExpr$ with the context $\A$, its allocation context
-parameter ($\rhoallocm$), and a type environment ($\env$) that
-contains region type bindings for all the arguments of the method,
-including the implicit $\C{this}$ argument. The region type template
-returned by $\elabExpr$ for the method body is checked against its
-expected type (derived from the type template of the method)
-generating more constraints. The function then returns the elaborated
-method definition and the set of constraints.
+% Function $\elabMeth$ elaborates a method definition of class $B$. It
+% calls $\elabExpr$ with the context $\A$, its allocation context
+% parameter ($\rhoallocm$), and a type environment ($\env$) that
+% contains region type bindings for all the arguments of the method,
+% including the implicit $\C{this}$ argument. The region type template
+% returned by $\elabExpr$ for the method body is checked against its
+% expected type (derived from the type template of the method)
+% generating more constraints. The function then returns the elaborated
+% method definition and the set of constraints.
 
-$\elabClass$ elaborates the definition of a class $B$. It relies on
-$\elabCons$\footnote{The definition of $\elabCons$ is straightforward,
-hence not shown.} and $\elabMeth$ functions to elaborate $B$'s
-constructor ($k$) and method definitions ($\bar{d}$), respectively. To
-the set of constraints returned by these functions, $\elabClass$ adds
-constraints generated by checking the well-formedness of the type
-templates of its superclass and fields, and also a new constraint
-capturing a couple of safety conditions: first, the allocation regions
-of objects referred by the instance variables should outlive the
-allocation region of the instance itself, and second, the allocation
-regions of a class type and its superclass type must be the same.
+% $\elabClass$ elaborates the definition of a class $B$. It relies on
+% $\elabCons$ (not shown) and $\elabMeth$ functions to elaborate $B$'s
+% constructor ($k$) and method definitions ($\bar{d}$), respectively. To
+% the set of constraints returned by these functions, $\elabClass$ adds
+% constraints generated by checking the well-formedness of the type
+% templates of its superclass and fields, and also a new constraint
+% capturing a couple of safety conditions: first, the allocation regions
+% of objects referred by the instance variables should outlive the
+% allocation region of the instance itself, and second, the allocation
+% regions of a class type and its superclass type must be the same.
 
 Function $\elabClassTable$ (Fig.~\ref{fig:fb-elabmeth}) elaborates
 every definition in the class table $CT$, while accumulating
@@ -210,11 +214,11 @@ table (and to the artifacts that make up the class table, recursively)
 to compute a class table that maps classes to their fully
 region-annotated definitions in $\FB$.
 
-Note that if the original program in $\absof{\FB}$ contains unsafe
-references, for example, a reference from a transferable region to a
-stack regions, then the constraints generated during the elaboration
-are not satisfiable. In such case, $\solve$ fails to solve
-constraints, causing the program to be rejected.
+% Note that if the original program in $\absof{\FB}$ contains unsafe
+% references, for example, a reference from a transferable region to a
+% stack regions, then the constraints generated during the elaboration
+% are not satisfiable. In such case, $\solve$ fails to solve
+% constraints, causing the program to be rejected.
 
 \subsection{Constraints}
 \label{sec:fb-constraintsem}
@@ -277,13 +281,13 @@ Where $\varphi_i$'s denote the unknown preconditions of the class and
 the method under elaboration. If the constraint is generated while
 checking the well-formedness of a type or elaborating an expression,
 then $\varphi_j$'s denote the unknown preconditions of classes and
-methods that were used in that type or expression.  Each use of a
-(region-polymorphic) class or a method may instantiate region
-parameters differently, resulting in a different pending substitution
-($F_j$). Formulas $\phictxt$ and $\phicstr$ are concrete, i.e., free
-of predicate variables and pending substitutions. While $\phictxt$
-captures relationships that are \emph{known} to hold between concrete
-region identifiers (i.e., $\rgn$'s) when the constraint was generated,
+methods that were used in that type or expression. Each use of a
+(region-polymorphic) class or a method has to instantiate region
+parameters, resulting in pending substitutions ($F_j$). Formulas
+$\phictxt$ and $\phicstr$ are concrete, i.e., free of predicate
+variables and pending substitutions. While $\phictxt$ captures
+relationships that are \emph{known} to hold between concrete region
+identifiers (i.e., $\rgn$'s) when the constraint was generated,
 $\phicstr$ captures relationships that are \emph{required} to hold
 among region varibles (i.e., $\rho$'s), or relationships between
 region variables and identifiers. Each region variable occuring in

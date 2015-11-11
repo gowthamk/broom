@@ -3,12 +3,6 @@
 \begin{codeml}
 $\elabExpr(CT, \A, \ralloc, \env, e)$ = 
   match $e$ with
-  | $\unitval$ $\longrightarrow$ ($\unitval:\unitZ$,$\top$)
-  | $x$ $\longrightarrow$ ($x:\env(x)$,$\top$)
-  | $e_a.f$ $\longrightarrow$ 
-    let ($e_a':\tau_a$,$C_1$) = $\elabExpr(\A,\ralloc,\env,e_a)$ in
-    let $F$ = $\fields(\tau_a)$ in
-      ($e_a'.f:F(f)$,$C_1$)
   | $\C{new} \fgjN(\bar{e})$ $\longrightarrow$ 
     let $\fbN$ = $\templateTy(\fbN)$ in
     let $C_1$ = $\typeOk({\A},{\fbN})$ in
@@ -42,6 +36,7 @@ $\elabExpr(CT, \A, \ralloc, \env, e)$ =
     let ($\A'$,$\env'$) = ($(\rhoenv \cup \{\rgn'\},\aenv,\phicx)$,$\env[y\mapsto T@\rgn']$) in
     let ($e_b':\tau$,$C_2$) = $\elabExpr(\A',\rgn',\env',[\rgn'/\rgn]e_a)$ in
       ($\open{e_a'}{\rgn'}{y}{e_b'} : \tau$, $C_1 \cup C_2$)
+  | _ $\longrightarrow$ ...
 \end{codeml}
 
 \caption{Constraint generation for expressions in $\absof{\FB}$}
