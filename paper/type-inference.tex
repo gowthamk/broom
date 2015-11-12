@@ -615,3 +615,48 @@ well-formedness requirement ($\tywf{\{\rhoalloc_0,\rho_{}0-4,
 \)
 \end{center}
 
+\subsection{Higher-Order Type Inference}
+
+We have so far ignored function types in the context of type
+inference. The region type system for $\FB$ admits function types with
+higher-rank region polymorphism, allowing region variables to be
+quantified in the types of higher-order arguments. The type system
+clearly does not have the principal typing property, as demonstrated
+by the \C{app2} method below:
+\begin{codejava}
+bool app2(A x, A y, (A $\rightarrow$ bool) f) 
+    { return (f x && f y); }
+\end{codejava}
+There are two possibilities for the region type of \C{app2}: one,
+where it allows \C{x} and \C{y} to be allocated in different regions,
+but requires \C{f} to be region-polymorphic (i.e, \C{f} should accept
+arguments from any region), and second, where it requires \C{x} and
+\C{y} to be allocated in the same region, and allows \C{f} to be
+monomorphic. None of the two types are more general than the other,
+and it is not clear which one is more preferable. The concrete
+manifestation of this dilemma is a constraint of form 
+$\isvalid{\phictxt \conj \varphi_1}{\phicstr \conj \varphi_2}$, with
+no additional constriants to help determine $\varphi_1$ or $\varphi_2$
+before solving this constraint. Since it is always possible to
+strengthen $\varphi_2$ and then find a suitable $\varphi_1$, there
+does not exist unique solution to such constraints. Nonetheless, it is
+possible to bias the constraint-solving algorithm to consistently
+prefer one solution over the other.
+
+In context of \name, however, we adopt a trivial solution of
+assigning the same region to the arguments and return values in
+(higher-order) function types. For user-defined functions (e.g.,
+predicate in the \C{WHERE} clause of the \C{SELECT} dataflow query)
+and lambda arguments to the $\RgnZ$ class constructor, which are the
+prominent uses of higher-order functions in \name, the simplistic
+approach seems to suffice in practice. However, it is always possible
+that this approach makes type checker reject a program that is
+otherwise valid. In such cases, programmer can help the type checker
+by writing region annotations for only the higher-order functions.
+
+% \begin{center}
+%   \C{app2} : $\inang{\rho_0,\rho_1}$(\C{A}$\inang{\rho_0}$, 
+%               \C{A}$\inang{\rho_0}$,
+%               $\inang{\rho_2}$\C{A}$\inang{\rho_2}$ $\rightarrow$
+%               \C{bool}) $\rightarrow$ \C{bool}
+% \end{center}
