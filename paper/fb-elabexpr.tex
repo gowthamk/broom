@@ -4,9 +4,10 @@
 $\elabExpr(CT, \A, \ralloc, \env, e)$ = 
   match $e$ with
   | $\C{new} \fgjN(\bar{e})$ $\longrightarrow$ 
-    let $\fbN$ = $\templateTy(\fbN)$ in
+    let $\fbN$ = $\templateTy(\fgjN)$ in
     let $C_1$ = $\typeOk({\A},{\fbN})$ in
-    let $C_2$ = $\{\isvalid{\A.\phicx}{\allocRgn(\fbN)=\ralloc}\}$ in
+    let $C_2$ = match $\fgjN$ with $\RgnZ\inang{T}$ $\longrightarrow$ $\top$
+          | _ $\longrightarrow$ $\{\isvalid{\A.\phicx}{\allocRgn(\fbN)=\ralloc}\}$ in
     let ($\_:\taubar$) = $\fields(\fbN)$
     let $(\bar{e'}:\bar{\tau'}, C_3)$ = $\elabExpr(\A,\ralloc,\env,\bar{e})$ in
     let $C_4$ = $\subtypeOk({\A},{\bar{\tau'}},{\taubar})$ in

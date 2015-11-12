@@ -42,23 +42,25 @@ variables ($\rho$) and predicate variables ($\varphi$) to denote
 unknown region annotations and region constraints, respectively. For
 instance, if a variable $x$ has type $\ObjZ$ in FGJ, its region type
 template is of form $\ObjZ\inang{\rho_0}$, where $\rho_0$ is a fresh
-region variable. Likewise, given the region-annotated definition of
-\C{Pair} class from \S\ref{sec:fb-syntax} a region type template for a
-method with FGJ type $\C{Pair}\inang{\C{A},\C{B}} \rightarrow \C{A}$
-is \footnote{In our exposition, we assume that classes $\C{A}$ and
-$\C{B}$ are trivial subclasses of $\ObjZ$ with no fields/methods. Like
-$\ObjZ$, they accept one region parameter - the allocation region of
-their objects.}\footnote{We abuse arrow notation to also represent
-types of methods, but unlike function types, there is no allocation
-region annotation atop the arrow in a method type.}
+region variable. FGJ type $\RgnZ\inang{T}$ is special; it is
+always templatized as $\RgnZ{\inang{T}}\inang{\toprgn}$. Given the
+region-annotated definition of \C{Pair} class from
+\S\ref{sec:fb-syntax} a region type template for a method with FGJ
+type $\C{Pair}\inang{\C{A},\C{B}} \rightarrow \C{A}$ is \footnote{In
+our exposition, we assume that classes $\C{A}$ and $\C{B}$ are trivial
+subclasses of $\ObjZ$ with no fields/methods. Like $\ObjZ$, they
+accept one region parameter - the allocation region of their
+objects.}\footnote{We abuse arrow notation to also represent types of
+methods, but unlike function types, there is no allocation region
+annotation atop the arrow in a method type.}
 $\inang{\rhoalloc_0,\rho_{1-4} \,|\, \varphi_0}
 \C{Pair}\inang{\C{A},\C{B}} \inang{\rho_{1-3}} \rightarrow
-\C{A}\inang{\rho_4}$, where $\rhoalloc_0$ and $\rho_{1-3}$ are fresh region
-variables, and $\varphi_0$ is a fresh predicate variable denoting
-unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.  Region type
-template of a type variable $\C{a}$ is $\C{a}@\rho$, where $\rho$ is
-fresh. For a class, a template is computed in two steps. In the first
-step, we templatize the types of all its fields, constructor
+\C{A}\inang{\rho_4}$, where $\rhoalloc_0$ and $\rho_{1-3}$ are fresh
+region variables, and $\varphi_0$ is a fresh predicate variable
+denoting unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.
+Region type template of a type variable $\C{a}$ is $\C{a}@\rho$, where
+$\rho$ is fresh. For a class, a template is computed in two steps. In
+the first step, we templatize the types of all its fields, constructor
 arguments, and arguments and return values of all its methods, along
 with the type of its superclass. In the second step, we generalize all
 the free region variables occuring in the templates computed in the
@@ -204,16 +206,14 @@ and its superclass type must be the same.
 % allocation region of the instance itself, and second, the allocation
 % regions of a class type and its superclass type must be the same.
 
-Function $\elabClassTable$ (Fig.~\ref{fig:fb-elabmeth}) elaborates
+Function $\elabClassTable$ (not shown) elaborates
 every definition in the class table $CT$, while accumulating
-constraints. The constraints are finally solved by $\solve$
-(\S\ref{sec:fb-constraintsolving}), which returns substitution
-functions $\substFn_\rho$ and $\substFn_\varphi$ for free region and
-predicate variables, respectively, introduced during templatization
-and elaboration stages. The substitutions are applied to the class
-table (and to the artifacts that make up the class table, recursively)
-to compute a class table that maps classes to their fully
-region-annotated definitions in $\FB$.
+constraints. The constraints are finally solved for free region and
+predicate variables introduced during templatization and elaboration
+stages. The solutions are applied to the class table (and to the
+artifacts that make up the class table, recursively) to compute a
+class table that maps classes to their fully region-annotated
+definitions in $\FB$.
 
 % Note that if the original program in $\absof{\FB}$ contains unsafe
 % references, for example, a reference from a transferable region to a
@@ -222,7 +222,7 @@ region-annotated definitions in $\FB$.
 % constraints, causing the program to be rejected.
 
 \subsection{Constraints}
-\label{sec:fb-constraintsem}
+\label{sec:constraints}
 
 Our constraint generation algorithm generates three kinds of
 constraints:
@@ -300,52 +300,69 @@ deducible from $\rgn_1 \outlives \rgn_2$.
 template from \S\ref{sec:fb-templatization}. Following constraints are
 generated during its elaboration (Constrains are identified with
 $\mathbf{c_i}$'s. Some trivial constraints, such as $\rho_4 \in
-\rhoenv_0$, where $\rhoenv_0 = \{\rhoalloc_0,\rho_{0-4}\}$, have been
-elided): 
+\rhoenv_0$ and $\rho_5 \in \rhoenv_1$, where $\rhoenv_0 =
+\{\rhoalloc_0,\rho_{0-4}\}$ and $\rhoenv_1 = \rhoenv_0 \cup
+\{\rho_5\}$, have been elided): 
 \begin{smathpar}
 \begin{array}{l}
   \csid{1} \tywf{\rhoenv_0}{\varphi_0} \qquad
   \csid{2} \isvalid{\varphi_0}{\rho_0 \outlives \rhoalloc_0 \conj \rho_1
      \succeq \rhoalloc_0 \conj \rho_4 = \rhoalloc_0} \\
   \csid{3} \isvalid{\varphi_0}{\rho_2 = \rho_0} \spc
-  \csid{4} \isvalid{\varphi_0}{\rho_3 = \rho_1} \spc
-  \csid{5} \isvalid{\varphi_0 \conj \varphi_1} {\rho_5 = \rho_0}\\
+  \csid{4} \isvalid{\varphi_0}{\rho_3 = \rho_1} \\
+  \csid{5} \isvalid{\varphi_0 \conj \varphi_1} {\rho_5 = \rho_0}\spc
+  \csid{6} \tywf{\rhoenv_1}{\varphi_1} \qquad
 \end{array}
 \end{smathpar}
 
 \paragraph{Constraints Example 2} Let us add to the \C{Pair} class a
-contrived method $\C{alt}$ that accepts an argument $\C{p}$ of type
-$\C{Pair}\inang{\C{A},\C{A}}$, and two objects ($\C{x}$ and $\C{y}$)
-of type $A$. It then assigns one object to $\C{p.fst}$ and other to
-$\C{p.snd}$, and calls itself recursively without ever terminating.
-Which one is assigned to $\C{fst}$, and which to $\C{snd}$, is
-alternated between recursive calls. Elaboration phase elaborates
-$\C{alt}$ to the following region-annotated definition\footnote{The
-original definition of \C{alt} can be obtained by erasing all the
-region annotations from the elaborated version}\footnote{The
-elaboration actually uses new region variables as parameters to the
-recursive call, and then generates constraints that unify them with
-the ones shown. We coalesced both steps to simplify presentation.}:
+contrived method $\C{alt}$ that accepts a \C{Region} object \C{r}, a
+\C{Pair<A,A>} object \C{q}, and an \C{A} object \C{y}. It assigns
+\C{y} to \C{fst} and \C{snd} fields of \C{q}, and calls itself
+recursively with the same region, a new \C{Pair} object allocated in a
+local region, and an \C{A} object referred by the \C{snd} field of the
+pair inside the region. \C{alt} never terminates.  Elaboration phase
+elaborates the method to the following region-annotated
+definition\footnote{In reality, elaboration uses new region variables
+as parameters to the constructor and method calls, and then generates
+constraints that unify them with actuals. In our examples, to avoid
+clutter due to trivial constraints,we coalesced both steps and show
+the actuals instead.}(The original definition of \C{alt} can be
+obtained by erasing all the region annotations from the elaborated
+version):
+% \begin{codejava}
+% unit alt<$\rhoalloc_2$,$\rho_{6-10}$ | $\varphi_2$>(Pair<A,A><$\rho_6$,$\rho_7$,$\rho_8$> p,
+%                           A<$\rho_9$> x, A<$\rho_{10}$> y) {
+%   p.fst = x; p.snd = y; 
+%   this.alt<$\rhoalloc_2$,$\rho_7$,$\rho_8$,$\rho_{10}$,$\rho_9$>(A,y,x);
+% }
+% \end{codejava}
 \begin{codejava}
-unit alt<$\rhoalloc_2$,$\rho_{6-10}$ | $\varphi_2$>(Pair<A,A><$\rho_6$,$\rho_7$,$\rho_8$> p,
-                          A<$\rho_9$> x, A<$\rho_{10}$> y) {
-  p.fst = x; p.snd = y; 
-  this.alt<$\rhoalloc_2$,$\rho_7$,$\rho_8$,$\rho_{10}$,$\rho_9$>(A,y,x);
+unit alt<$\rhoalloc_2$,$\rho_{6-9}\,$|$\,\varphi_2$>(Region<Pair<A,A>><$\toprgn$> r, 
+                Pair<A,A><$\rho_{6-8}$> q, A<$\rho_{9}$> y) {
+  q.fst := y; q.snd := y; 
+  open r as $\rgn_0$ withroot p in
+    letregion $\rgn_1$ in
+      let x = new Pair<A,A><$\rgn_1$,$\rgn_0$,$\rgn_0$>
+                      (p.fst,p.fst) in
+        alt<$\rgn_{1}$,$\rgn_{1}$,$\rgn_{0}$,$\rgn_{0}$,$\rgn_{0}$>(r,x,p.snd)
 }
 \end{codejava}
 % Note that, to avoid clutter, we have already resolved appropriate
 % region arguments to the recursive call, instead of introducing new
 % region variables and generating equality constraints on them. 
 Constraints generated during the elaboration are shown below
-(let $\rhoenv_2 = \{\rhoalloc_0,\rho_{0-4},\rhoalloc_2,\rho_{6-10}\}$ ):
+(let $\rhoenv_2 = \{\rhoalloc_0,\rho_{0-4},\rhoalloc_2,\rho_{6-9}\}$ ):
 \begin{smathpar}
 \begin{array}{l}
-\csid{6} \tywf{\rhoenv_2}{\varphi_2}\qquad
-\csid{7} \isvalid{\varphi_2}{\rho_7 \outlives \rho_6 \conj \rho_8
-  \outlives \rho_6} \\
-\csid{8} \isvalid{\varphi_2}{\rho_9 = \rho_7} \qquad
-\csid{9} \isvalid{\varphi_2}{\rho_{10} = \rho_8} \\
-\csid{10} \isvalid{\varphi_2}{[\rho_9/\rho_{10}][\rho_{10}/\rho_9]\varphi_2}
+\csid{7} \tywf{\rhoenv_2}{\varphi_2}\qquad
+\csid{8} \isvalid{\varphi_1 \conj \varphi_2}
+    {\rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6} \\
+\csid{9} \isvalid{\varphi_1 \conj \varphi_2}{\rho_7 = \rho_9} \qquad
+\csid{10} \isvalid{\varphi_1 \conj \varphi_2}{\rho_{8} = \rho_9} \\
+\csid{11} \isvalid{\varphi_1 \conj \varphi_2 \conj \rgn_0 \outlives
+\rgn_1} 
+    {[\rgn_1/\rhoalloc_2][\rgn_1/\rho_6][\rgn_0/\rho_{7-9}]\varphi_2}
 \end{array}
 \end{smathpar}
 % The first constraint is generated by $\typeOk$ on the type of
@@ -357,44 +374,37 @@ Constraints generated during the elaboration are shown below
 \label{sec:fb-constraintsolving}
 
 Our constraint generation algorithm traverses the entire program,
-performing elaboration and collecting constraints, which are
-subsequently solved enmasse. The motivation behind the whole-program
-approach to constraint generation is twofold: it simplifies
-elaboration functions and makes presentation easier, and second, it
-naturally generalizes to mutual recursion. Nonetheless, we do not
-intend our type inference to be a whole-program analysis for (a). it
-preempts opportunities for separate compilation and dynamic linking,
-and (b). it is expensive and an overkill in most practical cases. We
-therefore reclaim the compositionality of type inference by solving
-the constraints in a compositional fashion. In more practical terms
-this means that our constraint solving algorithm visits and solves
-every constraint (or, every set of mutually dependent constraints)
-only once. It composes computed solutions to solve other constraints
-that depend on the solved constraints. Importantly, the failure to
-solve a dependent constraint does not result in backtracking. We now
-describe our compositional constraint solving algorithm in detail. To
-simplify the presentation of our algorithm, we assume that are no
-mutually recursive definitions in the source program. Recursive
-definitions are nonetheless allowed.
+performing elaboration and collecting constraints. However, we do not
+require region type inference to be a whole-program analysis.
+Compositionality of type inference is reclaimed by solving the
+constraints in a compositional fashion. Concretely, this means that
+our constraint solving algorithm visits and solves every constraint
+(or, every set of mutually dependent constraints) only once. It
+composes computed solutions to solve other constraints that depend on
+the solved constraints. Importantly, the failure to solve a dependent
+constraint does not result in backtracking. We now describe our
+constraint solving algorithm by demonstrating its peformance over the
+example constraints shown in the previous section. A formal account of
+the algorithm can be found in our technical report~\cite{techrep}.
+% To simplify the presentation of our algorithm, we assume that are no
+% mutually recursive definitions in the source program. Recursive
+% definitions are nonetheless allowed.
 
 \paragraph{Terminology} In a validity constraint, a predicate variable
-occuring on the left side of the turnstile is said to occur
-negatively, or with \emph{negative polarity}. In contrast, a predicate
-variable occuring on the right side is said to occur positively, or
-with \emph{positive polarity}. A validity constraint
-\emph{constrains} the set of predicate variables that occur
-negatively in the constraint, while it \emph{uses} the set of
-predicate variables that occur positively. A constraint is said to be
-\emph{recursive} if it constrains and uses a predicate variable.
-% A pair of validity
-% constraints are said to be \emph{mutually dependent} if there exists a
-% pair ($\varphi_1$, $\varphi_2$) of predicate variables that occur
-% with opposite polarities in both the constraints. In such case, the
-% pair ($\varphi_1$,$\varphi_2$) of predicate variables are also said to
-% be mutually dependent. We call the transitive closure of mutual
-% dependency relation as \emph{transitive dependency} relation. Like
-% mutual dependency, transitive dependency is also extended to predicate
-% variables.
+occuring on the left side (resp. right side) of the turnstile is said
+to occur negatively (resp. positively). A validity constraint
+\emph{constrains} the set of predicate variables that occur negatively
+in the constraint, while it \emph{uses} the set of predicate variables
+that occur positively. A constraint is said to be \emph{recursive} if
+it constrains and uses a predicate variable.
+% A pair of validity constraints are said to be \emph{mutually
+% dependent} if there exists a pair ($\varphi_1$, $\varphi_2$) of
+% predicate variables that occur with opposite polarities in both the
+% constraints. In such case, the pair ($\varphi_1$,$\varphi_2$) of
+% predicate variables are also said to be mutually dependent. We call
+% the transitive closure of mutual dependency relation as
+% \emph{transitive dependency} relation. Like mutual dependency,
+% transitive dependency is also extended to predicate variables.
 
 Given a set of validity constraints, we first build a dependency graph
 ($G_c$) with constraints as nodes, and dependencies between them
@@ -402,301 +412,206 @@ captured as edges. There exists an edge from a constraint $c_2$ to a
 constraint $c_1$ in the graph (i.e., $c_2$ \emph{depends on} $c_1$) if
 any of the following conditions hold:
 \begin{itemize}
-\item $c_1$ constrains a predicate variable that $c_2$ uses. 
-\item $c_1$ constrains a (non-strict) subset of predicate variables
-that $c_2$ constraint.
+\item \textbf{Type 1} $c_1$ constrains a predicate variable that $c_2$ uses. 
+\item \textbf{Type 2} $c_1$ constrains a (non-strict) subset of predicate variables
+that $c_2$ constrains.
 \end{itemize}
-The first condition intuitively corresponds to a case, where
-expression or type, whose region elaboration is constrained by $c_2$
-refers to a method or a class, whose unknown precondition is
-constrained by $c_1$. The common predicate variable ($\varphi$)
-represents the unknown precondition in this case. The dependency from
-$c_2$ to $c_1$ means that $c_1$ must be solved to compute $\varphi$
-before $c_2$ is solved, thus enforcing the rule that the precondition
-of a method must not depend on its calling context. 
+
+% The first condition intuitively corresponds to a case, where
+% expression or type, whose region elaboration is constrained by $c_2$
+% refers to a method or a class, whose unknown precondition is
+% constrained by $c_1$. The common predicate variable ($\varphi$)
+% represents the unknown precondition in this case. The dependency from
+% $c_2$ to $c_1$ means that $c_1$ must be solved to compute $\varphi$
+% before $c_2$ is solved, thus enforcing the rule that the precondition
+% of a method must not depend on its calling context. 
 % Note that the first condition results in self-loops over recursive
 % constraints in the dependency graph.  Since mutually recursive
 % definitions refer each other, the first condition also results in
 % bidirectional dependencies between mutually recursive constraints
 % (and self-loops over recursive constraints). 
-The second condition captures two kinds of dependencies. First, the
-dependency from the constraints over a method precondition to the
-constraints over the precondition of the class containing the method.
-This captures our preference that the constraints over a class's
-region parameters should not depend on the idiosyncracies of its
-methods. Any additional constraints required by any of its methods
-must be captured in the precondition of the method itself
-(well-formedness rules allow this possibility). The second condition
-adds bidirectional dependencies between validity constraints that
-constraint the same set of predicate variables. 
-
+% The second condition captures two kinds of dependencies. First, the
+% dependency from the constraints over a method precondition to the
+% constraints over the precondition of the class containing the method.
+% This captures our preference that the constraints over a class's
+% region parameters should not depend on the idiosyncracies of its
+% methods. Any additional constraints required by any of its methods
+% must be captured in the precondition of the method itself
+% (well-formedness rules allow this possibility). The second condition
+% adds bidirectional dependencies between validity constraints that
+% constraint the same set of predicate variables. 
 Next, we convert the dependency graph over constraints into a
 dependency DAG ($G_C$) over sets of constraints, where each set
 represents a strongly connected component in the dependency graph.
+
+\paragraph{Example} The dependency DAG ($G_C$) over validity
+constraints from the \C{Pair} example (\S~\ref{sec:constraints}) is
+shown in Fig.~\ref{fig:pair-deps}. Each node (labeled $C_i$) is a set
+of constraints that belong to a strongly connected component in the
+dependency graph ($G_c$), hence are mutually dependent. All
+dependencies, except the self-dependency on $\mathbf{c_{10}}$, are
+type-2 dependencies.
+
+A dependency DAG makes the dependencies between constraints explicit.
 Constraints in each set are mutually dependent, and need to be solved
 simultaneously, whereas constraints in different sets can be solved as
 per any valid topological ordering of the graph. Accordingly, we
 obtain a topological ordering of nodes in the graph $G_{{C}}$, and
 solve the sets of constraints in that order. The solutions obtained
 after solving a constraint set are applied to the constraints in
-subsequent sets before attempting to solve them. Consequently, when
-the turn of a constraint set ($C$) arrives during the constraint solving
-process, it satisfies certain properties:
-\begin{itemize}
-\item There exists only one predicate variable ($\varphi$) that is either
-constrained or used by the constraints in the set ($C$). The variable is
-called set's \emph{subject}. This property follows from (a). the fact
-that all the dependency constraints have already been solved (and
-solutions applied), and (b). the assumption that there are no mutually
-recursive definitions. 
-\item All the constraints that constrain the set's subject are present
-in the set. This follows from our definition of the dependency relation.
-\end{itemize}
+subsequent sets before attempting to solve them. For the DAG in
+Fig.~\ref{fig:pair-deps}, we consider the topological order $[C_1,
+C_2, C_3]$, and solve the sets of constraints in that order.
 
-Solving the set ($C$) of constraints entails finding an assignment for
-$C$'s subject ($\varphi$), and also all the region variables
-($\rhobar$) that occur free in $C$, such that the solution satisfies
-well-formedness constraints on $\varphi$ and $\rhobar$. To simplify
-presentation, we think of $C$ as being parameterized on
-$\varphi$ and $\rhobar$, and write it as $C\lbrack \varphi,\rhobar
-\rbrack$. We now formalize the constraint satisfaction problem, and
-its solution.
-
-\begin{definition}
-\emph{(\textbf{Constraint Satisfaction Problem (CSP)})} A constraint
-satisfaction problem is a tuple $\CSP$, where $C\lbrack
-\varphi,\rhobar \rbrack$ is a set of validity constraints, where
-$i$'th validity constraint assumes one of the following forms:
-\begin{center}
-\(
-    \isvalid{\phictxt^{i} \conj \varphi}
-            {\phicstr^{i}}\qquad
-    \isvalid{\phictxt^{i} \conj \varphi}
-            {F_i(\varphi)}
-\)
-\end{center}
-$\bar{\rhoenv}$ are the unification domains for $\rhobar$. We call the
-union of all unification domains ($\bigcup\bar{\rhoenv}$) as the
-unification domain ($\rhoenv$) of the CSP.  The solution to the
-constraint satisfaction problem is a pair $(\substFn,\phisol)$, where
-$\substFn$ is a map from $\rhobar$ to $\rhoenv$ such that
-$\substFn(\rho_j) \in \rhoenv_j$, for every $j$, and $\phisol$ is a
-constraint formula such that:
-\begin{itemize}
-\item $\phisol$ is well-formed under $\rhoenv_{\varphi}$ (i.e.,
-$\tywf{\rhoenv_{\varphi}}{\phisol}$).
-\item Every sequent in $C\lbrack (\phisol,\substFn(\rhobar)) \rbrack$
-is valid.
-% \begin{center}
-% \(
-%   \isvalid{\phictxt^{i} \conj \bigwedge_j(\rho_j = \substFn(\rho_j)) \conj \phisol}
-%           {\phicstr^{i} \conj  F_i(\phisol))}
-% \)
-% \end{center}
-\item $\phisol$ is maximally weak. That is, $\nexists \phisol'$ such
-that $\phisol'$ is well-formed, $C\lbrack (\phisol',\substFn(\rhobar))
-\rbrack$ is valid, and $\phisol'$ is strictly weaker than $\phisol$
-(i.e., $\isvalid{\cdot}{\phisol \Rightarrow \phisol'}$ but
-$\isnotvalid{\cdot}{\phisol' \Rightarrow \phisol}$).
-\end{itemize}
-\end{definition}
-
-
-\subsection{Solving the CSP}
-
-The first step of solving the CSP $\CSP$ is to cast it as an
-equivalent problem $\csp$ involving a single validity constraint. The
-single constraint ($\lbrack \varphi,\rhobar \rbrack$) is:
-\begin{center}
-\(
-  \isvalid{ \Phicx \conj \varphi}
-        {\Phics \conj  \bigwedge_i F_i(\varphi)}
-\)
-\end{center}
-Where $\Phicx = \bigwedge_i \phictxt^{i}$ and $\Phics = \bigwedge_i
-\phicstr^{i}$. To see why both CSPs are equivalent, consider two
-distinct constraints, $c_i\lbrack \varphi,\rhobar_i \rbrack$ and
-$c_j\lbrack \varphi,\rhobar_j \rbrack$. Since $i\neq j$, $\rhobar_i
-\neq \rhobar_j$. Without the loss of generality, assume that $c_i$ was
-generated before $c_j$ by the constraint generation algorithm. Observe
-that when our constraint generation algorithm generates a constraint,
-all relationships between concrete region identifiers referred by the
-consequent of constraint are already present in its antecedent (this
-includes the unification domains of region variables referred by the
-consequent).  Since no new relationships between existing regions are
-added when a new constraints is generated, $\phictxt^j$ either
-describes the same relationships that are already described by
-$\phictxt^i$, or describes relationships among region identifiers that
-are new, and not relevant to $c_i$. Therefore, strengthening the
-context of $c_i$ with that of $c_j$ (or vice versa) neither weakens
-nor strengthens $c_i$ (resp.  $c_j$).
-
-\subsubsection{Non-Recursive Constraints}
-\label{sec:csolve}
-
-We first describe how we solve a non-recursive CSP $\csp$ where
-$c\lbrack \varphi,\rhobar \rbrack$ is of the form $\isvalid{\Phicx
-\conj \varphi}{\Phics}$. 
-
-Our approach is based on the observation that $\FB$ does not admit
-null values or uninitialized variables, thus forcing every region
-variable to be unified with some concrete region. The constraint
-formula $\Phics$ captures all such unification constraints on
-$\rhobar$. Since the set of all concrete region identifiers is the
-unification domain ($\rhoenv$) of CSP, this means for every $\rho_i$
-with a well-formedness constraint as $\rho_i \in \rhoenv_i$, there
-exists a $\rgn \in \rhoenv$ such that and $\isvalid{\Phicx \conj
-\Phics}{\rho = \rgn}$. However, $\rgn$ may not belong to $\rhoenv_i$,
-in which case the well-formedness constraint on $\rho_i$ is not
-satisfied, and constraint solving must fail.  Therefore, there exists
-a unique assignment $\substFn$ such that $c\lbrack
-\phi_{sol},\substFn(\rhobar)$ is satisfied, regardless of
-$\phi_{sol}$.
-
-To obtain $\phisol$, we make use of another observation. Let $c\lbrack
-\varphi, \substFn(\rhobar) \rbrack$ be the following constraint:
-\begin{center}
-\(
-  \isvalid{ \Phicx \conj \varphi}
-        {\Phics'}
-\)
-\end{center}
-Consider a maximally weak formula $\phi$ such that
-$\isvalid{\Phicx}{\phi \Leftrightarrow \Phics'}$. 
-% Since $\phi$ is
-% maximally weak, there does not exist a $\phi'$ satisfying all the
-% below three conditions:
+% Consequently, when the turn of a constraint set ($C$) arrives during
+% the constraint solving process, it satisfies certain properties:
 % \begin{itemize}
-% \item $\isvalid{\Phicx}{\phi' \Leftrightarrow \Phics'}$.
-% \item $\isvalid{\cdot} {\phi \Rightarrow \phi'}$.
-% \item $\isnotvalid{\cdot}{\phi' \Rightarrow \phi}$.
-% \end{itemize}
-Clearly, $\tywf{\rhoenv}{\phi}$. However, since $\rhoenv_{\varphi}
-\subseteq \rhoenv$, we have two cases:
-\begin{itemize}
-
-\item Case $\tywf{\rhoenv_{\varphi}}{\phi}$: This means that $\phi$ is
-a solution to $\varphi$. 
-% Furthermore, it is the weakest solution, because it is equivalent to
-% $\Phics$ under $\Phicx \conj \bigwedge_j(\rho_j =
-% \substFn(\rho_j))$, and any other solution has to stronger than
-% $\Phics$ under the same context.  
-
-\item Case $\tynwf{\rhoenv_{\varphi}}{\phi}$: In this case, $\phi$
-contains at least one equality or outlives constraint on two region
-identifiers, $\rgn_i$ and $\rgn_j$, where (a). $\rgn_i,\rgn_j \in
-\rhoenv - \rhoenv_{\varphi}$, or (b). $\rgn_i \in \rhoenv -
-\rhoenv_{\varphi}$ and $\rgn_j \in \rhoenv_{\varphi}$, such that the
-constraint is not implied by $\Phicx$ (if it is implied, then $\phi$
-is not maximally weak). Let us denote such constraint on $\rgn_i$ and
-$\rgn_j$ as $\phi_{ij}$. Now, let us consider a solution $\phisol$ to
-$\varphi$, which means that $\isvalid{\Phicx \conj \phisol}{\Phics'}$.
-Since $\isvalid{\Phicx}{\phi \Leftrightarrow \Phics'}$, we have
-$\isvalid {\Phicx \conj \phisol}{\phi}$. Since
-$\isvalid{\phi}{\phi_{ij}}$, we have $\isvalid {\Phicx \conj
-\phisol}{\phi_{ij}}$, although $\isnotvalid{\Phicx}{\phi_{ij}}$. But
-this is impossible. To see why, recall that all the constraints on
-identifiers in $\rhoenv_{\varphi}$ occuring in $\Phicx$ are subsumed
-by $(\rhoenv - \rhoenv_{\varphi}) \outlives \rhoenv_{\varphi}$.
-Therefore, it is impossible to derive $\phi_{ij}$ from $\Phicx$ by
-only adding constraints on $\rgn \in \rhoenv_{\varphi}$. Hence, such a
-solution $\phisol$ cannot exist.
-\end{itemize}
-The above discussion hints at an algorithm to compute a solution to
-$\varphi$: find a maximally weak $\phisol$ such that $\isvalid{\Phicx}
-{\phisol \Leftrightarrow \Phics'}$. If $\tywf{\rhoenv_{\varphi}}
-{\phisol}$, then $\phisol$ is the solution. Otherwise, there is no
-solution to $\varphi$. 
-
-\subsubsection{Solving Recursive Constraints}
-
-We now extend constraint solving to recursive CSP $\csp$, where
-$c\lbrack \varphi,\rhobar \rbrack$ assumes the form $\isvalid{\Phicx
-\conj \varphi}{\Phics \conj \bigwedge_i F_i(\varphi)}$. For the sake
-of brevity, we define $G(\varphi) = \Phicx \conj \bigwedge_i
-F_i(\varphi)$, and use $F$ in $c\lbrack \varphi,\rhobar \rbrack$: 
-\begin{center}
-\(
-  \isvalid{\Phicx \conj \varphi}{G(\varphi)}
-\)
-\end{center}
-To solve the above recursive constraint, we start with the observation
-that the set of all constaints ($\phi$) over $\rhoenv \cup
-\{\rhobar\}$ is a lattice, where $\phi_1 \le \phi_2 \triangleq
-\isvalid{\cdot}{\phi_1 \Rightarrow \phi_2}$. Note that $G$ is a
-monotone over the lattice:
-\begin{center}
-  $\forall \phi_1,\phi_2.\; \isvalid{\cdot}{(\phi_1 \Rightarrow
-  \phi_2) \Rightarrow (G(\phi_1) \Rightarrow G(\phi_2))}$
-\end{center}
-From Knaster-Tarski's theorem, we know that $G$ has a greatest fixed
-point ($\phi_f$), with following properties:
-\begin{itemize}
-\item \textbf{Property 1} $\phi_f = G(\phi_f)$, which means
-$\isvalid{\cdot}{\phi_f \Leftrightarrow G(\phi_f)}$
-\item \textbf{Property 2} $\forall \phi_f'$ such that $\phi_f' =
-G(\phi_f')$, we have $\phi_f' \le \phi_f$, which means $\isvalid
-{\cdot} {\phi_f' \Rightarrow \phi_f}$.
-\end{itemize}
-We therefore compute the greatest fixed point ($\phi_f$) of $G$, and
-convert the recursive constraint to the following non-recursive
-constraint:
-\begin{center}
-\(
-  \isvalid{\Phicx \conj \varphi}{\phi_f}
-\)
-\end{center}
-The technique described in \S~\ref{sec:csolve} now suffices to solve
-the above constraint.
-
-% Note that $F$ is a non-idempotent substitution function with following
-% properties:
-% \begin{itemize}
-% \item $F$ is a monotone: 
-% \begin{center}
-%   $\forall \phi_1,\phi_2.\; \isvalid{\cdot}{(\phi_1 \Rightarrow
-%   \phi_2) \Rightarrow (F(\phi_1) \Rightarrow F(\phi_2))}$
-% \end{center}
-
-% \item $F$ distributes over conjunction (mind the syntactic equality):
-% \begin{center}
-%   $\forall \phi_1,\phi_2.\; F(\phi_1 \conj \phi_2) = F(\phi_1) \conj
-%   F(\phi_2)$
-% \end{center}
+% \item There exists only one predicate variable ($\varphi$) that is either
+% constrained or used by the constraints in the set ($C$). The variable is
+% called set's \emph{subject}. This property follows from (a). the fact
+% that all the dependency constraints have already been solved (and
+% solutions applied), and (b). the assumption that there are no mutually
+% recursive definitions. 
+% \item All the constraints that constrain the set's subject are present
+% in the set. This follows from our definition of the dependency relation.
 % \end{itemize}
 
-% Define $G(\varphi) = \Phics \conj F(\varphi)$. Note that $G$ is also a
-% monotone, hence $G$ has greatest fixed point (GFP) in the lattice. Let
-% $\phi_f$ be the GFP of $G$. Following properties ensue:
-% \begin{itemize}
-% \item \textbf{Property 1} $\phi_f = G(\phi_f)$, which means
-% $\isvalid{\cdot}{\phi_f \Leftrightarrow G(\phi_f)}$
-% \item \textbf{Property 2} $\forall \phi_f'$ such that $\phi_f' =
-% G(\phi_f')$, we have $\phi_f' \le \phi_f$, which means $\isvalid
-% {\cdot} {\phi_f' \Rightarrow \phi_f}$.
-% \end{itemize}
+Solving a set ($C$) of constraints involves finding assignments for
+free region ($\rho$) and predicate ($\varphi$) varibles in the set.
+Assignments to region variables can be found via unification (for the
+examples in \S~\ref{sec:constraints}, we have already performed the
+unification, so $C_{1-3}$ do not contain free region variables). Once
+the region variables have been unified, we solve $C$ to find an
+assignment for free predicate variables. The first step is to reduce
+the set of constraints into an equivalent single constraint by
+conjoining antecedents and consequents of all constraints in the
+set\footnote{\cite{techrep} formally justifies the soundness of this
+step}. For the constraint sets $C_1$, $C_2$, and $C_3$, the equivalent
+constraint are $c_{12}$, $c_{13}$, and $c_{14}$, respectively, shown
+below:
+\begin{smathpar}
+\begin{array}{l}
+  \csid{12} \isvalid{\varphi_0}{\rho_0 \outlives \rhoalloc_0 \conj \rho_1
+     \succeq \rhoalloc_0 \conj \rho_4 = \rhoalloc_0 \conj 
+     \rho_2 = \rho_0 \conj \rho_3 = \rho_1}\\
+  \csid{13} \isvalid{\varphi_0 \conj \varphi_1} {\rho_5 = \rho_0}\\
+  \csid{14} \isvalid{\varphi_1 \conj \varphi_2 \conj \rgn_0 \outlives \rgn_1} 
+    {
+        \rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6 \conj 
+        \rho_7 = \rho_9 \conj 
+    }\\
+  \hspace*{1.4in} \rho_{8} = \rho_9 \conj
+        [\rgn_1/\rhoalloc_2][\rgn_1/\rho_6][\rgn_0/\rho_{7-9}]\varphi_2
+\end{array}
+\end{smathpar}
+The constraint $c_{12}$ is a non-recursive constraint of the form
+$\isvalid{\phictxt \conj \varphi}{\phicstr}$, where $\phictxt$ and
+$\phicstr$ are concrete constraint formulas ($\phictxt$ is $true$ in
+this case). Such constraints are solved for $\varphi$ by computing a
+maximally weak $\phisol$ such that $\isvalid{\phictxt}{\phisol
+\Leftrightarrow \phicstr}$. If such $\phisol$ satisfies the
+well-formedness condition on $\varphi$, then it is clearly a solution
+for $\varphi$, because there cannot exist a weaker solution for
+$\varphi$ that implies $\phicstr$ under $\phictxt$. On contrary, if a
+maximally weak $\phisol$ fails the well-formedness condition, then we
+establish~\cite{techrep} that it is impossible to satisfy the
+constraint. Hence, it suffices to obtain a maximally weak $\phisol$,
+that satisfies $\isvalid{\phictxt}{\phisol \Leftrightarrow \phicstr}$
+and check if it satisfies the well-formedness condition on $\varphi$.
+The former problem can be cast as an instance of graph augmentation
+problem, as described below.
+\vspace*{-0.05in}
+\paragraph{Definitions} Given a constraint formula $\phi$, we define
+its graph encoding $G(\phi)=(V(\phi),E(\phi))$ as a digraph whose
+vertices ($V(\phi)$) are free region variables and identifiers in
+$\phi$, and whose edges ($E(\phi)$) denote outlives constraints
+in\footnote{We alternate between viewing a constraint formula ($\phi$)
+as a set of constraints and a conjunction of constraints in this
+description} $\phi$.  That is, if $\phi$ contains a constraint $\rho_1
+\outlives \rho_2$, then $\rho_1,\rho_2 \in V(\phi)$ and
+$(\rho_1,\rho_2) \in E(\phi)$. Equality constraints are treated as a
+conjunction of symmetric outlives constraints for the purpose of graph
+encoding. Conversely, given a digraph $G$, we define its constraint
+encoding $\Phi(G)$ in a straightforward manner. We say that a graph
+$G_1=(V_1,E_1)$ is as connected as graph $G_2=(V_2,E_2)$ if $V_2
+\subseteq V_1$, and for every $\rho_1, \rho_2 \in V_2$, if there
+exists a path between $\rho_1$ and $\rho_2$ in $G_2$, then there must
+exist a path between same pair of vertices in $G_1$. 
 
-% \begin{theorem}
-% $\phi_f$ is a solution.
-% \end{theorem}
-% \begin{proof}
-% $\phi_f$ is GFP of $G$. Therefore, $\isvalid{\cdot}{\phi_f
-% \Leftrightarrow G(\phi_f)}$. By strengthening the context, we get
-% $\isvalid{\Phicx}{\phi_f \Leftrightarrow G(\phi_f)}$. It follows that
-% $\isvalid{\Phicx \conj \phi_f}{G(\phi_f)}$. Hence, $\phi_f$ is a
-% solution for $\varphi$.
-% \end{proof}
+A maximally weak $\phisol$ that satisfies $\isvalid{\phictxt}{\phisol
+\Leftrightarrow \phicstr}$ is a constraint encoding of the smallest
+graph $G$ (i.e., $\Phi(G)$) such that $G(\phictxt) \cup G$ is as
+connected as $G(\phicstr)$. The problem of computing such a $G$ is
+equivalent to the problem finding of finding minimum number of edges
+to add to $G(\phictxt)$ such that it is as connected as $G(\phicstr)$.
+Efficient algorithms to solve the later problem are known to
+exist~\cite{graph}, and we rely on them for the solution.
 
-% \begin{theorem}
-% If $\phisol$ is a solution of $\varphi$, then $\isvalid{\Phicx \conj
-% \phisol}{\phi_f}$
-% \end{theorem}
-% \begin{proof}
-%   Since $\phisol$ is a solution, $\isvalid{\Phicx}{\phisol \Rightarrow
-%   G(\phisol)}$. Therefore, $\isvalid{}{\Phicx \conj \phisol \Rightarrow
-%   \Phicx \conj G(\phisol)}$. Therefore, $\isvalid{}{G(\Phicx) \conj
-%   G(\phisol) \Rightarrow G(\Phicx) \conj G^2(\phisol)}$
+Solving the constraints $c_{12}$ and $c_{13}$ by reducing them to
+graph augmentation problems, as described above, results in the
+following solutions for $\varphi_0$ and $\varphi_1$ (symmetric
+outlives constraints are replaced with equalities):
+\begin{center}
+\(
+  \varphi_1 \Leftrightarrow \rho_0 \outlives \rhoalloc_0 \conj \rho_1
+     \succeq \rhoalloc_0 \conj \rho_4 = \rhoalloc_0 \conj 
+     \rho_2 = \rho_0 \conj \rho_3 = \rho_1
+\)\\
+\(
+  \varphi_2 \Leftrightarrow \rho_5 = \rho_0
+\)
+\end{center}
+Substituting the above solutions for $\varphi_0$ and $\varphi_1$ in
+$c_{14}$ gives us a recursive constraint of the following form:
+\begin{center}
+\(
+  \isvalid{\phictxt \conj \varphi}{\phicstr \conj F(\varphi)}
+\)
+\end{center}
+Where $\phictxt$ and $\phicstr$ are concrete constraint formulas, and
+$F$ is a substitution function, not necessarily idempotent. Let
+$G(\varphi) = \phicstr \conj F(\varphi)$, so that the constraint is
+$\isvalid{\phictxt \conj \varphi}{H(\varphi)}$. Our solution to such
+recursive constraints  is based on some observations. Firstly, the set
+of all possible constraints over a finite set of region
+variables/identifiers is a complete meet semi-lattice, where (a).
+meet operation is defined as $\phi_1 \sqcap \phi_2 \triangleq \phi_1
+\conj \phi_2$, and (b). lattice order is defined as $\phi_1 \le \phi_2
+\triangleq \isvalid{\cdot}{\phi_1 \Rightarrow \phi_2}$. Secondly,
+function $H$ is a monotone over the lattice since $\forall
+\phi_1,\phi_2.\; \isvalid{\cdot}{(\phi_1 \Rightarrow \phi_2)
+\Rightarrow (H(\phi_1) \Rightarrow H(\phi_2))}$. From Knaster-Tarski's
+theorem, we know that $H$ has a greatest fixed point $\phi_f$ such
+that $\isvalid{\cdot}{\phi_f \Leftrightarrow H(\phi_f) }$. To solve
+the recursive constraint shown above, we first compute the greatest
+fixed point ($\phi_f$) of $H$, and then reduce the constraint to the
+following non-recursive constraint:
+\begin{center}
+\(
+  \isvalid{\phictxt \conj \varphi}{\phi_f}
+\)
+\end{center}
+Which can then be solved via the graph-based approach described
+before.
 
-% \end{proof}
-
+Let $H(\varphi_2)$ denote the consequent of the recursive constraint
+$c_{14}$. Its greatest fixed point ($\phi_f$) is shown below:
+\begin{center}
+\(
+  \rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6 \conj \rho_7 =
+  \rho_9 \conj \rho_8 = \rho_9 \conj \rgn_0 \outlives \rgn_1 \conj
+  \rgn_0 = \rgn_0
+\)
+\end{center}
+Computing a maximally weak $\phisol$ such that $\isvalid{\varphi_1
+\conj \rgn_0 \outlives \rgn_1}{\phisol \Leftrightarrow \phi_f}$
+results in the following solution for $\varphi_2$ that meets its
+well-formedness requirement ($\tywf{\{\rhoalloc_0,\rho_{}0-4,
+\rhoalloc_2, \rho_{6-9}\}}{\varphi_2} $):
+\begin{center}
+\(
+  \rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6 \conj \rho_7 =
+  \rho_9 \conj \rho_8 = \rho_9
+\)
+\end{center}
 
