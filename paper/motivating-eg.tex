@@ -1,14 +1,14 @@
 \begin{figure}[t!]
 \begin{numcodejava}
 class MapVertex<TIn, TOut> {
-  Func<TIn, TOut> userDefinedFunction;
+  Func<TIn, TOut> selector;
   Dictionary<Time, List<TOut>> map;
   ...
   void onReceive(Time t, List<TIn> inputList) {
     if (!map.ContainsKey(t))
        map[t] = new List<TOut>();
     foreach (TIn input in inputList) {
-      TOut output = userDefinedFunction(input);
+      TOut output = selector(input);
       map[t].add(output);
     }
   }
@@ -22,15 +22,3 @@ class MapVertex<TIn, TOut> {
 \caption{\C{SELECT} dataflow operator}
 \label{fig:motivating-eg}
 \end{figure}
-
-%    List<TOut> outps = new List<TOut>();
-%    Iterator<Pair<Time, List<TOut>>> iter = 
-%        // entries(0,t):  map entries with keys 
-%        // between (and including) 0 & t
-%        map.entries(0,t).iterator();
-%    while(iter.hasNext()) {
-%      Pair<Time, List<TOut>> p = iter.getNext();
-%      outps.addAll(p.getSnd());
-%      map.remove(p.getFst());
-%    }
-%    transfer(t, outps);
