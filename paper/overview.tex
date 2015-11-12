@@ -355,7 +355,7 @@ allocation context, and to access its root object:
 \begin{codejava}
   Region<string> rgn = new Region<List<String>>
                         (() => new List<String>());
-  open rgn as R0 withroot strList {
+  open rgn as  strList@R0 {
     strList.addAtHead("World");
     strList.addAtHead("Hello");
   }
@@ -380,12 +380,11 @@ data and transfer it to another actor, or free the region.
 
 \name lets stack regions to be used as working memory while operating
 with the data stored in a transferable region. Consider the following
-code, for instance\footnote{For brevity, we drop \C{as} part of the
-\C{open} expression whenever there is no need to assign a static
-identifier for the open region.}:
+code, for instance\footnote{For brevity, we drop the region identifier binding part of the
+\C{open} expression whenever the identifier is not used.}:
 \begin{codejava}
 void onReceive(Region<List<String>> rgn)
-  open rgn withroot strList {
+  open rgn as strList {
     letregion R1 {
       String s = "";
       ListIterator<String> i = strList.listIterator();
@@ -441,8 +440,6 @@ as well as the runtime overhead of checking the region's state transition discip
 
 \input{motivating-eg-in-broom}
 
-% \input{naiad-ex}
-
 \subsection{An Example}
 
 Fig~\ref{fig:motivating-eg-in-broom} shows how the motivating example
@@ -458,18 +455,18 @@ Thus, the temporary objects created by the iteration in line 11,
 for example, will be allocated in this stack region that lives just
 long enough.
 We open the desired output region in line 12, so that the new output
-objects created by the invocation of \C{userDefinedFunction} in line 13
+objects created by the invocation of \C{selector} in line 13
 are allocated in the output region.
 Finally, the input region is freed in line 19.
 
-Note that this approach works correctly only if \C{userDefinedFunction}
+Note that this approach works correctly only if \C{selector}
 creates an output object that does not share any subobjects with its input
 object (which resides in the input region and will be freed at the end of
 the method).
 If desired, such subobjects must be cloned (to copy them from the input
 region to the output region).
 Fortunately, \name's region type system (\S~\ref{sec:type-system}) is
-capable of capturing such nuances in the type of \C{userDefinedFunction}
+capable of capturing such nuances in the type of \C{selector}
 and the type checker will ensure correctness.
 Furthermore, the type can be automatically inferred by \name's region type
 inference (\S~\ref{sec:type-inference}), which can peform the above

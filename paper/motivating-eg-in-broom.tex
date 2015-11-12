@@ -1,18 +1,18 @@
 \begin{figure}[t!]
 \begin{numcodejava}
 class MapVertex<TIn, TOut> {
-  Func<TIn, TOut> userDefinedFunction;
+  Func<TIn, TOut> selector;
   Dictionary<Time, List<TOut>> map;
   ...
   void onReceive(Time t, Region<List<TIn>> inRgn) {
     if (!map.ContainsKey(t))
        map[t] = new Region<List<TOut>> (
                   () => new List<TOut>());
-    open inRgn withroot inMsg {
+    open inRgn as inMsg {
       letregion R0 {
         foreach (TIn input in inputList) {
-          openalloc map[t] withroot outMsg {
-            TOut output = userDefinedFunction(input);
+          open map[t] as outMsg {
+            TOut output = selector(input);
             outMsg.add(output);
           }
         }
