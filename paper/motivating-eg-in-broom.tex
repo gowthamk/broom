@@ -1,0 +1,32 @@
+\begin{figure}[t!]
+\begin{numcodejava}
+class MapVertex<TIn, TOut> {
+  Func<TIn, TOut> userDefinedFunction;
+  Dictionary<Time, List<TOut>> map;
+  ...
+  void onReceive(Time t, Region<List<TIn>> inRgn) {
+    if (!map.ContainsKey(t))
+       map[t] = new Region<List<TOut>> (
+                  () => new List<TOut>());
+    open inRgn withroot inMsg {
+      letregion R0 {
+        foreach (TIn input in inputList) {
+          openalloc map[t] withroot outMsg {
+            TOut output = userDefinedFunction(input);
+            outMsg.add(output);
+          }
+        }
+      }
+    }
+    inRgn.free();
+  }
+  void onNotify(Time t) {
+     Region<List<TOut>> outputRgn = map[t];
+     map.Remove(t);
+     successor.onReceive(t, outputRgn.transfer()); 
+  }
+}
+\end{numcodejava}
+\caption{\C{SELECT} dataflow operator in \name}
+\label{fig:motivating-eg-in-broom}
+\end{figure}

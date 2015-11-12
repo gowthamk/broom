@@ -1,0 +1,42 @@
+Fig~\ref{fig:naiad-ex} shows \C{SelectVertex} class, which is a
+straightforward implementation of the \C{SELECT} dataflow operator.
+\C{SelectVertex} implements \C{onReceive} method, which is called by
+the run-time when a message from an upstream actor is ready to be
+delivered. A message is usually a sequence of tuples (e.g., key-value
+pairs) wrapped inside a transferable region (\C{inRgn}).
+\C{SelectVertex} opens its input region \C{inRgn} (line 16), iterates
+through the sequence, filtering the input tuples that meet the
+selection criterion of the \C{whereFn} (line 19), and applying the
+\C{mapFn} to map the selected input tuples to output (line 22).
+Observe that the iterator is allocated in the temporary (stack) region
+\C{R0} that lives just long enough.  Functions \C{mapFn} and
+\C{whereFn} are defined by the users of the dataflow system, hence
+they are called \emph{user-defined functions}.  Unlike dataflow system
+builders, users are oblivious of regions, hence user-defined functions
+are expected to not contain explicit region annotations. While
+\C{whereFn} defines the selection criterion that the user is
+interested in (e.g: \C{age $\ge$ 18}), \C{mapFn} can either project
+attributes of its input tuple amounting to type \C{TOut}, or can
+create and return a new \C{TOut} object. Note that, unlike \C{inRgn},
+the output transferable region (\C{outRgn}) was opened for allocation
+and the \C{mapFn} is applied under this allocation context. Also note
+that the input tuple is cloned under this allocation context.
+Consequently, the result (\C{outp}) of applying the \C{mapFn} (line
+22), which is subsequently added to \C{outMsg}, is guaranteed to be in
+the \C{outRgn} regardless of the semantics of \C{mapFn}. On the other
+hand, if the input tuple is not cloned (i.e., \C{inp} instead of
+\C{inp.clone()} on line 22) and the \C{mapFn} simply projects its
+input, then \C{outp} refers to an object inside \C{inp}, which no
+longer exists when the \C{outRgn} is transferred to a downstream
+actor. Therefore, if \C{mapFn} is applied over \C{inp} instead of
+\C{inp.clone()}, then it better be a function that creates and returns
+a new \C{TOut} object. Under such scenario, the region type of
+\C{SelectVertex.mapFn} should be precise enough to prevent it from
+being assigned a function (line 6) that simply returns its input.
+Fortunately, \name's region type system (\S~\ref{sec:type-system}) is
+capable of capturing such nuances in the type of
+\C{SelectVertex.mapFn}. Furthermore, the type can be automatically
+inferred by \name's region type inference
+(\S~\ref{sec:type-inference}), which can peform the above non-trivial
+reasoning on behalf of the programmer.
+
