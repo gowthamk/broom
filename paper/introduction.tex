@@ -5,7 +5,7 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Consider the example shown in Fig.~\ref{fig:motivating-eg}.
+Consider the example, from~\cite{Broom:HotOS}, shown in Fig.~\ref{fig:motivating-eg}.
 This code represents the logic for a streaming query operator.
 The operator receives a stream of input messages, each associated
 with a time (window) $t$, processed by method \texttt{onReceive}.
@@ -54,13 +54,14 @@ any containment relation between their lifetimes).
 We refer to regions with lexically scoped lifetimes as \emph{stack regions} and to regions 
 that do not have such a lexically scoped region as \emph{dynamic} regions.
 
-The goal of this work is an automatic (memory-safe) region-based memory management technique
+The goal of this work is a \emph{memory-safe} region-based memory management technique
 that supports dynamic regions (that are first-class objects) and higher-order functions.
-Though our focus is on memory-safety, dynamic regions also have other side-benefits.
+Though our focus, in this paper, is on memory-safety, our approach offers other side-benefits.
 When a producer transfers a data-structure to a consumer, in a shared-memory context , our approach
 provides an ownership discipline that ensures that the producer cannot subsequently modify
 the data-structure. When the same transfer happens in a distributed setting, the system guarantees
 that the data-structure is self-contained and can be safely transmitted across address spaces.
+We refer to dynamic regions that provide these guarantees as \emph{transferable} regions.
 
 The key memory safety property we wish to ensure is that there are no dangling references:
 i.e., a reference to an object that has been freed.
@@ -168,14 +169,14 @@ The paper makes the following contributions:
   
 \end{itemize}
 
-The rest of the paper is organized as follows. The next section
-presents an informal overview of \name, and motivates the need for a
-region type system.  \S~\ref{sec:type-system} formalizes the type
-system and its safety guarantees. The type inference algorithm is
-described in \S~\ref{sec:type-inference}. \S~\ref{sec:csolve} focuses
-on \csolve, the constraint solving algorithm, and its correctness
-guarantees.  Implementations details and practical extensions to the
-type system are described in \S~\ref{sec:implementation}.
-\S~\ref{sec:evaluation} presents experimental evaluation and case
-studies.  \S~\ref{sec:related} discusses the related work, and
-\S~\ref{sec:conclusion} concludes.
+%The rest of the paper is organized as follows. The next section
+%presents an informal overview of \name, and motivates the need for a
+%region type system.  \S~\ref{sec:type-system} formalizes the type
+%system and its safety guarantees. The type inference algorithm is
+%described in \S~\ref{sec:type-inference}. \S~\ref{sec:csolve} focuses
+%on \csolve, the constraint solving algorithm, and its correctness
+%guarantees.  Implementations details and practical extensions to the
+%type system are described in \S~\ref{sec:implementation}.
+%\S~\ref{sec:evaluation} presents experimental evaluation and case
+%studies.  \S~\ref{sec:related} discusses the related work, and
+%\S~\ref{sec:conclusion} concludes.
