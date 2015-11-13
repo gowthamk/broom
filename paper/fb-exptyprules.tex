@@ -76,12 +76,12 @@
 \RULE
   {
    \hastyp{\exptycx{\ralloc}{\env}}{x}
-            {\RgnZ\inang{T}\inang{\rgn'}}\spc
+            {\RgnZ\inang{T}\inang{\toprgn}}\spc
     \A = (\subtypcx) \spc
     \rgn \notin \rhoenv \\
     \A' = (\rhoenv \cup \{\rgn\},\aenv,\phicx) \spc
     \env' =  \env[y\mapsto T@\rgn]\spc
-    \hastyp{\A',\ralloc,\env'}{e}{\tau} 
+    \hastyp{\A',\rgn,\env'}{e}{\tau} 
   }
   {
     \hastyp{\exptycx{\ralloc}{\env}}{\open{x}{\rgn}{y}{e}}
