@@ -4,10 +4,10 @@ class MapVertex<TIn, TOut> {
   Func<TIn, TOut> selector;
   Dictionary<Time, List<TOut>> map;
   ...
-  void onReceive(Time t, List<TIn> inputList) {
+  void onReceive(Time t, List<TIn> inputs) {
     if (!map.ContainsKey(t))
        map[t] = new List<TOut>();
-    foreach (TIn input in inputList) {
+    foreach (TIn input in inputs) {
       TOut output = selector(input);
       map[t].add(output);
     }
@@ -15,7 +15,7 @@ class MapVertex<TIn, TOut> {
   void onNotify(Time t) {
      List<TOut> outputList = map[t];
      map.Remove(t);
-     successor.onReceive(t, outputList); 
+     transfer(t, outputList); 
   }
 }
 \end{numcodejava}

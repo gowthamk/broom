@@ -23,7 +23,7 @@ class MapVertex<TIn, TOut> {
   void onNotify(Time t) {
      Region<List<TOut>> outputRgn = map[t];
      map.Remove(t);
-     successor.onReceive(t, outputRgn.transfer()); 
+     transfer(t, outputRgn); 
   }
 }
 \end{numcodejava}

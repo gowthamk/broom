@@ -69,7 +69,7 @@ This is illustrated by the following code that creates a transferable region
 \begin{figure}
 \begin{codejava}
   public class Region<T> {
-    public Region(Func<void,T> mkRoot);
+    public Region(Func<T> mkRoot);
     public void free();
     public void transfer();
   }
