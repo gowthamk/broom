@@ -124,6 +124,8 @@ Finally, the input region is freed in line 19.
 \subsection{Memory Safety}
 \label{sec:memory-safety}
 
+Our goal is a type system that can ensure the memory safety of programs that use the region
+constructs described above.
 The key to memory safety in \name is the following restriction:
 an object $o_1$ in a region $R_1$ is allowed to store a pointer to
 an object $o_2$ in a region $R_2$ only if $R_2$ is guaranteed to outlive $R_1$.
