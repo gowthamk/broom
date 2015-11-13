@@ -8,7 +8,7 @@ class MapVertex<TIn, TOut> {
     if (!map.ContainsKey(t))
        map[t] = new Region<List<TOut>> (
                   () => new List<TOut>());
-    open inRgn as inMsg {
+    open inRgn as inputList {
       letregion R0 {
         foreach (TIn input in inputList) {
           open map[t] as outMsg {
