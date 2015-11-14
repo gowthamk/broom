@@ -1,4 +1,3 @@
-\newcommand{\emptyA}[0]{(dom(\rhomap),\rhoenv,\cdot,true)}
 \begin{theorem}
 \emph{(\textbf{Progress})}
 \label{thm:fb-progress}
@@ -8,13 +7,24 @@ following holds:\\
   \begin{smathpar}
   \begin{array}{rl}
     (i) & \exists (e',\rhomap').\;\redstoo{(e,\rhomap)}{(e',\rhomap')}\\
-    (ii) & e \; \mathit{is\; a \; value}\\
+    (ii) & \valuee(e)\\
     (iii) & \redstoo{(e,\rhomap)}{\invalidexn}\\
   \end{array}
   \end{smathpar}
 \end{theorem}
 \begin{proof}
-Intros $e$. Induction on $e$. Cases:
+Intros $e$. Induction on $e$. For every subexpressions $e_0$, inductive
+hypothesis gives us the following:
+\begin{smathpar}
+\begin{array}{cr}
+  \hspace*{-2in}\forall (\tau_0, \rhoenv_0, \rhomap_0, \rgn_0). \rgn_0 \in \rhoenv_0 \conj
+    \hastyp{(dom(\rhomap_0),\rhoenv_0,\cdot,true),\rgn_0, \cdot}{e_0}{\tau_0} \Rightarrow& IH1\\
+       (\exists(e_0',\rhomap_0'). \redstoo{(e_0,\rhomap_0)}
+                {(e_0',\rhomap_0')}) \disj (\valuee(e_0)) 
+       \disj (\redstoo{(e_0,\rhomap_0)}{\invalidexn})& \\
+\end{array}
+\end{smathpar}
+Cases from the induction:
 \begin{itemize}
   \item Cases ($e = \unitval$ and $e = x$): proof trivial.
 
@@ -23,10 +33,6 @@ Intros $e$. Induction on $e$. Cases:
   \begin{array}{cr}
     \rgn \in \rhoenv & H2\\
     \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H5\\
-    \forall (\tau, \rhoenv, \rhomap, \rgn). \rgn \in \rhoenv \conj
-      \hastyp{\emptyA,\rgn, \cdot}{e_0}{\tau} \;
-      \Rightarrow \; \exists(e',\rhomap'). \redstoo{(e_0,\rhomap)}
-                      {(e',\rhomap')} & IH1\\
   \end{array}
   \end{smathpar}
   Inverting $H5$:
@@ -75,10 +81,6 @@ Intros $e$. Induction on $e$. Cases:
   \begin{array}{cr}
     \rgn \in \rhoenv & H2\\
     \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H5\\
-    \forall (\tau, \rhoenv, \rhomap, \rgn). \rgn \in \rhoenv \conj
-      \hastyp{\emptyA,\rgn, \cdot}{e_0}{\tau} \;
-      \Rightarrow \; \exists(e',\rhomap'). \redstoo{(e_0,\rhomap)}
-                      {(e',\rhomap')} & IH1\\
   \end{array}
   \end{smathpar}
   Inverting $H5$:
@@ -130,28 +132,29 @@ Intros $e$. Induction on $e$. Cases:
   have to consider two possible derivations: one from the generic type rule for values of any type,
   and another from the type rule tailor-made for $\RgnZ$ values. The first rule does not apply
   because $\fields(\RgnZ\inang{T} \inang{\toprgn})$ is undefined. The only rule that applies is the
-  special type rule for $\RgnZ$ values. Hence, $e_a$ is $\C{new}\;
-  \RgnZ\inang{T}\inang{\rgn_i}(\lambdaexp{\rgn}{\rhoalloc}{}{v})$, where:
+  special type rule for $\RgnZ$ values. Hence, $e_a$ is $\C{new}\; \RgnZ\inang{T}\inang{\rgn_i}(v)$, where:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn_i \neq \toprgn & H12\\
-    \rgn_i \in dom(\rhomap) \cup \{\toprgn\} & H13\\
-    \hastyp{\emptyA,\rgn,
-    \cdot}{\lambdaexp{\rgn}{\rhoalloc}{}{v}}{\inang{\rhoalloc}\unitZ \xrightarrow{\rgn} T@\rhoalloc} & H14\\
+    \rgn_i \notin \rhoenv & H12\\
+    \rgn_i \in dom(\rhomap)& H13\\
+    \hastyp{(dom(\rhomap), \rhoenv \cup \{\rgn_i\},\cdot,true),\rgn_i, \cdot}{v}{T@\rgn_i} & H16\\
+%   \hastyp{\emptyA,\rgn,
+%   \cdot}{\lambdaexp{\rgn}{\rhoalloc}{}{v}}{\inang{\rhoalloc}\unitZ \xrightarrow{\rgn} T@\rhoalloc} & H14\\
   \end{array}
   \end{smathpar}
-  $H13$ follows from the fact that for $\C{new} \RgnZ\inang{T}\inang{\rgn_i}(...)$ to be a value,
-  $\rgn_i$ cannot be $\toprgn$. Inversion on $H14$:
+%  $H13$ follows from the fact that for $\C{new} \RgnZ\inang{T}\inang{\rgn_i}(...)$ to be a value,
+%  $\rgn_i$ cannot be $\toprgn$. i
+% Inversion on $H14$:
+% \begin{smathpar}
+% \begin{array}{cr}
+%   \rhoalloc \notin \rhoenv & H15\\
+%   \hastyp{(dom(\rhomap), \rhoenv \cup \{\rhoalloc\},\cdot,true),\rhoalloc, \cdot}{v}{T@\rhoalloc} & H16\\
+% \end{array}
+% \end{smathpar}
+  From $H9$, $H13$, $H16$, and Lemma~\ref{thm:fb-renaming}:
   \begin{smathpar}
   \begin{array}{cr}
-    \rhoalloc \notin \rhoenv & H15\\
-    \hastyp{(dom(\rhomap), \rhoenv \cup \{\rhoalloc\},\cdot,true),\rhoalloc, \cdot}{v}{T@\rhoalloc} & H16\\
-  \end{array}
-  \end{smathpar}
-  From $H9$, $H15$ and $H16$:
-  \begin{smathpar}
-  \begin{array}{cr}
-    \hastyp{(dom(\rhomap),\rhoenv \cup \{\rgn_0\},\cdot,true),\rgn_0, \cdot}{[\rgn_0/\rhoalloc]v}{T@\rgn_0} & H18\\
+    \hastyp{(dom(\rhomap),\rhoenv \cup \{\rgn_0\},\cdot,true),\rgn_0, \cdot}{[\rgn_0/\rgn_i]v}{T@\rgn_0} & H18\\
   \end{array}
   \end{smathpar}
   From $H11$, $H18$ and Lemma~\ref{thm:fb-substitution}:
@@ -174,10 +177,10 @@ Intros $e$. Induction on $e$. Cases:
     \end{smathpar}
     In the second case, the evaluation of $e$ also raises $\invalidexn$.
 
-    \item SCase($\rhomap(\rho) \neq \XFERRED$ and $e_b$ is a value $v_b$): Trivially,
+    \item SCase($\rhomap(\rgn_i) \neq \XFERRED$ and $e_b$ is a value $v_b$): Trivially,
     $\redstoo{(e,\rhomap)}{(v_b,\rhomap)}$.
 
-    \item SCase($\rhomap(\rho) = \XFERRED$): $e$ raises $\invalidexn$.
+    \item SCase($\rhomap(\rgn_i) = \XFERRED$): $e$ raises $\invalidexn$.
   \end{itemize}
  
   \item (e = $e_a.m\inang{\ralloc,\rbar}(\ebar)$): Intros. Hypotheses:
@@ -268,24 +271,72 @@ Intros $e$. Induction on $e$. Cases:
     \end{itemize}
     
     \item SCase ($\shape(\fbN) = \RgnZ\inang{T}$ and $e =
-    \RgnZ\inang{T}\inang{\rgn_i}(\lambdaexp{\rgn}{\rhoalloc}{}{v})$): Hypotheses:
+    \RgnZ\inang{T}\inang{\rgn_i}(e_0)$): From $H4$:
     \begin{smathpar}
     \begin{array}{cr}
-      \fgjtywf{\cdot}{T} & H12\\
-      \rgn_i \in dom(\rhomap) \cup \{\toprgn\} & H13\\
-      \hastyp{\emptyA,\rgn,\cdot}{\lambdaexp{\rgn}{\rhoalloc}{}{v}}
-        {\inang{\inang{\rhoalloc}\unitZ \xrightarrow{\rgn} T@\rhoalloc}}& H14\\
+      \hastyp{\emptyA,\rgn, \cdot}{\C{new}\; \RgnZ\inang{T}\inang{\rgn_i}(e_0)}{\tau} & H4\\
     \end{array}
     \end{smathpar}
-    Two cases:
+    Inversion on $H4$ gives two cases:
     \begin{itemize}
-      \item SSCase ($\rgn_i \in dom(\rhomap)$): In this case, $e$ is a value.
-      \item SSCase ($\rgn_i = \toprgn$): In this case, $\redstoo{(e,\rhomap)}
-        {(\RgnZ\inang{T}\inang{\rgn_i}(\lambdaexp{\rgn}{\rhoalloc}{}{v},\rhomap[\rgn_j \mapsto
-        \CLOSED])}$, where $\rgn_j \notin dom(\rhomap)$.
-    \end{itemize}
-    \end{itemize}
+      \item SSCase($\rgn_i = \toprgn$): Hypotheses:
+      \begin{smathpar}
+      \begin{array}{cr}
+        \fgjtywf{\cdot}{T} & H12\\
+        \rgn_i = \toprgn & H13\\
+        \hastyp{\emptyA,\rgn,\cdot}{e_0}
+          {\inang{\inang{\rhoalloc}\unitZ \xrightarrow{\rgn} T@\rhoalloc}}& H14\\
+      \end{array}
+      \end{smathpar}
+      From $H14$, $e_0$ can either take a step, or raise $\invalidexn$, or is a value. In the first
+      two cases, $e$ takes a step, $e$ raises $\invalidexn$, respectively. In the third case, $e_0$
+      is a value $v_0$. By inversion on $H14$, we know that $v_0 =
+      \lambdaexp{\rgn}{\rhoalloc}{}{e_1}$.  In this case, $\redstoo{(\C{new}\;
+      \RgnZ\inang{T}\inang{\toprgn}(v_0),\rhomap)} {(\C{new}\;
+      \RgnZ\inang{T}\inang{\rgn_j}([\rgn_j/\rhoalloc]e_1), \rhomap[\rgn_j \mapsto \CLOSED])}$, where
+      $\rgn_j$ is fresh ($\rgn_j \notin \rhoenv \cup dom(\rhomap)$).
 
+      \item SSCase ($\rgn_i \neq \toprgn$): Hypotheses:
+      \begin{smathpar}
+      \begin{array}{cr}
+        \rgn_i \in dom(\rhomap) & H16\\
+        \rgn_i \notin \rhoenv & H18\\
+        \hastyp{(dom(\rhomap), \rhoenv \cup \{\rgn_i\},\cdot,true),\rgn_i,\cdot}
+              {e_0}{T@\rgn_i} & H20\\
+      \end{array}
+      \end{smathpar}
+      From $IH1$ and $H20$, we have three cases:
+      \begin{itemize}
+        \item SSSCase ($e_0$ is a value $v_0$): In this case, $e = \RgnZ\inang{T}\inang{\rgn_i}(v_0)$ is also
+        a value.
+        \item SSSCase ($e_0$ raises $\invalidexn$): In this case, $e$ also raises $\invalidexn$.
+        \item SSSCase ($\redsto{\rhoenv \cup \{\rgn_i\}}{(e_0,\rhomap)} {(e_0',\rhomap')}$): In this
+        case, $\redstoo{(\RgnZ\inang{T}\inang{\rgn_i}(e_0),\rhomap)}
+        {(\RgnZ\inang{T}\inang{\rgn_i}(e_0'), \rhomap')}$
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}
+%   \begin{smathpar}
+%   \begin{array}{cr}
+%     \rhoalloc \notin \rhoenv & H17\\
+%     \hastyp{(dom(\rhomap), \rhoenv \cup \{\rhoalloc\},\cdot,true),\rgn,\cdot}
+%           {e_1}{T@\rhoalloc} & H19\\
+%   \end{array}
+%   \end{smathpar}
+%   Consider a fresh $\rgn_j$:
+%   \begin{smathpar}
+%   \begin{array}{cr}
+%     \rgn_j \notin \rhoenv \cup dom(\rhomap) & H20\\
+%   \end{array}
+%   \end{smathpar}
+%   From $H17$, $H19$, $H20$, and Lemma~\ref{thm:fb-renaming}, we have:
+%   \begin{smathpar}
+%   \begin{array}{cr}
+%     \hastyp{(dom(\rhomap), \rhoenv \cup \{\rhoalloc\},\cdot,true),\rgn,\cdot}
+%           {e_1}{T@\rhoalloc} & H19\\
+%   \end{array}
+%   \end{smathpar}
+    
   \item Case ($e = e_0.\transfer\inang{\ralloc}()$): Intros. Hypotheses:
   \begin{smathpar}
   \begin{array}{cr}

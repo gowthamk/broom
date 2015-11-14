@@ -1,0 +1,8 @@
+\begin{lemma}
+\emph{(\textbf{Region Renaming Preserves Typing})}
+\label{thm:fb-renaming}
+$\forall v, \rhoset, T, \rhoenv, \rho, \rgn$, if $\rho,\rgn \notin
+\rhoenv$ and $\hastyp{(\rhoset,\rhoenv \cup \{\rho\},\cdot,true),
+\rho, \cdot}{v}{T@\rho}$, then $\hastyp{(\rhoset,\rhoenv \cup \{\rgn\}, 
+\cdot,true),\rgn, \cdot}{v}{T@\rgn}$
+\end{lemma}

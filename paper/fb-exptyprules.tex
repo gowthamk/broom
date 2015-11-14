@@ -77,16 +77,14 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \rgn \in \A.\rhoset \cup \{\toprgn\}\spc
     \fgjtywf{\A.\aenv}{T} \spc
     \fgjN = \RgnZ\inang{T}\\
-    \hastyp{\exptycx{\ralloc}{\env}}{\lambdaexp{\ralloc}{\rhoalloc}{}{v}}
+    \hastyp{\exptycx{\ralloc}{\env}}{e}
       {\inang{\rhoalloc}\unitZ \xrightarrow{\ralloc} T@\rhoalloc}
   }
   {
     \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\;
-    \fgjN\inang{\rgn}(\lambdaexp{\ralloc}{\rhoalloc}{}{v})}
-        {\fgjN\inang{\toprgn}}
+    \fgjN\inang{\toprgn}(e)} {\fgjN\inang{\toprgn}}
   }
 \end{array}
 \end{smathpar}
@@ -417,7 +415,7 @@
 % \end{smathpar}
 % \end{minipage}
 %
-\begin{minipage}{1.5in}
+\begin{minipage}{2in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -432,4 +430,25 @@
 \end{smathpar}
 \end{minipage}
 %
-
+%
+\begin{minipage}{1.8in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn \in \A.\rhoset\spc
+    \rgn \notin \A.\rhoenv\spc
+    \fgjtywf{\A.\aenv}{T} \spc
+    \fgjN = \RgnZ\inang{T}\\
+    \hastyp{(\A.\rhoset, \A.\rhoenv \cup \{\rgn\}, \A.\aenv, \A.\phicx),
+            {\rgn},{\env}}{e}{T@\rgn}
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\;
+    \fgjN\inang{\rgn}(e)} {\fgjN\inang{\toprgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
