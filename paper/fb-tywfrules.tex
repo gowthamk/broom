@@ -45,14 +45,14 @@
 % \end{smathpar}
 % \end{minipage}
 %
-\begin{minipage}{2.5in}
+\begin{minipage}{2.7in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
     \{\rhoalloc,\rhobar\} \notin \A.\rhoenv \spc
-    \A' = (\A.\rhoenv \cup \{\rhoalloc,\rhobar\}, 
+    \A' = (\A.\rhoset, \A.\rhoenv \cup \{\rhoalloc,\rhobar\}, 
            \A.\aenv, \A.\phicx \conj \phi) \\
     \rgn \in \A.\rhoenv \spc
     \tywf{\A'.\rhoenv}{\phi}\spc 
@@ -62,6 +62,21 @@
   {
     \tywf{\A}{\inang{\rhoalloc\rhobar \,|\, \phi}
               \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.8in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \fgjtywf{\A.\aenv}{T}
+  }
+  {
+    \RgnZ\inang{T}\inang{\rgn}
   }
 \end{array}
 \end{smathpar}

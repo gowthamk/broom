@@ -1,0 +1,8 @@
+\begin{lemma}
+\emph{(\textbf{Substitution Preserves Typing})}
+\label{thm:fb-substitution}
+$\forall e, \tau, \rhoenv$, if $\hastyp{(\rhoenv,\cdot,true),\rgn,[x
+\mapsto \tau_1]}{e}{\tau_2}$ and $\hastyp{(\rhoenv,\cdot,true),\rgn,
+\cdot}{v}{\tau_1}$, then $\hastyp{(\rhoenv,\cdot,true),\rgn,
+\cdot}{[v/x]e}{\tau_2}$
+\end{lemma}

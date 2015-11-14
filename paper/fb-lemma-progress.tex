@@ -1,0 +1,328 @@
+\newcommand{\emptyA}[0]{(dom(\rhomap),\rhoenv,\cdot,true)}
+\begin{theorem}
+\emph{(\textbf{Progress})}
+\label{thm:fb-progress}
+$\forall e, \tau, \rhoenv, \rhomap, \rgn$, if $\rgn \in \rhoenv$ and
+$\hastyp{\emptyA,\rgn, \cdot}{e}{\tau}$, then one of the
+following holds:\\
+  \begin{smathpar}
+  \begin{array}{rl}
+    (i) & \exists (e',\rhomap').\;\redstoo{(e,\rhomap)}{(e',\rhomap')}\\
+    (ii) & e \; \mathit{is\; a \; value}\\
+    (iii) & \redstoo{(e,\rhomap)}{\invalidexn}\\
+  \end{array}
+  \end{smathpar}
+\end{theorem}
+\begin{proof}
+Intros $e$. Induction on $e$. Cases:
+\begin{itemize}
+  \item Cases ($e = \unitval$ and $e = x$): proof trivial.
+
+  \item Case ($e = e_0.f$): Intros. Hypothesis:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn \in \rhoenv & H2\\
+    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H5\\
+    \forall (\tau, \rhoenv, \rhomap, \rgn). \rgn \in \rhoenv \conj
+      \hastyp{\emptyA,\rgn, \cdot}{e_0}{\tau} \;
+      \Rightarrow \; \exists(e',\rhomap'). \redstoo{(e_0,\rhomap)}
+                      {(e',\rhomap')} & IH1\\
+  \end{array}
+  \end{smathpar}
+  Inverting $H5$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyA,\rgn, \cdot}{e_0}{\tau'} & H7\\
+    \bar{f} :\taubar = \fields(\bound_{\cdot}(\tau')) & H9\\
+  \end{array}
+  \end{smathpar}
+  Applying $H7$ in $IH1$, we have three cases:
+  \begin{itemize}
+    \item SCase ($e_0$ takes a step): Hypotheses:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \redstoo{(e_0,\rhomap)}{(e_0',\rhomap_0')} & H11\\
+    \end{array}
+    \end{smathpar}
+    Therefore $(e_0.f_i,\rhomap)$ takes a step to $(e_0'.f_i,\rhomap_0')$ under $\rhoenv$.
+    \item SCase ($e_0$ is a value): Since $e_0$ has type $\tau'$ and $\bound_{\cdot}$ is defined for
+    $\tau'$, it follows that $e_0$ is $\C{new} \fbN(\vbar)$. From $H7$:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \hastyp{\emptyA,\rgn, \cdot}{\C{new} \fbN(\vbar)}{\tau'} & H14\\
+    \end{array}
+    \end{smathpar}
+    Inverting $H14$: 
+    \begin{smathpar}
+    \begin{array}{cr}
+      \tywf{\emptyA}{N} & H16\\
+    \end{array}
+    \end{smathpar}
+    Inverting $H16$:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \allocRgn(N) \in \rhoenv & H18\\
+    \end{array}
+    \end{smathpar}
+    From $H9$, $H18$, we know that $(e_0.f_i,\rhomap)$ takes a step to
+    $(v_i,\rhomap)$
+    \item SCase ($e_0$ raises $\invalidexn$): $e_0.f_i$ also raises
+    $\invalidexn$.
+    \end{itemize}
+
+  \item Case ($e = \letregion{\rgn_0}{e_0}$): Intros. Hypothesis:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn \in \rhoenv & H2\\
+    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H5\\
+    \forall (\tau, \rhoenv, \rhomap, \rgn). \rgn \in \rhoenv \conj
+      \hastyp{\emptyA,\rgn, \cdot}{e_0}{\tau} \;
+      \Rightarrow \; \exists(e',\rhomap'). \redstoo{(e_0,\rhomap)}
+                      {(e',\rhomap')} & IH1\\
+  \end{array}
+  \end{smathpar}
+  Inverting $H5$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn_0 \notin \rhoenv & H7\\
+    \hastyp{(dom(\rhomap),\rhoenv \cup \{\rgn_0\}, \cdot, \rhoenv \outlives
+    \rgn_0), \rgn_0, \cdot}{e_0}{\tau} & H9\\
+  \end{array}
+  \end{smathpar}
+  From $H9$ and $IH1$, we have three cases:
+  \begin{itemize}
+    \item SCase ($e_0$ takes a step). Hypotheses:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \redsto{\rhoenv \cup \{\rgn_0\}}{(e_0,\rhomap)}{(e_0',\rhomap_0')} & H11\\
+    \end{array}
+    \end{smathpar}
+    From $H7$ and $H11$, $\redstoo{(e,\rhomap)}{(\letregion{\rgn_0}{e_0'},\rhomap_0')}$.
+    \item SCase ($e_0$ is a value $v_0$): From $H7$, $\redstoo{(e,\rhomap)}{(v_0,\rhomap)}$
+    \item SCase ($e_0$ raises $\invalidexn$): trivial.
+  \end{itemize}
+  
+  \item Case ($e = \open{e_a}{\rgn_0}{y}{e_b}$): Intros. Hypotheses:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn \in \rhoenv & H2\\
+    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H5\\
+%   \forall (\tau, \rhoenv, \rhomap, \rgn). \rgn \in \rhoenv \conj
+%     \hastyp{\emptyA,\rgn, \cdot}{e_0}{\tau} \;
+%     \Rightarrow \; \exists(e',\rhomap'). \redstoo{(e_0,\rhomap)}
+%                     {(e',\rhomap')} & IH1\\
+  \end{array}
+  \end{smathpar}
+  Inverting $H5$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyA,\rgn, \cdot}{e_a}{\RgnZ\inang{T}\inang{\toprgn}} & H7\\
+    \rgn_0 \notin \rhoenv & H9\\
+    \hastyp{(dom(\rhomap),\rhoenv \cup \{\rgn_0\},\cdot,true),\rgn_0,[y \mapsto
+    T@\rgn_0]}{e_b}{\tau} & H11\\
+  \end{array}
+  \end{smathpar}
+  We have three cases. First case deals with $(e_a,\rhomap)$ taking a step to $(e_a',\rhomap_a')$
+  under $\rhoenv$. Under this context, $(e,\rhomap)$ takes a step to
+  $(\open{e_a'}{\rgn_0}{y}{e_b},\rhomap_a')$. So, there is progress.  Second case deals with $e_a$
+  raising $\invalidexn$. In this case, execution of $e$ also raises $\invalidexn$. So, we again have
+  progress. Third case deals with $e_a$ being a value $\C{new}\;\fbN(\vbar)$. Inverting $H7$, we
+  have to consider two possible derivations: one from the generic type rule for values of any type,
+  and another from the type rule tailor-made for $\RgnZ$ values. The first rule does not apply
+  because $\fields(\RgnZ\inang{T} \inang{\toprgn})$ is undefined. The only rule that applies is the
+  special type rule for $\RgnZ$ values. Hence, $e_a$ is $\C{new}\;
+  \RgnZ\inang{T}\inang{\rgn_i}(\lambdaexp{\rgn}{\rhoalloc}{}{v})$, where:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn_i \neq \toprgn & H12\\
+    \rgn_i \in dom(\rhomap) \cup \{\toprgn\} & H13\\
+    \hastyp{\emptyA,\rgn,
+    \cdot}{\lambdaexp{\rgn}{\rhoalloc}{}{v}}{\inang{\rhoalloc}\unitZ \xrightarrow{\rgn} T@\rhoalloc} & H14\\
+  \end{array}
+  \end{smathpar}
+  $H13$ follows from the fact that for $\C{new} \RgnZ\inang{T}\inang{\rgn_i}(...)$ to be a value,
+  $\rgn_i$ cannot be $\toprgn$. Inversion on $H14$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rhoalloc \notin \rhoenv & H15\\
+    \hastyp{(dom(\rhomap), \rhoenv \cup \{\rhoalloc\},\cdot,true),\rhoalloc, \cdot}{v}{T@\rhoalloc} & H16\\
+  \end{array}
+  \end{smathpar}
+  From $H9$, $H15$ and $H16$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{(dom(\rhomap),\rhoenv \cup \{\rgn_0\},\cdot,true),\rgn_0, \cdot}{[\rgn_0/\rhoalloc]v}{T@\rgn_0} & H18\\
+  \end{array}
+  \end{smathpar}
+  From $H11$, $H18$ and Lemma~\ref{thm:fb-substitution}:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{(dom(\rhomap),\rhoenv \cup \{\rgn_0\},\cdot,true),\rgn_0,\cdot}{[[\rgn_0/\rhoalloc]v/y]e_b}{\tau} & H19\\
+  \end{array}
+  \end{smathpar}
+  From $H12$ and $H13$, we know that $\rgn_i \in dom(\rhomap)$. We now have three cases:
+  \begin{itemize}
+    \item SCase ($\rhomap(\rgn_i) \neq \XFERRED$ and $e_b$ is not a value): By inductive hypothesis,
+    $([[\rgn_0/\rhoalloc]v/y]e_b,\rhomap[\rho \mapsto \OPEN]$ can either (a). take a step to
+    $(e_b',\rhomap')$ under $\rhoenv \cup \{\rgn_0\}$, or (b). $e_b$ evaluates to $\invalidexn$.  In
+    the first case, $(e,\rhomap)$ itself evaluates to: 
+    \begin{smathpar}
+    \begin{array}{cr}
+      (\open{(\C{new} \; \RgnZ\inang{T}\inang{\rho}
+      (\lambdaexp{\rgn}{\rhoalloc}{}{v}))}{y}{e_b'}, \rhomap'[\rho \mapsto \rhomap(\rho)])
+    \end{array}
+    \end{smathpar}
+    In the second case, the evaluation of $e$ also raises $\invalidexn$.
+
+    \item SCase($\rhomap(\rho) \neq \XFERRED$ and $e_b$ is a value $v_b$): Trivially,
+    $\redstoo{(e,\rhomap)}{(v_b,\rhomap)}$.
+
+    \item SCase($\rhomap(\rho) = \XFERRED$): $e$ raises $\invalidexn$.
+  \end{itemize}
+ 
+  \item (e = $e_a.m\inang{\ralloc,\rbar}(\ebar)$): Intros. Hypotheses:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn \in \rhoenv & H2\\
+    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H4\\
+  \end{array}
+  \end{smathpar}
+  By inversion on $H4$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyA,\rgn,\cdot}{e_a}{\tau_a} & H6\\
+    \ralloc = \rgn & H7\\
+    \rbar \in \rhoenv & H8\\
+    \mtype(m,\bound_{\cdot}(\tau_a)) = \inang{\rhoalloc\rhobar\,|\,\phi}\bar{\tau^1} \rightarrow \tau^2 & H10\\
+    \hastyp{\emptyA,\rgn,\cdot}{\ebar}{[\rbar/\rhobar][\rgn/\rhoalloc]\bar{\tau^1}} & H11\\
+    \isvalid{true}{[\rbar/\rhobar][\rgn/\rhoalloc]\phi}
+  \end{array}
+  \end{smathpar}
+  Three cases: 
+  \begin{itemize}
+    \item SCase ($e_a$ isn't a value): From $H16$ and $IH$, we know that either (a). $e_a$ can take
+    a step, or (b) $e_a$ reduces to $\invalidexn$. In first case, $e$ can also take a step, and in
+    second case, $e$ also reduces to $\invalidexn$.
+
+    \item SCase ($e_a = v_a$, but $\exists i$ such that  $e_i$ isn't a value): From $H11$, we know
+    that $(e_i,\rhomap)$ can either (a). take a step to $(e_i',\rhomap')$ under $\rhoenv$, or (b).
+    $e_i$ reduces to $\invalidexn$. In the first case, we have
+    $\redstoo{(v_a.m\inang{\ralloc,\rbar}(...,e_i,...),\rhomap)}
+    {(v_a.m\inang{\ralloc,\rbar}(...,e_i',...),\rhomap')}$.
+
+    \item SCase ($e_a = v_a$ and $\forall i.\,e_i = v_i$): $H10$ says that bound for $\tau_a$ is
+    defined under empty $\aenv$. This is possible only if $\tau_a = \fbN$ and $v_a = \C{new}\;
+    \fbN(\bar{v'})$. Furthemore, $\fbN$ cannot be of form $\RgnZ\inang{T}\inang{\toprgn}$ because,
+    $\mtype$ isn't defined for $\RgnZ$. Using these facts, and inverting $H6$, we get
+    $\tywf{\emptyA}{\fbN}$. Inverting it again:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \allocRgn(\fbN) \in \rhoenv & H13\\
+    \end{array}
+    \end{smathpar}
+    Now, since $\mtype(m,\fbN)$ is defined if and only if $\mbody(m,\fbN)$ is defined, we know that:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \mbody(m,\fbN) = \xbar.\,e_m & H14\\
+    \end{array}
+    \end{smathpar}
+    From $H13$ and $H14$, we know that $\redstoo{((v_a.m\inang{\ralloc,\rbar}(\bar{v}),\rhomap)}
+      {([\bar{v}/\xbar][\C{new}\;\fbN(\bar{v'})/\thisZ]e_m, \rhomap)}$
+  \end{itemize}
+
+  \item Case ($e = e_a\inang{\ralloc\rbar}(\ebar)$). Proof closely follows the proof for
+  $e_a.m\inang{\ralloc\rbar}(\ebar)$. The only difference is that when $e_a$ evaluates to a lambda
+  $\lambdaexp{\rgn_0}{\rhoalloc\rhobar \,|\, \phi}{\taubar \; \xbar}{e_b}$, we need a proof that
+  $\rgn_0 \in \rhoenv$. This can be obtained by inverting the type judgment for the lambda.
+
+  \item Case($e = \C{new}\; \fbN(\ebar)$): Intros. Hypotheses:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn \in \rhoenv & H2\\
+    \hastyp{\emptyA,\rgn, \cdot}{\C{new}\; \fbN(\ebar)}{\tau} & H4\\
+  \end{array}
+  \end{smathpar}
+  Inverting $H4$ leads to two cases:
+  \begin{itemize}
+    \item SCase ($\shape(\fbN) \neq \RgnZ\inang{T}$): Hypotheses:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \tywf{\emptyA}{\fbN} & H5\\
+      \fields(\fbN) = \bar{f}:\taubar & H7\\
+      \hastyp{\emptyA,\rgn,\cdot}{\ebar}{\taubar} & H8\\
+    \end{array}
+    \end{smathpar}
+    Inverting $H5$:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \allocRgn(\fbN) \in \rhoenv & H10\\
+    \end{array}
+    \end{smathpar}
+    Three cases:
+    \begin{itemize}
+      \item SSCase ($\exists i$ such that $e_i$ takes a step): In this case, $e$ also takes a step.
+      \item SSCase ($\exists i$ such that $e_i$ reduces to $\invalidexn$). In this case, $e$ also
+      reduces to $\invalidexn$.
+      \item SSCase ($\forall i$ $e_i$ is a value $v_i$): In this case, $e$ is also a value
+      $\C{new}\;\fbN(\vbar)$.
+    \end{itemize}
+    
+    \item SCase ($\shape(\fbN) = \RgnZ\inang{T}$ and $e =
+    \RgnZ\inang{T}\inang{\rgn_i}(\lambdaexp{\rgn}{\rhoalloc}{}{v})$): Hypotheses:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \fgjtywf{\cdot}{T} & H12\\
+      \rgn_i \in dom(\rhomap) \cup \{\toprgn\} & H13\\
+      \hastyp{\emptyA,\rgn,\cdot}{\lambdaexp{\rgn}{\rhoalloc}{}{v}}
+        {\inang{\inang{\rhoalloc}\unitZ \xrightarrow{\rgn} T@\rhoalloc}}& H14\\
+    \end{array}
+    \end{smathpar}
+    Two cases:
+    \begin{itemize}
+      \item SSCase ($\rgn_i \in dom(\rhomap)$): In this case, $e$ is a value.
+      \item SSCase ($\rgn_i = \toprgn$): In this case, $\redstoo{(e,\rhomap)}
+        {(\RgnZ\inang{T}\inang{\rgn_i}(\lambdaexp{\rgn}{\rhoalloc}{}{v},\rhomap[\rgn_j \mapsto
+        \CLOSED])}$, where $\rgn_j \notin dom(\rhomap)$.
+    \end{itemize}
+    \end{itemize}
+
+  \item Case ($e = e_0.\transfer\inang{\ralloc}()$): Intros. Hypotheses:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn \in \rhoenv & H2\\
+    \ralloc = \rgn & H3\\
+    \hastyp{\emptyA,\rgn, \cdot}{e_0.\transfer\inang{\ralloc}()}{\tau} & H4\\
+  \end{array}
+  \end{smathpar}
+  By inversion on $H4$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyA,\rgn,\cdot}{e_0}{\RgnZ\inang{T}\inang{\toprgn}} & H6\\
+  \end{array}
+  \end{smathpar}
+  Now, if $e_0$ can take a step, so can $e$, hence there is progress. Else, if $e_0$ raises an
+  exception, so does $e$. The only non-trivial case is when $e_0$ is a value. But, only values of
+  type $\RgnZ\inang{T}\inang{\toprgn}$ is $\C{new}\;\RgnZ\inang{T}\inang{\rgn_i}(...)$, where
+  $\rgn_i \neq \toprgn$. By inversion on $H6$, we get:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn_i \in dom(\rhomap) & H8\\
+  \end{array}
+  \end{smathpar}
+  We have two cases:
+  \begin{itemize}
+    \item ($\rhomap(\rgn_i) \neq \OPEN$): In this case,
+    $\redstoo{(e,\rhomap)}{(\unitval,\rhomap[\rgn_i \mapsto \XFERRED])}$.
+
+    \item ($\rhomap(\rgn_i) = \OPEN$): In this case, evaluation of $e$ raises $\invalidexn$.
+  \end{itemize}
+
+  \item Case ($e$ is a lambda abstraction): $e$ is already a value.
+
+  \item Case ($e = e_1;\,e_2$): Proof trivial.
+% End of proof cases.
+\end{itemize}
+
+\qed
+\end{proof}
+

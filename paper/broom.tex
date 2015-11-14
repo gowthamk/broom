@@ -20,7 +20,7 @@
 %-----------------------------------------------------------------------------
 
 
-\documentclass[pldi]{sigplanconf}
+\documentclass[10pt,pldi]{sigplanconf}
 
 % The following \documentclass options may be useful:
 
@@ -74,6 +74,7 @@
 \newcommand{\tywf}[2]{#1\,\vdash\,#2 \; \texttt{ok}}
 \newcommand{\fgjtywf}[2]{#1\,\Vdash\,#2 \; \texttt{ok}}
 \newcommand{\isvalid}[2]{#1\,\vdash\,#2}
+\newcommand{\isnotvalid}[2]{#1\,\nvdash\,#2}
 \newcommand{\hastyp}[3]{#1\,\vdash\,#2:#3}
 \newcommand{\hasfgjtyp}[3]{#1\,\Vdash^{}\,#2\,:\,#3}
 \newcommand{\hassort}[3]{#1\,\vdash\,#2\,::\,#3}
@@ -108,16 +109,18 @@
 \newcommand{\hspa}[0]{\hspace*{-0.08in}}
 % removable:
 \newcommand{\subst}[2]{\lbrack #1/#2 \rbrack}
-\newcommand{\absof}[1]{\left\| #1 \right\| }
+%\newcommand{\absof}[1]{\left\| #1 \right\| }
+\newcommand{\absof}[1]{\thesemof{#1}}
 \newcommand{\broom}{{\sc Broom}\xspace}
 \newcommand{\name}{{\sc Broom}\xspace}
 \newcommand{\fbname}{{\sc Featherweight Broom}\xspace}
 \newcommand{\FB}{{\sc FB}\xspace}
 \newcommand{\naiad}{{\sc Naiad}\xspace}
-\newcommand{\csolve}{{\sc Csolve}\xspace}
+\newcommand{\csolve}{{\sc CSolve}\xspace}
 \newcommand{\GK}[1]{{\textcolor{red}{{GK: #1}}}}
 \newcommand{\csharp}{C\#~}
 \newcommand{\outlives}{\succeq}
+\newcommand{\underlives}{\preceq}
 \newcommand{\coloneqq}{::=}
 \newcommand{\R}[1]{\textrm{#1}}
 \newcommand{\N}[1]{{\normalfont #1}}
@@ -145,7 +148,7 @@
 \newcommand{\extends}{\triangleleft}
 \newcommand{\rextends}{\blacktriangleleft}
 \renewcommand{\bar}[1]{\overline{#1}}
-\newcommand{\angR}{\inang{\rhoalloc\rhobar \,|\, \phi}}
+\newcommand{\angR}{\inang{\rhoalloc,\rhobar \,|\, \phi}}
 \newcommand{\angT}{\inang{\tbar}}
 \newcommand{\tyvar}{a}
 \newcommand{\tyvarb}{b}
@@ -154,13 +157,16 @@
 \newcommand{\fbN}{N}
 \newcommand{\headerOf}[1]{\C{class}\; #1\angAlpha\angR \extends \fbN}
 \newcommand{\substFn}{\mathcal{S}}
-\newcommand{\mang}{\inang{\rhoalloc_m\bar{\rho_m} \,|\, \phi_m}}
+\newcommand{\mang}{\inang{\rhoalloc_m,\bar{\rho_m} \,|\, \phi_m}}
 \newcommand{\rhoset}{\Sigma}
 \newcommand{\rhomap}{\Sigma}
 \newcommand{\rhoenv}{\Delta}
 \newcommand{\aenv}{\Theta}
 \newcommand{\phicx}{\Phi}
-\newcommand{\subtypcx}{\rhoenv,\aenv,\phicx}
+\newcommand{\phictxt}{\phi_{cx}}
+\newcommand{\phicstr}{\phi_{cs}}
+\newcommand{\phisol}{\phi_{sol}}
+\newcommand{\subtypcx}{\rhoset, \rhoenv,\aenv,\phicx}
 \newcommand{\A}{{\mathcal{A}}}
 \newcommand{\exptycx}[2]{\A,#1,#2}
 \newcommand{\void}{\C{void}}
@@ -203,6 +209,11 @@
 \newcommand{\OPEN}{\mathtt{O}}
 \newcommand{\XFERRED}{\mathtt{X}}
 \newcommand{\transfer}{{\sf transfer}}
+\newcommand{\CSP}{(C\lbrack \varphi,\rhobar \rbrack,\rhoenv_{\varphi}, \bar{\rhoenv})}
+\newcommand{\csp}{(c\lbrack \varphi,\rhobar \rbrack,\rhoenv_{\varphi},\bar{\rhoenv})}
+\newcommand{\Phicx}{\Phi_{cx}}
+\newcommand{\Phics}{\Phi_{cs}}
+\newcommand{\tynwf}[2]{#1\,\nvdash\,#2 \; \texttt{ok}}
 
 %Rules
 %-----
@@ -262,7 +273,7 @@ breaklines=true,                % sets automatic line breaking
 breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
 commentstyle=\itshape\color{MidnightBlue},
 %escapeinside={\%*}{*)},         % if you want to add a comment within your code
-morekeywords={letregion, let, in, as, openalloc, open, withroot, not, : , /\\}
+morekeywords={var, unit, letregion, let, in, as, openalloc, open, withroot, not, : , /\\}
 }}
 \lstnewenvironment{codejava}
     { % \centering
@@ -280,6 +291,33 @@ morekeywords={letregion, let, in, as, openalloc, open, withroot, not, : , /\\}
     { %\centering
       \csname lst@savefirstlabel\endcsname}
 
+\newcommand{\lstml}{\lstset{ %
+language=[Objective]Caml, % choose the language of the code
+basicstyle=\small\ttfamily,       % the size of the fonts that are used for the code
+keywordstyle=\color{Bittersweet},
+% numbers=left,                   % where to put the line-numbers
+numberstyle=\tiny,      % the size of the fonts that are used for the line-numbers
+stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
+numbersep=5pt,                  % how far the line-numbers are from the code
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+% frame=single,                   % adds a frame around the code
+tabsize=2,                      % sets default tabsize to 2 spaces
+captionpos=b,                   % sets the caption-position to bottom
+breaklines=true,                % sets automatic line breaking
+breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+commentstyle=\itshape\color{MidnightBlue},
+escapeinside={\%*}{*)},         % if you want to add a comment within your code
+morekeywords={foreach, do, done, not, : , /\\}
+}}
+\lstnewenvironment{codeml}
+    { % \centering
+			\lstml
+      \lstset{mathescape=true}%
+      \csname lst@setfirstlabel\endcsname}
+    { %\centering
+      \csname lst@savefirstlabel\endcsname}
 
 \begin{document}
 
@@ -307,38 +345,7 @@ Programs}
 \maketitle
 
 \begin{abstract}
-
-Distributed execution engines, such as MapReduce and Dryad, represent
-a data-parallel computation as a dataflow graph with computational
-vertices connected by communication edges. The computation is run by
-executing the vertices of this graph on a set of available computers,
-while communication edges are materialized as either network
-connections, or appropriate inter-process communication channels.
-Although MapReduce and Dryad can perform optimal distribution the
-computation across available computers, they nevertheless rely on
-language runtimes, such as JVM or C\#.Net, to manage an atomic
-computation on a given machine. 
-
-In this paper, we demonstrate that the general purpose garbage
-collection scheme employed by C\#.Net runtime is not very effective
-for dataflow programs to the extent that the latency due to GC is
-intolerably high in many practical examples. We propose a memory
-management scheme that combines user-managed memory regions with
-automatic garbage collection, and lets programmers exploit specific
-memory behaviours exhibited by dataflow programs. To protect
-programmers from the dangers of manual memory management, we
-supplement our memory management scheme with a region type system that
-statically ensures the memory safety of region-annotated C\# programs,
-even in presence of higher-order stateful functions. Further, we
-describe a type inference algorithm that infers principal region types
-for first-order programs thereby saving programmers the need to write
-region annotations on types. Our inference algorithm is also very
-effective, albeit incomplete, for higher-order programs. As a
-testament to efficacy of our approach, we demonstrate performance
-improvements over a range of realistic dataflow programs that were
-rewritten to use region-based manual memory management, but are
-nevertheless judged to be safe by our type system.
-
+\input{abstract}
 \end{abstract}
 
 % general terms are not compulsory anymore, 
@@ -352,6 +359,9 @@ nevertheless judged to be safe by our type system.
 
 \input{type-system}
 
+\input{type-inference}
+
+\input{related}
 % \appendix
 % \section{Appendix Title}
 
@@ -360,7 +370,7 @@ nevertheless judged to be safe by our type system.
 % We recommend abbrvnat bibliography style.
 
 \bibliographystyle{abbrvnat}
-\bibliography{catalyst}
+\bibliography{broom}
 
 
 \end{document}

@@ -1,6 +1,6 @@
-all:
+full:
 	pdflatex broom
-	pdflatex broom
+##pdflatex broom
 ##pdflatex -shell-escape broom
 ##pdflatex -shell-escape broom
 ##bibtex broom

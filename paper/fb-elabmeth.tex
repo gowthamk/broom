@@ -1,0 +1,44 @@
+\newcommand{\hdOf}[2]{\C{class}\; #1\angAlpha\inang{\rhoalloc\rhobar \,|\, #2} \extends \fbN}
+\begin{figure}
+
+\begin{codeml}
+$\elabMeth(CT, B, \tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \; \xbar)\{\C{return} e;\})$ = 
+  let $\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}\}$ = $CT(B)$ in
+  let ($\rhoenv$,$\aenv$,$\phicx$) as $\A$ = 
+            $(\{\rhoalloc,\rhobar,\rhoalloc_m,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN},\varphi \conj \varphi_m)$ in
+  let $C_1$ = $\{\tywf{\rhoenv}{\varphi_m}\}$ in
+  let $\env$ = $\cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhoalloc\rhobar}][\xbar \mapsto \taubar]$ in
+  let ($e':\tau'$,$C_2$) = $\elabExpr (\A,\rhoalloc_m,\env,e)$ in
+  let $C_3$ = $\subtypeOk({\A},{\tau'},{\tau})$ in
+    ($\tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \;
+    \xbar)\{\C{return} e';\}$, $C_1 \cup C_2 \cup C_3$)
+\end{codeml}
+
+\begin{codeml}
+$\elabClass(CT,B)$ = 
+  let $\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}\}$ = $CT(B)$ in
+  let ($\rhoenv$,$\aenv$,$\phicx$) as $\A$ = $(\{\rhoalloc,\rhobar\},\bar{\tyvar} \extends \bar{\fgjN},\varphi)$ in
+  let $C_1$ = $\tywf{\rhoenv}{\varphi}$ in
+  let ($C_2$,$C_3$) = ($\typeOk({\A},{\fbN})$,$\typeOk({\A},{\bar{\tau^f}})$) in
+  let $C_4$ = $\{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allocRgn(\fbN) = \rhoalloc}\}$ in
+  let ($k'$,$C_5$) = $\elabCons(B,k)$ in
+  let ($\bar{d'}$,$C_6$) = $\elabMeth(B,\bar{d})$ in
+    ($\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;k'\;\bar{d'}\}$, $\bigcup_{i=1}^6 C_i$)
+\end{codeml}
+
+\begin{codeml}
+$\elabClassTable(CT)$ = 
+  let ($CT'$,$C$) = (ref $\cdot$, ref $\emptyset$) in
+  let _ = foreach $B \in dom(CT)$ do
+            let ($D_B$,$C_B$) = $\elabClass(CT,B)$ in
+              $CT'$ := $CT'[B \mapsto D_B]$;
+              $C$ := $C \cup C_B$
+           done in
+  let ($\substFn_\rho$,$\substFn_\varphi$) = $\solve(C)$ in
+    $\substFn_\varphi(\substFn_\rho(CT')) $
+      
+\end{codeml}
+
+\caption{Method, class and class table elaboration}
+\label{fig:fb-elabmeth}
+\end{figure}
