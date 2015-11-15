@@ -1,0 +1,10 @@
+\begin{lemma}
+\emph{(\textbf{Weakening the context})}
+\label{thm:fb-tywf}
+$\forall v, \tau, \rhoenv, \rhoset, \phi, \rgn, \rgn_0$, such that $\value(v)$, $\rgn
+\in \rhoenv$ and $\rgn_0 \notin \rhoenv$, if $\hastyp{(\rhoset, \rhoenv \cup
+\{\rgn_0\}, \cdot, \phi \conj (\rhoenv \outlives \rgn_0)),\rgn_0,\cdot}{v}{\tau}$
+and $\tywf{(\rhoset, \rhoenv, \cdot, \phi)}{\tau}$, then $\hastyp{(\rhoset,
+\rhoenv, \cdot, \phi),\rgn,\cdot}{v}{\tau}$.
+\end{lemma}
+\nobreak

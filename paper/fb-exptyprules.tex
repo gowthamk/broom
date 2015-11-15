@@ -189,14 +189,14 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-%   \A = (\subtypcx)\spc
-    \rgn \in \A.\rhoenv \\
-    \rhoalloc,\rhobar \notin \A.\rhoenv \spc
+    \rgn \in \A.\rhoenv \spc
+    \rhoalloc,\rhobar \notin \A.\rhoenv \\
 %   \rhoenv' = \rhoenv \cup \{\rhoalloc,\rhobar\}\spc
     \A' = (\A.\rhoset, \A.\rhoenv \cup \{\rhoalloc,\rhobar\}, \A.\aenv, 
-          \A.\phicx \conj \phi)\\
-    \tywf{\A'.\rhoenv}{\phi}\spc
+          \A.\phicx \conj \phi)\spc
+    \tywf{\A'.\rhoenv}{\phi}\\
     \tywf{\A'}{\bar{\tau^1}}\spc
+    \tywf{\A'}{\tau^2}\spc
     \hastyp{\A',\rhoalloc,\env[\xbar \mapsto \bar{\tau^1}]}{e}{\tau^2}
   }
   {
