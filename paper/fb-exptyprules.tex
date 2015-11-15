@@ -168,7 +168,8 @@
     \\
     \A = (\subtypcx) \spc
     \rgn \notin \rhoenv \spc
-    \phi = \rhoenv \outlives \rgn\\
+    \phi = \rhoenv \outlives \rgn
+    \tywf{\A}{\tau}\\
     \A' = (\rhoset, \rhoenv \cup \{\rgn\}, \aenv, \phicx \conj \phi)\spc
     \hastyp{\A',\rgn,\env}{e}{\tau}
   }
@@ -256,7 +257,8 @@
     \rgn \notin \rhoenv \spc
     \A' = (\rhoset, \rhoenv \cup \{\rgn\},\aenv,\phicx) \\
     \env' =  \env[y\mapsto T@\rgn]\spc
-    \hastyp{\A',\rgn,\env'}{e_b}{\tau} 
+    \hastyp{\A',\rgn,\env'}{e_b}{\tau} \spc
+    \tywf{\A}{\tau}
   }
   {
     \hastyp{\exptycx{\ralloc}{\env}}{\open{e_a}{\rgn}{y}{e_b}}

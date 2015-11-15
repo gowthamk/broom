@@ -1,0 +1,110 @@
+\begin{theorem}
+\emph{(\textbf{Preservation})}
+\label{thm:fb-preservation}
+$\forall e, \tau, \rhoenv, \rhomap, \rgn$, such that $\rgn \in
+\rhoenv$, if $\hastyp{\emptyA,\rgn, \cdot}{e}{\tau}$ and
+$\redstoo{(e,\rhomap)}{(e',\rhomap')}$, then 
+$\hastyp{(dom(\rhomap'),\rhoenv,\cdot,true),\rgn, \cdot}{e'}{\tau}$.
+\end{theorem}
+\begin{proof}
+Intros $e$. Induction on $e$. For every subexpressions $e_0$, inductive
+hypothesis gives us the following:
+\begin{smathpar}
+\begin{array}{cr}
+  \forall (\tau_0, \rhoenv_0, \rhomap_0, \rgn_0). \spc (\rgn_0 \in \rhoenv_0)
+  \;\conj\; (\hastyp{(dom(\rhomap_0),\rhoenv_0,\cdot,true),\rgn_0,
+    \cdot}{e_0}{\tau_0}) \;\conj\; (\redstoo{(e_0,\rhomap_0)}
+                {(e_0',\rhomap_0')}) & IH1\\
+     \Rightarrow \hastyp{(dom(\rhomap_0'),\rhoenv_0,\cdot,true),\rgn_0,
+    \cdot}{e_0'}{\tau_0} & \\
+\end{array}
+\end{smathpar}
+Cases from induction
+\begin{itemize}
+\item Case ($e = \unitval$ or $e = x$): Proof is trivial.
+\item Case ($e = e_0.f_i$): Intros. Hypothesis:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn \in \rhoenv & H2\\
+    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H4\\
+    \redstoo{(e,\rhomap)}{(e',\rhomap')} & H6\\
+  \end{array}
+  \end{smathpar}
+  Inverting $H4$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyA,\rgn, \cdot}{e_0}{\tau'} & H7\\
+    \bar{f} :\taubar = \fields(\bound_{\cdot}(\tau')) & H9\\
+  \end{array}
+  \end{smathpar}
+  Inverting $H6$, we get two cases:
+  \begin{itemize}
+    \item SCase ($\redstoo{(e_0,\rhomap)}{(e_0',\rhomap')}$): In this
+    case, $\redstoo{(e_0.f_i,\rhomap)}{(e_0'.f_i,\rhomap')}$. $H7$ and $IH1$ gives:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \hastyp{(dom(\rhomap'),\rhoenv,\cdot,true),\rgn,
+          \cdot}{e_0'}{\tau'} & H11\\
+    \end{array}
+    \end{smathpar}
+    Proof follows from $H11$ and $H9$.
+
+    \item SCase ($e_0$ is a value $\C{new} \; \fbN(\vbar)$):
+    Hypotheses:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \allocRgn(N) \in \rhoenv & H13\\
+      \redstoo{(e,\rhomap)}{(v_i,\rhomap)} & H15\\
+    \end{array}
+    \end{smathpar}
+    \end{itemize}
+    We need to prove that $\hastyp{(\emptyA,\rgn,\cdot)}{v_i}{\tau_i}$. 
+    From $H7$, since $e_0 = \C{new} \; \fbN(\vbar)$:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \hastyp{\emptyA,\rgn, \cdot}{\C{new} \;\fbN(\vbar)}{\tau'} & H16\\
+    \end{array}
+    \end{smathpar}
+    Inverting $H16$ and using $H9$ gives us the proof.
+
+  \item Case ($e = \letregion{\rgn_0}{e_0}$): Intros. Hypothesis:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn \in \rhoenv & H2\\
+    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H4\\
+    \redstoo{(e,\rhomap)}{(e',\rhomap')} & H6\\
+  \end{array}
+  \end{smathpar}
+  Inverting $H4$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn_0 \notin \rhoenv & H7\\
+    \tywf{\emptyA}{\tau} & H8\\
+    \hastyp{(dom(\rhomap),\rhoenv \cup \{\rgn_0\}, \cdot, \rhoenv \outlives
+    \rgn_0), \rgn_0, \cdot}{e_0}{\tau} & H9\\
+  \end{array}
+  \end{smathpar}
+  Inverting $H6$, we get two cases:
+  \begin{itemize}
+    \item SCase ($\redstocup{\rgn_0}{(e_0,\rhomap)}{(e_0',\rhomap')}$): In this
+    case, $\redstoo{(\letregion{\rgn_0}{e_0},\rhomap)} {(\letregion{\rgn_0}{e_0'},\rhomap')}$. 
+    $H9$ and $IH1$ gives:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \hastyp{(dom(\rhomap'),\rhoenv \cup \{\rgn_0\},\cdot,\rhoenv \outlives \rgn_0),\rgn,
+          \cdot}{e_0'}{\tau} & H11\\
+    \end{array}
+    \end{smathpar}
+    From $H7$ and $H11$, we can conclude that
+    $\hastyp{(dom(\rhomap'),\rhoenv,\cdot,true),\rgn, \cdot}{\letregion{\rgn_0}{e_0'}}{\tau}$.
+
+    \item SCase ($e_0$ is a value $v_0$): In this case, $\redstoo{(\letregion{\rgn_0}{e_0},\rhomap)}
+    {(v_0,\rhomap')}$.
+
+  \end{itemize}
+
+%End of cases for proof
+\end{itemize}
+\qed
+\end{proof}
+
