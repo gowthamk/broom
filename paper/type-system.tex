@@ -441,7 +441,8 @@ To help state the type safety theorem, we extend \FB's expressions
 with $\invalidexn$, and define the syntactic class of values:
 \begin{smathpar}
 \begin{array}{lclcl}
-v & \in & \mathtt{values} & \coloneqq & \C{new}\; \fbN(\bar{v}) \\
+v & \in & \mathtt{values} & \coloneqq & \C{new}\; \fbN(\bar{v}) \ALT
+\lambdaexp{\ralloc}{\rhoalloc\rhobar\,|\,\phi}{\taubar \; \xbar}{e}\\
 \end{array}
 \end{smathpar}
 Type safety theorem is now stated thus:

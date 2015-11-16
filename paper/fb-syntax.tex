@@ -39,9 +39,9 @@ e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f
 %          \ALT \Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}
            \ALT e\inang{\ralloc\rbar}(\bar{e})
 %          \ALT e(\bar{e}) 
-           \ALT x\,:=\,e \ALT e.f\,:=\,e \ALT e\,;\,e\\
-   & & & & \ALT \letexp{x}{e}{e} \ALT \letregion{\rho}{e} 
-           \ALT \open{x}{\rgn}{y}{e} \\
+           \ALT e\,;\,e \ALT \letexp{x}{e}{e} \\
+   & & & & \ALT \letregion{\rho}{e} 
+           \ALT \open{e}{\rgn}{y}{e} \\
 %   & & & & \ALT \unpackexp{\rgn}{x}{e}{e} \ALT e\,;\,e\\
 % s  & \in & \M{Statements} & \coloneqq & \tau\;x\;=\;e \ALT x\;=\;e
 %      \ALT e.f\;=\;e 
