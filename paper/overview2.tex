@@ -36,31 +36,24 @@ new region \C{R}.
 \name's \emph{transferable regions} are an encapsulation of a data-structure
 that can be transferred between autonomous entities
 (\eg, between two concurrently executing threads or actors).
-% Transferable regions are similar to stack regions in that they are memory regions
-% that support arbitrary object allocations, but they differ from stack regions in the
-% following ways.
 Hence, unlike stack regions, transferable regions are not constrained to have a
 lexically scoped lifetime.
 (Hence, we also refer to them as \emph{dynamic} regions.)
-% regions whose lifetimes transcend the boundaries of lexical blocks, functions, or
-% even programs.
 
 Furthermore, transferable regions, unlike stack regions, are first class values of \name:
-they are considered objects of \C{Region} class, and, like objects of other
-classes, they are created using the \C{new} keyword, can be passed as
-arguments, stored in data structures, and returned from methods.
-As mentioned above, a transferable region is intended to encapsulate a single
-data-structure, consisting of a collection of objects with a distinguished root
-object of some type \C{T}, which we refer to as the region's \emph{root} object.
+they are objects of the class \C{Region}, 
+they are created using the \C{new} keyword,
+and can be passed as arguments, stored in data structures, and returned from methods.
+A transferable region is intended to encapsulate a single data-structure,
+consisting of a collection of objects with a distinguished root object of some type \C{T},
+which we refer to as the region's \emph{root} object.
 The class \C{Region} is parametric over the type \C{T} of this root object.
 
-The \C{Region} constructor expects a \C{Func}
-object - a higher-order function argument that returns an object of
-root type.  The idea is to execute this function with the newly
-created transferable region as its allocation context. The object thus
-created inside the transferable region will serve as its root object.
-This is illustrated by the following code that creates a transferable region
-(\C{r}) of type \C{T}:
+The \C{Region} constructor takes as a parameter a function that constructs
+the root object: it creates a new region and invokes this function, with the new
+region as the allocation context, to create the root object of the region.
+This following code illustrates the creation of a transferable region:
+% (\C{r}) of type \C{T}:
 \begin{codejava}
   Region<T> r = new Region<T>(() => new T())
 \end{codejava}
@@ -146,7 +139,6 @@ In particular, an open region is guaranteed to be live for the entire duration o
 This allows the type system to infer a valid outlives relation between the opened region
 and any stack region that is nested within the open construct.
 
-
 \begin{figure}
 \includegraphics[scale=0.45]{region-fsm.png}
 \caption{The lifetime of a dynamic (transferable) region in \name}
@@ -154,17 +146,15 @@ and any stack region that is nested within the open construct.
 \end{figure}
 
 The protocol for transferable regions is presented as a finite state machine in Fig.~\ref{fig:region-fsm}.
-A transferable region starts its lifetime in a \emph{closed} state,
-when it is created through \C{new Region} expresion. \name provides
-
-As evident in the above examples, the safety of memory accesses in
-\name is now subject to the condition that every transferable region
-correctly follows the state transition discipline shown
-in Fig.~\ref{fig:region-fsm}. If this is
-guaranteed, then \name's region type system statically guarantees the
-safety of all memory accesses. In other words, the type system reduces
-the problem of ensuring memory safety in \name programs to the problem
-of enforcing the state transition discipline for transferable regions.
+A transferable region starts its lifetime in a \emph{closed} state, when it is created.
+%
+The safety of memory accesses in \name is now subject to the condition that
+every transferable region correctly follows the state transition discipline shown
+in Fig.~\ref{fig:region-fsm}. If this is guaranteed, then \name's region type system
+statically guarantees the safety of all memory accesses.
+% In other words, the type system reduces
+% the problem of ensuring memory safety in \name programs to the problem
+% of enforcing the state transition discipline for transferable regions.
 
 In \name, this enforcement is done at runtime by explicitly keeping
 track of the \emph{current state} for $\RgnZ$ objects, and
