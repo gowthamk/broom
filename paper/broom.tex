@@ -181,7 +181,8 @@
 \newcommand{\Lambdaexp}[2]{\Lambda\inang{#1}.#2}
 \newcommand{\letexp}[3]{\C{let}\;#1\,=\,#2\;\C{in}\;#3}
 \newcommand{\letregion}[2]{\C{letregion}\;#1\;\C{in}\;#2}
-\newcommand{\open}[4]{\C{open}\;#1\;\C{as}\;#2\;\C{withroot}\;#3\;\C{in}\;#4}
+% \newcommand{\open}[4]{\C{open}\;#1\;\C{as}\;#2\;\C{withroot}\;#3\;\C{in}\;#4}
+\newcommand{\open}[4]{\C{open}\;#1\;\C{as}\;{#3}@#2\;\C{in}\;#4}
 \newcommand{\openalloc}[3]{\C{openalloc}\;#1\;\C{withroot}\;#2\;\C{in}\;#3}
 \newcommand{\unpackexp}[4]{\C{let}\;(#1,\,#2)\,=\,\C{unpack}\;#3\;\C{in}\;#4}
 \newcommand{\invalidexn}{\C{InvalidOpnException}}
