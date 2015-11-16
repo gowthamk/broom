@@ -47,11 +47,12 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \rgn \notin \rhoenv \spc
-    \redsto{\rhoenv \cup \{\rgn\}}{(e,\rhomap)}{(e',\rhomap')}
+    \fresh(\rgn')\spc
+%   \rgn \notin \rhoenv \spc
+    \redsto{\rhoenv \cup \{\rgn'\}}{([\rgn'/\rgn]e,\rhomap)}{(e',\rhomap')}
   }
   {
-    \redstoo{(\letregion{\rgn}{e},\rhomap)}{(\letregion{\rgn}{e'},\rhomap')}
+    \redstoo{(\letregion{\rgn}{e},\rhomap)}{(\letregion{\rgn'}{e'},\rhomap')}
   }
 \end{array}
 \end{smathpar}
@@ -65,7 +66,7 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \rgn \notin \rhoenv
+%   \rgn \notin \rhoenv
   }
   {
     \redstoo{(\letregion{\rgn}{v},\rhomap)}{(v,\rhomap)}
@@ -82,7 +83,8 @@
   {
     \fgjN = \RgnZ\inang{T} \spc
     \ralloc \in \rhoenv \spc
-    \rgn \notin dom(\rhomap) \cup \rhoenv \spc
+    \fresh(\rgn)\spc
+%   \rgn \notin dom(\rhomap) \cup \rhoenv \spc
     \rhomap' = \rhomap[\rho \mapsto \CLOSED]
   }
   {
@@ -105,7 +107,7 @@
   {
     \fgjN = \RgnZ\inang{T} \spc
     \rgn \in dom(\rhomap) \spc
-    \redstocup{\rgn}{(e,\rhomap)}{(e',\rhomap')}
+    \redsto{\{\rgn\}}{(e,\rhomap)}{(e',\rhomap')}
   }
   {
     \redstoo{(\C{new} \; \fgjN\inang{\rgn}
@@ -125,7 +127,7 @@
   {
     v_a = \C{new} \; \RgnZ\inang{T}\inang{\rgn}(v_r) \spc
     \rhomap(\rgn) \neq \XFERRED \spc
-    \rgn_0 \notin \rhoenv \spc
+%   \rgn_0 \notin \rhoenv \spc
   }
   {
     \redstoo{(\open{v_a}{\rgn_0}{x}{v_b},\rhomap)} {(v_b,\rhomap)}
@@ -144,14 +146,15 @@
   {
     v_a = \C{new} \; \RgnZ\inang{T}\inang{\rgn}(v_r) \spc
     \rhomap(\rgn) \neq \XFERRED \spc
-    \rgn_0 \notin \rhoenv \\
-    \redstocup{\rgn_0}{([[\rgn_0/\rgn]v_r/x]e_b,
+    \fresh(\rgn_1)\\
+%   \rgn_0 \notin \rhoenv \\
+    \redsto{\{\rgn_1\}}{([\rgn_1/\{\rgn,\rgn_0\}][v_r/x]e_b,
       \rhomap[\rgn \mapsto \OPEN])}{(e_b',\rhomap')} \spc
     \rhomap'' = \rhomap'[\rgn \mapsto \rhomap(\rgn)]
   }
   {
     \redstoo{(\open{v_a}{\rgn_0}{x}{e_b},\rhomap)} 
-            {(\open{v_a}{\rgn_0}{x}{e_b'},\rhomap'')}
+            {(\open{v_a}{\rgn_1}{x}{e_b'},\rhomap'')}
   }
 \end{array}
 \end{smathpar}
@@ -166,7 +169,7 @@
   {
     \\
     v_a = \C{new} \; \RgnZ\inang{T}\inang{\rgn}(v_r) \spc
-    \rhomap(\rgn) = \XFERRED \spc
+    \rhomap(\rgn) = \XFERRED \\
 %   \rgn_0 \notin \rhoenv \\
 %   \redstocup{\rgn_0}{([[\rgn_0/\rgn]v_r/x]e_b,
 %     \rhomap[\rgn \mapsto \OPEN])}{(e_b',\rhomap')}
@@ -334,9 +337,9 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \\
-    \rgn \notin \rhoenv \spc
-    \redsto{\rhoenv \cup \{\rgn\}}{(e,\rhomap)}{\invalidexn}
+%   \rgn \notin \rhoenv \spc
+    \fresh(\rgn')\\
+    \redsto{\rhoenv \cup \{\rgn'\}}{([\rgn'/\rgn]e,\rhomap)}{\invalidexn}
   }
   {
     \redstoo{(\letregion{\rgn}{e},\rhomap)}{\invalidexn}
@@ -353,7 +356,7 @@
   {
     \fgjN = \RgnZ\inang{T} \spc
     \rgn \in dom(\rhomap) \\
-    \redstocup{\rgn}{(e,\rhomap)}{\invalidexn}
+    \redsto{\{\rgn\}}{(e,\rhomap)}{\invalidexn}
   }
   {
     \redstoo{(\C{new} \; \fgjN\inang{\rgn}
@@ -372,8 +375,9 @@
   {
     v_a = \C{new} \; \RgnZ\inang{T}\inang{\rgn}(v_r) \spc
     \rhomap(\rgn) \neq \XFERRED \spc
-    \rgn_0 \notin \rhoenv \\
-    \redstocup{\rgn_0}{([[\rgn_0/\rgn]v_r/x]e_b,
+    \fresh(\rgn_1)\\
+%  \rgn_0 \notin \rhoenv \\
+    \redsto{\{\rgn_1\}}{([\rgn_1/\{\rgn,\rgn_0\}][v_r/x]e_b,
       \rhomap[\rgn \mapsto \OPEN])}{\invalidexn}
   }
   {

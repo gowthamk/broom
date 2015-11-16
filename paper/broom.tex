@@ -201,6 +201,7 @@
 %\newcommand{\smallskip}{\vspace*{0.1in}}
 \newcommand{\elabMeth}{{\sf elabMeth}}
 \newcommand{\frv}{{\sf frv}}
+\newcommand{\rv}{{\sf RVars}}
 \newcommand{\solve}{{\sf solve}}
 \newcommand{\valuee}{{\sf value}}
 \newcommand{\elabClass}{{\sf elabClass}}
@@ -227,8 +228,11 @@
                                     \cdot,\phicx \conj \rhoenv \outlives #2)}
 \newcommand{\emptyADelcupPhicapp}[2]{(dom(\rhomap),\rhoenv \cup \{#1\},
                                     \cdot,\phicx \conj #2)}
+\newcommand{\empTyADelcup}[1]{(\rhomap,\rhoenv \cup \{#1\},\cdot,\phicx)}
+\newcommand{\empTyADelcupPhisubst}[2]{(\rhomap,\rhoenv \cup \{#1\},\cdot,[#2]\phicx)}
 \newcommand{\vacantA}[1]{(\emptyset,\{#1\},\cdot,true)}
 \newcommand{\RgnZT}[1]{\RgnZ\inang{T}\inang{#1}}
+\newcommand{\BZ}[0]{B\inang{\tbar}}
 \newcommand{\BZT}[1]{B\inang{\tbar}\inang{#1}}
 
 %Rules

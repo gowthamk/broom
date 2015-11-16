@@ -441,11 +441,11 @@
 \RULE
   {
     \rgn \in \A.\rhoset\spc
+    \A' = (\{\}, \{\rgn\}, \A.\aenv, true) \\
     \rgn \notin \A.\rhoenv \cup \{\toprgn\} \spc
-    \fgjtywf{\A.\aenv}{T} \\
+    \tywf{\A'}{T@\rgn} \spc
 %   \fgjN = \RgnZ\inang{T}\spc
-    \hastyp{(\A.\rhoset, \A.\rhoenv \cup \{\rgn\}, \A.\aenv, \A.\phicx),
-            {\rgn},{\env}}{e}{T@\rgn}
+    \hastyp{\A', {\rgn},{\env}}{e}{T@\rgn}
   }
   {
     \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\;

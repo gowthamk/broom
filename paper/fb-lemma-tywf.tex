@@ -23,14 +23,21 @@ Proof by induction on $H6$. Cases:
   \begin{smathpar}
   \begin{array}{cr}
     \fields(\fbN_0) = \bar{f}:\bar{\tau} & H10\\
+    \tywf{\emptyA}{\fbN_0} & H11\\
     \hastyp{\emptyADelcupPhicapp{\rgn_0}{\rhoenv_0 \outlives \rgn_0},\rgn_0,\cdot}{\vbar}{\taubar} & H12\\
+  \end{array}
+  \end{smathpar}
+  Inductive hypothesis on $\vbar$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \tywf{\emptyA}{\taubar}\; \Rightarrow\; \hastyp{\emptyA,\rgn,\cdot}{\vbar}{\taubar} & IH1\\
   \end{array}
   \end{smathpar}
   Inversion on $H8$ tells us that $\fbN_0$ is of the form $\BZT{\rgn\rbar}$, where,
   $\headerOf{B}\{\bar{\tau^h} \; \bar{h},...\}$ is a well-formed class definition. Furthermore, we get:
   \begin{smathpar}
   \begin{array}{cr}
-    \rbar \in \rhoenv & H13\\
+    \rgn,\rbar \in \rhoenv & H13\\
     \fgjtywf{\cdot}{\bar{T}} & H14\\
     \isvalid{\phicx}[\rgn/\rhoalloc][\rbar/\rhobar]\phi & H16\\
   \end{array}
@@ -43,27 +50,121 @@ Proof by induction on $H6$. Cases:
     \bar{\fgjN}],\phi)}{\bar{\tau^h}\bar{\tau^g}} & H18\\
   \end{array}
   \end{smathpar}
+  Since $\fgjtywf{\cdot}{\BZ}$, $H18$ gives:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \tywf{(\emptyset,\{\rhoalloc,\rhobar\},\cdot,
+    \phi)}{[\tbar/\bar{a}](\bar{\tau^h}\bar{\tau^g})} & H20\\
+  \end{array}
+  \end{smathpar}
+  And, since $\rgn \neq \rhoalloc$ and $\{\rbar\} \cap \{\rhobar\} = \emptyset$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \tywf{(\emptyset,\{\rgn,\rbar\},\cdot, [\rbar/\rhobar][\rgn/\rhoalloc]\phi)}
+      {[\rbar/\rhobar][\rgn/\rhoalloc][\tbar/\bar{a}](\bar{\tau^h}\bar{\tau^g})} & H22\\
+  \end{array}
+  \end{smathpar}
   From the definition of $\fields$, we have:
   \begin{smathpar}
   \begin{array}{cr}
-    \fields(\BZT{\rgn\rbar}) = \bar{h}:\bar{\tau^h},\,\bar{g}:\bar{\tau^g} & H20\\
+    \fields(\BZT{\rgn\rbar}) = \bar{h}:[\rbar/\rhobar][\rgn/\rhoalloc][\tbar/\bar{a}]\bar{\tau^h},\,
+                      \bar{g}:[\rbar/\rhobar][\rgn/\rhoalloc][\tbar/\bar{a}]\bar{\tau^g} & H24\\
   \end{array}
   \end{smathpar}
-  From $H10$ and  $H20$, we know that $\taubar = \bar{\tau^h}\bar{\tau^g}$. Substituting this in
-  H18:
+  From $H10$ and  $H24$, we know that $\taubar =
+  [\rbar/\rhobar][\rgn/\rhoalloc][\tbar/\bar{a}](\bar{\tau^h}\bar{\tau^g)}$. Substituting this in
+  H22:
   \begin{smathpar}
   \begin{array}{cr}
-    \tywf{(\emptyset,\{\rhoalloc,\rhobar\},[\bar{a} \mapsto
-    \bar{\fgjN}],\phi)}{\taubar} & H22\\
+    \tywf{(\emptyset,\{\rgn,\rbar\},\cdot, [\rbar/\rhobar][\rgn/\rhoalloc]\phi)} {\taubar} & H26\\
   \end{array}
   \end{smathpar}
-  $H22$ gives:
+  Using $H13$ and $H16$, from $H26$, we derive:
   \begin{smathpar}
   \begin{array}{cr}
-    \tywf{(\emptyset,\{\rgn,\rbar\},\cdot,[\rbar/\rhobar][\rgn/\rhoalloc]\phi)}{[\rbar/\rhobar][\rgn/\rhoalloc][\tbar/\bar{a}]\taubar} & H22\\
+    \tywf{\emptyA} {\taubar} & H28\\
   \end{array}
   \end{smathpar}
-\end{itemize}
+  From $H28$ and $IH1$, we get:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyA,\rgn,\cdot}{\vbar}{\taubar} & H30\\
+  \end{array}
+  \end{smathpar}
+  From $H10$, $H11$, and $H30$, we prove the required goal:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyA,\rgn,\cdot}{\C{new}\; \fbN_0(\vbar)}{\fbN_0} & \\
+  \end{array}
+  \end{smathpar}
 
+  \item Case ($v = \C{new}\; \RgnZT{\rgn_i}(v_0)$ and $\tau = \RgnZT{\toprgn}$): Inversion on $H6$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rgn_i \in dom(\rhomap) & H10\\
+    \rgn_i \notin \rhoenv \cup \{\rgn_0,\toprgn\} & H12\\
+    \tywf{\emptyADelcupPhicapp{\rgn_i,\rgn_0}{\rhoenv_0 \outlives \rgn_0}}{T@\rgn_i} & H14\\
+    \hastyp{\emptyADelcupPhicapp{\rgn_i,\rgn_0}{\rhoenv_0 \outlives \rgn_0},\rgn,\cdot}{v_0}{T@\rgn_i} & H16\\
+  \end{array}
+  \end{smathpar}
+  Inductive hypothesis on $v_0$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \tywf{\emptyADelcup{\rgn_i}}{T@\rgn_i}\; \Rightarrow\; \hastyp{\emptyADelcup{\rgn_i},\rgn,\cdot}{v_0}{T@\rgn_i} & IH1\\
+  \end{array}
+  \end{smathpar}
+  Inverting $H14$, we get:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \fgjsubtyp{\cdot}{T}{\ObjZ} & H18\\
+    \fgjtywf{\cdot}{T} & H19\\
+    \rgn_i \in \rhoenv \cup \{\rgn_i,\rgn_0\} & H20\\
+  \end{array}
+  \end{smathpar}
+  $H20$ implies $\rgn_i \in \rhoenv \cup \{\rgn_i\}$. Using this, $H18$, and $H19$, and applying the
+  type well-formedness rule for $T@\rgn_i$, we derive the following:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \tywf{\emptyADelcup{\rgn_i}}{T@\rgn_i} & H22\\
+  \end{array}
+  \end{smathpar}
+  $H22$ and $IH1$ gives:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyADelcup{\rgn_i},\rgn,\cdot}{v_0}{T@\rgn_i} & H24\\
+  \end{array}
+  \end{smathpar}
+  $H12$ implies $\rgn_i \notin \rhoenv \cup \{\toprgn\}$. Using this, and $H10$, $H22$ and $H24$, we
+  conclude:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyA,\rgn,\cdot}{\RgnZT{\rgn_i}}{\RgnZT{\toprgn}} & \\
+  \end{array}
+  \end{smathpar}
+
+  \item Case ($v = \lambdaexp{\ralloc}{\rhoalloc\rhobar \,|\, \phi}{\bar{\tau^1} \; \xbar}{e}$ and 
+              $\tau = \inang{\rhoalloc\rhobar\,|\,\phi}\taubar \xrightarrow{\ralloc} \tau^2$):
+  By inversion on $H6$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \ralloc = \rgn_0 & H10\\
+    \hastyp{\emptyADelcupPhicapp{\rgn_0}{\rhoenv_0 \outlives \rgn_0},\rgn_0, \cdot}
+      {\lambdaexp{\rgn_0}{\rhoalloc\rhobar \,|\, \phi}{\bar{\tau^1} \; \xbar}{e}}
+      {\inang{\rhoalloc\rhobar\,|\,\phi}\taubar \xrightarrow{\rgn_0} \tau^2} & H12\\
+  \end{array}
+  \end{smathpar}
+  From $H8$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \tywf{\emptyA}{\inang{\rhoalloc\rhobar\,|\,\phi}\taubar \xrightarrow{\rgn_0} \tau^2} & H14\\
+  \end{array}
+  \end{smathpar}
+  Inverting $H14$ tells us that $\rgn_0 \in \rhoenv$. But $H2$ tells us that $\rgn_0 \notin
+  \rhoenv$. This is a contradiction, telling us that it cannot be the case that the type of lambda
+  is well-formed under $\emptyA$. Intuitively, this means that a $\C{letregion}$ expression or an
+  $\C{open}$ expression can never return a closure, thereby ensure that a function application never
+  dereferences an invalid reference.
 % End of proof cases.
+\end{itemize}
+\qed
 \end{proof}

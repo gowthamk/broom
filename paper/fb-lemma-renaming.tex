@@ -1,10 +1,26 @@
 \begin{lemma}
-\emph{(\textbf{Region Renaming Preserves Typing})}
+\emph{(\textbf{Safe Region Renaming})}
 \label{thm:fb-renaming}
-$\forall e, \rhoset, \tau, \rhoenv, \phicx, \rho, \rgn$, if $\rho,\rgn \notin
-\rhoenv$ and $\hastyp{\emptyADelcup{\rho}, \rho, \cdot}{e}{\tau}$, 
-then $\hastyp{\emptyADelcup{\rgn},\rgn, \cdot}{[\rgn/\rho]e}{[\rgn/\rho]\tau}$
+$\forall e, \rhoset, \tau, \rhoenv, \phicx, \rho, \rgn$, such that $\tywf{\rhoenv}{\phicx}$, $\rho
+\notin \rhoenv \cup \rhoset$ and $\fresh(\rgn)$ (i.e., $\rgn \notin \rhoenv \cup \rhoset \cup
+\rv(e) \cup \rv(CT)$), if $\hastyp{\empTyADelcup{\rho}, \rho, \cdot}{e}{\tau}$, then
+$\hastyp{\empTyADelcupPhisubst{\rgn}{\rgn/\rho},\rgn, \cdot}{[\rgn/\rho]e}{[\rgn/\rho]\tau}$
 \end{lemma}
 \begin{proof}
-  Intros $e$. Induction $e$.
+By induction on $e$. Proof in each case follows directly from the following facts:
+\begin{itemize}
+  \item The inductive hypothesis, which says that for every sub-expression $e_0$ of $e$, the
+  following holds:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \forall \rhoset, \tau, \rhoenv, \phicx, \rho, \rgn,\, \mathit{such\; that} \;
+    \tywf{\rhoenv}{\phicx}, \rho \notin \rhoenv \cup \rhoset \;\mathit{and}\; \fresh(\rgn),\; \mathit{if}
+    \;\hastyp{\empTyADelcup{\rho}, \rho, \cdot}{e}{\tau}, \;\mathit{then} & IH1\\
+    \hastyp{\empTyADelcupPhisubst{\rgn}{\rgn/\rho},\rgn, \cdot}{[\rgn/\rho]e}{[\rgn/\rho]\tau} & \\
+  \end{array}
+  \end{smathpar}
+  \item If $\rho \notin \rv(e)$ and $e_0$ is a subexpression of $e$, then $\rho \notin \rv(e_0)$
+  \item If $\rgn \notin \frv(\phi_1 \conj \phi_2)$, then
+  $\isvalid{\phi_1}{\phi_2}$ implies $\isvalid{[\rgn/\rho]\phi_1}{[\rgn/\rho]\phi_2}$.
+\end{itemize}
 \end{proof}
