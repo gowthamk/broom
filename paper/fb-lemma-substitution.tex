@@ -1,8 +1,34 @@
 \begin{lemma}
 \emph{(\textbf{Substitution Preserves Typing})}
 \label{thm:fb-substitution}
-$\forall e, \tau, \rhoenv$, if $\hastyp{(\rhoenv,\cdot,true),\rgn,[x
-\mapsto \tau_1]}{e}{\tau_2}$ and $\hastyp{(\rhoenv,\cdot,true),\rgn,
-\cdot}{v}{\tau_1}$, then $\hastyp{(\rhoenv,\cdot,true),\rgn,
-\cdot}{[v/x]e}{\tau_2}$
+$\forall e, z, \tau_1, \tau_2, \rhoset, \rhoenv, \env, \phicx$, if $\hastyp{\emptyA,\rgn,
+\env[z \mapsto \tau_1]}{e}{\tau_2}$ and $\hastyp{\emptyA,\rgn, \env}{v}{\tau_1}$, then 
+$\hastyp{\emptyA,\rgn, \env}{[v/z]e}{\tau_2}$
 \end{lemma}
+\begin{proof}
+Intros $e$. Induction on $e$. For every subexpression $e_0$, inductive hypothesis says the
+following:
+\begin{smathpar}
+\begin{array}{cr}
+  \forall (z, \tau_1, \tau_2, \rhoset, \rhoenv, \env, \phicx).\spc \hastyp{\emptyA,\rgn,
+  \env[z \mapsto \tau_1]}{e_0}{\tau_2} \spc \conj \spc \hastyp{\emptyA,\rgn, \env}{v}{\tau_1} & IH1 \\
+  \Rightarrow \; \hastyp{\emptyA,\rgn, \env}{[v/z]e_0}{\tau_2} & \\
+\end{array}
+\end{smathpar}
+In all the inductive cases, we have the following hypotheses:
+\begin{smathpar}
+\begin{array}{cr}
+  \hastyp{\emptyA,\rgn,\env[z \mapsto \tau_1]}{e}{\tau_2} & H2\\
+  \hastyp{\emptyA,\rgn, \env}{v}{\tau_1} & H4\\
+\end{array}
+\end{smathpar}
+In each case, proof strategy is the same: invert on $H2$, apply $IH1$, and then construct the
+proof term for the goal by applying type rules.
+% \begin{itemize}
+%   \item Proof for cases $\unitval$, $x$, $e_0.f_i$, $\C{new} \fbN(\bar{e})$, $\C{new}\;
+%   \RgnZT{\toprgn}$ follow straightforwardly from the inductive hypothesis.
+%   \item Case ($\C{new}\; \RgnZT{\toprgn} : \RgnZT{\toprgn}$): 
+% \end{itemize}
+\qed
+\end{proof}
+

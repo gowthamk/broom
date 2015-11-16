@@ -215,12 +215,21 @@
 \newcommand{\Phicx}{\Phi_{cx}}
 \newcommand{\Phics}{\Phi_{cs}}
 \newcommand{\tynwf}[2]{#1\,\nvdash\,#2 \; \texttt{ok}}
-\newcommand{\emptyA}[0]{(dom(\rhomap),\rhoenv,\cdot,true)}
-\newcommand{\emptyASigp}[0]{(dom(\rhomap'),\rhoenv,\cdot,true)}
-\newcommand{\emptyASigpp}[0]{(dom(\rhomap''),\rhoenv,\cdot,true)}
-\newcommand{\emptyADelcup}[1]{(dom(\rhomap),\rhoenv \cup \{#1\},\cdot,true)}
-\newcommand{\emptyASigpDelcup}[1]{(dom(\rhomap'),\rhoenv \cup \{#1\},\cdot,true)}
+\newcommand{\emptyA}[0]{(dom(\rhomap),\rhoenv,\cdot,\phicx)}
+\newcommand{\emptyASigp}[0]{(dom(\rhomap'),\rhoenv,\cdot,\phicx)}
+\newcommand{\emptyASigpp}[0]{(dom(\rhomap''),\rhoenv,\cdot,\phicx)}
+\newcommand{\emptyADelcup}[1]{(dom(\rhomap),\rhoenv \cup \{#1\},\cdot,\phicx)}
+\newcommand{\emptyASigpDelcup}[1]{(dom(\rhomap'),\rhoenv \cup \{#1\},
+                                    \cdot,\phicx)}
+\newcommand{\emptyASigxDelcup}[2]{(dom(\rhomap[#1]),\rhoenv \cup \{#2\},
+                                    \cdot,\phicx)}
+\newcommand{\emptyADelcupPhicap}[2]{(dom(\rhomap),\rhoenv \cup \{#1\},
+                                    \cdot,\phicx \conj \rhoenv \outlives #2)}
+\newcommand{\emptyADelcupPhicapp}[2]{(dom(\rhomap),\rhoenv \cup \{#1\},
+                                    \cdot,\phicx \conj #2)}
+\newcommand{\vacantA}[1]{(\emptyset,\{#1\},\cdot,true)}
 \newcommand{\RgnZT}[1]{\RgnZ\inang{T}\inang{#1}}
+\newcommand{\BZT}[1]{B\inang{\tbar}\inang{#1}}
 
 %Rules
 %-----

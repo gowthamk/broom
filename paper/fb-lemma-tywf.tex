@@ -1,10 +1,69 @@
 \begin{lemma}
-\emph{(\textbf{Weakening the context})}
+\emph{(\textbf{Weakening})}
 \label{thm:fb-tywf}
-$\forall v, \tau, \rhoenv, \rhoset, \phi, \rgn, \rgn_0$, such that $\value(v)$, $\rgn
-\in \rhoenv$ and $\rgn_0 \notin \rhoenv$, if $\hastyp{(\rhoset, \rhoenv \cup
-\{\rgn_0\}, \cdot, \phi \conj (\rhoenv \outlives \rgn_0)),\rgn_0,\cdot}{v}{\tau}$
-and $\tywf{(\rhoset, \rhoenv, \cdot, \phi)}{\tau}$, then $\hastyp{(\rhoset,
-\rhoenv, \cdot, \phi),\rgn,\cdot}{v}{\tau}$.
+$\forall v, \tau, \rhoenv, \rhoenv_0, \rhoset, \phicx, \rgn, \rgn_0$, such that $\valuee(v)$, $\rgn
+\in \rhoenv$, $\rgn_0 \notin \rhoenv$, and $\rhoenv_0 \subseteq \rhoenv$, if
+$\hastyp{\emptyADelcupPhicapp{\rgn_0}{\rhoenv_0 \outlives \rgn_0},\rgn_0,\cdot}{v}{\tau}$ and
+$\tywf{\emptyA}{\tau}$, then $\hastyp{\emptyA,\rgn,\cdot}{v}{\tau}$.
 \end{lemma}
-\nobreak
+\begin{proof}
+Intros. Hypotheses:
+\begin{smathpar}
+\begin{array}{cr}
+  \rgn \in \rhoenv & H1\\
+  \rgn_0 \notin \rhoenv & H2\\
+  \rhoenv_0 \subseteq \rhoenv & H4\\
+  \hastyp{\emptyADelcupPhicapp{\rgn_0}{\rhoenv_0 \outlives \rgn_0},\rgn_0, \cdot}{v}{\tau} & H6\\
+  \tywf{\emptyA}{\tau} & H8\\
+\end{array}
+\end{smathpar}
+Proof by induction on $H6$. Cases:
+\begin{itemize}
+  \item Case ($v = \C{new}\; \fbN_0(\vbar)$ and $\tau = \fbN_0$): Inversion on $H6$:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \fields(\fbN_0) = \bar{f}:\bar{\tau} & H10\\
+    \hastyp{\emptyADelcupPhicapp{\rgn_0}{\rhoenv_0 \outlives \rgn_0},\rgn_0,\cdot}{\vbar}{\taubar} & H12\\
+  \end{array}
+  \end{smathpar}
+  Inversion on $H8$ tells us that $\fbN_0$ is of the form $\BZT{\rgn\rbar}$, where,
+  $\headerOf{B}\{\bar{\tau^h} \; \bar{h},...\}$ is a well-formed class definition. Furthermore, we get:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \rbar \in \rhoenv & H13\\
+    \fgjtywf{\cdot}{\bar{T}} & H14\\
+    \isvalid{\phicx}[\rgn/\rhoalloc][\rbar/\rhobar]\phi & H16\\
+  \end{array}
+  \end{smathpar}
+  Let $\fields(\fbN) = \bar{g}:\bar{\tau^g}$. Inverting the well-formedness of class $B$, we get
+  the following:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \tywf{(\emptyset,\{\rhoalloc,\rhobar\},[\bar{a} \mapsto
+    \bar{\fgjN}],\phi)}{\bar{\tau^h}\bar{\tau^g}} & H18\\
+  \end{array}
+  \end{smathpar}
+  From the definition of $\fields$, we have:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \fields(\BZT{\rgn\rbar}) = \bar{h}:\bar{\tau^h},\,\bar{g}:\bar{\tau^g} & H20\\
+  \end{array}
+  \end{smathpar}
+  From $H10$ and  $H20$, we know that $\taubar = \bar{\tau^h}\bar{\tau^g}$. Substituting this in
+  H18:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \tywf{(\emptyset,\{\rhoalloc,\rhobar\},[\bar{a} \mapsto
+    \bar{\fgjN}],\phi)}{\taubar} & H22\\
+  \end{array}
+  \end{smathpar}
+  $H22$ gives:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \tywf{(\emptyset,\{\rgn,\rbar\},\cdot,[\rbar/\rhobar][\rgn/\rhoalloc]\phi)}{[\rbar/\rhobar][\rgn/\rhoalloc][\tbar/\bar{a}]\taubar} & H22\\
+  \end{array}
+  \end{smathpar}
+\end{itemize}
+
+% End of proof cases.
+\end{proof}

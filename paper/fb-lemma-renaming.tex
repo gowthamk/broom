@@ -1,8 +1,10 @@
 \begin{lemma}
 \emph{(\textbf{Region Renaming Preserves Typing})}
 \label{thm:fb-renaming}
-$\forall v, \rhoset, T, \rhoenv, \rho, \rgn$, if $\rho,\rgn \notin
-\rhoenv$ and $\hastyp{(\rhoset,\rhoenv \cup \{\rho\},\cdot,true),
-\rho, \cdot}{v}{\tau}$, then $\hastyp{(\rhoset,\rhoenv \cup \{\rgn\}, 
-\cdot,true),\rgn, \cdot}{[\rgn/\rho]v}{[\rgn/\rho]\tau}$
+$\forall e, \rhoset, \tau, \rhoenv, \phicx, \rho, \rgn$, if $\rho,\rgn \notin
+\rhoenv$ and $\hastyp{\emptyADelcup{\rho}, \rho, \cdot}{e}{\tau}$, 
+then $\hastyp{\emptyADelcup{\rgn},\rgn, \cdot}{[\rgn/\rho]e}{[\rgn/\rho]\tau}$
 \end{lemma}
+\begin{proof}
+  Intros $e$. Induction $e$.
+\end{proof}
