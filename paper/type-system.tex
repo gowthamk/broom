@@ -1,17 +1,17 @@
-\section{The Core Language}
+\section{\fbname}
 \label{sec:type-system}
 
-\input{fb-syntax}
+In this section, we formally develop \fbname, a language that incorporates
+the features introduced in the previous section, as well as its type system,
+building on the Featherweight Generic Java (FGJ)~\cite{fgj} formalism.
+Our development reuses notations and various definitions from~\cite{fgj},
+such as the definition of type well-formedness for the core (region-free) language,
+which are elaborated further in the supplement~\cite{techrep}.
 
 \subsection{Syntax}
 \label{sec:fb-syntax}
 
-We build on the Featherweight Generic Java (FGJ)~\cite{fgj} formalism
-to formalize \name and its region type system. Our development reuses
-notations from~\cite{fgj}, and relies on several of its definitions,
-such as the definition of type well-formedness for the core
-(region-free) language. We refrain from reproducing them here, and
-instead encourage the reader to refer to~\cite{fgj,techrep}.
+\input{fb-syntax}
 
 Fig~\ref{fig:fb-syntax} describes the syntax of our formal language,
 which we call \fbname (\FB). Class types in \FB are region-annotated
