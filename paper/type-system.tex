@@ -1,26 +1,44 @@
 \section{\fbname}
 \label{sec:type-system}
 
-In this section, we formally develop \fbname, a language that incorporates
-the features introduced in the previous section, as well as its type system,
-building on the Featherweight Generic Java (FGJ)~\cite{fgj} formalism.
-Our development reuses notations and various definitions from~\cite{fgj},
-such as the definition of type well-formedness for the core (region-free) language,
-which are elaborated further in the supplement~\cite{techrep}.
+The purpose of \name's region type system is to enforce the key
+invariant required for memory safety, namely that an object $o_1$ in a
+region $R_1$ contains a reference to an object $o_2$ in $R_2$, only if
+$R_2$ is guaranteed to outlive $R_1$. Intuitively, the invariant can
+be enforced by (a). tracking \emph{outlives} relationships between
+various regions in the program (b). tagging the C\# type of every
+object in the program with its allocation region, and (c).  ensuring
+that, when a reference is created, its target object ($o_2$) is
+allocated in a region that is known to be in outlives relationship
+with the object containing the reference. We now formally develop this
+intuition via \fbname, our explicitly typed core language (with region
+types) that incorporates the features introduced in the previous
+section. \fbname builds on the Featherweight Generic Java
+(FGJ)~\cite{fgj} formalism, and reuses notations and various
+definitions from~\cite{fgj}, such as the definition of type
+well-formedness for the core (region-free) language. 
+
+% In this section, we formally develop \fbname, a language that
+% incorporates the features introduced in the previous section, as well
+% as its type system, building on the Featherweight Generic Java
+% (FGJ)~\cite{fgj} formalism.  Our development reuses notations and
+% various definitions from~\cite{fgj}, such as the definition of type
+% well-formedness for the core (region-free) language, which are
+% elaborated further in the supplement~\cite{techrep}.
 
 \subsection{Syntax}
 \label{sec:fb-syntax}
 
 \input{fb-syntax}
 
-Fig~\ref{fig:fb-syntax} describes the syntax of our formal language,
-which we call \fbname (\FB). Class types in \FB are region-annotated
-variants of class types in FGJ (also called \emph{core types}). This
-correspondence is reflected in the $T@\rgn$ syntax of a region type,
-which is the simplest form of a region type describing an object of
-core type $T$ contained in a region $\rgn$. We let $\rgn$ range over
-static identifiers of regions in \FB. The only unboxed value in \FB is
-$\unitval$ of type \unitZ. Rest are objects.
+Fig~\ref{fig:fb-syntax} describes the syntax of \fbname (\FB). Class
+types in \FB are region-annotated variants of class types in FGJ (also
+called \emph{core types}). This correspondence is reflected in the
+$T@\rgn$ syntax of a region type, which is the simplest form of a
+region type describing an object of core type $T$ contained in a
+region $\rgn$. We let $\rgn$ range over static identifiers of regions
+in \FB. The only unboxed value in \FB is $\unitval$ of type \unitZ.
+Rest are objects.
 
 \FB extends FGJ's expression language with assignments, local variable
 declarations (via \C{let} expressions), region constructs
