@@ -355,13 +355,13 @@ unsound subtyping rule on region objects from effecting the memory safety.
 % \end{array}
 % \end{smathpar}
 
-The actual implementations of region-based memory management for \name
-may choose to realize the $\toprgn$ as a garbage-collected region, but
-this is not required. Our operational semantics
-(\S\ref{sec:fb-opsem}), for example, does not even associate a region
-with $\toprgn$, instead opting to allocate $\RgnZ$ objects in the same
-transferable regions that they represent. Our type safety result
-nonetheless guarantees memory safety in this implementation.
+%The actual implementations of region-based memory management for \name
+%may choose to realize the $\toprgn$ as a garbage-collected region, but
+%this is not required. Our operational semantics
+%(\S\ref{sec:fb-opsem}), for example, does not even associate a region
+%with $\toprgn$, instead opting to allocate $\RgnZ$ objects in the same
+%transferable regions that they represent. Our type safety result
+%nonetheless guarantees memory safety in this implementation.
 
 % Such a rule is unsound for it allows an object in a region ($\rgn_1$)
 % to be treated as an object in a shorter living region ($\rgn_2
