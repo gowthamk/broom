@@ -1,46 +1,52 @@
 \begin{figure*}[t!]
 %
+%\begin{minipage}
 \begin{smathpar}
 \renewcommand{\arraystretch}{1.2}
-\begin{array}{lclcl} 
-\multicolumn{5}{c}{
+\begin{array}{lr} 
+\multicolumn{2}{c}{
   {\rgn} \in \mathtt{Static \; region \; ids} \qquad
   {\rho} \in \mathtt{Region \; variables} \qquad
   {\tyvar, \tyvarb} \in \mathtt{Type \; variables} \qquad
   {m} \in \mathtt{Method \; names} \qquad
   {x,y,f} \in \mathtt{Variables \; and \; fields} }\\
-cn & \in & \M{Class \; names} & \coloneqq & \ObjZ \ALT \RgnZ \ALT A \ALT B\\
-     \fgjN & \in & \M{FGJ \; class \; types} & \coloneqq & cn\inang{\tbar}\\
-T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \ALT \unitZ
-     \ALT \bar{T} \rightarrow T \\
-\fbN  & \in & \M{Region-annotated \; class \; types} & \coloneqq & 
-     cn\inang{\tbar}\inang{\ralloc \rbar} \\
-\tau &\in& \M{types} & \coloneqq & T@\rgn  
-      \ALT \fbN \ALT \unitZ 
-      \ALT \inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau}
-      \xrightarrow{\rgn} \tau \\
-D  & \in & \M{Class \; definitions} & \coloneqq & 
-     \C{class} \; cn\inang{\bar{\tyvar} \extends \bar{\fgjN}} 
-                    \inang{\rhoalloc \rhobar \,|\, \phi}\extends \fbN 
-                    \{\bar{\tau} \; \bar{f};\; k\; \bar{d}\}\;\\
-k  & \in & \M{Constructors} & \coloneqq & 
-     cn(\bar{\tau} \; \bar{x})\{\C{super}(\bar{x}); \;
-                                \C{this}.\bar{f}\,=\,\bar{x};\}\\
-d  & \in & \M{Methods} & \coloneqq & 
-     \tau \; m\inang{\rhoalloc \rhobar \,|\, \phi} (\taubar \; \xbar)
-     \{\C{return}\;e;\}\\
-\phi,\phicx &\in& \M{Region\;constraints} & \coloneqq & true 
-      \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi\\
-% v  & \in & \M{Value\;expressions} & \coloneqq & x \ALT \C{new} \; \fbN(\vbar)\\
+\begin{array}{lclcl}
+  cn & \in & \M{Class \; names} & \coloneqq & \ObjZ \ALT \RgnZ \ALT A \ALT B\\
+  T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \ALT \unitZ
+       \ALT \bar{T} \rightarrow T \\
+  D  & \in & \M{Classes} & \coloneqq & 
+       \C{class} \; cn\inang{\bar{\tyvar} \extends \bar{\fgjN}} 
+                      \inang{\rhoalloc \rhobar \,|\, \phi}\extends \fbN 
+                      \{\bar{\tau} \; \bar{f};\; k\; \bar{d}\}\;\\
+  k  & \in & \M{Constructors} & \coloneqq & 
+       cn(\bar{\tau} \; \bar{x})\{\C{super}(\bar{x}); \;
+                                  \C{this}.\bar{f}\,=\,\bar{x};\}\\
+  d  & \in & \M{Methods} & \coloneqq & 
+       \tau \; m\inang{\rhoalloc \rhobar \,|\, \phi} (\taubar \; \xbar)
+       \{\C{return}\;e;\}\\
+\end{array}
+\begin{array}{lclcl}
+  \fgjN & \in & \M{FGJ \; class \; types} & \coloneqq & cn\inang{\tbar}\\
+  \fbN  & \in & \M{FB \; class \; types} & \coloneqq & 
+       cn\inang{\tbar}\inang{\ralloc \rbar} \\
+  \tau &\in& \M{types} & \coloneqq & T@\rgn  
+        \ALT \fbN \ALT \unitZ \\
+       &   & & & \ALT \inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau}
+        \xrightarrow{\rgn} \tau \\
+  \phi &\in& \M{Constraints} & \coloneqq & true 
+        \ALT \rho \outlives \rho \\
+        & & & & \ALT \rho = \rho \ALT \phi \conj \phi\\
+  % v  & \in & \M{Value\;expressions} & \coloneqq & x \ALT \C{new} \; \fbN(\vbar)\\
+\end{array}\\
+\begin{array}{lclcl}
 e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f 
-     \ALT e.m\inang{\ralloc \rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar) \\
+     \ALT e.m\inang{\ralloc \rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar) 
+     \ALT \lambdaexp{\rhoalloc\rhobar \,|\, \phi}{\xbar:\taubar} {e}
+     \ALT e\inang{\ralloc\rbar}(\bar{e})\\
 %    \ALT (\tau)\, e\\
-   & & & & \ALT \lambdaexp{\rhoalloc\rhobar \,|\, \phi}{\xbar:\taubar} {e}
-%          \ALT \Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}
-           \ALT e\inang{\ralloc\rbar}(\bar{e})
-%          \ALT e(\bar{e}) 
-           \ALT e\,;\,e \ALT \letexp{x}{e}{e} \\
-   & & & & \ALT \letregion{\rho}{e} 
+%    \ALT e\,;\,e  \\
+   & & & & \ALT \letexp{x}{e}{e}
+           \ALT \letregion{\rho}{e} 
            \ALT \open{e}{\rgn}{y}{e} \\
 %   & & & & \ALT \unpackexp{\rgn}{x}{e}{e} \ALT e\,;\,e\\
 % s  & \in & \M{Statements} & \coloneqq & \tau\;x\;=\;e \ALT x\;=\;e
@@ -48,6 +54,7 @@ e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f
 %      \ALT \C{open}\;x\;\C{withroot}\;y\;\{s\} \\
 %     & & & & \ALT \C{openalloc}\;x\;\C{withroot}\;y\;\{s\} 
 %      \ALT (\rho,\tau\;x)\;=\;\C{unpack}\;e \ALT s\,;\,s\\
+\end{array}
 \end{array}
 \end{smathpar}
 
