@@ -15,7 +15,7 @@ class MapVertex<TIn, TOut> {
   void onNotify(Time t) {
      List<TOut> outputList = map[t];
      map.Remove(t);
-     transfer(t, outputList); 
+     transfer(successorId, t, outputList); 
   }
 }
 \end{numcodejava}

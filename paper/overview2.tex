@@ -10,7 +10,7 @@ In this section, we present an informal overview of these region-specific constr
 \subsection{Using Regions in \name}
 
 \paragraph{Stack Regions}
-The ``\C{letregion R S}'' construct creates a new stack region,
+The ``\C{letregion R \{ S \}}'' construct creates a new stack region,
 with a static identifier \C{R}, whose scope is restricted to the
 statement \C{S}. The semantics of  \C{letregion} is similar
 to Tofte and Talpin~\cite{tofte94}'s \C{letregion} expression:
@@ -26,11 +26,12 @@ regions, and we refer to the region at the top of the stack as the \emph{allocat
 context}. The statement \C{new T()} allocates the newly created object in
 the current allocation context.
 %
-This is important as it enables \name applications to use existing region-oblivious
-C\# libraries. In particular, given a  C\# library function \C{F} (that makes no use of
-\name's region constructs), the statement ``\C{letregion R F()}'' invokes \C{F},
-but has the effect that all objects allocated by this invocation are allocated in the
-new region \C{R}.
+This is important as it enables \name applications to use existing
+region-oblivious C\# libraries. In particular, given a  C\# library
+function \C{f} (that makes no use of \name's region constructs), the
+statement ``\C{letregion R \{ f(); \}}'' invokes \C{f}, but has the
+effect that all objects allocated by this invocation are allocated in
+the new region \C{R}.
 
 \paragraph{Transferable Regions}
 \name's \emph{transferable regions} are an encapsulation of a data-structure

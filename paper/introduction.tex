@@ -1,163 +1,200 @@
-\newcommand{\TODO}[1]{\textbf{TODO: #1}}
-\newcommand{\eg}{\emph{e.g.}}
+\newcommand{\TODO}[1]{\textbf{TODO: #1}} \newcommand{\eg}{\emph{e.g.}}
 \newcommand{\ie}{\emph{i.e.}}
 
-\section{Introduction}
-\label{sec:introduction}
+\section{Introduction} \label{sec:introduction}
 
-Consider the example, from~\cite{Broom:HotOS}, shown in Fig.~\ref{fig:motivating-eg}.
-This code represents the logic for a streaming query operator.
-The operator receives a stream of input messages, each associated
-with a time (window) $t$, processed by method \texttt{onReceive}.
-Each input message contains a list of inputs, each of which is processed
-by applying a user-defined function to create a corresponding output.
-The operator may receive multiple messages with the same timestamp
-(and messages with different timestamps may be delivered out of order).
-A timing-message (an invocation of method \texttt{OnNotify}) indicates that
-no more input messages with a timestamp $t$ will be subsequently delivered.
-At this point, the operator completes the processing for time window $t$ and sends
-a corresponding output message to its successor.
+Consider the example, from~\cite{Broom:HotOS}, shown in
+Fig.~\ref{fig:motivating-eg}.  This code represents the logic for a
+streaming query operator.  The operator receives a stream of input
+messages, each associated with a time (window) $t$, processed by
+method \texttt{onReceive}.  Each input message contains a list of
+inputs, each of which is processed by applying a user-defined function
+to create a corresponding output.  The operator may receive multiple
+messages with the same timestamp (and messages with different
+timestamps may be delivered out of order).  A timing-message (an
+invocation of method \texttt{OnNotify}) indicates that no more input
+messages with a timestamp $t$ will be subsequently delivered.  At this
+point, the operator completes the processing for time window $t$ and
+sends a corresponding output message to its successor.
 
 \input{motivating-eg}
 
 This example is an instance of a general pattern, where a producer
-creates a data-structure and passes it to a consumer.  In a system
+creates a data-structure and passes it to a consumer. In a system
 where most of the computation takes this form, and these
 data-structures are very large, as is the case with many streaming
-big-data analysis systems, the garbage collection overhead becomes
-significant.
-% as the collector scans these large data-structures
-However, these data-structures have a well-defined lifetime, which can
-be exploited to achieve better performance.
-% using alternative memory management techniques.
+big-data analysis systems, garbage collection overhead becomes
+significant. Importantly, much of this overhead results from the
+collector performing avoidable or unproductive
+work~\cite{Broom:HotOS}. For example, a consumer process may trigger a
+GC as soon as it receives a large data-structure from a producer
+process, which has just finished its GC. In such case, consumer's GC
+traverses the entire data-structure performing little or no work.
+Another example is the process executing the code in
+Fig.~\ref{fig:motivating-eg}, whose GC might repeatedly traverse the
+\C{map} data-structure, although its objects cannot be collected until
+a suitable timing message arrives.
+% as the collector scans these large data-structures For instance, in
+% the above example, the list at \C{map[t]} cannot be collected until
+% the the timing message arrives, and the list is transferred.
+% \C{transfer} operation is complete.  using alternative memory
+% management techniques.
 
-Region-based memory management is a good fit for such programs.
-A region is a block of memory (consisting of one or more contiguous
-range of memory locations, permitting a region to grow).
-% that is used to realize a data-structure with a well-defined lifetime. 
-Once a region is created, individual objects may be dynamically allocated within
-the region over time. Finally, the entire region is freed in one shot.
-In this example, the output to be constructed for each time window $t$ can be
-implemented using a separate region.
+An important observation, in the context of processes of kind
+described above, is that the data-structures exchanged between them
+have can be partitioned into sets of fate-sharing objects with common
+lifetimes, which makes them good candidates for a region-based memory
+management discipline. A region is a block of memory that is allocated
+and freed in one shot, consuming constant time. A region may contain
+one or more contiguous range of memory locations, and individual
+objects may be dynamically allocated within the region over time,
+while they are deallocated en masse when the region is freed.  Thus, a
+region is a good fit for a set of fate-sharing objects.
+% that is used to realize a data-structure with a well-defined
+% lifetime. 
+In this example, the output to be constructed for each time window $t$
+can be implemented using a separate region.
 
-Region-based memory management, both manual as well as automatic, has been known for
-a long time. Manual region-based memory management suffers from the usual challenges,
-namely the potential for dangling references and lack of memory safety. Automatic
-region-based memory management systems guarantee memory safety, but impose various restrictions.
-Tofte and Talpin's system~\cite{tofte94,tofte97} , for example, uses lexically scoped regions.
-At runtime, the set of all regions (existing at a point in time) forms a stack. Thus, the lifetimes of
-all regions must be well-nested: it is not possible to have two regions whose lifetimes
-overlap, with neither one's lifetime contained within the other.
-Unfortunately, the data-structures in the above example do not satisfy this restriction
-(as the output messages for multiple time windows may be simultaneously live, without
-any containment relation between their lifetimes).
-We refer to regions with lexically scoped lifetimes as \emph{stack regions} and to regions 
-that do not have such a lexically scoped region as \emph{dynamic} regions.
+Region-based memory management, both manual as well as automatic, has
+been known for a long time. Manual region-based memory management
+suffers from the usual challenges, namely the potential for dangling
+references and lack of memory safety. Automatic region-based memory
+management systems guarantee memory safety, but impose various
+restrictions.  Tofte and Talpin's system~\cite{tofte94,tofte97} , for
+example, uses lexically scoped regions.  At runtime, the set of all
+regions (existing at a point in time) forms a stack. Thus, the
+lifetimes of all regions must be well-nested: it is not possible to
+have two regions whose lifetimes overlap, with neither one's lifetime
+contained within the other.  Unfortunately, the data-structures in the
+above example do not satisfy this restriction (as the output messages
+for multiple time windows may be simultaneously live, without any
+containment relation between their lifetimes).  We refer to regions
+with lexically scoped lifetimes as \emph{stack regions} and to regions
+that do not have such a lexically scoped region as \emph{dynamic}
+regions.
 
-The goal of this work is a \emph{memory-safe} region-based memory management technique
-that supports dynamic regions (that are first-class objects) and higher-order functions.
-Though we focus, in this paper, on memory-safety, our approach offers other benefits.
-When a producer transfers a data-structure to a consumer, in a shared-memory context , our approach
-provides an ownership discipline that ensures that the producer cannot subsequently modify
-the data-structure. When the same transfer happens in a distributed setting, the system guarantees
-that the data-structure is self-contained and can be safely transmitted across address spaces.
-We refer to dynamic regions that provide these guarantees as \emph{transferable} regions.
+The goal of this work is a \emph{memory-safe} region-based memory
+management technique that supports dynamic regions as first-class
+objects. Though we focus, in this paper, on memory-safety, our
+approach offers other benefits.  When a producer transfers a
+data-structure to a consumer, in a shared-memory context , our
+approach provides an ownership discipline that ensures that the
+producer cannot subsequently modify the data-structure. When the same
+transfer happens in a distributed setting, the system guarantees that
+the data-structure is self-contained and can be safely transmitted
+across address spaces.  We refer to dynamic regions that provide these
+guarantees as \emph{transferable} regions.
 
-The key memory safety property we wish to ensure is that there are no dangling references:
-i.e., a reference to an object that has been freed.
-A key invariant and restriction that we utilize to achieve this is that no object $o_1$ in one dynamic
-region $D_1$ can contain a pointer to an object $o_2$ in another dynamic region $D_2$.
-In cases where this is too restrictive, the user has to resort to (deep) copying $o_2$ to $D_1$.
-This is conceptually quite reasonable given the perspective that $D_1$ is a self-contained data-structure.
-Furthermore, this is quite analogous, from a performance perspective, to the copying that happens
-when a garbage collector promotes an object from a lower generation to a higher generation.
-From this perspective, a region may be seen as a user-controlled generation.
+The key memory safety property we wish to ensure is that there are no
+dangling references: i.e., a reference to an object that has been
+freed.  A key invariant and restriction that we utilize to achieve
+this is that no object $o_1$ in one dynamic region $D_1$ can contain a
+pointer to an object $o_2$ in another dynamic region $D_2$.  In cases
+where this is too restrictive, the user has to resort to (deep)
+copying $o_2$ to $D_1$.  This is conceptually quite reasonable given
+the perspective that $D_1$ is a self-contained data-structure.
+Furthermore, this is quite analogous, from a performance perspective,
+to the copying that happens when a garbage collector promotes an
+object from a lower generation to a higher generation.  From this
+perspective, a region may be seen as a user-controlled generation.
 
-This ensures that we can safely free one dynamic region (\eg, the input-message in our example)
-without affecting the validity of pointers in another dynamic region (\eg, the output-message).
-However, this is not sufficient! When processing the input-message $D$, we necessarily will have to create
-pointers that point to objects that are internal to $D$. Such pointers may be stack-allocated or even reside
-in the heap (\eg, consider the iterator object used to iterate over the list in the input-message).
-How do we ensure the safety of these pointers?
+This ensures that we can safely free one dynamic region (\eg, the
+input-message in our example) without affecting the validity of
+pointers in another dynamic region (\eg, the output-message).
+However, this is not sufficient! When processing the input-message
+$D$, we necessarily will have to create pointers that point to objects
+that are internal to $D$. Such pointers may be stack-allocated or even
+reside in the heap (\eg, consider the iterator object used to iterate
+over the list in the input-message).  How do we ensure the safety of
+these pointers?
 
-We use \emph{stack regions} (regions with lexically-scoped lifetimes), as well as the stack,
-for such temporary pointers (to objects inside a dynamic region) and use the following protocol
-to ensure safety of such pointers.
-To work with a dynamic region $D$, we must first \emph{open} region $D$,
-to indicate that $D$ should not be freed during this period.
-When the processing of the region is complete, we close the region $D$,
-to indicate that it is safe to free $D$.
-In general, a dynamic region may be opened and closed multiple times before it is finally freed.
+We use \emph{stack regions} (regions with lexically-scoped lifetimes),
+as well as the stack, for such temporary pointers (to objects inside a
+dynamic region) and use the following protocol to ensure safety of
+such pointers.  To work with a dynamic region $D$, we must first
+\emph{open} region $D$, to indicate that $D$ should not be freed
+during this period.  When the processing of the region is complete, we
+\emph{close} the region $D$, to indicate that it is safe to free $D$.
+In general, a dynamic region may be opened and closed multiple times
+before it is finally freed.
 
-Our type-system permits the creation of pointers to internal objects of \emph{open dynamic} regions,
-but uses lexical scoping to ensure that such pointers are no longer live when the region is closed.
-Thus, such pointers may be either stack-allocated or reside in a region whose lifetime is statically
-guaranteed to be contained within the interval when $D$ is open.
-As a consequence, the system ensures the strong invariant that for a \emph{closed dynamic} region $D$
-no pointer from outside $D$ points to an internal object of $D$.
+Our type-system permits the creation of pointers to internal objects
+of \emph{open dynamic} regions, but uses lexical scoping to ensure
+that such pointers are no longer live when the region is closed.
+Thus, such pointers may be either stack-allocated or reside in a
+region whose lifetime is statically guaranteed to be contained within
+the interval when $D$ is open.  As a consequence, the system ensures
+the strong invariant that for a \emph{closed dynamic} region $D$ no
+pointer from outside $D$ points to an internal object of $D$.
 
-The final piece required to ensure memory-safety is ensuring that the program correctly follows the above-mentioned
-protocol for dynamic regions: \eg, an open region should not be freed and, dually, a freed region should not be opened.
-(A complete typestate specification of the protocol is presented later.)
+The final piece required to ensure memory-safety is ensuring that the
+program correctly follows the above-mentioned protocol for dynamic
+regions: \eg, an open region should not be freed and, dually, a freed
+region should not be opened.  (A complete typestate specification of
+the protocol is presented later.)
 
-Dynamic regions are first-class objects in our system: \eg, in our running example,
-we would like to use a dictionary that stores dynamic regions. However, this means that the program may create multiple
-aliases (pointers) to the same region, which, in turn, means that statically checking if the program correctly follows the
-dynamic region protocol is hard (undecidable, in fact). Safety can be ensured by using, \eg, linear typing to prevent the
-creation of aliases, but this would be quite restrictive. Hence, in our system, we dynamically check for adherence to
-this protocol.
+Dynamic regions are first-class objects in our system. For instance,
+in our running example, we would like to use a dictionary that stores
+dynamic regions. However, this means that the program may create
+multiple aliases (pointers) to the same region, which, in turn, means
+that statically checking if the program correctly follows the dynamic
+region protocol is hard (undecidable, in fact). Safety can be ensured
+by using, \eg, linear typing to prevent the creation of aliases, but
+this would be quite restrictive. Hence, in our system, we dynamically
+check for adherence to this protocol.
 
 In summary, our approach reduces memory safety to two sub-problems:
-(a) Ensuring  low-level invariants about pointers to (fine-grained) objects inside regions and 
-(b) Ensuring higher-level (typestate) invariants about the regions themselves. 
-We use a type system to statically ensure the first set of invariants. We use a dynamic check to ensure that the
-second set of invariants are satisfied at runtime.
+(a) Ensuring  low-level invariants about pointers to (fine-grained)
+objects inside regions and (b) Ensuring higher-level (typestate)
+invariants about the regions themselves.  We use a type system to
+statically ensure the first set of invariants. We use a dynamic check
+to ensure that the second set of invariants are satisfied at runtime.
 %
-This is a novel aspect of our system. We believe that this is a reasonable choice:
-dynamically checking for the second category of invariants is easy and does not pose a performance concern (unlike, \eg, the first category of constraints);
-a static typechecker that rules out the second category of violations would be very restrictive from an expressiveness perspective;
-finally, the human effort required to ensure the second set of invariants is not as burdensome (as regions are coarse-grained objects
-manipulated infrequently), \eg, as it would be for the first set of invariants.
+This is a novel aspect of our system. We believe that this is a
+reasonable choice: dynamically checking for the second category of
+invariants is easy and does not pose a performance concern (unlike,
+\eg, the first category of constraints); a static typechecker that
+rules out the second category of violations would be very restrictive
+from an expressiveness perspective; finally, the human effort required
+to ensure the second set of invariants is not as burdensome (as
+regions are coarse-grained objects manipulated infrequently), \eg, as
+it would be for the first set of invariants.
 
 \subsection*{Contributions}
 
 The paper makes the following contributions:
 
-\begin{itemize}
-  \item We present \name, a \csharp-like typed object-oriented language
-  that eschews garbage collection in favour of programmer-managed
-  memory regions . \name extends its core language, which includes
-  \emph{lambdas} (higher-order functions) and \emph{generics}
-  (parametric polymorphism), with constructs to create, manage and
-  destroy static and dynamic memory regions. Dynamic regions are
-  first-class values in \name.
-  % Experiments demonstrate that   \naiad~\cite{naiad} dataflow program using programmer-managed
-  % memory regions outperform their GC counterparts by a margin of upto
-  % 59\%. 
+\begin{itemize} \item We present \name, a \csharp-like typed
+object-oriented language that eschews garbage collection in favour of
+programmer-managed memory regions . \name extends its core language,
+which includes \emph{lambdas} (higher-order functions) and
+\emph{generics} (parametric polymorphism), with constructs to create,
+manage and destroy static and dynamic memory regions. Dynamic regions
+are first-class values in \name.
+  % Experiments demonstrate that   \naiad~\cite{naiad} dataflow
+  % program using programmer-managed memory regions outperform their
+  % GC counterparts by a margin of upto 59\%. 
 
   \item \name is equipped with a region type system that statically
   guarantees safety of all memory accesses in a well-typed program,
-  provided that the region usage correctly follows a simple discipline.
-  The correctness of region usage is checked efficiently at run-time.
-  The overhead of checking these conditions is less than
-  \GK{x\%} in our experiments with \naiad workloads.
+  provided that certain typestate invariants on regions hold.  The
+  later invariants are enforced via simple runtime checks.
+% The correctness of region usage is checked efficiently at run-time.
+% The overhead of checking these conditions is less than \GK{x\%} in
+% our experiments with \naiad workloads.
 
   \item We define an operational semantics for \name, and a type
-  safety result that formalizes and proves safety guarantees described
-  above.
+  safety result that clearly defines and proves safety guarantees
+  described above.
 
   \item We describe a region type inference algorithm for \name that
   (a). completely eliminates the need to annotate \name programs with
   region types, and (b). enables seamless interoperability between
   region-aware \name programs and legacy standard library code that is
-  region-oblivious. The cornerstone of our inference algorithm is
-  \csolve, a novel constraint solving algorithm that performs
-  abduction and deduction in a Herbrand constraint system to solve the
-  constraints generated by the type inference algorithm.
-
-  \item We prove that region type inference is sound with respect to
-  its type system, and also complete for the set of first-order
-  programs (i.e., programs without lambdas). 
+  region-oblivious. The cornerstone of our inference algorithm is a
+  novel constraint solver that performs abduction in a partial-order
+  constraint domain to infer weakest solutions to recursive
+  constraints.
 
   \item We describe an implementation of \name frontend in OCaml,
   along with experimental results, and case studies where the region

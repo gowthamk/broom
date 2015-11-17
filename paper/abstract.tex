@@ -1,18 +1,22 @@
-Recent work in high-performance systems written in managed languages (such as Java or C\#) has shown
-that garbage-collection can be a significant performance bottleneck in such systems.
-A class of these systems, focused on big-data, create huge data-structures with well-defined lifetimes.
-In this paper, we present a language and memory management scheme based on user-managed
-memory regions (called \emph{transferable regions}) that allow programmers to exploit
-knowledge of data-structures' lifetimes to achieve significant performance improvements.
+Recent work in high-performance systems written in managed languages
+(such as Java or C\#) has shown that garbage-collection can be a
+significant performance bottleneck in such systems.  A class of these
+systems, focused on big-data, create huge data-structures with
+well-defined lifetimes.  In this paper, we present a language and
+memory management scheme based on user-managed memory regions (called
+\emph{transferable regions}) that allow programmers to exploit
+knowledge of data-structures' lifetimes to achieve significant
+performance improvements.
 
-Manual memory management is susceptible to the usual perils of dangling pointers.
-A key contribution of this paper is a region type system that
-ensures the memory safety of region-annotated C\# programs,
-even in presence of higher-order stateful functions. We
-also present a type inference algorithm that infers principal region types
-for first-order programs, eliminating the need for programmers to write
-region annotations on types. Our inference algorithm is also very
-effective, albeit incomplete, for higher-order programs.
+Manual memory management is susceptible to the usual perils of
+dangling pointers.  A key contribution of this paper is a region type
+system that ensures the memory safety of C\# programs in the presence
+of transferable regions. We compliment our type system with a type
+inference algorithm that infers principal region types for first-order
+programs. This eliminates the need for programmers to write region
+annotations on types, while facilitating the reuse of existing C\#
+libraries with no modifications. Various case studies demonstrate the
+practical utility of our approach.
 
 %As a testament to efficacy of our approach, we demonstrate performance
 %improvements over a range of realistic dataflow programs that were
