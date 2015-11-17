@@ -11,7 +11,7 @@ object in the program with its allocation region, and (c).  ensuring
 that, when a reference is created, its target object ($o_2$) is
 allocated in a region that is known to be in outlives relationship
 with the object containing the reference. We now formally develop this
-intuition via \fbname, our explicitly typed core language (with region
+intuition via \fbname (\FB), our explicitly typed core language (with region
 types) that incorporates the features introduced in the previous
 section. \fbname builds on the Featherweight Generic Java
 (FGJ)~\cite{fgj} formalism, and reuses notations and various
@@ -31,49 +31,10 @@ well-formedness for the core (region-free) language.
 
 \input{fb-syntax}
 
-Fig~\ref{fig:fb-syntax} describes the syntax of \fbname (\FB). Class
-types in \FB are region-annotated variants of class types in FGJ (also
-called \emph{core types}). This correspondence is reflected in the
-$T@\rgn$ syntax of a region type, which is the simplest form of a
-region type describing an object of core type $T$ contained in a
-region $\rgn$. We let $\rgn$ range over static identifiers of regions
-in \FB. The only unboxed value in \FB is $\unitval$ of type \unitZ.
-Rest are objects.
-
-\FB extends FGJ's expression language with assignments, local variable
-declarations (via \C{let} expressions), region constructs
-(\C{letregion} and \C{open}), lambda abstraction
-($\lambdaexp{...}{\xbar : \taubar}{e}$) and application
-($e\inang{...}(\bar{e})$) expressions. Assignments and region
-constructs, which are statements in \name, are treated as effectful
-expressions in \FB. Lambda abstraction and application expressions are
-to define and apply anonymous functions. Modulo the angle braces
-(whose presence will be justified later), these expressions are
-uncurried variants of the corresponding expressions from System F.
-Since FGJ formalism does not include higher-order functions, we extend
-the syntactic class (\C{T}) of FGJ types with an (uncurried) arrow
-type.
-
-Class definitions in \FB extend FGJ's with region parameters
-($\rho$). Informally, region variables ($\rho$) are to region
-identifiers ($\rgn$) as type variables ($a$) are to core types ($T$);
-they can be instantiated with region identifiers, as needed. A class
-in \FB is necessarily parameterized over the allocation region of its
-objects. We use $\rho^a$ to denote this parameter, and often refer to
-it as \emph{class}'s allocation region, although it is really the
-allocation region of its objects. An Object in \FB can contain fields
-referring to objects allocated in regions ($\rhobar$) other than its
-own allocation region ($\rhoalloc$), provided that the former outlive
-the later (i.e., $\rhobar \outlives \rho$). In such cases, the
-definition of object's class needs to be parametric over allocation
-regions of its fields (i.e., their classes). Furthermore, the
-constraint that such regions must outlive the allocation region of the
-class needs to be made explicit in the definition. For instance, a
-\C{Pair} object allocated in a region ${\rhoalloc}$ can have its first
-component coming from ${\rho_1}$ and second from $\rho_2$, where all
-the $\rho$'s are distinct, and $\rho_1, \rho_2$ outlive
-$\rhoalloc$. The corresponding definition of the \C{Pair} class is as
-follows(The symbol $\extends$ should be read \emph{extends}):  
+Fig~\ref{fig:fb-syntax} describes the syntax of \FB.
+We refer to the class types of FGJ as \emph{core types}.
+%
+The following example illustrates some  key elements of \FB.
 \begin{codejava}[mathescape=true]
 class Pair<a $\extends$ Object, b $\extends$ Object>
           <$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a \conj \rho_2 \outlives \rho^a$> $\extends$ Object<$\rho^a$>
@@ -90,6 +51,26 @@ class Pair<a $\extends$ Object, b $\extends$ Object>
   }
 }
 \end{codejava}
+
+A class in \FB is parametric over zero or more type variables (as in FGJ) as well as
+one or more region variables $\rho$.
+(The symbol $\extends$ should be read \emph{extends}.)
+% In the above example, the class \C{Pair} is parameterized over $\rho^a, \rho_1, \rho_2$.
+We refer to the first region parameter, usually denoted $\rho^a$, as the \emph{allocation
+region} of the class: it serves to identify the region where an instance of the class is allocated.
+%
+An object in \FB can contain fields referring to objects allocated in regions ($\rhobar$) other than its
+own allocation region ($\rhoalloc$), provided that the former outlive
+the later (i.e., $\rhobar \outlives \rho$). In such cases, the
+definition of object's class needs to be parametric over allocation
+regions of its fields (i.e., their classes). Furthermore, the
+constraint that such regions must outlive the allocation region of the
+class needs to be made explicit in the definition. 
+%
+For instance, a \C{Pair} object allocated in a region ${\rhoalloc}$ can have its first
+component coming from ${\rho_1}$ and second from $\rho_2$, as long as
+$\rho_1, \rho_2$ outlive $\rhoalloc$, as illustrated by the above definition.
+
 To construct objects of the \C{Pair} class, its type and region
 parameters need to be instantiated with core types ($T$) and concrete
 region identifiers ($\rgn$), respectively. For example:
@@ -117,6 +98,50 @@ as \C{Pair<\ObjZ,\ObjZ>@$\rgn_1$}\footnote{In general, we treat
 $B\inang{\tbar}@\rgn$ as an abbreviation of
 $B\inang{\tbar}\inang{\rbar}$}. The $\ObjZ$ class in \FB has no
 fields, hence its region type is of form $\ObjZ@\rgn$.
+
+%Class definitions in \FB extend FGJ's with region parameters
+%($\rho$). Informally, region variables ($\rho$) are to region
+%identifiers ($\rgn$) as type variables ($a$) are to core types ($T$);
+%they can be instantiated with region identifiers, as needed. A class
+%in \FB is necessarily parameterized over the allocation region of its
+%objects. We use $\rho^a$ to denote this parameter, and often refer to
+%it as \emph{class}'s allocation region, although it is really the
+%allocation region of its objects. An Object in \FB can contain fields
+%referring to objects allocated in regions ($\rhobar$) other than its
+%own allocation region ($\rhoalloc$), provided that the former outlive
+%the later (i.e., $\rhobar \outlives \rho$). In such cases, the
+%definition of object's class needs to be parametric over allocation
+%regions of its fields (i.e., their classes). Furthermore, the
+%constraint that such regions must outlive the allocation region of the
+%class needs to be made explicit in the definition. For instance, a
+%\C{Pair} object allocated in a region ${\rhoalloc}$ can have its first
+%component coming from ${\rho_1}$ and second from $\rho_2$, where all
+%the $\rho$'s are distinct, and $\rho_1, \rho_2$ outlive
+%$\rhoalloc$. T
+
+Class types in \FB are region-annotated variants of class types in FGJ (also
+called \emph{core types}). This correspondence is reflected in the
+$T@\rgn$ syntax of a region type, which is the simplest form of a
+region type describing an object of core type $T$ contained in a
+region $\rgn$. We let $\rgn$ range over static identifiers of regions
+in \FB. The only unboxed value in \FB is $\unitval$ of type \unitZ.
+Rest are objects.
+
+\FB extends FGJ's expression language with assignments, local variable
+declarations (via \C{let} expressions), region constructs
+(\C{letregion} and \C{open}), lambda abstraction
+($\lambdaexp{...}{\xbar : \taubar}{e}$) and application
+($e\inang{...}(\bar{e})$) expressions. Assignments and region
+constructs, which are statements in \name, are treated as effectful
+expressions in \FB. Lambda abstraction and application expressions are
+to define and apply anonymous functions. Modulo the angle braces
+(whose presence will be justified later), these expressions are
+uncurried variants of the corresponding expressions from System F.
+Since FGJ formalism does not include higher-order functions, we extend
+the syntactic class (\C{T}) of FGJ types with an (uncurried) arrow
+type.
+
+
 % In general, the \C{@} notation in a
 % region type of an object \C{x} highlights that
 % \C{x}, and all the objects reachable from \C{x} via references are
