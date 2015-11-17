@@ -34,55 +34,59 @@ well-formedness for the core (region-free) language.
 Fig~\ref{fig:fb-syntax} describes the syntax of \FB.
 We refer to the class types of FGJ as \emph{core types}.
 %
-The following example illustrates some  key elements of \FB.
+The following definition of \C{Pair} class in \FB illustrates some
+of the key elements of the formal language\footnote{The symbol
+$\extends$ should be read \emph{extends}, and the symbol $\outlives$
+stands for \emph{outlives}}:
 \begin{codejava}[mathescape=true]
 class Pair<a $\extends$ Object, b $\extends$ Object>
-          <$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a \conj \rho_2 \outlives \rho^a$> $\extends$ Object<$\rho^a$>
-           {
+          <$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a \conj \rho_2 \outlives \rho^a$> $\extends$ Object<$\rho^a$> {
   a@$\rho_1$ fst; 
   b@$\rho_2$ snd;
   Pair(a@$\rho_1$ fst, b@$\rho_2$ snd) {
-    super(); 
-    this.fst = fst; 
-    this.snd = snd;
+    super(); this.fst = fst; this.snd = snd;
   }
-  a@$\rho_1$ getFst() {
-    return this.fst;
+  a@$\rho_1$ getFst() { 
+    return this.fst; 
   }
 }
 \end{codejava}
 
-A class in \FB is parametric over zero or more type variables (as in FGJ) as well as
-one or more region variables $\rho$.
-(The symbol $\extends$ should be read \emph{extends}.)
-% In the above example, the class \C{Pair} is parameterized over $\rho^a, \rho_1, \rho_2$.
-We refer to the first region parameter, usually denoted $\rho^a$, as the \emph{allocation
-region} of the class: it serves to identify the region where an instance of the class is allocated.
+A class in \FB is parametric over zero or more type variables (as in
+FGJ) as well as one or more region variables $\rho$.
+% In the above example, the class \C{Pair} is parameterized over
+% $\rho^a, \rho_1, \rho_2$.
+We refer to the first region parameter, usually denoted $\rho^a$, as
+the \emph{allocation region} of the class: it serves to identify the
+region where an instance of the class is allocated.
 %
 An object in \FB can contain fields referring to objects allocated in regions ($\rhobar$) other than its
 own allocation region ($\rhoalloc$), provided that the former outlive
-the later (i.e., $\rhobar \outlives \rho$). In such cases, the
+the later (i.e., $\rhobar \outlives \rho$). In such case, the
 definition of object's class needs to be parametric over allocation
 regions of its fields (i.e., their classes). Furthermore, the
 constraint that such regions must outlive the allocation region of the
-class needs to be made explicit in the definition. 
+class needs to be made explicit in the definition, as the \C{Pair}
+class does in the above definition. We say that the \C{Pair} class
+exhibits \emph{constrained region polymorphism}.
 %
-For instance, a \C{Pair} object allocated in a region ${\rhoalloc}$ can have its first
-component coming from ${\rho_1}$ and second from $\rho_2$, as long as
-$\rho_1, \rho_2$ outlive $\rhoalloc$, as illustrated by the above definition.
+% For instance, a \C{Pair} object allocated in a region ${\rhoalloc}$ can have its first
+% component coming from ${\rho_1}$ and second from $\rho_2$, as long as
+% $\rho_1, \rho_2$ outlive $\rhoalloc$, as illustrated by the above definition.
 
 To construct objects of the \C{Pair} class, its type and region
 parameters need to be instantiated with core types ($T$) and concrete
-region identifiers ($\rgn$), respectively. For example:
+region identifiers\footnote{Region variables ($\rho$) and region
+identifiers ($\rgn$) belong to the same syntactic class. Region
+identifiers are to region variables, as types ($T$) are to type
+variables ($a$)} ($\rgn$), respectively. For example:
 \begin{codejava}
-letregion $\rgn_0$ {
-  Object<$\rgn_0$> snd = new Object<$\rgn_0$>();
-  letregion $\rgn_1$ {
-    Object<$\rgn_1$> fst = new Object<$\rgn_1$>();
+letregion $\rgn_0$ in
+  let snd = new Object<$\rgn_0$>() in
+  letregion $\rgn_1$ in
+    let fst = new Object<$\rgn_1$>() in
     let p = new Pair<Object,Object><$\rgn_1$,$\rgn_0$,$\rgn_1$>
                   (fst,snd);
-  }
-}
 \end{codejava}
 In the above code, the instantiation of $\rhoalloc$ and $\rho_1$ with
 $\rgn_0$, and $\rho_2$ with $\rgn_1$ is allowed because (a) $\rgn_0$
@@ -92,13 +96,17 @@ reflexive). Observe that the region type of \C{p} conveys
 the fact that (a). it is allocated in region $\rgn_1$, and (b). it
 holds references to objects allocated in region $\rgn_0$ and $\rgn_1$.
 In contrast, if we choose to allocate the \C{snd} object also in
-$\rgn_1$, the region type of \C{p} would be
-\C{Pair<\ObjZ,\ObjZ><$\rgn_1$,$\rgn_1$,$\rgn_1$>}, which we abbreviate
-as \C{Pair<\ObjZ,\ObjZ>@$\rgn_1$}\footnote{In general, we treat
-$B\inang{\tbar}@\rgn$ as an abbreviation of
-$B\inang{\tbar}\inang{\rbar}$}. The $\ObjZ$ class in \FB has no
-fields, hence its region type is of form $\ObjZ@\rgn$.
-
+$\rgn_1$, then \C{p} would be contained in $\rgn_1$, and its region
+type would be \C{Pair<\ObjZ,\ObjZ><$\rgn_1$,$\rgn_1$,$\rgn_1$>}, which
+we abbreviate as \C{Pair<\ObjZ,\ObjZ>@$\rgn_1$}. {In general, we treat
+$B\inang{\tbar}@\rgn$ as being equivalent to
+$B\inang{\tbar}\inang{\rbar}$}. Region annotation on type $a$, where
+$a$ is a type variable, assumes the form $a@\rgn$. If $a$ is
+instantiated with \C{Pair<\ObjZ,\ObjZ>}, the result is the type of a
+\C{Pair} object contained in  $\rgn$. The type $\unitZ$ is unboxed in
+\FB, hence it has no region annotations.
+% The region type of $\ObjZ$ class in \FB has no fields, hence its
+% region type is of form $\ObjZ@\rgn$. 
 %Class definitions in \FB extend FGJ's with region parameters
 %($\rho$). Informally, region variables ($\rho$) are to region
 %identifiers ($\rgn$) as type variables ($a$) are to core types ($T$);
@@ -119,27 +127,25 @@ fields, hence its region type is of form $\ObjZ@\rgn$.
 %the $\rho$'s are distinct, and $\rho_1, \rho_2$ outlive
 %$\rhoalloc$. T
 
-Class types in \FB are region-annotated variants of class types in FGJ (also
-called \emph{core types}). This correspondence is reflected in the
-$T@\rgn$ syntax of a region type, which is the simplest form of a
-region type describing an object of core type $T$ contained in a
-region $\rgn$. We let $\rgn$ range over static identifiers of regions
-in \FB. The only unboxed value in \FB is $\unitval$ of type \unitZ.
-Rest are objects.
+% Class types in \FB are region-annotated variants of class types in
+% FGJ (also called \emph{core types}). This correspondence is
+% reflected in the $T@\rgn$ syntax of a region type, which is the
+% simplest form of a region type describing an object of core type $T$
+% contained in a region $\rgn$. We let $\rgn$ range over static
+% identifiers of regions in \FB. The only unboxed value in \FB is
+% $\unitval$ of type \unitZ.  Rest are objects.
 
-\FB extends FGJ's expression language with assignments, local variable
-declarations (via \C{let} expressions), region constructs
-(\C{letregion} and \C{open}), lambda abstraction
-($\lambdaexp{...}{\xbar : \taubar}{e}$) and application
-($e\inang{...}(\bar{e})$) expressions. Assignments and region
-constructs, which are statements in \name, are treated as effectful
-expressions in \FB. Lambda abstraction and application expressions are
-to define and apply anonymous functions. Modulo the angle braces
-(whose presence will be justified later), these expressions are
-uncurried variants of the corresponding expressions from System F.
-Since FGJ formalism does not include higher-order functions, we extend
-the syntactic class (\C{T}) of FGJ types with an (uncurried) arrow
-type.
+% \FB extends FGJ's expression language with local variable
+% declarations (via \C{let} expressions), region constructs
+% (\C{letregion} and \C{open}), lambda abstraction
+% ($\lambdaexp{...}{\xbar : \taubar}{e}$) and application
+% ($e\inang{...}(\bar{e})$) expressions. Lambda abstraction and
+% application expressions are to define and apply anonymous functions.
+% Modulo the angle braces (whose presence will be justified later),
+% these expressions are uncurried variants of the corresponding
+% expressions from System F.  Since FGJ formalism does not include
+% higher-order functions, we extend the syntactic class (\C{T}) of FGJ
+% types with an (uncurried) arrow type.
 
 
 % In general, the \C{@} notation in a
@@ -208,12 +214,12 @@ type.
 % existentially bound region variable with $\rgn$, and assume the type
 % of $\RgnZ\inang{\rgn}$.
 
-Like classes, methods can also exhibit qualified region polymorphism.
-A method definition in \FB is necessarily polymorphic over its
-allocation context (Sec.~\ref{sec:alloc-ctxt}), and optionally
-polymorphic with respect to the regions containing its arguments.
-Region parameters, like those on classes, are qualified with
-constraints ($\phi$).
+Like classes, methods can also exhibit constrained region
+polymorphism.  A method definition in \FB is necessarily polymorphic
+over its allocation context (\S~\ref{sec:alloc-ctxt}), and
+optionally polymorphic with respect to the regions containing its
+arguments.  Region parameters, like those on classes, are qualified
+with constraints ($\phi$).
 % Region parameters on the methods, like those on classes, are
 % accompanied by constraints ($\phi$) capturing the conditions that the
 % parameters need to satisfy for the method to be considered well-formed
@@ -230,33 +236,36 @@ equality constraint in $\phi$.
 % A lambda expression defines a region-polymorphic
 % multi-argument function closure parameterized over function's
 % allocation context parameter. 
-The angle braces in the lambda expression ($\inang{\rho^a\rhobar \,|\,
-\phi}$) serve the same purpose as they do in a method definition - to
-capture region parameters along with their constraints. Region
-parameters also appear in the arrow type of the lambda expression 
+\FB extends FGJ's expression language with a lambda expression and an
+application expression ($e\inang{\ralloc\rbar}(\bar{e})$) to define
+and apply functions\footnote{We distinguish between functions and
+methods. The formed result from lambda expressions, whereas the latter
+come from class definitions}. Functions, like methods, exhibit
+constrained region polymorphism, as evident in their arrow region type
 ($\inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau} \xrightarrow{\rgn}
-\tau$) at the prenex position, similar to ML type schemes. However,
-unlike ML, we don't distinguish between types and type schemes; any of
-the $\tau$'s in the arrow type can themselves be region-parametric
-arrow types. Like with methods, region parameters on functions can be
-instantiated when they are applied.
+\tau$).
+% at the prenex position, similar to ML type schemes. However,
+% unlike ML, we don't distinguish between types and type schemes; any of
+% the $\tau$'s in the arrow type can themselves be region-parametric
+% arrow types. Like with methods, region parameters on functions can be
+% instantiated when they are applied.
 % In this respect, our region type system is more like
 % System F's type system, which admits higher-rank parametric
 % polymorphism. Like System F, \FB provides a region instantiation
 % expression ($e\inang{\ralloc\rbar}$), and a region generalization
 % expression ($\Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}$) to
 % instantiate and generalize region variables. 
-
-A lambda expression creates a closure, which can escape the
-context in which it is created. It is therefore important to keep track of
-the region in which a closure is allocated in order to avoid unsafe
-dereferences. The $\rgn$ annotation above the arrow in the arrow
-type denotes the allocation region of the corresponding closure. Note
-that it is important to distinguish between the allocation context
-argument ($\rhoalloc$) of a function and the allocation region
-($\rgn$) of its closure. In \name, the later corresponds to the region where
-a \C{Func} object is allocated, while the former corresponds to the
-region where it is applied ($e\inang{\ralloc\rbar}(\bar{e})$). 
+Since a function closure can escape the context in which it is
+created, it is important to keep track of the region in which it is
+created in order to avoid unsafe dereferences. The $\rgn$ annotation
+above the arrow in the arrow type denotes the allocation region of the
+corresponding closure. 
+% Note that it is important to distinguish
+% between the allocation context argument ($\rhoalloc$) of a function
+% and the allocation region ($\rgn$) of its closure. In \name, the later
+% corresponds to the region where a \C{Func} object is allocated, while
+% the former corresponds to the region where it is applied
+. 
 % For instance, in the following example:
 % \begin{codejava}
 % letregion $\rgn$ {
