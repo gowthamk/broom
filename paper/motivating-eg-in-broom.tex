@@ -1,32 +1,29 @@
 \begin{figure}[t!]
 \begin{numcodejava}
-class MapVertex<TIn, TOut> {
+class SelectVertex<TIn, TOut> {
   Func<TIn, TOut> selector;
-  Dictionary<Time, List<TOut>> map;
+  Dictionary<Time, Region<List<TOut>>> map;
   ...
-  void onReceive(Time t, Region<List<TIn>> inRgn) {
+  void onReceive(Time t,Region<List<TIn>> inRgn){
     if (!map.ContainsKey(t))
        map[t] = new Region<List<TOut>> (
                   () => new List<TOut>());
     open inRgn as inputList {
       letregion R0 {
         foreach (TIn input in inputList) {
-          open map[t] as outMsg {
+          open map[t] as outRgn {
             TOut output = selector(input);
-            outMsg.add(output);
-          }
-        }
-      }
-    }
+            outRgn.add(output); } } } }
     inRgn.free();
   }
   void onNotify(Time t) {
-     Region<List<TOut>> outputRgn = map[t];
+     Region<List<TOut>> outRgn = map[t];
      map.Remove(t);
-     transfer(t, outputRgn); 
+     outRgn.transfer();
   }
 }
 \end{numcodejava}
 \caption{\C{SELECT} dataflow operator in \name}
 \label{fig:motivating-eg-in-broom}
+\vspace*{-0.15in}
 \end{figure}
