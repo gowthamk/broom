@@ -29,8 +29,6 @@ well-formedness for the core (region-free) language.
 \subsection{Syntax}
 \label{sec:fb-syntax}
 
-\input{fb-syntax}
-
 Fig~\ref{fig:fb-syntax} describes the syntax of \FB.
 We refer to the class types of FGJ as \emph{core types}.
 %
@@ -214,6 +212,8 @@ instantiated with \C{Pair<\ObjZ,\ObjZ>}, the result is the type of a
 % existentially bound region variable with $\rgn$, and assume the type
 % of $\RgnZ\inang{\rgn}$.
 
+\input{fb-staticsem}
+
 Like classes, methods can also exhibit constrained region
 polymorphism.  A method definition in \FB is necessarily polymorphic
 over its allocation context (\S~\ref{sec:alloc-ctxt}), and
@@ -278,17 +278,14 @@ corresponding closure.
 % in $\rgn$, and (b). when executed under an allocation context
 % $\rho^a$, the closure returns an object allocated in $\rho^a$.
 
-\input{fb-staticsem}
 \subsection{Types and Well-formedness}
 
-Static semantics of \fbname is defined by the rules to establish
-well-formedness of region types and region constraints, check
-subtyping between a pair of region types, and type-check expressions
-against region types. Fig.~\ref{fig:fb-staticsem} contains an
-illustrative subset of such rules\footnote{The full formal development
-can be found in our technical report~\cite{techrep}}, along with some
-auxiliary definitions. The judgments defined by these rules make use
-of a context ($\A$), which is a tuple of:
+Well-formedness and typing rules of \fbname establish the conditions
+under which a region type is considered well-formed, and an expression
+is considered to have a certain region type, respectively.
+Fig.~\ref{fig:fb-staticsem} contains an illustrative subset of such
+rules\footnote{The full formal development can be found in the
+supplement}. The rules refer to a context ($\A$), which is a tuple of:
 \begin{itemize}
 \item A set ($\rhoenv \in 2^\rgn$) of static identifiers of regions
 that are estimated to be live,
@@ -300,82 +297,108 @@ $\Delta$ in FGJ formalism}, and
 \item A constraint formula ($\phicx$) that captures the outlives
 constraints on regions in $\rhoenv$.
 \end{itemize}
-The context for the expression typing judgment also includes:
+$\A$ also contains $\rhomap$, 
+% a map ($\rhomap \in \rgn \mapsto
+% \{\CLOSED,\OPEN,\XFERRED\}$) from unique region identifiers of
+% transferable regions to their current state in the FSM from
+% Fig.~\ref{fig:region-fsm}.
+which is primarily an artifact to facilitate the type safety proof,
+and can be ignored while type checking user-written programs
+in \FB. The context for the expression typing judgment also includes:
 \begin{itemize}
 \item A type environment ($\env \in x \mapsto \tau$) that contains the
 type bindings for variables in scope, and 
 \item The static identifier ($\rgn^a$) of the allocation context for
-the expression is being type-checked.  
+the expression is being typechecked.  
 \end{itemize}
+Like the judgments in FGJ~\ref{fgj}, all the judgments defined by the
+rules in Fig.~\ref{fig:fb-staticsem} are implicitly parameterized on a
+class table ($CT \in cn \mapsto D$) that maps class names to their
+definitions in \FB.
+% \begin{figure}
 
-\begin{figure}
+% \begin{codejava}
+% class Region<a $\extends$ Object><${\rhoalloc}$> $\extends$ Object<$\rhoalloc$>{
+%   <${\rho}$>unit$\xrightarrow{\rhoalloc}$a@$\rho$ thunk;
+%   Region(<${\rho}$>unit$\xrightarrow{\rhoalloc}$a@$\rho$ thunk) {
+%     super(); 
+%     this.thunk = thunk;
+%   }
+%   unit transfer$\inang{\rho}$(unit u) {
+%     return u;
+%   }
+% }
+% \end{codejava}
 
-\begin{codejava}
-class Region<a $\extends$ Object><${\rhoalloc}$> $\extends$ Object<$\rhoalloc$>{
-  <${\rho}$>unit$\xrightarrow{\rhoalloc}$a@$\rho$ thunk;
-  Region(<${\rho}$>unit$\xrightarrow{\rhoalloc}$a@$\rho$ thunk) {
-    super(); 
-    this.thunk = thunk;
-  }
-  unit transfer$\inang{\rho}$(unit u) {
-    return u;
-  }
-}
-\end{codejava}
-
-\caption{The stub used for $\RgnZ$ class}
-\label{fig:region-stub}
-\end{figure}
+% \caption{The stub used for $\RgnZ$ class}
+% \label{fig:region-stub}
+% \end{figure}
 
 \noindent The well-formedness judgment on region types
 ($\tywf{\A}{\tau}$) makes use of the well-formedness and subtyping
 judgments on core types \footnote{We use a double-piped turnstile
 ($\Vdash$) for judgments in FGJ~\cite{fgj}, and a simple turnstile
-($\vdash$) for those in \FB.}. All judgments are implicitly
-parameterized on a class table ($CT \in cn \mapsto D$) that maps class
-names to their definitions in \FB. For judgments in FGJ, we use a
-class table that maps class names to their region-erased definitions.
-We denote the region-erased class table as ($\absof{CT}$). The precise
-semantics of region erasure ($\absof{\cdot}$) are defined
-in~\cite{techrep}, but it can be understood as an operation that
-erases region annotations on types. The class table is assumed to bind
-the name $\RgnZ$ to the stub shown in Fig.~\ref{fig:region-stub}.
-This mostly eliminates the need to treat $\RgnZ$ objects, which double
-up as transferable region handlers, as a special case in semantics.
-
-The well-formedness rule for region instantiation in class types
-($B\inang{\tbar}\inang{\ralloc\rbar}$) requires that the region-erased
-(core) type be well-formed, instantiated regions be live, and that
-they satisfy the constraints ($\phi$) imposed by the class on its
-region parameters. The later is enforced by checking the validity of
-$\phi$, with actual region arguments substituted\footnote{The notation
+($\vdash$) for those in \FB.}. The class table ($\absof{CT}$) for such
+judgments is derived from \FB's class table ($CT$) by erasing all
+region annotations on types, and region arguments in expressions
+($\absof{\cdot}$ denotes the region erasure operation). 
+% For judgments in FGJ, we use a
+% class table that maps class names to their region-erased definitions.
+% We denote the region-erased class table as ($\absof{CT}$). The precise
+% semantics of region erasure ($\absof{\cdot}$) are defined
+% in~\cite{techrep}, but it can be understood as an operation that
+% erases region annotations on types. The class table is assumed to bind
+% the name $\RgnZ$ to the stub shown in Fig.~\ref{fig:region-stub}.
+% This mostly eliminates the need to treat $\RgnZ$ objects, which double
+% up as transferable region handlers, as a special case in semantics.
+The well-formedness rule for class types
+($B\inang{\tbar}\inang{\ralloc\rbar}$) is responsible for enforcing
+the safety property that prevents objects from containing unsafe
+references. It does so by insisting that regions $\ralloc\rbar$
+satisfy the constraints ($\phi$) imposed by the class on its region
+parameters. The later is enforced by checking the validity of $\phi$,
+with actual region arguments substituted\footnote{The notation
 $[a/b](e)$ stands for "$a$ is substituted for $b$ in $e$"} for formal
 region parameters, under the conditions ($\A.\phicx$) guaranteed by
 the context. The semantics of this sequent is straightforward, and
 follows directly from the properties of outlives and equality
 relations. For any well-formed core type $T$, $T@\rgn$ is a
-well-formed region type if $\rgn$ is a valid region. Well-formedness
-of region constraints requires that the regions referred by the
-constraints be live.
+well-formed region type if $\rgn$ is a valid region. The type
+$\RgnZT{\rgn}$ is well-formed only if $\rgn = \toprgn$, where
+$\toprgn$ is a special immortal region that outlives every other live
+region. This arrangement allows \C{\RgnZ} handlers to be aliased and
+referenced freely from objects in various regions, regardless of their
+lifetimes. On the flip side, this also opens up the possibility of
+references between transferable regions, which become unsafe in
+context of the receipient's address space. Fortunately, such
+references are explictly prohibited by the type rule of \C{\RgnZ}
+objects, as described below.
 
-The subtype relation between region types of objects
-($B\inang{\ralloc\rbar}\inang{\tbar}$) follows directly from the
-subclass relation between their class types. Note that, in general, we
-don't lift outlives relation between regions to subtype relation
-between objects (of same core type) allocated in those regions. Such
-lifting is unsound for the same reason as covariant/contravariant
-subtyping between mutable references is unsound. However, we make a
-special case for $\RgnZ$ objects: we allow $\RgnZ$ objects allocated
-in any region to be considered as objects allocated in an eternal
-region ($\toprgn$) that outlives every other region. This lets $\RgnZ$
-objects escape the context they are created in (as required by the
-\C{transfer} operation), and also facilitates data structures of
-regions created in different contexts (for e.g., a list of $\RgnZ$
-objects, whose root objects are of (core) type $T$, can be typed
-$\C{List}\inang{\RgnZ\inang{T}}\inang{\rgn,\toprgn}$, where $\rgn$ is
-the region where the spine of the list is allocated). As described in
-\S\ref{sec:memory-safety}, runtime checks are used to prevent the
-unsound subtyping rule on region objects from effecting the memory safety.
+% Recall that a class definition in \FB is annotated with constraints
+% over its region arguments, which require the regions referred by its
+% fields to outlive its own allocation region. The well-formedness rule
+% requires that (core) type be well-formed, instantiated regions be
+% live, and that they   Well-formedness of region constraints requires
+% that the regions referred by the constraints be live.
+
+% The subtype relation between region types of objects
+% ($B\inang{\ralloc\rbar}\inang{\tbar}$) follows directly from the
+% subclass relation between their class types. Note that, in general, we
+% don't lift outlives relation between regions to subtype relation
+% between objects (of same core type) allocated in those regions. Such
+% lifting is unsound for the same reason as covariant/contravariant
+% subtyping between mutable references is unsound. However, we make a
+% special case for $\RgnZ$ objects: we allow $\RgnZ$ objects allocated
+% in any region to be considered as objects allocated in an eternal
+% region ($\toprgn$) that outlives every other region. This lets $\RgnZ$
+% objects escape the context they are created in (as required by the
+% \C{transfer} operation), and also facilitates data structures of
+% regions created in different contexts (for e.g., a list of $\RgnZ$
+% objects, whose root objects are of (core) type $T$, can be typed
+% $\C{List}\inang{\RgnZ\inang{T}}\inang{\rgn,\toprgn}$, where $\rgn$ is
+% the region where the spine of the list is allocated). As described in
+% \S\ref{sec:memory-safety}, runtime checks are used to prevent the
+% unsound subtyping rule on region objects from effecting the memory safety.
 % \begin{smathpar}
 % \begin{array}{c}
 % \renewcommand*{\arraystretch}{1.1}
@@ -414,14 +437,14 @@ unsound subtyping rule on region objects from effecting the memory safety.
 % well-formedness rule on class definitions (not shown) captures this
 % restriction.
 
-As expected, subtyping between arrow types is contravariant in
-argument types and covariant in return types. It is also contravariant
-in the region constraints that the region parameters have to satisfy.
-For example, the type $\inang{\rhoalloc\rho} A@\rho \xrightarrow{\rgn}
-\unitZ$ is a subtype of $\inang{\rhoalloc\rho \,|\, \rho =  \rhoalloc}
-A@\rho \xrightarrow{\rgn} \unitZ$, for the former's precondition is
-weaker than the later's. Finally, the subtyping is invariant with
-respect to the allocation region ($\rgn$) of closures. 
+% As expected, subtyping between arrow types is contravariant in
+% argument types and covariant in return types. It is also contravariant
+% in the region constraints that the region parameters have to satisfy.
+% For example, the type $\inang{\rhoalloc\rho} A@\rho \xrightarrow{\rgn}
+% \unitZ$ is a subtype of $\inang{\rhoalloc\rho \,|\, \rho =  \rhoalloc}
+% A@\rho \xrightarrow{\rgn} \unitZ$, for the former's precondition is
+% weaker than the later's. Finally, the subtyping is invariant with
+% respect to the allocation region ($\rgn$) of closures. 
 % This subtype rule assumes that both arrow types have same set of
 % region parameters.  However, this is not restrictive as (a). it is
 % possible to add more region parameters to a function type and declare
@@ -429,41 +452,71 @@ respect to the allocation region ($\rgn$) of closures.
 % (b). it is possible to rename region parameters by composing
 % instantiation and generalization (big-lambda) expressions together.
 
+The type rules distinguish between the \C{new} expressions that create
+objects of  the \RgnZ class, and \C{new} expressions that create
+objects of other classes. The rule for the later relies on an
+auxiliary definition called $\fields$ that returns the sequence of
+type bindings for fields (instance variables) of a given class type.
+Like in FGJ, the names and types of a constructor's arguments in \FB
+are same as the names and types of its class's fields, and the type
+rule relies on this fact to typecheck constructor applications. Note
+that this rule does not apply to \C{new} expressions involving \RgnZ
+class, as we do not define $\fields$ for \RgnZ. 
+
+The type rule for \C{new \RgnZ} expressions expects the \RgnZ class's
+constructor to be called with a nullary function that returns a value
+in its allocation context. It enforces this by typechecking the body
+($e$) of the function under an empty context containing nothing but
+the allocation context of the function. This step ensures that the
+value returned by the function stores no references to objects
+allocated elsewhere, including the top region ($\toprgn$), thus
+preventing cross-region references originating from transferable
+regions\footnote{The body of the function ($e$) might, however, create
+new (transferable) regions while execution, but that is fine as long
+as such regions, and objects allocated in them, don't find their way
+into the result of evaluating $e$}.
+
 The type rule for \C{letregion} expression requires that the static
 identifier introduced by the expression be unique under the current
 context (i.e., $\rgn \notin \rhoenv$). This condition is needed in
 order to prevent the new region from incorrectly assuming any existing
 outlives relationships on an eponymus region. Provided this is
 satisfied, the expression ($e$) under \C{letregion} is then
-type-checked against $\unitZ$ assuming that the new region is live
-($\rgn \in \rhoenv$) and that it is outlived by all existing live
-regions ($\rhoenv \outlives \rgn$).
+typechecked assuming that the new region is live ($\rgn \in \rhoenv$)
+and that it is outlived by all existing live regions ($\rhoenv
+\outlives \rgn$). The result of a \C{letregion} expression must have a
+type that is well-formed under a context not containing the new
+region. This ensures that the value obtained by evaluating a
+\C{letregion} expression contains no references to the temporary
+objects inside the region\footnote{The supplement contains a formal
+proof of this claim}.
 
-Like the rule for \C{letregion}, the type rule for the \C{open}
-expression requires that the static identifier ($\rgn$) introduced to
-refer to the transferable region being opened be unique. However,
-unlike the \C{letregion} rule, the rule for \C{open} does not
-introduce any outlives relationship between the newly opened region
-and any pre-existing region while checking the type of the expression
-($e$) under \C{open}. This effectively preempts the possibility of any
-references from objects inside the transferable region to those
-outside. Environment ($\env$) is extended with binding for the type of
-root object while type-checking $e$. 
+The rule for \C{open} expression, unlike the rule for \C{letregion},
+does not introduce any outlives relationship between the newly opened
+region and any pre-existing region while checking the type of the
+expression ($e$) under \C{open}. This prevents new objects allocated
+inside the transferable region from storing references to those
+outside.  Environment ($\env$) is extended with binding for the type
+of root object while typechecking $e$. 
 
-The type rule for lamdba expression requires that its region
-parameters ($\rhoalloc\rhobar$) be unique under the current context,
-and that the constraints ($\phi$) over region parameters be
-well-formed. The lambda-bound expression ($e$) is checked under an
-extended type environment containing bindings for function's
-arguments, assuming that region parameters are live, and that declared
-constraints over region parameters hold. Note that the closure is
-always allocated in the current allocation context ($\rgn^a$). This
+The type rule for lamdba expression typechecks
+% requires that its region
+% parameters ($\rhoalloc\rhobar$) be unique under the current context,
+% and that the constraints ($\phi$) over region parameters be
+% well-formed. 
+the lambda-bound expression ($e$) under an extended type environment
+containing bindings for function's arguments, assuming that region
+parameters are live, and that declared constraints over region
+parameters hold. The constraints ($\phi$) are required to be
+well-formed under $\rhoenv'$, which means that $\phi$ must only refer
+to the region variables in the set $\rhoenv'$. Note that the closure
+is always allocated in the current allocation context ($\rgn^a$). This
 prevents the closure from escaping the context in which it is created,
 thus trivially ensuring the safety of any dereferences inside the
 closure.
 
-The type rule for the \C{new} expression is a straightforward
-adaptation of corresponding FGJ rule to the the region type setting.
+% The type rule for the \C{new} expression is a straightforward
+% adaptation of corresponding FGJ rule to the the region type setting.
 
 % The type rule for assignment expression ($e_1 := e_2$) ensures that a
 % (local or instance) variable is only assigned objects of either the
@@ -478,16 +531,23 @@ adaptation of corresponding FGJ rule to the the region type setting.
 \subsection{Operational Semantics and Type Safety}
 \label{sec:fb-opsem}
 
-Operational semantics of \fbname defines an evaluation relation
-($\redsto$) over its expression language. In particular, the
-evaluation gets stuck if an expression attempts to dereference a
-pointer into a region that has either been deallocated or transferred.
-On the other hand, if expression attempts to commit an operation on a
-transferable region handler (a $\RgnZ$ object) that is not sanctioned
-by the state transition discipline in Fig.~\ref{fig:region-fsm}, then
-it is reduced to a value called $\invalidexn$. The accompanying
-technical report~\cite{techrep} contains full operational semantics of
-\fbname. 
+The supplement defines a small-step operational semantics for \fbname
+via a five-place reduction relation:
+\begin{smathpar}
+  \redstoo{(e,\rhomap)}{(e',\rhomap')}
+\end{smathpar}
+The reduction judgment should be read as following: given a set
+($\rhoenv$) of regions that are currently live, and a map ($\rhomap$)
+from unique identifiers of transferable regions to their current
+states (Fig.~\ref{fig:region-fsm}), the expression $e$ reduces to
+$e'$, while updating $\rhomap$ to $\rhomap'$. The semantics gets
+``stuck'' if $e$ attempts to access an object whose allocation region
+is not present in $\rhoenv$, or if $e$ tries to \C{open} a
+transferable region, whose identifier is not mapped to a state by
+$\rhomap$.  On the other hand, if $e$ attempts to commit an operation
+on a $\RgnZ$ object that is not sanctioned by the transition
+discipline in Fig.~\ref{fig:region-fsm}, then it raises an exception
+value ($\invalidexn$).
 
 To help state the type safety theorem, we extend \FB's expressions
 with $\invalidexn$, and define the syntactic class of values:
@@ -495,16 +555,46 @@ with $\invalidexn$, and define the syntactic class of values:
 \begin{array}{lclcl}
 v & \in & \mathtt{values} & \coloneqq & \C{new}\; \fbN(\bar{v}) \ALT
 \lambdaexp{\ralloc}{\rhoalloc\rhobar\,|\,\phi}{\taubar \; \xbar}{e}\\
+  &     & & & \C{new}\; \RgnZT{\rgn}(v)\\
 \end{array}
 \end{smathpar}
+Note that for $\C{new}\; \RgnZT{\rgn}(v)$ to be considered a value,
+$\rgn \neq \toprgn$. The semantics reduces a $\C{new}\;
+\RgnZT{\toprgn}(e)$ expression in the user program to a runtime
+$\C{new}\; \RgnZT{\rgn}(v)$ value that is tagged with a unique
+identifier ($\rgn$) for this region. A binding is also added to
+$\rhomap$, mapping $\rgn$ to the ``closed'' state. The supplement
+defines a type rule for such values, allowing them to be typed.
 Type safety theorem is now stated thus:
 \begin{theorem}
 \emph{(\textbf{Type Safety})}
-\label{thm:core-safety}
-Let $\A_{\emptyset} = (\emptyset,\cdot,true)$ denote an empty context.
-If $\hastyp{\A_{\emptyset}, \toprgn, \cdot}{e}{\tau}$, then either $e$
-is a value, or $e \redsto \invalidexn$, or there exists an $e'$ such
-that $e \redsto e'$ and $\hastyp{\A_{\emptyset}, \toprgn,
-\cdot}{e'}{\tau}$.
+\label{thm:fb-type-safety}
+$\forall e, \tau, \rhoenv, \rhomap, \rgn$, if $\rgn \in \rhoenv$ and
+$\hastyp{\emptyA,\rgn, \cdot}{e}{\tau}$, then either $e$ is a value,
+or $e$ raises an exception ($\redstoo{(e,\rhomap)}{\invalidexn}$), or
+there exists an $e'$ and a $\rhomap'$ such that
+$\redstoo{(e,\rhomap)}{(e',\rhomap')}$ and $\hastyp{\emptyASigp,\rgn,
+\cdot}{e}{\tau}$.
 \end{theorem}
 
+Furthermore, we prove the following theorem about \FB, which, in
+conjunction with the type safety theorem, implies the safety of region
+transfers across adress spaces:
+\begin{theorem}
+\emph{(\textbf{Transfer Safety})}
+\label{thm:fb-type-safety}
+$\forall$ $v$, $\rhoenv$, $\rhoenv'$, $\rhomap$, $\rhomap'$, $\phicx$,
+$\phicx'$, $\rgn$, $\rgn'$, such that $\rgn \in \rhoenv$, $\rgn' \in \rhoenv'$, and
+$\rgn_i \notin dom(\rhomap')$, if $\hastyp{\emptyA,\rgn,
+\cdot}{\C{new}\; \RgnZT{\rgn_i}}{\RgnZT{\toprgn}}$, then
+$\hastyp{(\rhomap'[\rgn_i \mapsto \CLOSED],\rhoenv',\cdot,\phicx')}
+{\C{new}\; \RgnZT{\rgn_i}}{\RgnZT{\toprgn}}$
+\end{theorem}
+The above theorem states that if a $\C{new}\; \RgnZT{\rgn_i}(v)$ value
+is well-typed under one context, then it is also well-typed under
+every other context, whose $\rhomap$ maps $\rgn_i$ to closed
+($\CLOSED$) state.  Thus, a receipient of a transferable region only
+needs to add a binding for the region to its $\rhomap$ in order to
+preserve its type safety. Notably, this result could not have been
+established if it were possible for a transferable region to contain
+references to objects outside the region.

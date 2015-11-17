@@ -1,41 +1,25 @@
 \begin{figure*}[t!]
-%
-\textbf{Auxiliary Definitions}\\
-\input{fb-auxdef}
-%
+% %
+% \textbf{Auxiliary Definitions}\\
+% \input{fb-auxdef}
+% %
 
-\vspace*{0.1in}
+% \vspace*{0.1in}
 %
-\textbf{Type, and Type Constraint Well-formedness}  \; \fbox
-  {\(\tywf{\A}{\tau}, \spc 
-     \tywf{\rhoenv}{\phi}\)}\\
+%\textbf{Type, and Type Constraint Well-formedness}  \; 
+\fbox
+  {\(\tywf{\A}{\tau}, \spc \hastyp{\exptycx{\ralloc}{\env}}{e}{\tau} 
+%   \tywf{\rhoenv}{\phi}
+  \)}\\
 \input{fb-tywfrules}
 
 % \vspace*{0.1in}
-% %
-% \textbf{Subtyping}  \; \fbox
-%   {\(\subtyp{\A}{\tau_1}{\tau_2}\)}\\
-% \input{fb-subtyprules}
-% %
-
-\vspace*{0.1in}
-\textbf{Expression Typing}  \; \fbox
-  {\(\hastyp{\exptycx{\ralloc}{\env}}{e}{\tau}\)}\\
+% \textbf{Expression Typing}  \; \fbox
+%   {\(\)}\\
 \input{fb-exptyprules}
 %
-%%\textbf{Statement Semantics}  \; \fbox
-%%  {\(\stmtsem{\ralloc}{s}{\stmtsemcx}{\stmtsemcxp}\)}\\
-%%\input{fb-stmttyprules}
 
-\caption{\fbname: Static Semantics}
+\caption{\fbname: Type Well-formedness and Expression Typing}
 \label{fig:fb-staticsem}
 \end{figure*}
 
-
-%% Trash
-%%\env = [\xbar \mapsto \bar{\tau^B},
-%%        \thisZ \mapsto B\inang{\rhoalloc\rhobar}\inang{\bar{\tyvar}}]\spc
-%%\hastyp{\exptycx{\rhoalloc}{\env}}{\bar{u}}
-%%       {\bar{\tau^{u}}}\spc
-%%\hastyp{\exptycx{\rhoalloc}{\env}}{\bar{v}}
-%%       {\bar{\tau^{v}}}\spc
