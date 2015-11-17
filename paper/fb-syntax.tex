@@ -33,7 +33,7 @@
         \ALT \fbN \ALT \unitZ \\
        &   & & & \ALT \inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau}
         \xrightarrow{\rgn} \tau \\
-  \phi &\in& \M{Constraints} & \coloneqq & true 
+  \phi,\Phi &\in& \M{Constraints} & \coloneqq & true 
         \ALT \rho \outlives \rho \\
         & & & & \ALT \rho = \rho \ALT \phi \conj \phi\\
   % v  & \in & \M{Value\;expressions} & \coloneqq & x \ALT \C{new} \; \fbN(\vbar)\\
@@ -41,7 +41,7 @@
 \begin{array}{lclcl}
 e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f 
      \ALT e.m\inang{\ralloc \rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar) 
-     \ALT \lambdaexp{\rhoalloc\rhobar \,|\, \phi}{\xbar:\taubar} {e}
+     \ALT \lambdaexp{\ralloc}{\rhoalloc\rhobar \,|\, \phi}{\xbar:\taubar} {e}
      \ALT e\inang{\ralloc\rbar}(\bar{e})\\
 %    \ALT (\tau)\, e\\
 %    \ALT e\,;\,e  \\
