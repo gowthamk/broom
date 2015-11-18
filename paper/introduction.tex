@@ -24,16 +24,26 @@ creates a data-structure and passes it to a consumer. In a system
 where most of the computation takes this form, and these
 data-structures are very large, as is the case with many streaming
 big-data analysis systems, garbage collection overhead becomes
-significant. Importantly, much of this overhead results from the
-collector performing avoidable or unproductive
-work~\cite{Broom:HotOS}. For example, a consumer process may trigger a
-GC as soon as it receives a large data-structure from a producer
-process, which has just finished its GC. In such case, consumer's GC
-traverses the entire data-structure performing little or no work.
-Another example is the process executing the code in
-Fig.~\ref{fig:motivating-eg}, whose GC might repeatedly traverse the
-\C{map} data-structure, although its objects cannot be collected until
-a suitable timing message arrives.
+significant~\cite{Broom:HotOS}. This is a cause of concern because,
+firstly, in a distributed dataflow system, GC overhead at one node can
+have compounding adverse effect on the performance of other nodes.
+This can happen, for instance, when a GC is triggered at an upstream
+actor that is about to send a message, while the downstream actors are
+blocked waiting for messages. Secondly, much of the GC overhead
+results from the collector performing avoidable or unproductive work.
+For example, in the process executing the code from
+Fig.~\ref{fig:motivating-eg}, GC might repeatedly traverse the \C{map}
+data-structure, although its objects cannot be collected until a
+suitable timing message arrives.
+
+% actors.
+% performance degradation due to
+% GC overhead becomes aggravated in the distributed 
+% For example, a consumer process may trigger a
+% GC as soon as it receives a large data-structure from a producer
+% process, which has just finished its GC. In such case, consumer's GC
+% traverses the entire data-structure performing little or no work.
+
 % as the collector scans these large data-structures For instance, in
 % the above example, the list at \C{map[t]} cannot be collected until
 % the the timing message arrives, and the list is transferred.

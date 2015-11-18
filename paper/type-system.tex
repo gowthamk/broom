@@ -49,6 +49,7 @@ class Pair<a $\extends$ Object, b $\extends$ Object>
   }
 }
 \end{codejava}
+\vspace*{-0.15in}
 
 A class in \FB is parametric over zero or more type variables (as in
 FGJ) as well as one or more region variables $\rho$.
@@ -86,9 +87,10 @@ letregion $\rgn_0$ in
     let p = new Pair<Object,Object><$\rgn_1$,$\rgn_0$,$\rgn_1$>
                   (fst,snd);
 \end{codejava}
+%\vspace*{-0.1in}
 In the above code, the instantiation of $\rhoalloc$ and $\rho_1$ with
 $\rgn_0$, and $\rho_2$ with $\rgn_1$ is allowed because (a) $\rgn_0$
-and $\rgn_1$ are live during the instantation, and (b). $\rgn_0
+and $\rgn_1$ are live during the instantiation, and (b). $\rgn_0
 \outlives \rgn_1$ and $\rgn_1 \outlives \rgn_1$ (since outlives is
 reflexive). Observe that the region type of \C{p} conveys
 the fact that (a). it is allocated in region $\rgn_1$, and (b). it
@@ -370,8 +372,8 @@ region. This arrangement allows \C{\RgnZ} handlers to be aliased and
 referenced freely from objects in various regions, regardless of their
 lifetimes. On the flip side, this also opens up the possibility of
 references between transferable regions, which become unsafe in
-context of the receipient's address space. Fortunately, such
-references are explictly prohibited by the type rule of \C{\RgnZ}
+context of the recipient's address space. Fortunately, such
+references are explicitly prohibited by the type rule of \C{\RgnZ}
 objects, as described below.
 
 % Recall that a class definition in \FB is annotated with constraints
@@ -480,7 +482,7 @@ The type rule for \C{letregion} expression requires that the static
 identifier introduced by the expression be unique under the current
 context (i.e., $\rgn \notin \rhoenv$). This condition is needed in
 order to prevent the new region from incorrectly assuming any existing
-outlives relationships on an eponymus region. Provided this is
+outlives relationships on an eponymous region. Provided this is
 satisfied, the expression ($e$) under \C{letregion} is then
 typechecked assuming that the new region is live ($\rgn \in \rhoenv$)
 and that it is outlived by all existing live regions ($\rhoenv
@@ -499,7 +501,7 @@ inside the transferable region from storing references to those
 outside.  Environment ($\env$) is extended with binding for the type
 of root object while typechecking $e$. 
 
-The type rule for lamdba expression typechecks
+The type rule for lambda expression typechecks
 % requires that its region
 % parameters ($\rhoalloc\rhobar$) be unique under the current context,
 % and that the constraints ($\phi$) over region parameters be
@@ -533,6 +535,7 @@ closure.
 
 The supplement defines a small-step operational semantics for \fbname
 via a five-place reduction relation:
+\vspace*{-0.15in}
 \begin{smathpar}
   \redstoo{(e,\rhomap)}{(e',\rhomap')}
 \end{smathpar}
@@ -579,7 +582,7 @@ and $\hastyp{\emptyASigp,\rgn, \cdot}{e}{\tau}$.
 
 Furthermore, we prove the following theorem about \FB, which, in
 conjunction with the type safety theorem, implies the safety of region
-transfers across adress spaces:
+transfers across address spaces:
 \begin{theorem}
 \emph{(\textbf{Transfer Safety})}
 \label{thm:fb-type-safety}
@@ -593,7 +596,7 @@ $\hastyp{(\rhomap'[\rgn_i \mapsto \CLOSED],\rhoenv',\cdot,\phicx')}
 The above theorem states that if a $\C{new}\; \RgnZT{\rgn_i}(v)$ value
 is well-typed under one context, then it is also well-typed under
 every other context, whose $\rhomap$ maps $\rgn_i$ to closed
-($\CLOSED$) state.  Thus, a receipient of a transferable region only
+($\CLOSED$) state.  Thus, a recipient of a transferable region only
 needs to add a binding for the region to its $\rhomap$ in order to
 preserve its type safety. Notably, this result could not have been
 established if it were possible for a transferable region to contain
