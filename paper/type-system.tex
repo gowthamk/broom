@@ -313,7 +313,7 @@ type bindings for variables in scope, and
 \item The static identifier ($\rgn^a$) of the allocation context for
 the expression is being typechecked.  
 \end{itemize}
-Like the judgments in FGJ~\ref{fgj}, all the judgments defined by the
+Like the judgments in FGJ~\cite{fgj}, all the judgments defined by the
 rules in Fig.~\ref{fig:fb-staticsem} are implicitly parameterized on a
 class table ($CT \in cn \mapsto D$) that maps class names to their
 definitions in \FB.
@@ -552,8 +552,7 @@ on a $\RgnZ$ object that is not sanctioned by the transition
 discipline in Fig.~\ref{fig:region-fsm}, then it raises an exception
 value ($\invalidexn$).
 
-To help state the type safety theorem, we extend \FB's expressions
-with $\invalidexn$, and define the syntactic class of values:
+To help state the type safety theorem, we define the syntactic class of values:
 \begin{smathpar}
 \begin{array}{lclcl}
 v & \in & \mathtt{values} & \coloneqq & \C{new}\; \fbN(\bar{v}) \ALT

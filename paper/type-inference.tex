@@ -7,8 +7,9 @@ is prohibitive. We now present our region type inference algorithm
 that completely eliminates the need to write region type annotations,
 except on some higher-order functions. Formally, the type inference
 algorithm is an elaboration function from programs in $\absof{\FB}$
-(i.e., region annotation-erased \FB) to programs in \FB. The key
-aspects of this elaboration are described below.
+(i.e., \FB without region types, but with \C{letregion} and \C{open}
+expressions) to programs in \FB. The key aspects of this elaboration
+are described below.
 
 % We formalize region type inference as an elaboration function from
 % programs in $\absof{\FB}$ (i.e., region annotation-erased \FB) to
@@ -60,7 +61,7 @@ subclasses of $\ObjZ$ with no fields/methods. Like $\ObjZ$, they
 accept one region parameter - the allocation region of their
 objects.}\footnote{We abuse arrow notation to also represent types of
 methods, but unlike function types, there is no allocation region
-annotation atop the arrow in a method type.}
+annotation atop the arrow.}
 $\inang{\rhoalloc_0,\rho_{1-4} \,|\, \varphi_0}
 \C{Pair}\inang{\C{A},\C{B}} \inang{\rho_{1-3}} \rightarrow
 \C{A}\inang{\rho_4}$, where $\rhoalloc_0$ and $\rho_{1-3}$ are fresh
@@ -150,10 +151,10 @@ the techniques outlined above, we compute region type templates for
 all classes bound in the class table of the $\absof{\FB}$ program
 before we proceed to elaborate expressions.
 
-\input{fb-elabexpr}
-\input{fb-elabmeth}
+%\input{fb-elabexpr}
+%\input{fb-elabmeth}
 
-\subsection{Expression Elaboration}
+\subsection{Elaboration and Constraint Generation}
 
 Elaborating $\absof{\FB}$ expressions to $\FB$ expressions involves
 (a). replacing core types occurring in expressions with fresh region
@@ -161,13 +162,15 @@ type templates, and (b). explicitly instantiating region parameters
 with fresh region variables in method calls and function applications.
 This elaboration is performed with respect to the polymorphic type
 templates of classes and methods computed as per
-\S\ref{sec:fb-templatization}. The elaboration function traverses
-expressions in a syntax-directed manner of a type checker, introducing
-fresh region type templates for unknown region types, while generating
-constraints over region and predicate variables. The precise nature of
-generated constraints is explained in \S\ref{sec:fb-constraintsem},
-but in summary, they capture the relationships between the type
-templates of various subexpressions and their well-formedness.
+\S\ref{sec:fb-templatization}. Our expression elaboration
+function\footnote{Supplement contains the pseudocode for all the
+elaboration functions.} traverses expressions in a syntax-directed
+manner of a type checker, introducing fresh region type templates for
+unknown region types, while generating constraints over region and
+predicate variables. The precise nature of generated constraints is
+explained in \S\ref{sec:constraints}, but in summary, they
+capture the relationships between the type templates of various
+subexpressions and their well-formedness.
 
 % Function $\elabExpr$, shown in Fig.~\ref{fig:fb-elabexpr}, performs
 % this elaboration for a subset of expressions in $\absof{\FB}$
@@ -188,24 +191,55 @@ templates of various subexpressions and their well-formedness.
 % shown) used by $\elabExpr$ implement type well-formedness and subtype
 % judgments from Fig.~\ref{fig:fb-staticsem}, respectively.
 
-\subsection{Method and Class Elaboration}
+Expression elaboration can be trivially lifted to the level of a
+method, and method elaboration to the level of a class, while
+accumulating constraints. Besides such constraints, elaboration
+functions for methods and classes also generate new constraints by
+checking well-formedness and subtype relationships among the types of
+their constituents. For instance, method elaboration generates a new
+constraint that captures the requirement that, under the guarantees
+provided by the context, the region type of a method body must be a
+subtype\footnote{Subtyping is type equality in \FB. In \name,
+subtyping between region types is a straightforward extension of
+subtyping between core types.} of method's return type.  Likewise, the
+elaboration function for a class generates a fresh constraint that
+captures a couple of safety conditions: first, the allocation regions
+of objects referred by the instance variables should outlive the
+allocation region of the instance itself, and second, the allocation
+regions of a class type and its superclass type must be the same.
 
-Functions $\elabMeth$ and $\elabClass$ shown in
-Fig.~\ref{fig:fb-elabmeth} lift expression elaboration to method and
-class definitions, respectively. Both functions first build a context
-($\A$) containing a set ($ \rhoenv$) of regions that are currently
-live, a map ($\aenv$) mapping type variables to their bounds, and a
-constraint formula ($\phicx$) capturing constraints over live region
-variables. We use predicate variables ($\varphi$ and $\varphi_m$) to
-capture constraints over variables in $\rhoenv$ denoting the fact that
-such constraints are yet to be inferred. Both elaboration functions
-generate new constraints by checking well-formedness and subtype
-relationships among types of their constituents. A fresh constraint
-($C_4$) generated by $\elabClass$ captures a couple of safety
-conditions: first, the allocation regions of objects referred by the
-instance variables should outlive the allocation region of the
-instance itself, and second, the allocation regions of a class type
-and its superclass type must be the same.
+Elaborating a class table ($CT$) entails elaborating every class
+definition in $CT$, while collecting constraints. The constraints thus
+collected are finally solved to obtain assignments for free region and
+predicate variables introduced during templatization and elaboration
+stages. The solutions are applied to the class table (and to the
+artifacts that make up the class table, recursively) to compute a
+class table that maps classes to their fully region-annotated
+definitions in $\FB$.
+
+% \subsection{Method and Class Elaboration}
+
+% Elaborating a method involves performingexpression elaboration over
+% its body, while collecting constraints. Method elaboration can be
+% lifted to the level of classes
+
+
+% Functions $\elabMeth$ and $\elabClass$ shown in
+% Fig.~\ref{fig:fb-elabmeth} lift expression elaboration to method and
+% class definitions, respectively. Both functions first build a context
+% ($\A$) containing a set ($ \rhoenv$) of regions that are currently
+% live, a map ($\aenv$) mapping type variables to their bounds, and a
+% constraint formula ($\phicx$) capturing constraints over live region
+% variables. We use predicate variables ($\varphi$ and $\varphi_m$) to
+% capture constraints over variables in $\rhoenv$ denoting the fact that
+% such constraints are yet to be inferred. Both elaboration functions
+% generate new constraints by checking well-formedness and subtype
+% relationships among types of their constituents. A fresh constraint
+% ($C_4$) generated by $\elabClass$ captures a couple of safety
+% conditions: first, the allocation regions of objects referred by the
+% instance variables should outlive the allocation region of the
+% instance itself, and second, the allocation regions of a class type
+% and its superclass type must be the same.
 
 % Function $\elabMeth$ elaborates a method definition of class $B$. It
 % calls $\elabExpr$ with the context $\A$, its allocation context
@@ -228,14 +262,14 @@ and its superclass type must be the same.
 % allocation region of the instance itself, and second, the allocation
 % regions of a class type and its superclass type must be the same.
 
-Function $\elabClassTable$ (not shown) elaborates
-every definition in the class table $CT$, while accumulating
-constraints. The constraints are finally solved for free region and
-predicate variables introduced during templatization and elaboration
-stages. The solutions are applied to the class table (and to the
-artifacts that make up the class table, recursively) to compute a
-class table that maps classes to their fully region-annotated
-definitions in $\FB$.
+% Function $\elabClassTable$ (not shown) elaborates
+% every definition in the class table $CT$, while accumulating
+% constraints. The constraints are finally solved for free region and
+% predicate variables introduced during templatization and elaboration
+% stages. The solutions are applied to the class table (and to the
+% artifacts that make up the class table, recursively) to compute a
+% class table that maps classes to their fully region-annotated
+% definitions in $\FB$.
 
 % Note that if the original program in $\absof{\FB}$ contains unsafe
 % references, for example, a reference from a transferable region to a
@@ -246,8 +280,7 @@ definitions in $\FB$.
 \subsection{Constraints}
 \label{sec:constraints}
 
-Our constraint generation algorithm generates three kinds of
-constraints:
+Three kinds of constraints are generated during elaboration:
 \begin{itemize}
 \item Well-formedness constraints of form $\rho \in \rhoenv$,
 restricting the domain of unification for a region variable ($\rho$)
@@ -395,19 +428,17 @@ Constraints generated during the elaboration are shown below
 \subsection{Constraint Solving}
 \label{sec:fb-constraintsolving}
 
-Our constraint generation algorithm traverses the entire program,
-performing elaboration and collecting constraints. However, we do not
-require region type inference to be a whole-program analysis.
-Compositionality of type inference is reclaimed by solving the
-constraints in a compositional fashion. Concretely, this means that
-our constraint solving algorithm visits and solves every constraint
-(or, every set of mutually dependent constraints) only once. It
-composes computed solutions to solve other constraints that depend on
-the solved constraints. Importantly, the failure to solve a dependent
-constraint does not result in backtracking. We now describe our
-constraint solving algorithm by demonstrating its performance over the
-example constraints shown in the previous section. A formal account of
-the algorithm can be found in our technical report~\cite{techrep}.
+Although we collect constraints for the entire program during
+elaboration, we solve the constraints in a compositional fashion.
+Concretely, this means that our constraint solving algorithm visits
+and solves every constraint (or, every set of mutually dependent
+constraints) only once. It composes computed solutions to solve other
+constraints that depend on the solved constraints. Importantly, the
+failure to solve a dependent constraint does not result in
+backtracking. We now describe our constraint solving algorithm by
+demonstrating its performance over the example constraints shown in
+the previous section. A formal account of the algorithm can be found
+in the supplement.
 % To simplify the presentation of our algorithm, we assume that are no
 % mutually recursive definitions in the source program. Recursive
 % definitions are nonetheless allowed.
@@ -468,22 +499,28 @@ represents a strongly connected component in the dependency graph.
 
 \paragraph{Example} The dependency DAG ($G_C$) over validity
 constraints from the \C{Pair} example (\S~\ref{sec:constraints}) is
-shown in Fig.~\ref{fig:pair-deps}. Each node (labeled $C_i$) is a set
-of constraints that belong to a strongly connected component in the
-dependency graph ($G_c$), hence are mutually dependent. All
-dependencies, except the self-dependency on $\mathbf{c_{10}}$, are
-type-2 dependencies.
+shown below: %in Fig.~\ref{fig:pair-deps}. 
+\vspace*{-0.08in}
+\begin{figure}[H]
+\includegraphics[scale=0.6]{DepDAG.png}
+\end{figure}
+\vspace*{-0.08in}
+Each node (labeled $C_i$) is a set of constraints that belong to a
+strongly connected component in the dependency graph ($G_c$), hence
+are mutually dependent. All dependencies, except the self-dependency
+on $\mathbf{c_{10}}$, are type-2 dependencies.
 
 A dependency DAG makes the dependencies between constraints explicit.
 Constraints in each set are mutually dependent, and need to be solved
 simultaneously, whereas constraints in different sets can be solved as
-per any valid topological ordering of the graph. Accordingly, we
-obtain a topological ordering of nodes in the graph $G_{{C}}$, and
-solve the sets of constraints in that order. The solutions obtained
-after solving a constraint set are applied to the constraints in
-subsequent sets before attempting to solve them. For the DAG in
-Fig.~\ref{fig:pair-deps}, we consider the topological order $[C_1,
-C_2, C_3]$, and solve the sets of constraints in that order.
+per any valid topological ordering of the graph's transpose.
+Accordingly, we obtain a topological ordering of nodes in the graph
+$G_{{C}}^{T}$ ($G_C$'s transpose), and solve the sets of constraints
+in that order. The solutions obtained after solving a constraint set
+are applied to the constraints in subsequent sets before attempting to
+solve them. For the DAG in figure above, we consider the topological
+order $[C_1, C_2, C_3]$ of its transpose, and solve the sets of
+constraints in that order.
 
 % Consequently, when the turn of a constraint set ($C$) arrives during
 % the constraint solving process, it satisfies certain properties:
@@ -507,8 +544,8 @@ the region variables have been unified, we solve $C$ to find an
 assignment for free predicate variables. The first step is to reduce
 the set of constraints into an equivalent single constraint by
 conjoining antecedents and consequents of all constraints in the
-set\footnote{\cite{techrep} formally justifies the soundness of this
-step}. For the constraint sets $C_1$, $C_2$, and $C_3$, the equivalent
+set\footnote{Supplement contains formal justification for this step}.
+For the constraint sets $C_1$, $C_2$, and $C_3$, the equivalent
 constraint are $c_{12}$, $c_{13}$, and $c_{14}$, respectively, shown
 below:
 \begin{smathpar}
@@ -529,58 +566,36 @@ below:
 The constraint $c_{12}$ is a non-recursive constraint of the form
 $\isvalid{\phictxt \conj \varphi}{\phicstr}$, where $\phictxt$ and
 $\phicstr$ are concrete constraint formulas ($\phictxt$ is $true$ in
-this case). Such constraints are solved for $\varphi$ by computing a
-maximally weak $\phisol$ such that $\isvalid{\phictxt}{\phisol
-\Leftrightarrow \phicstr}$. If such $\phisol$ satisfies the
-well-formedness condition on $\varphi$, then it is clearly a solution
-for $\varphi$, because there cannot exist a weaker solution for
-$\varphi$ that implies $\phicstr$ under $\phictxt$. On contrary, if a
-maximally weak $\phisol$ fails the well-formedness condition, then we
-establish~\cite{techrep} that it is impossible to satisfy the
-constraint. Hence, it suffices to obtain a maximally weak $\phisol$,
-that satisfies $\isvalid{\phictxt}{\phisol \Leftrightarrow \phicstr}$
-and check if it satisfies the well-formedness condition on $\varphi$.
-The former problem can be cast as an instance of graph augmentation
-problem, as described below.
-\vspace*{-0.05in}
-\paragraph{Definitions} Given a constraint formula $\phi$, we define
-its graph encoding $G(\phi)=(V(\phi),E(\phi))$ as a digraph whose
-vertices ($V(\phi)$) are free region variables and identifiers in
-$\phi$, and whose edges ($E(\phi)$) denote outlives constraints
-in\footnote{We alternate between viewing a constraint formula ($\phi$)
-as a set of constraints and a conjunction of constraints in this
-description} $\phi$.  That is, if $\phi$ contains a constraint $\rho_1
-\outlives \rho_2$, then $\rho_1,\rho_2 \in V(\phi)$ and
-$(\rho_1,\rho_2) \in E(\phi)$. Equality constraints are treated as a
-conjunction of symmetric outlives constraints for the purpose of graph
-encoding. Conversely, given a digraph $G$, we define its constraint
-encoding $\Phi(G)$ in a straightforward manner. We say that a graph
-$G_1=(V_1,E_1)$ is as connected as graph $G_2=(V_2,E_2)$ if $V_2
-\subseteq V_1$, and for every $\rho_1, \rho_2 \in V_2$, if there
-exists a path between $\rho_1$ and $\rho_2$ in $G_2$, then there must
-exist a path between same pair of vertices in $G_1$. 
-
-A maximally weak $\phisol$ that satisfies $\isvalid{\phictxt}{\phisol
-\Leftrightarrow \phicstr}$ is a constraint encoding of the smallest
-graph $G$ (i.e., $\Phi(G)$) such that $G(\phictxt) \cup G$ is as
-connected as $G(\phicstr)$. The problem of computing such a $G$ is
-equivalent to the problem finding of finding minimum number of edges
-to add to $G(\phictxt)$ such that it is as connected as $G(\phicstr)$.
-Efficient algorithms to solve the later problem are known to
-exist~\cite{graph}, and we rely on them for the solution.
-
-Solving the constraints $c_{12}$ and $c_{13}$ by reducing them to
-graph augmentation problems, as described above, results in the
-following solutions for $\varphi_0$ and $\varphi_1$ (symmetric
-outlives constraints are replaced with equalities):
+this case). Note that the constraint describes an abduction problem,
+whose solution is the weakest $\phisol$ such that $\isvalid{\phictxt
+\conj \phisol}{\phicstr}$. We solve the problem by casting it as an
+instance of graph augmentation problem~\cite{siam92}. Our intuition is
+based on the observation that a constraint can be viewed as a directed
+graph with region variables as vertices and outlives relationships
+between them as edges (equality is encoded as a conjunction of
+symmetric outlives relationships).  Let $G(\phictxt)$ and
+$G(\phicstr)$ represent such graphs for $\phictxt$ and $\phicstr$,
+respectively. Now, $\isvalid{\phictxt}{\phicstr}$ if and only if every
+pair $(\rho_1,\rho_2)$ of connected vertices in $G(\phicstr)$ are also
+connected in $G(\phictxt)$. If $\rho_1$ and $\rho_2$ are not connected
+in $G(\phictxt)$, then it means that $\isvalid{\phicstr}{\rho_1
+\outlives \rho_2}$ but $\isnotvalid{\phictxt}{\rho_1 \outlives
+\rho_2}$. Since $\phisol$ needs to satisfy $\isvalid{\phictxt \conj
+\phisol}{\phicstr}$, it must be the case that $\rho_1$ and $\rho_2$
+are connected in $G(\phictxt) \cup G(\phisol)$. Since $\phisol$ must
+be weakest such formula, it can be obtained by computing the minimum
+number of edges that need to be added to $G(\phictxt)$ such that it is
+``as connected as'' $G(\phicstr)$. Using this technique, we obtain the
+following solutions to $\varphi_0$ and $\varphi_1$ for constraints in
+the running example:
 \begin{center}
 \(
-  \varphi_1 \Leftrightarrow \rho_0 \outlives \rhoalloc_0 \conj \rho_1
+  \varphi_0 \Leftrightarrow \rho_0 \outlives \rhoalloc_0 \conj \rho_1
      \succeq \rhoalloc_0 \conj \rho_4 = \rhoalloc_0 \conj 
      \rho_2 = \rho_0 \conj \rho_3 = \rho_1
 \)\\
 \(
-  \varphi_2 \Leftrightarrow \rho_5 = \rho_0
+  \varphi_1 \Leftrightarrow \rho_5 = \rho_0
 \)
 \end{center}
 Substituting the above solutions for $\varphi_0$ and $\varphi_1$ in
@@ -590,46 +605,17 @@ $c_{14}$ gives us a recursive constraint of the following form:
   \isvalid{\phictxt \conj \varphi}{\phicstr \conj F(\varphi)}
 \)
 \end{center}
-Where $\phictxt$ and $\phicstr$ are concrete constraint formulas, and
-$F$ is a substitution function, not necessarily idempotent. Let
-$G(\varphi) = \phicstr \conj F(\varphi)$, so that the constraint is
-$\isvalid{\phictxt \conj \varphi}{H(\varphi)}$. Our solution to such
-recursive constraints  is based on some observations. Firstly, the set
-of all possible constraints over a finite set of region
-variables/identifiers is a complete meet semi-lattice, where (a).
-meet operation is defined as $\phi_1 \sqcap \phi_2 \triangleq \phi_1
-\conj \phi_2$, and (b). lattice order is defined as $\phi_1 \le \phi_2
-\triangleq \isvalid{\cdot}{\phi_1 \Rightarrow \phi_2}$. Secondly,
-function $H$ is a monotone over the lattice since $\forall
-\phi_1,\phi_2.\; \isvalid{\cdot}{(\phi_1 \Rightarrow \phi_2)
-\Rightarrow (H(\phi_1) \Rightarrow H(\phi_2))}$. From Knaster-Tarski's
-theorem, we know that $H$ has a greatest fixed point $\phi_f$ such
-that $\isvalid{\cdot}{\phi_f \Leftrightarrow H(\phi_f) }$. To solve
-the recursive constraint shown above, we first compute the greatest
-fixed point ($\phi_f$) of $H$, and then reduce the constraint to the
-following non-recursive constraint:
-\begin{center}
-\(
-  \isvalid{\phictxt \conj \varphi}{\phi_f}
-\)
-\end{center}
-Which can then be solved via the graph-based approach described
-before.
-
-Let $H(\varphi_2)$ denote the consequent of the recursive constraint
-$c_{14}$. Its greatest fixed point ($\phi_f$) is shown below:
-\begin{center}
-\(
-  \rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6 \conj \rho_7 =
-  \rho_9 \conj \rho_8 = \rho_9 \conj \rgn_0 \outlives \rgn_1 \conj
-  \rgn_0 = \rgn_0
-\)
-\end{center}
-Computing a maximally weak $\phisol$ such that $\isvalid{\varphi_1
-\conj \rgn_0 \outlives \rgn_1}{\phisol \Leftrightarrow \phi_f}$
-results in the following solution for $\varphi_2$ that meets its
-well-formedness requirement ($\tywf{\{\rhoalloc_0,\rho_{}0-4,
-\rhoalloc_2, \rho_{6-9}\}}{\varphi_2} $):
+Where $\phictxt$ and $\phicstr$ are concrete constraint formulas, and $F$ is
+a substitution function, not necessarily idempotent. Our solution to the
+constraints of the above form is based on the observation that $H(\varphi) =
+\phicstr \conj F(\varphi)$ is a monotone over the complete meet semi-lattice
+of all possible constraints over the domain of region variables in the
+program. Hence, by Tarski's fixpoint theorem~\cite{tarski}, $H$ has a
+greatest fixed point. To solve the recursive constraint, we first compute the
+greatest fixed point ($\phi_f$) for $H$, and then solve the non-recursive
+constraint $\isvalid{\phictxt \conj \varphi}{\phi_f}$ using the graph
+approach described above. Using this approach, we solve the recursive
+constraint $c_{14}$, to obtain the following solution to $\varphi_2$:
 \begin{center}
 \(
   \rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6 \conj \rho_7 =
@@ -637,44 +623,167 @@ well-formedness requirement ($\tywf{\{\rhoalloc_0,\rho_{}0-4,
 \)
 \end{center}
 
+% If such $\phisol$ satisfies the
+% well-formedness condition on $\varphi$, then it is clearly a solution
+% for $\varphi$, because there cannot exist a weaker solution for
+% $\varphi$ that implies $\phicstr$ under $\phictxt$. On contrary, if a
+% maximally weak $\phisol$ fails the well-formedness condition, then we
+% establish~\cite{techrep} that it is impossible to satisfy the
+% constraint. Hence, it suffices to obtain a maximally weak $\phisol$,
+% that satisfies $\isvalid{\phictxt}{\phisol \Leftrightarrow \phicstr}$
+% and check if it satisfies the well-formedness condition on $\varphi$.
+
+% \vspace*{-0.05in}
+% \paragraph{Definitions} Given a constraint formula $\phi$, we define
+% its graph encoding $G(\phi)=(V(\phi),E(\phi))$ as a digraph whose
+% vertices ($V(\phi)$) are free region variables and identifiers in
+% $\phi$, and whose edges ($E(\phi)$) denote outlives constraints
+% in\footnote{We alternate between viewing a constraint formula ($\phi$)
+% as a set of constraints and a conjunction of constraints in this
+% description} $\phi$.  That is, if $\phi$ contains a constraint $\rho_1
+% \outlives \rho_2$, then $\rho_1,\rho_2 \in V(\phi)$ and
+% $(\rho_1,\rho_2) \in E(\phi)$. Equality constraints are treated as a
+% conjunction of symmetric outlives constraints for the purpose of graph
+% encoding. Conversely, given a digraph $G$, we define its constraint
+% encoding $\Phi(G)$ in a straightforward manner. We say that a graph
+% $G_1=(V_1,E_1)$ is as connected as graph $G_2=(V_2,E_2)$ if $V_2
+% \subseteq V_1$, and for every $\rho_1, \rho_2 \in V_2$, if there
+% exists a path between $\rho_1$ and $\rho_2$ in $G_2$, then there must
+% exist a path between same pair of vertices in $G_1$. 
+
+% A maximally weak $\phisol$ that satisfies $\isvalid{\phictxt}{\phisol
+% \Leftrightarrow \phicstr}$ is a constraint encoding of the smallest
+% graph $G$ (i.e., $\Phi(G)$) such that $G(\phictxt) \cup G$ is as
+% connected as $G(\phicstr)$. The problem of computing such a $G$ is
+% equivalent to the problem finding of finding minimum number of edges
+% to add to $G(\phictxt)$ such that it is as connected as $G(\phicstr)$.
+% Efficient algorithms to solve the later problem are known to
+% exist~\cite{graph}, and we rely on them for the solution.
+
+% Solving the constraints $c_{12}$ and $c_{13}$ by reducing them to
+% graph augmentation problems, as described above, results in the
+% following solutions for $\varphi_0$ and $\varphi_1$ (symmetric
+% outlives constraints are replaced with equalities):
+% \begin{center}
+% \(
+%   \varphi_1 \Leftrightarrow \rho_0 \outlives \rhoalloc_0 \conj \rho_1
+%      \succeq \rhoalloc_0 \conj \rho_4 = \rhoalloc_0 \conj 
+%      \rho_2 = \rho_0 \conj \rho_3 = \rho_1
+% \)\\
+% \(
+%   \varphi_2 \Leftrightarrow \rho_5 = \rho_0
+% \)
+% \end{center}
+% Substituting the above solutions for $\varphi_0$ and $\varphi_1$ in
+% $c_{14}$ gives us a recursive constraint of the following form:
+% \begin{center}
+% \(
+%   \isvalid{\phictxt \conj \varphi}{\phicstr \conj F(\varphi)}
+% \)
+% \end{center}
+% Where $\phictxt$ and $\phicstr$ are concrete constraint formulas, and
+% $F$ is a substitution function, not necessarily idempotent. Let
+% $G(\varphi) = \phicstr \conj F(\varphi)$, so that the constraint is
+% $\isvalid{\phictxt \conj \varphi}{H(\varphi)}$. Our solution to such
+% recursive constraints  is based on some observations. Firstly, the set
+% of all possible constraints over a finite set of region
+% variables/identifiers is a complete meet semi-lattice, where (a).
+% meet operation is defined as $\phi_1 \sqcap \phi_2 \triangleq \phi_1
+% \conj \phi_2$, and (b). lattice order is defined as $\phi_1 \le \phi_2
+% \triangleq \isvalid{\cdot}{\phi_1 \Rightarrow \phi_2}$. Secondly,
+% function $H$ is a monotone over the lattice since $\forall
+% \phi_1,\phi_2.\; \isvalid{\cdot}{(\phi_1 \Rightarrow \phi_2)
+% \Rightarrow (H(\phi_1) \Rightarrow H(\phi_2))}$. From Knaster-Tarski's
+% theorem, we know that $H$ has a greatest fixed point $\phi_f$ such
+% that $\isvalid{\cdot}{\phi_f \Leftrightarrow H(\phi_f) }$. To solve
+% the recursive constraint shown above, we first compute the greatest
+% fixed point ($\phi_f$) of $H$, and then reduce the constraint to the
+% following non-recursive constraint:
+% \begin{center}
+% \(
+%   \isvalid{\phictxt \conj \varphi}{\phi_f}
+% \)
+% \end{center}
+% Which can then be solved via the graph-based approach described
+% before.
+
+% Let $H(\varphi_2)$ denote the consequent of the recursive constraint
+% $c_{14}$. Its greatest fixed point ($\phi_f$) is shown below:
+% \begin{center}
+% \(
+%   \rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6 \conj \rho_7 =
+%   \rho_9 \conj \rho_8 = \rho_9 \conj \rgn_0 \outlives \rgn_1 \conj
+%   \rgn_0 = \rgn_0
+% \)
+% \end{center}
+% Computing a maximally weak $\phisol$ such that $\isvalid{\varphi_1
+% \conj \rgn_0 \outlives \rgn_1}{\phisol \Leftrightarrow \phi_f}$
+% results in the following solution for $\varphi_2$ that meets its
+% well-formedness requirement ($\tywf{\{\rhoalloc_0,\rho_{}0-4,
+% \rhoalloc_2, \rho_{6-9}\}}{\varphi_2} $):
+% \begin{center}
+% \(
+%   \rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6 \conj \rho_7 =
+%   \rho_9 \conj \rho_8 = \rho_9
+% \)
+% \end{center}
+
 \subsection{Higher-Order Type Inference}
 
-We have so far ignored function types in the context of type
-inference. The region type system for $\FB$ admits function types with
-higher-rank region polymorphism, allowing region variables to be
-quantified in the types of higher-order arguments. The type system
-clearly does not have the principal typing property, as demonstrated
-by the \C{app2} method below:
-\begin{codejava}
-bool app2(A x, A y, (A $\rightarrow$ bool) f) 
-    { return (f x && f y); }
-\end{codejava}
-There are two possibilities for the region type of \C{app2}: one,
-where it allows \C{x} and \C{y} to be allocated in different regions,
-but requires \C{f} to be region-polymorphic (i.e, \C{f} should accept
-arguments from any region), and second, where it requires \C{x} and
-\C{y} to be allocated in the same region, and allows \C{f} to be
-monomorphic. None of the two types are more general than the other,
-and it is not clear which one is more preferable. The concrete
-manifestation of this dilemma is a constraint of form 
-$\isvalid{\phictxt \conj \varphi_1}{\phicstr \conj \varphi_2}$, with
-no additional constraints to help determine $\varphi_1$ or $\varphi_2$
-before solving this constraint. Since it is always possible to
-strengthen $\varphi_2$ and then find a suitable $\varphi_1$, there
-does not exist unique solution to such constraints. Nonetheless, it is
-possible to bias the constraint-solving algorithm to consistently
-prefer one solution over the other.
+% The region type system for $\FB$ admits function types with
+% higher-rank region polymorphism, allowing region variables to be
+% quantified in the types of higher-order arguments. This allows, for
+% example, a user-defined function to be applied on arguments from
+% different regions in different contexts. However, like most type
+% systems, our region type system loses principal typing property in
+% presence of higher-rank polymorphism, which means that there can be
+% two possible types for a function, where neither one is more general
+% than the other. Consequently, it is not possible to infer a unique
+% type for a function. Nonetheless, it is possible to engineer type
+% inference to to consistently prefer one type over the other.
+Our type inference algorithm does not generalize to higher-order case,
+due to the lack of principal typing in presence of higher-rank
+polymorphism. We therefore adopt a trivial approach of assigning the
+same region to the arguments and return values in (higher-order)
+function types. For user-defined functions (e.g., predicate in the
+\C{WHERE} clause of the \C{SELECT} dataflow query) and lambda
+arguments to the $\RgnZ$ class constructor, which are the prominent
+uses of higher-order functions in \name, the simplistic approach seems
+to suffice in practice. However, it is always possible that this
+approach makes type checker reject a program that is otherwise valid.
+In such cases, programmer can help the type checker by writing region
+annotations for only the higher-order functions.
 
-In context of \name, however, we adopt a trivial solution of
-assigning the same region to the arguments and return values in
-(higher-order) function types. For user-defined functions (e.g.,
-predicate in the \C{WHERE} clause of the \C{SELECT} dataflow query)
-and lambda arguments to the $\RgnZ$ class constructor, which are the
-prominent uses of higher-order functions in \name, the simplistic
-approach seems to suffice in practice. However, it is always possible
-that this approach makes type checker reject a program that is
-otherwise valid. In such cases, programmer can help the type checker
-by writing region annotations for only the higher-order functions.
+% \begin{codejava}
+% bool app2(A x, A y, (A $\rightarrow$ bool) f) 
+%     { return (f x && f y); }
+% \end{codejava}
+% There are two possibilities for the region type of \C{app2}: one,
+% where it allows \C{x} and \C{y} to be allocated in different regions,
+% but requires \C{f} to be region-polymorphic (i.e, \C{f} should accept
+% arguments from any region), and second, where it requires \C{x} and
+% \C{y} to be allocated in the same region, and allows \C{f} to be
+% monomorphic. None of the two types are more general than the other,
+% and it is not clear which one is more preferable. The concrete
+% manifestation of this dilemma is a constraint of form 
+% $\isvalid{\phictxt \conj \varphi_1}{\phicstr \conj \varphi_2}$, with
+% no additional constraints to help determine $\varphi_1$ or $\varphi_2$
+% before solving this constraint. Since it is always possible to
+% strengthen $\varphi_2$ and then find a suitable $\varphi_1$, there
+% does not exist unique solution to such constraints. Nonetheless, it is
+% possible to bias the constraint-solving algorithm to consistently
+% prefer one solution over the other.
+
+% In context of \name, however, we adopt a trivial solution of
+% assigning the same region to the arguments and return values in
+% (higher-order) function types. For user-defined functions (e.g.,
+% predicate in the \C{WHERE} clause of the \C{SELECT} dataflow query)
+% and lambda arguments to the $\RgnZ$ class constructor, which are the
+% prominent uses of higher-order functions in \name, the simplistic
+% approach seems to suffice in practice. However, it is always possible
+% that this approach makes type checker reject a program that is
+% otherwise valid. In such cases, programmer can help the type checker
+% by writing region annotations for only the higher-order functions.
 
 % \begin{center}
 %   \C{app2} : $\inang{\rho_0,\rho_1}$(\C{A}$\inang{\rho_0}$, 
