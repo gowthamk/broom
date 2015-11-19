@@ -113,11 +113,16 @@ to regions with dynamic lifetimes. However, dynamic regions are still
 not first-class values of the language, and reference counting is
 nonetheless needed to ensure memory safety.~\cite{WW01} extends lambda
 calculus with first-class regions with dynamic lifetimes, and imposes
-linear typing to control accesses to regions. All type annotations
-need to be written explicitly. Moreover, invariants needed to ensure
-safety under region transfers, such as the absence of references that
-escape a transferable region, cannot be enforced under~\cite{WW01}'s
-type system.
+linear typing to control accesses to regions. Our open/close lexical
+block for transferable regions traces its orgins to the \C{let!}
+expression in~\cite{WW01} and~\cite{wadler90} that safely relaxes
+linear typing restrictions, allowing variables to be temporarily
+aliased. We don't have linear typing, thus admit unrestricted
+aliasing. Non-linear typing keeps our type system simple, and makes it
+possible to infer types, thus eliminating the annotation burden.
+Moreover, ~\cite{WW01}'s linear type system is insufficient to enforce
+the invariants needed to ensure safety under region transfers, such as
+the absence of references that escape a transferable region.
 
 The idea of using region-based memory management to facilitate the
 safe transfer of rich data structures between computational nodes has

@@ -741,18 +741,24 @@ constraint $c_{14}$, to obtain the following solution to $\varphi_2$:
 % than the other. Consequently, it is not possible to infer a unique
 % type for a function. Nonetheless, it is possible to engineer type
 % inference to to consistently prefer one type over the other.
-Our type inference algorithm does not generalize to higher-order case,
-due to the lack of principal typing in presence of higher-rank
-polymorphism. We therefore adopt a trivial approach of assigning the
-same region to the arguments and return values in (higher-order)
-function types. For user-defined functions (e.g., predicate in the
-\C{WHERE} clause of the \C{SELECT} dataflow query) and lambda
-arguments to the $\RgnZ$ class constructor, which are the prominent
-uses of higher-order functions in \name, the simplistic approach seems
-to suffice in practice. However, it is always possible that this
-approach makes type checker reject a program that is otherwise valid.
-In such cases, programmer can help the type checker by writing region
-annotations for only the higher-order functions.
+Our type inference algorithm does not straightforwardly generalize to
+the higher-order case, due to the lack of principal typing in presence of
+higher-rank polymorphism. Fortunately, higher-order type inference, in
+its full generality, is rarely needed in the context of \name, where
+higher-order control flow is predominantly due to the second-order
+arguments to constructors (For \eg, user-defined functions in dataflow
+queries, and lambda arguments to the $\RgnZ$ class constructor). We
+therefore extend our inference algorithm with a heuristics tailor-made
+for the aforementioned second-order cases. The simplistic approach
+seems to suffice in our experience, but, it is always possible that it
+makes the type checker reject a program that is otherwise valid. In
+such cases, programmer can help the type checker by writing region
+annotations only over higher-order arguments.  Nonetheless, we note
+that it is possible to infer most general (if not principal) types for
+higher-order arguments, by extending our constraint solver with an
+approach modeled after~\cite{gulwani09}, which lets it compute maximally
+weak/strong solutions to multiple competing $\varphi$'s
+simultaneously.
 
 % \begin{codejava}
 % bool app2(A x, A y, (A $\rightarrow$ bool) f) 
