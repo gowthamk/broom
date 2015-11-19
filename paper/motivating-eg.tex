@@ -4,18 +4,18 @@ class SelectVertex<TIn, TOut> {
   Func<TIn, TOut> selector;
   Dictionary<Time, List<TOut>> map;
   ...
-  void onReceive(Time t, List<TIn> inputs) {
+  void onReceive(Time t, List<TIn> inList) {
     if (!map.ContainsKey(t))
        map[t] = new List<TOut>();
-    foreach (TIn input in inputs) {
+    foreach (TIn input in inList) {
       TOut output = selector(input);
       map[t].add(output);
     }
   }
   void onNotify(Time t) {
-     List<TOut> outputList = map[t];
+     List<TOut> outList = map[t];
      map.Remove(t);
-     transfer(successorId, t, outputList); 
+     transfer(successorId, t, outList); 
   }
 }
 \end{numcodejava}

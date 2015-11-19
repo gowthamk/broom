@@ -6,14 +6,14 @@ class SelectVertex<TIn, TOut> {
   ...
   void onReceive(Time t,Region<List<TIn>> inRgn){
     if (!map.ContainsKey(t))
-       map[t] = new Region<List<TOut>> (
-                  () => new List<TOut>());
-    open inRgn as inputList {
+       map[t] = new Region<List<TOut>> 
+                  (() => new List<TOut>());
+    open inRgn as inList {
       letregion R0 {
-        foreach (TIn input in inputList) {
-          open map[t] as outRgn {
+        foreach (TIn input in inList) {
+          open map[t] as outList {
             TOut output = selector(input);
-            outRgn.add(output); } } } }
+            outList.add(output); } } } }
     inRgn.free();
   }
   void onNotify(Time t) {

@@ -24,18 +24,19 @@
 % Tofte & Birkedal, A Region Inference Algorithm, TOPLAS'98.
 
 Tofte and Talpin in~\cite{tofte93,tofte94,tofte97} introduce the
-concept of a region type system to statically ensure the safety of
-region-based memory management in ML. Following their seminal work,
-static type systems for safe region-based memory management have been
-extensively studied in the context of various languages and problem
-settings~\cite{cyclone02, cyclone04, yates99, MIT03, DPJ09, HMN01,
-WW01, rust, gpu14}. Our work differs from the existing proposals in a
-number of ways. Firstly, our problem setting includes lexically scoped
-stack regions and dynamic transferable regions (both
-programmer-managed) in context of an object-oriented programming
-language equipped with higher-order functions. Second, we adopt a
-two-pronged approach to memory safety that relies on a combination of
-a simple static type discipline and lightweight runtime checks. 
+concept of a region type system to statically enforce the safety of
+their region-based memory management scheme in ML. Following their
+seminal work, static type systems for safe region-based memory
+management have been extensively studied in the context of various
+languages and problem settings~\cite{cyclone02, cyclone04, yates99,
+MIT03, DPJ09, HMN01, WW01, rust, gpu14}. Our work differs from the
+existing proposals in a number of ways. Firstly, our problem setting
+includes lexically scoped stack regions and dynamic transferable
+regions (both programmer-managed) in context of an object-oriented
+programming language equipped with higher-order functions. Second, we
+adopt a two-pronged approach to memory safety that relies on a
+combination of a simple static type discipline and lightweight runtime
+checks. 
 % The type system reduces the problem of ensuring safety of all memory
 % accesses in a program into a problem of enforcing a state-transition
 % discipline on memory accesses over a small subset of objects in the
@@ -45,9 +46,9 @@ In particular, our approach requires neither restrictive static
 mechanisms (e.g., linear types and unique pointers) nor expensive
 runtime mechanisms (e.g., garbage collection and reference counting)
 in order to guarantee safety. Lastly, our region type system comes
-equipped with full type inference that completely eliminates the need
-to write region annotations on types to convince the type checker that
-the program is safe. 
+equipped with full type inference that more or less eliminates the
+need to write region annotations on types to convince the type checker
+that the program is safe. 
 
 ~\cite{tofte97} proposes to extend Standard ML, a higher-order
 functional language, with lexically-scoped stack regions, and defines
@@ -57,15 +58,16 @@ and do away with GC in a transparent fashion without jeopardizing
 memory safety. We too define an elaboration, but our focus is on
 introducing region annotations necessary to prove the safety of an
 object-oriented program that already uses (stack and dynamic) regions.
-Similar to their region inference algorithm, our region type inference
-algorithm can deal with region-polymorphic recursion by computing
-fixed points for recursive constraints. While their inference
-algorithm only ever generates equality constraints, which can be
-solved via unification, our type inference algorithm also generates
-partial order outlives constraints, which are required to capture
-subtle relationships between lifetimes of transferable regions and
-stack regions. Consequently, our constraint solving algorithm is more
-sophisticated, and is capable of inferring unknown outlives
+% Similar to their region inference algorithm, our region type inference
+% algorithm can deal with region-polymorphic recursion by computing
+% fixed points for recursive constraints. 
+Our type inference is analogous to their region inference. While their
+inference algorithm only ever generates equality constraints, which
+can be solved via unification, our type inference algorithm also
+generates partial order outlives constraints, which are required to
+capture subtle relationships between lifetimes of transferable regions
+and stack regions. Consequently, our constraint solving algorithm is
+more sophisticated, and is capable of inferring unknown outlives
 constraints over region arguments of polymorphic recursive functions.
 
 Cyclone~\cite{cyclone02} equips C with programmer-managed stack
@@ -80,26 +82,29 @@ structures are allowed to have multiple references, and safety for
 such objects was ensured via runtime reference counting.
 
 An ownership type system for safe region-based memory management in
-real-time Java has been proposed by~\cite{MIT03}. Like us, they too
-assume a source language with programmer-managed memory regions, and
-focus on proving safety of programs written in that language. Their
-source language admits various kinds of regions in order to support
-shared-memory concurrency. However, all their regions have
-lexically-scoped lifetimes. In contrast, we admit regions with
+real-time Java has been proposed by~\cite{MIT03}.  
+% Like us, they too assume a source language with programmer-managed
+% memory regions, and focus on proving safety of programs written in
+% that language.  
+Their source language admits various kinds of regions with
+lexically-scoped lifetimes (i.e., stack regions) in order to support
+shared-memory concurrency. In contrast, we admit regions with
 dynamically determined lifetimes in order to support message-passing
 concurrency. We borrow outlives relation from their formal
 development, and our type system bears some similarities to theirs.
 However, our language also admits parametric polymorphism (generics)
-and higher-order functions, whose interaction is non-trivial in
-context of a region type system. On the other hand, our type system
-eschews the notions of region kinds and ownership, leading to a more
-succinct formalization. Furthermore, we establish a type safety result
-that formalizes its guarantees with respect to a well-defined
-operational semantics. Like Cyclone, ~\cite{MIT03}'s language is
-explicitly typed. Although there is some support for local type
-inference, region types for methods and classes need to be written
-explicitly. In contrast, we support full type inference that
-eliminates any such need.
+and higher-order functions.
+%, whose interaction is non-trivial in context of a region type system. 
+% On the other hand, our type system eschews the notions of region kinds
+% and ownership, leading to a more succinct formalization. 
+Furthermore, we establish type safety and transfer safety results that
+formalize the guarantees provided by our system. While ~\cite{MIT03}'s
+language is explicitly typed, our language comes equipped with full
+type inference.
+% Although there is some support for local
+% type inference, region types for methods and classes need to be
+% written explicitly. In contrast, our region type inference that
+% eliminates any such need.
 
 ~\cite{HMN01} proposes a flow-sensitive region-based memory management
 for first-order programs that proposes to overcome some of the

@@ -110,9 +110,10 @@ of Fig.~\ref{fig:motivating-eg} can be written in \name.  The
 \emph{transferred} region (\ie, a \emph{closed} region whose ownership
 is transferred to the recipient).  Line 7 creates a new region to
 store the output for time \C{t}, initializing it to contain an empty
-list.  Line 9 opens the input region to process it.  Line 10 creates a
-stack region \C{R0}.  Thus, the temporary objects created by the
-iteration in line 11, for example, will be allocated in this stack
+list.  Line 9 opens the input region to process it\footnote{We omit
+\C{@R} annotation in \C{open} when we don't need \C{R}.}.  Line 10
+creates a stack region \C{R0}.  Thus, the temporary objects created by
+the iteration in line 11, for example, will be allocated in this stack
 region that lives just long enough.  We open the desired output region
 in line 12, so that the new output objects created by the invocation
 of \C{selector} in line 13 are allocated in the output region.
@@ -120,8 +121,8 @@ Finally, the input region is freed in line 15. The output region at
 \C{map[t]} stays as along as input messages with timestamp \C{t} keep
 arriving. When the timing message for \C{t} arrives, the \C{onNotify}
 method transfers the \C{outRgn} at \C{map[t]} to a downstream actor.
-After the transfer, \C{SelectVertex} is no longer allowed to access
-the \C{outRgn}, facilitating its deallocation.
+% After the transfer, \C{SelectVertex} is no longer allowed to access
+% the \C{outRgn}, facilitating its deallocation.
 
 \input{motivating-eg-in-broom}
 
