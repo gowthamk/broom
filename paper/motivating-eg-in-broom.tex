@@ -1,0 +1,29 @@
+\begin{figure}[t!]
+\begin{numcodejava}
+class SelectVertex<TIn, TOut> {
+  Func<TIn, TOut> selector;
+  Dictionary<Time, Region<List<TOut>>> map;
+  ...
+  void onReceive(Time t,Region<List<TIn>> inRgn){
+    if (!map.ContainsKey(t))
+       map[t] = new Region<List<TOut>> 
+                  (() => new List<TOut>());
+    open inRgn as inList {
+      letregion R0 {
+        foreach (TIn input in inList) {
+          open map[t] as outList {
+            TOut output = selector(input);
+            outList.add(output); } } } }
+    inRgn.free();
+  }
+  void onNotify(Time t) {
+     Region<List<TOut>> outRgn = map[t];
+     map.Remove(t);
+     outRgn.transfer();
+  }
+}
+\end{numcodejava}
+\caption{\C{SELECT} dataflow operator in \name}
+\label{fig:motivating-eg-in-broom}
+\vspace*{-0.15in}
+\end{figure}

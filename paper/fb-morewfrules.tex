@@ -3,9 +3,6 @@
 \textbf{Method Well-formedness}  \; \fbox
   {\(d \; \mathtt{ok \; in} \; B \)}\\
 %
-\bigskip
-
-%
 \begin{minipage}{5.5in}
 \begin{smathpar}
 \begin{array}{c}
@@ -22,7 +19,7 @@
     \headerOf{B}\{...\}\spc
     \env = \cdot[\xbar\mapsto\bar{\tau^1}][\thisZ\mapsto
             B\inang{\bar{\tyvar}}\inang{\rhoalloc\rhobar}] \\
-    override(m,\fbN,\inang{\rhoallocm\rhobarm \,|\, \phi_m}\bar{\tau^1} 
+    \override(m,\fbN,\inang{\rhoallocm\rhobarm \,|\, \phi_m}\bar{\tau^1} 
              \rightarrow \tau^2) \spc
 %   \stmtsem{\rhoallocm}{s}{\stmtsemcx}{\stmtsemcxp}\spc
     \hastyp{\exptycx{\rhoallocm}{\env}}{e}{\tau} \spc
@@ -43,9 +40,6 @@
 \textbf{Class Well-formedness}  \; \fbox
   {\(B \; \mathtt{ok}\)}\\
 %
-\bigskip
-
-%
 \begin{minipage}{5.5in}
 \begin{smathpar}
 \begin{array}{c}
@@ -59,10 +53,10 @@
     \tywf{\rhoenv}{\phi} \\
     \fgjtywf{\aenv}{\bar{\fgjN}} \spc
     \tywf{\A}{\fbN,\bar{\tau^f}} \spc
-    shape(\fbN) \neq \RgnZ\inang{T}\spc 
+    \shape(\fbN) \neq \RgnZ\inang{T}\spc 
 %   \tywf{\A}{\bar{\tau^f}} \spc
     \isvalid{\phicx}{allocRgn(\bar{\tau^f}) \outlives \rho^a} \\
-    ctype(\fbN) = \bar{\tau^{\fbN}} \spc
+    \ctype(\fbN) = \bar{\tau^{\fbN}} \spc
     k = B(\bar{\tau^f}\;\xbar,\bar{\tau^{\fbN}}\;\bar{y})
         \{\superZ(\xbar);\,\thisZ.\bar{f} = \bar{y};\} \spc
     \okin{\bar{d}}{B}

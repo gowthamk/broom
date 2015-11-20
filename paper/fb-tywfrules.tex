@@ -1,10 +1,11 @@
 %
-\begin{minipage}{1.2in}
+\begin{minipage}{1.25in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
     \rgn \in \A.\rhoenv
   }
   {
@@ -45,7 +46,7 @@
 % \end{smathpar}
 % \end{minipage}
 %
-\begin{minipage}{3.2in}
+\begin{minipage}{3.3in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -67,12 +68,13 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.8in}
+\begin{minipage}{1in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
     \fgjtywf{\A.\aenv}{T}
   }
   {
@@ -82,10 +84,25 @@
 \end{smathpar}
 \end{minipage}
 %
-\bigskip
+\begin{minipage}{1in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    \rho_0,\rho_1 \in \rhoenv
+  }
+  {
+    \tywf{\rhoenv}{\rho_0 \outlives \rho_1}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
 
 %
-\begin{minipage}{3.1in}
+\begin{minipage}{3.5in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -104,7 +121,7 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.4in}
+\begin{minipage}{1.65in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -116,22 +133,6 @@
   }
   {
     \tywf{\A}{T@\ralloc}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{1in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \\
-    \rho_0,\rho_1 \in \rhoenv
-  }
-  {
-    \tywf{\rhoenv}{\rho_0 \outlives \rho_1}
   }
 \end{array}
 \end{smathpar}

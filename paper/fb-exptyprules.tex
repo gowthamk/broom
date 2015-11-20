@@ -1,37 +1,13 @@
 %
-\begin{minipage}{1in}
+\begin{minipage}{1.2in}
 \begin{smathpar}
 \begin{array}{l}
 \renewcommand*{\arraystretch}{1.2}
 \hastyp{\exptycx{\ralloc}{\env}}{\unitval}{\unitZ}\\
 \hastyp{\exptycx{\ralloc}{\env}}{x}{\env(\tau)}
-% \RULE
-%   {
-%     \\
-%     \env(x) = \tau
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{x}{\tau}
-%   }
 \end{array}
 \end{smathpar}
 \end{minipage}
-%
-% \begin{minipage}{1.2in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \\
-%     \\
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{\unitval}{\unitZ}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
 %
 \begin{minipage}{1.8in}
 \begin{smathpar}
@@ -58,11 +34,6 @@
     \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\taubar} \\
     \tywf{\A}{\fbN} \spc
     \fields(\fbN) = \bar{f} : \taubar \\
-%   \subtyp{\A}{\bar{\tau'}}{\taubar}\\
-%   \absof{\fbN} = \RgnZ\inang{T} \; \Rightarrow \;
-%   \allocRgn(\fbN)=\toprgn\\
-%   allocRgn(\fbN) = \rgn \spc
-%   \isvalid{\A.\phicx}{\rgn \outlives \ralloc}
   }
   {
     \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\; \fbN(\bar{e})}{\fbN}
@@ -71,7 +42,25 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.8in}
+\begin{minipage}{2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\tau_1}\\
+    \hastyp{\exptycx{\ralloc}{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}\\
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{\letexp{x}{e_1}{e_2}}{\tau_2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{3.25in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -90,49 +79,28 @@
 \end{smathpar}
 \end{minipage}
 %
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn \in \A.\rhoset\spc
+    \A' = (\{\}, \{\rgn\}, \A.\aenv, true) \\
+    \rgn \notin \A.\rhoenv \cup \{\toprgn\} \spc
+    \tywf{\A'}{T@\rgn} \spc
+%   \fgjN = \RgnZ\inang{T}\spc
+    \hastyp{\A', {\rgn},{\env}}{e}{T@\rgn}
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\;
+    \RgnZT{\rgn}(e)} {\RgnZT{\toprgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
 %
-%
-% --- PACK expressio removed ---
-% \begin{minipage}{1.75in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \tywf{\A}{\exists\rho.\tau}\\
-%     \hastyp{\exptycx{\ralloc}{\env}}{e}{[\rho_0/\rho]\tau}
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}
-%            {\C{pack} \; (\rho_0,e) \; \C{as} \; \exists\rho.\tau}
-%            {\exists\rho.\tau}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-%
-\bigskip
 
-% --- No special treatment of NEW REGION ---
-% \begin{minipage}{2.1in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \fgjtywf{\A.\aenv}{\RgnZ\inang{T}}\\
-%     \hastyp{\exptycx{\ralloc}{\env}}{e}{\tau} \\
-%     \subtyp{\A}{\tau}{\inang{\rhoalloc}
-%     {\unitZ}\xrightarrow{\rgn}{T@\rhoalloc}}
-%   }
-%   {
-%     {\exptycx{\ralloc}{\env}}\,\vdash\,
-%           {\C{new}\; \RgnZ\inang{\rgn}\inang{T}(e)}\\
-%            \hspace*{0.5in}{:\exists\rho.\RgnZ\inang{\rho}\inang{T}}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
 %
 \begin{minipage}{3.7in}
 \begin{smathpar}
@@ -143,8 +111,10 @@
     \hastyp{\exptycx{\ralloc}{\env}}{e_0}{\tau} \spc
     \rbar \in \A.\rhoenv \\
     \mtype(m,\bound_{\A.\aenv}(\tau)) = \inang{\rhoalloc\rhobar \,|\, 
-        \phi}\bar{\tau^1}\rightarrow{\tau^2} \\
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc] \spc
+        \phi}\bar{\tau^1}\rightarrow{\tau^2} \spc
+    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc] \\
+    \tywf{\A}{\inang{\rhoalloc\rhobar \,|\,
+    \phi}\bar{\tau^1}\rightarrow{\tau^2}}\spc
 %   \tywf{\A}{\substFn(\bar{\tau^1})} \spc
 %   \tywf{\A}{\substFn(\tau^2)} \\
     \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\substFn(\bar{\tau^1})} \spc
@@ -180,10 +150,9 @@
 \end{smathpar}
 \end{minipage}
 %
-\bigskip
 
 %
-\begin{minipage}{3.2in}
+\begin{minipage}{3.5in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -210,42 +179,6 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{2in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\tau_1}\\
-    \hastyp{\exptycx{\ralloc}{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}\\
-  }
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}{\letexp{x}{e_1}{e_2}}{\tau_2}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-% SEQUENCING expr removed
-% \begin{minipage}{1.5in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\unitZ}\\
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_2}{\tau}\spc
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_1\,;\,e_2}{\tau}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-%
-\bigskip
-
-%
 \begin{minipage}{3in}
 \begin{smathpar}
 \begin{array}{c}
@@ -268,52 +201,10 @@
 \end{array}
 \end{smathpar}
 \end{minipage}
-% % --- No OPENALLOC ---
-% \begin{minipage}{3.25in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \A = (\subtypcx) \spc
-%     \A' = (\rhoset,\rhoenv \cup \{\rgn\},\aenv,\phicx) \\
-%     \hastyp{\exptycx{\ralloc}{\env}}{x}{\RgnZ\inang{\rgn}\inang{T}}\spc
-%     \hastyp{\A',\rgn,\env[y\mapsto T@\rgn]}{e}{\unitZ}
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{\openalloc{x}{y}{e}}
-%             {\unitZ}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
 %
-% % --- BIG LAMBDA not needed ---
-% \begin{minipage}{3.75in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \rhoalloc,\rhobar \notin \A.\rhoenv \spc
-% %   \rhoenv' = \rhoenv \cup \{\rhoalloc,\rhobar\}\\
-%     \A' = (\A.\rhoenv \cup \{\rhoalloc,\rhobar\}, 
-%             \A.\aenv, \A.\phicx \conj \phi)\\
-%     \tywf{\A'.\rhoenv}{\phi}\spc
-%     \hastyp{\A',\ralloc,\env}{e}{\bar{\tau^1} \xrightarrow
-%             {\rgn} \tau^2}
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}
-%            {\Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}}
-%            {\inang{\rhoalloc\rhobar \,|\, \phi}
-%             \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
+
 %
-\begin{minipage}{3.2in}
+\begin{minipage}{3.5in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -338,29 +229,6 @@
 \end{smathpar}
 \end{minipage}
 %
-\bigskip
-
-% % --- APPLICATION coalesced with instantiation ---
-% \begin{minipage}{2in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_0}
-%         {\bar{\tau^1} \xrightarrow{\rgn} \tau^2}\\
-%     \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}
-%         {\bar{\tau}}\spc
-%     \subtyp{\A}{\taubar}{\bar{\tau^1}}
-%   }
-%   {
-%     \hastyp{\A,\ralloc,\env}{e_0(\bar{e})}
-%            {\tau^2}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-%
 % --- ASSIGNMENT cannot be modeled with rewrite semantics ---
 % \begin{minipage}{2in}
 % \begin{smathpar}
@@ -380,50 +248,13 @@
 % \end{smathpar}
 % \end{minipage}
 %
-% \begin{minipage}{1.1in}
-% \begin{smathpar}
-% \begin{array}{c}
-% % --- UPCAST removed ---
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e}{\tau_1}\\
-%     \subtyp{\A}{\tau_1}{\tau}
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{(\tau)\,e}{\tau}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% % --- No UNPACK expression ---
-% \begin{minipage}{3.25in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\exists \rho.\tau}\spc
-%     \A = (\subtypcx) \spc
-%     \rgn \notin \rhoset \\
-%     \A' = (\rhoset \cup \{\rgn\},\rhoenv,\aenv,\phicx) \spc
-%     \hastyp{\A',\ralloc,\env[x \mapsto \subst{\rgn}{\rho}\tau]}
-%            {e_2}{\tau_2}\spc
-%   }
-%   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{\unpackexp{\rgn}{x}{e_1}{e_2}}
-%             {\tau_2}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-%
 \begin{minipage}{2in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
     \hastyp{\exptycx{\ralloc}{\env}}{e}{\RgnZ\inang{T}\inang{\toprgn}}
   }
   {
@@ -433,25 +264,4 @@
 \end{smathpar}
 \end{minipage}
 %
-%
-\begin{minipage}{1.8in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \rgn \in \A.\rhoset\spc
-    \A' = (\{\}, \{\rgn\}, \A.\aenv, true) \\
-    \rgn \notin \A.\rhoenv \cup \{\toprgn\} \spc
-    \tywf{\A'}{T@\rgn} \spc
-%   \fgjN = \RgnZ\inang{T}\spc
-    \hastyp{\A', {\rgn},{\env}}{e}{T@\rgn}
-  }
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\;
-    \RgnZT{\rgn}(e)} {\RgnZT{\toprgn}}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
+

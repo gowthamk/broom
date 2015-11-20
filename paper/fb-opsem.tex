@@ -1,5 +1,3 @@
-\newcommand{\redstoo}[2]{\redsto{\rhoenv}{#1}{#2}}
-\newcommand{\redstocup}[3]{\redsto{\rhoenv \cup \{#1\}}{#2}{#3}}
 \newcommand{\anobjty}[0]{B\inang{\tbar}\inang{\ralloc\rbar}}
 \newcommand{\anobj}[0]{\C{new} \; \anobjty(\bar{v})}
 \begin{figure*}[t!]
@@ -23,23 +21,6 @@
 \end{array}
 \end{smathpar}
 \end{minipage}
-%
-% \begin{minipage}{3in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \ralloc \in \rhoenv \spc
-%     \redstoo{(e_i,\rhomap)}{(e_i',\rhomap')}
-%   }
-%   {
-%     \redstoo{(\C{new} \; \fbN(...,e_i,...),\rhomap)}
-%             {(\C{new} \; \fbN(...,e_i',...),\rhomap')}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
 %
 \begin{minipage}{3.2in}
 \begin{smathpar}
@@ -99,15 +80,15 @@
 %
 
 %
-\begin{minipage}{3.6in}
+\begin{minipage}{2.8in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \redsto{\{\rgn\}}{(e,\rhomap)}{(e',\rhomap')}\\
     \fgjN = \RgnZ\inang{T} \spc
-    \rgn \in dom(\rhomap) \spc
-    \redsto{\{\rgn\}}{(e,\rhomap)}{(e',\rhomap')}
+    \rgn \in dom(\rhomap)
   }
   {
     \redstoo{(\C{new} \; \fgjN\inang{\rgn}
@@ -119,18 +100,36 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{2.5in}
+\begin{minipage}{2.7in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
     v_a = \C{new} \; \RgnZ\inang{T}\inang{\rgn}(v_r) \spc
     \rhomap(\rgn) \neq \XFERRED \spc
 %   \rgn_0 \notin \rhoenv \spc
   }
   {
     \redstoo{(\open{v_a}{\rgn_0}{x}{v_b},\rhomap)} {(v_b,\rhomap)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    \redstoo{(e,\rhomap)}{\invalidexn}
+  }
+  {
+    \redstoo{(E\lbrack e \rbrack, \rhomap)}
+            {\invalidexn}
   }
 \end{array}
 \end{smathpar}
@@ -246,7 +245,7 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{2.5in}
+\begin{minipage}{2.85in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -263,42 +262,8 @@
 \end{array}
 \end{smathpar}
 \end{minipage}
-%
-% %
-% \begin{minipage}{1.8in}
-% \begin{smathpar}
-% \begin{array}{c}
-% \renewcommand*{\arraystretch}{1.2}
-% \RULE
-%   {
-%     \redstoo{(e_1,\rhomap)}{(e_1',\rhomap')}
-%   }
-%   {
-%     \redstoo{(e_1;\,e_2,\rhomap)}
-%             {(e_1';\,e_2,\rhomap')}
-%   }
-% \end{array}
-% \end{smathpar}
-% \end{minipage}
-% %
-
-\begin{minipage}{1.8in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    
-  }
-  {
-    \redstoo{(\unitval;\,e_2,\rhomap)}
-            {(e_2,\rhomap)}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
 % 
-\begin{minipage}{1.8in}
+\begin{minipage}{1.5in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -314,21 +279,6 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.2in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \redstoo{(e,\rhomap)}{\invalidexn}
-  }
-  {
-    \redstoo{(E\lbrack e \rbrack, \rhomap)}
-            {\invalidexn}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
 
 %
 \begin{minipage}{2in}
@@ -398,7 +348,7 @@
 E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\ralloc\rbar}(\ebar) \ALT
       v.m\inang{\ralloc\rbar}(...,\bullet,...) \ALT \C{new}\; \fbN(...,\bullet,...) \ALT
       \C{new} \; \RgnZ\inang{T}\inang{\toprgn}(\bullet) \ALT \bullet\inang{\ralloc\rbar}(\ebar) \\
-  &  & \ALT v\inang{\ralloc\rbar}(...,\bullet,...) \ALT \bullet;\,e \ALT \open{\bullet}{\rgn}{y}{e}
+  &  & \ALT v\inang{\ralloc\rbar}(...,\bullet,...) \ALT \open{\bullet}{\rgn}{y}{e}
 \end{array}
 \end{smathpar}
 

@@ -1,0 +1,63 @@
+\section{Implementation and Evaluation}
+\label{sec:implementation}
+
+We have implemented the prototype of \name compiler frontend,
+including its region type system and type inference, in 3k+ lines of
+OCaml. The input to our system is a program in $\absof{\FB^+}$, an extended
+version of $\absof{\FB}$ that includes assignments, conditionals,
+loops, more primitive datatypes (\eg strings), and a null value. 
+% If needed, a specification file containing region type annotations
+% for higher-order functions can also be provided. 
+Our implementation of region type inference closely follows the
+description given in Sec.~\ref{sec:type-inference}. To solve the
+constraints that arise during type inference, we built a solver called
+\csolve that implements constraint solving approach based on fixpoint
+computation and graph augmentation described in \S~\ref{sec:csolve}. 
+% Since graph augmentation is NP-hard, \csolve uses an approximation
+% algorithm that repeatedly adds an edge and recomputes paths in graph
+% $G_1$ until it is as connected as graph $G_2$. Though this approach
+% may not necessarily return the weakest solution to the abduction
+% problem (\S~\ref{sec:csolve}), it seems to do so in practice, since
+% constraints are not often complex. 
+If the input $\absof{\FB^+}$ program does not create any unsafe
+references, our compiler annotates it with region types, which act as
+a witness to program's memory safety. On contrary, if the input
+program does create a reference that is potentially unsafe, then the
+type inference fails during the constraint solving phase. We currently
+do not implement error localization and feedback mechanisms.
+
+To evaluate the practical utility of our region type system and type
+inference, we 
+% implemented some of the C\# libraries in $\absof{\FB^+}$, and 
+translated some of the Naiad streaming query operator benchmarks
+(Naiad vertices) used in~\cite{Broom:HotOS} to $\absof{\FB^+}$, and
+used our prototype compiler to assign region types to these programs,
+and thus prove their safety. During the process, we found multiple
+instances of potential memory safety violations in the $\absof{FB^+}$
+translation of benchmarks, which we verified to be present in the
+original C\# implementation as well. The cause of all safety
+violations is the creation of a reference from the outgoing message (a
+transferable region) to the payload of the incoming message. For
+example, the implementation of \C{RegionSelectVertex} contains the
+following:
+\begin{codejava}
+  if (this.selectFn(inMsg.payload[i])) {
+    outMsg.set(outputOffset, inMsg.payload[i]);
+    ...
+  } 
+\end{codejava}
+The \C{outMsg} is later transferred to a downstream actor, where the
+reference to \C{inMsg}'s payload becomes unsafe\footnote{This unsafe
+reference could have gone unnoticed during experiments
+in~\cite{Broom:HotOS} because their experimental setup included only
+one actor.}. We eliminated such unsafe references by creating a clone
+of \C{inMsg.payload[i]} in \C{outMsg}, and our compiler was
+subsequently able to certify the safety of all references.
+
+% We now briefly describe our experience of
+% working with these benchmarks. Note that the performance benefits of
+% using transferable regions in dataflow systems have been established
+% in~\cite{Broom:HotOS}. Our current evaluation only focuses on safety
+% aspects.
+
+% \paragraph{Memory safety violation} 

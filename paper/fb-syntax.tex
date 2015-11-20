@@ -31,24 +31,13 @@ d  & \in & \M{Methods} & \coloneqq &
      \{\C{return}\;e;\}\\
 \phi,\phicx &\in& \M{Region\;constraints} & \coloneqq & true 
       \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi\\
-% v  & \in & \M{Value\;expressions} & \coloneqq & x \ALT \C{new} \; \fbN(\vbar)\\
 e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f 
-     \ALT e.m\inang{\ralloc \rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar) \\
-%    \ALT (\tau)\, e\\
-   & & & & \ALT \lambdaexp{\ralloc}{\rhoalloc\rhobar \,|\, \phi}
+     \ALT e.m\inang{\ralloc \rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar)
+     \ALT \lambdaexp{\ralloc}{\rhoalloc\rhobar \,|\, \phi}
                     {\xbar:\taubar} {e}
-%          \ALT \Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}
-           \ALT e\inang{\ralloc\rbar}(\bar{e})
-%          \ALT e(\bar{e}) 
-           \ALT x\,:=\,e \ALT e.f\,:=\,e \ALT e\,;\,e\\
+           \ALT e\inang{\ralloc\rbar}(\bar{e})\\
    & & & & \ALT \letexp{x}{e}{e} \ALT \letregion{\rho}{e} 
            \ALT \open{x}{\rgn}{y}{e} \\
-%   & & & & \ALT \unpackexp{\rgn}{x}{e}{e} \ALT e\,;\,e\\
-% s  & \in & \M{Statements} & \coloneqq & \tau\;x\;=\;e \ALT x\;=\;e
-%      \ALT e.f\;=\;e 
-%      \ALT \C{open}\;x\;\C{withroot}\;y\;\{s\} \\
-%     & & & & \ALT \C{openalloc}\;x\;\C{withroot}\;y\;\{s\} 
-%      \ALT (\rho,\tau\;x)\;=\;\C{unpack}\;e \ALT s\,;\,s\\
 \end{array}
 \end{smathpar}
 

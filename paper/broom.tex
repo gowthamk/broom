@@ -20,7 +20,8 @@
 %-----------------------------------------------------------------------------
 
 
-\documentclass[10pt,pldi]{sigplanconf}
+%\documentclass[10pt,pldi]{sigplanconf}
+\documentclass[pldi]{sigplanconf-pldi16}
 
 % The following \documentclass options may be useful:
 
@@ -49,6 +50,7 @@
 \usepackage{verbatimbox}
 \usepackage{breakurl}
 \usepackage[breaklinks]{hyperref}
+\usepackage[multiple]{footmisc}
 
 %Formatting Commands
 %-------------------
@@ -198,6 +200,8 @@
 \newcommand{\templateTy}{{\sf templateTy}}
 \newcommand{\allocRgn}{{\sf allocRgn}}
 \newcommand{\shape}{{\sf shape}}
+\newcommand{\ctype}{{\sf ctype}}
+\newcommand{\override}{{\sf override}}
 %\newcommand{\smallskip}{\vspace*{0.1in}}
 \newcommand{\elabMeth}{{\sf elabMeth}}
 \newcommand{\frv}{{\sf frv}}
@@ -216,6 +220,8 @@
 \newcommand{\Phicx}{\Phi_{cx}}
 \newcommand{\Phics}{\Phi_{cs}}
 \newcommand{\tynwf}[2]{#1\,\nvdash\,#2 \; \texttt{ok}}
+\newcommand{\csid}[1]{\lbrack \mathbf{c_{#1}} \rbrack:\;}
+\newcommand{\qqquad}{\quad\quad\quad}
 \newcommand{\emptyA}[0]{(dom(\rhomap),\rhoenv,\cdot,\phicx)}
 \newcommand{\emptyASigp}[0]{(dom(\rhomap'),\rhoenv,\cdot,\phicx)}
 \newcommand{\emptyASigpp}[0]{(dom(\rhomap''),\rhoenv,\cdot,\phicx)}
@@ -234,6 +240,8 @@
 \newcommand{\RgnZT}[1]{\RgnZ\inang{T}\inang{#1}}
 \newcommand{\BZ}[0]{B\inang{\tbar}}
 \newcommand{\BZT}[1]{B\inang{\tbar}\inang{#1}}
+\newcommand{\redstoo}[2]{\redsto{\rhoenv}{#1}{#2}}
+\newcommand{\redstocup}[3]{\redsto{\rhoenv \cup \{#1\}}{#2}{#3}}
 
 %Rules
 %-----
@@ -277,8 +285,8 @@
 
 \newcommand{\lstjava}{\lstset{ %
 language=Java, % choose the language of the code
-basicstyle=\small\ttfamily,       % the size of the fonts that are used for the code
-keywordstyle=\color{Bittersweet},
+basicstyle=\footnotesize\ttfamily,       % the size of the fonts that are used for the code
+keywordstyle=\color{Bittersweet}\bf,
 % numbers=left,                   % where to put the line-numbers
 numberstyle=\tiny,      % the size of the fonts that are used for the line-numbers
 stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
@@ -293,7 +301,7 @@ breaklines=true,                % sets automatic line breaking
 breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
 commentstyle=\itshape\color{MidnightBlue},
 %escapeinside={\%*}{*)},         % if you want to add a comment within your code
-morekeywords={var, unit, letregion, let, in, as, openalloc, open, withroot, not, : , /\\}
+morekeywords={var, foreach, unit, letregion, let, in, as, openalloc, open, withroot, not, : , /\\}
 }}
 \lstnewenvironment{codejava}
     { % \centering
@@ -313,8 +321,8 @@ morekeywords={var, unit, letregion, let, in, as, openalloc, open, withroot, not,
 
 \newcommand{\lstml}{\lstset{ %
 language=[Objective]Caml, % choose the language of the code
-basicstyle=\small\ttfamily,       % the size of the fonts that are used for the code
-keywordstyle=\color{Bittersweet},
+basicstyle=\footnotesize\ttfamily,       % the size of the fonts that are used for the code
+keywordstyle=\color{Bittersweet}\bf,
 % numbers=left,                   % where to put the line-numbers
 numberstyle=\tiny,      % the size of the fonts that are used for the line-numbers
 stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
@@ -356,12 +364,9 @@ morekeywords={foreach, do, done, not, : , /\\}
 
 %The Paper
 %---------------------
-\title{Broom: Safe Region-Based Memory Management for Dataflow
-Programs}
+\title{Safe Transferable Regions}
 
-\authorinfo{}
-           {}
-           {}
+%\authorinfo{} {} {}
 \maketitle
 
 \begin{abstract}
@@ -380,6 +385,8 @@ Programs}
 \input{type-system}
 
 \input{type-inference}
+
+\input{implementation}
 
 \input{related}
 % \appendix
