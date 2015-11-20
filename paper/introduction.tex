@@ -19,21 +19,20 @@ sends a corresponding output message to its successor.
 
 \input{motivating-eg}
 
-This example is an instance of a general pattern, where a producer
-creates a data structure and passes it to a consumer. In a system
-where most of the computation takes this form, and these
-data structures are very large, as is the case with many streaming
-big-data analysis systems, garbage collection overhead becomes
-significant~\cite{Broom:HotOS}.
-Furthermore, in a distributed dataflow system, the GC pause at one node can
-have a cascading adverse effect on the performance of other nodes.
-For instance, a GC pause at an upstream actor can block
-downstream actors that are waiting for messages. 
-Much of the GC overhead results from the collector performing avoidable or unproductive work.
-For example, in the process executing the code from
-Fig.~\ref{fig:motivating-eg}, GC might repeatedly traverse the \C{map}
-data structure, although its objects cannot be collected until a
-suitable timing message arrives.
+This example is an instance of a general pattern, where a producer creates a
+data structure and passes it to a consumer. In a system where most of the
+computation takes this form, and these data structures are very large, as is
+the case with many streaming big-data analysis systems, garbage collection
+overhead becomes significant~\cite{Broom:HotOS}.  Furthermore, in a
+distributed dataflow system, the GC pause at one node can have a cascading
+adverse effect on the performance of other nodes, particularly when real-time
+streaming performance is required~\cite{Broom:HotOS, harris15}.  In
+particular, a GC pause at an upstream actor can block downstream actors that
+are waiting for messages.  However, often much of the GC overhead results
+from the collector performing avoidable or unproductive work.  For example,
+in the process executing the code from Fig.~\ref{fig:motivating-eg}, GC might
+repeatedly traverse the \C{map} data structure, although its objects cannot
+be collected until a suitable timing message arrives.
 
 % actors.
 % performance degradation due to
@@ -49,8 +48,8 @@ suitable timing message arrives.
 % \C{transfer} operation is complete.  using alternative memory
 % management techniques.
 
-An important observation, in the context of processes of kind
-described above, is that the data structures exchanged between them
+An important observation, in the context of processes of the kind
+described above, is that the data-structures exchanged between them
 can be partitioned into sets of fate-sharing objects with common
 lifetimes, which makes them good candidates for a region-based memory
 management discipline. A region is a block of memory that is allocated
@@ -283,18 +282,105 @@ the impediment to adopt our approach in practical setting.
 % to ensure the second set of invariants is not as burdensome (as
 % regions are coarse-grained objects manipulated infrequently), \eg, as
 % it would be for the first set of invariants.
+% =======
+% objects. Though we focus, in this paper, on memory-safety, our
+% approach offers other benefits.  When a producer transfers a
+% data-structure to a consumer, in a shared-memory context , our
+% approach provides an ownership discipline that ensures that the
+% producer cannot subsequently modify the data-structure. When the same
+% transfer happens in a distributed setting, the system guarantees that
+% the data-structure is self-contained and can be safely transmitted
+% across address spaces.  We refer to dynamic regions that provide these
+% guarantees as \emph{transferable} regions.
+
+% The key memory safety property we wish to ensure is that there are no
+% dangling references: i.e., a reference to an object that has been
+% freed.  A key invariant and restriction that we utilize to achieve
+% this is that no object $o_1$ in one dynamic region $D_1$ can contain a
+% pointer to an object $o_2$ in another dynamic region $D_2$.  In cases
+% where this is too restrictive, the user has to resort to (deep)
+% copying $o_2$ to $D_1$.  This is conceptually quite reasonable given
+% the perspective that $D_1$ is a self-contained data-structure.
+% Furthermore, this is quite analogous, from a performance perspective,
+% to the copying that happens when a garbage collector promotes an
+% object from a lower generation to a higher generation.  From this
+% perspective, a region may be seen as a user-controlled generation.
+
+% This ensures that we can safely free one dynamic region (\eg, the
+% input-message in our example) without affecting the validity of
+% pointers in another dynamic region (\eg, the output-message).
+% However, this is not sufficient! \dv{for what} When processing the input-message
+% $D$, we necessarily will have to create pointers that point to objects
+% that are internal to $D$. Such pointers may be stack-allocated or even
+% reside in the heap (\eg, consider the iterator object used to iterate
+% over the list in the input-message).  How do we ensure the safety of
+% these pointers?
+
+% We use \emph{stack regions} (regions with lexically-scoped lifetimes),
+% as well as the stack, for such temporary pointers (to objects inside a
+% dynamic region) and use the following protocol to ensure safety of
+% such pointers.  To work with a dynamic region $D$, we must first
+% \emph{open} region $D$, to indicate that $D$ should not be freed
+% during this period.  When the processing of the region is complete, we
+% \emph{close} the region $D$, to indicate that it is safe to free $D$.
+% In general, a dynamic region may be opened and closed multiple times
+% before it is finally freed.
+
+% Our type-system permits the creation of pointers to internal objects
+% of \emph{open dynamic} regions, but uses lexical scoping to ensure
+% that such pointers are no longer live when the region is closed.
+% Thus, such pointers may be either stack-allocated or reside in a
+% region whose lifetime is statically guaranteed to be contained within
+% the interval when $D$ is open.  As a consequence, the system ensures
+% the strong invariant that for a \emph{closed dynamic} region $D$ no
+% pointer from outside $D$ points to an internal object of $D$.
+
+% The final piece required to ensure memory-safety is ensuring that the
+% program correctly follows the above-mentioned protocol for dynamic
+% regions: \eg, an open region should not be freed and, dually, a freed
+% region should not be opened.  (A complete typestate specification of
+% the protocol is presented later.)
+
+% Dynamic regions are first-class objects in our system. For instance,
+% in our running example, we would like to use a dictionary that stores
+% dynamic regions. However, this means that the program may create
+% multiple aliases (pointers) to the same region, which, in turn, means
+% that statically checking if the program correctly follows the dynamic
+% region protocol is hard (undecidable, in fact). Safety can be ensured
+% by using, \eg, linear typing to prevent the creation of aliases, but
+% this would be quite restrictive. Hence, in our system, we dynamically
+% check for adherence to this protocol.
+
+% In summary, our approach reduces memory safety to two sub-problems:
+% (a) Ensuring  low-level invariants about pointers to (fine-grained)
+% objects inside regions and (b) Ensuring higher-level (typestate)
+% invariants about the regions themselves.  We use a type system to
+% statically ensure the first set of invariants. We use a dynamic check
+% to ensure that the second set of invariants are satisfied at runtime.
+% %
+% This is a novel aspect of our system. We believe that this is a
+% reasonable choice: dynamically checking for the second category of
+% invariants is easy and does not pose a performance concern (unlike,
+% \eg, the first category of constraints); a static typechecker that
+% rules out the second category of violations would be very restrictive
+% from an expressiveness perspective; finally, the human effort required
+% to ensure the second set of invariants is not as burdensome (as
+% regions are coarse-grained objects manipulated infrequently), \eg, as
+% it would be for the first set of invariants.
+% >>>>>>> af17b22a358a6165ae10628a5247cd4fa66adc07
 
 \subsection*{Contributions}
 
 The paper makes the following contributions:
 
-\begin{itemize} \item We present \name, a \csharp-like typed
-object-oriented language that eschews garbage collection in favour of
-programmer-managed memory regions . \name extends its core language,
-which includes \emph{lambdas} (higher-order functions) and
-\emph{generics} (parametric polymorphism), with constructs to create,
-manage and destroy static and transferable memory regions. Transferable regions
-are first-class values in \name.
+\begin{itemize} 
+  \item We present \name, a \csharp-like typed
+  object-oriented language that eschews garbage collection in favour of
+  programmer-managed memory regions . \name extends its core language,
+  which includes \emph{lambdas} (higher-order functions) and
+  \emph{generics} (parametric polymorphism), with constructs to create,
+  manage and destroy static and transferable memory regions. Transferable regions
+  are first-class values in \name.
   % Experiments demonstrate that   \naiad~\cite{naiad} dataflow
   % program using programmer-managed memory regions outperform their
   % GC counterparts by a margin of upto 59\%. 
@@ -321,19 +407,19 @@ are first-class values in \name.
   constraints.
 
   \item We describe an implementation of \name frontend in OCaml,
-  along with experimental results, and case studies where the region
-  type system was able to identify unsafe memory accesses statically.
+  along with case studies where the region type system was able to
+  identify unsafe memory accesses statically.
   
 \end{itemize}
 
-%The rest of the paper is organized as follows. The next section
-%presents an informal overview of \name, and motivates the need for a
-%region type system.  \S~\ref{sec:type-system} formalizes the type
-%system and its safety guarantees. The type inference algorithm is
-%described in \S~\ref{sec:type-inference}. \S~\ref{sec:csolve} focuses
-%on \csolve, the constraint solving algorithm, and its correctness
-%guarantees.  Implementations details and practical extensions to the
-%type system are described in \S~\ref{sec:implementation}.
-%\S~\ref{sec:evaluation} presents experimental evaluation and case
-%studies.  \S~\ref{sec:related} discusses the related work, and
-%\S~\ref{sec:conclusion} concludes.
+  %The rest of the paper is organized as follows. The next section
+  %presents an informal overview of \name, and motivates the need for a
+  %region type system.  \S~\ref{sec:type-system} formalizes the type
+  %system and its safety guarantees. The type inference algorithm is
+  %described in \S~\ref{sec:type-inference}. \S~\ref{sec:csolve} focuses
+  %on \csolve, the constraint solving algorithm, and its correctness
+  %guarantees.  Implementations details and practical extensions to the
+  %type system are described in \S~\ref{sec:implementation}.
+  %\S~\ref{sec:evaluation} presents experimental evaluation and case
+  %studies.  \S~\ref{sec:related} discusses the related work, and
+  %\S~\ref{sec:conclusion} concludes.
