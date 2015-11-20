@@ -24,13 +24,12 @@ creates a data-structure and passes it to a consumer. In a system
 where most of the computation takes this form, and these
 data-structures are very large, as is the case with many streaming
 big-data analysis systems, garbage collection overhead becomes
-significant~\cite{Broom:HotOS}. This is a cause of concern because,
-firstly, in a distributed dataflow system, GC overhead at one node can
-have compounding adverse effect on the performance of other nodes.
-This can happen, for instance, when a GC is triggered at an upstream
-actor that is about to send a message, while the downstream actors are
-blocked waiting for messages. Secondly, much of the GC overhead
-results from the collector performing avoidable or unproductive work.
+significant~\cite{Broom:HotOS}.
+Furthermore, in a distributed dataflow system, the GC pause at one node can
+have a cascading adverse effect on the performance of other nodes.
+For instance, a GC pause at an upstream actor can block
+downstream actors that are waiting for messages. 
+Much of the GC overhead results from the collector performing avoidable or unproductive work.
 For example, in the process executing the code from
 Fig.~\ref{fig:motivating-eg}, GC might repeatedly traverse the \C{map}
 data-structure, although its objects cannot be collected until a
