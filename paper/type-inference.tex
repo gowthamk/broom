@@ -397,7 +397,7 @@ version):
 unit alt<$\rhoalloc_2$,$\rho_{6-9}\,$|$\,\varphi_2$>(Region<Pair<A,A>><$\toprgn$> r, 
                 Pair<A,A><$\rho_{6-8}$> q, A<$\rho_{9}$> y) {
   q.fst := y; q.snd := y; 
-  open r as $\rgn_0$ withroot p in
+  open r as $p@\rgn_0$ in
     letregion $\rgn_1$ in
       let x = new Pair<A,A><$\rgn_1$,$\rgn_0$,$\rgn_0$>
                       (p.fst,p.fst) in
