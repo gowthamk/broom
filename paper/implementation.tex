@@ -3,45 +3,86 @@
 
 We have implemented the prototype of \name compiler frontend,
 including its region type system and type inference, in 3k+ lines of
-OCaml. The input to our system is a program in $\absof{\FB^+}$, an extended
-version of $\absof{\FB}$ that includes assignments, conditionals,
-loops, more primitive datatypes (\eg strings), and a null value. 
+OCaml. Our implementation is called \namec. The input to \namec is a
+program in $\absof{\FB^+}$, an extended version of $\absof{\FB}$ that
+includes assignments, conditionals, loops, more primitive datatypes
+(\eg, integers), and a null value. 
 % If needed, a specification file containing region type annotations
 % for higher-order functions can also be provided. 
-Our implementation of region type inference closely follows the
-description given in Sec.~\ref{sec:type-inference}. To solve the
-constraints that arise during type inference, we built a solver called
-\csolve that implements constraint solving approach based on fixpoint
-computation and graph augmentation described in \S~\ref{sec:csolve}. 
+Our implementation of region type inference and constraint solving
+closely follows the description given in
+Sec.~\ref{sec:type-inference}. The one difference is that our
+constraint solver uses an approximation algorithm to compute the
+minimal graph augmentation (\S~\ref{sec:csolve}), since the general
+problem is NP-hard~\cite{siam92}.
+% To solve the
+% constraints that arise during type inference, we built a solver called
+% \csolve that implements constraint solving approach based on fixpoint
+% computation and graph augmentation described in \S~\ref{sec:csolve}. 
 % Since graph augmentation is NP-hard, \csolve uses an approximation
 % algorithm that repeatedly adds an edge and recomputes paths in graph
 % $G_1$ until it is as connected as graph $G_2$. Though this approach
 % may not necessarily return the weakest solution to the abduction
 % problem (\S~\ref{sec:csolve}), it seems to do so in practice, since
 % constraints are not often complex. 
-If the input $\absof{\FB^+}$ program does not create any unsafe
-references, our compiler annotates it with region types, which act as
-a witness to program's memory safety. On contrary, if the input
-program does create a reference that is potentially unsafe, then the
-type inference fails during the constraint solving phase. We currently
-do not implement error localization and feedback mechanisms.
+% If the input $\absof{\FB^+}$ program does not create any unsafe
+% references, \namec annotates it with region types, which act as a
+% witness to program's memory safety. If potential safety violations are
+% encountered, then the type inference fails during the constraint
+% solving phase. 
+
+\begin{figure}
+\begin{codejava}
+class LinkedList<T><R5,R4 | R4$\outlives$R5> {
+  ListNode<T><R5,R4> head;
+  ..
+  List<T><R17,R4> rev<R17,R4 | R4$\outlives$R17>(unit u) {
+    List<T><R17,R4> xs = 
+        new List<T><R17,R4>(this.head.val);
+    ListNode<T><R5,R4> cur = this.head.next;
+    while (!cur == Null) {
+      xs.add<R17>(cur.val)
+      cur = cur.next;
+    }
+    return xs;
+  }
+\end{codejava}
+
+\caption{Region-annotated definition of \C{rev} computed by \namec}
+\label{fig:rev}
+\end{figure}
 
 To evaluate the practical utility of our region type system and type
 inference, we 
 % implemented some of the C\# libraries in $\absof{\FB^+}$, and 
-translated some of the Naiad streaming query operator benchmarks
-(Naiad vertices) used in~\cite{Broom:HotOS} to $\absof{\FB^+}$, and
-used our prototype compiler to assign region types to these programs,
-and thus prove their safety. During the process, we found multiple
-instances of potential memory safety violations in the $\absof{FB^+}$
-translation of benchmarks, which we verified to be present in the
-original C\# implementation as well. The cause of all safety
-violations is the creation of a reference from the outgoing message (a
-transferable region) to the payload of the incoming message. For
-example, the implementation of \C{RegionSelectVertex} contains the
-following:
+performed two kinds of experiments. First, we implemented some of the
+microbenchmarks ($\le$100 LOC), which are the standard libraries such
+as pairs, lists, list iterators, etc., in $\absof{\FB^+}$, and used
+our inference engine to infer their principal region types. Since a
+library class is region-oblivious, if it is well-typed as per the core
+type system, then \namec must be able to automatically construct its
+region-type-annotated definition without fail. As expected, \namec was
+able to infer principal region types for all the library classes,
+under 10ms. Fig~\ref{fig:rev} shows the region-type-annotated
+definition computed for the list reverse method. Observe that \namec
+was able to infer that the list and its data (of type \C{T}) can be
+allocated in different regions, as long as the later outlives the
+former. This allows, for instance, a \C{preOrder} method to traverse a
+tree in a transferable region, and return a list of its nodes, where
+the list itself is allocated in the stack region. 
+
+Next, we translated some of the Naiad streaming query operator
+benchmarks (Naiad vertices) used in~\cite{Broom:HotOS} to
+$\absof{\FB^+}$, and used \namec to verify their safety. During the
+process, we found multiple instances of potential memory safety
+violations in the $\absof{FB^+}$ translation of benchmarks, which we
+verified to be present in the original C\# implementation as well. The
+cause of all safety violations is the creation of a reference from the
+outgoing message (a transferable region) to the payload of the
+incoming message. For example, the implementation of \C{SelectVertex}
+contains the following:
 \begin{codejava}
-  if (this.selectFn(inMsg.payload[i])) {
+  if (this.selector(inMsg.payload[i])) {
     outMsg.set(outputOffset, inMsg.payload[i]);
     ...
   } 
@@ -52,7 +93,22 @@ reference could have gone unnoticed during experiments
 in~\cite{Broom:HotOS} because their experimental setup included only
 one actor.}. We eliminated such unsafe references by creating a clone
 of \C{inMsg.payload[i]} in \C{outMsg}, and our compiler was
-subsequently able to certify the safety of all references.
+subsequently able to certify the safety of all references. 
+
+Our experience with Naiad benchmarks suggests that, although our
+approach cannot statically enforce memory safety, it is nonetheless
+useful, particularly because the static verification comes at no
+additional cost to the developer. If the developer is satisfied with
+the confidence gained by static verification, she may even choose to
+turn the runtime safety checks off. Since we did not implement code
+generation in \namec, we could not measure the runtime overhead of
+checks needed to enforce safety. However, the number of LOC peforming
+operations on \C{Region} objects relative to the total LOC never
+exceeds 8\% in Naiad benchmarks. 
+% \C{SelectVertex}, for example, contains one each of
+% \C{open} and \C{transfer} operations on one region in its 45LOC,
+% whereas, \C{JoinVertex} contains 5 \C{open}s, 2 \C{transfer}s, and 1
+% \C{free} operation.
 
 % We now briefly describe our experience of
 % working with these benchmarks. Note that the performance benefits of
