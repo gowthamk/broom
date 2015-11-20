@@ -26,10 +26,12 @@ data-structures are very large, as is the case with many streaming
 big-data analysis systems, garbage collection overhead becomes
 significant~\cite{Broom:HotOS}.
 Furthermore, in a distributed dataflow system, the GC pause at one node can
-have a cascading adverse effect on the performance of other nodes.
-For instance, a GC pause at an upstream actor can block
+have a cascading adverse effect on the performance of other nodes, particularly
+when real-time streaming performance is required.
+\dv{citation missing here, Tim Haris's work and our HotOS submission.}
+In particular, a GC pause at an upstream actor can block
 downstream actors that are waiting for messages. 
-Much of the GC overhead results from the collector performing avoidable or unproductive work.
+However, often much of the GC overhead results from the collector performing avoidable or unproductive work.
 For example, in the process executing the code from
 Fig.~\ref{fig:motivating-eg}, GC might repeatedly traverse the \C{map}
 data-structure, although its objects cannot be collected until a
@@ -49,7 +51,7 @@ suitable timing message arrives.
 % \C{transfer} operation is complete.  using alternative memory
 % management techniques.
 
-An important observation, in the context of processes of kind
+An important observation, in the context of processes of the kind
 described above, is that the data-structures exchanged between them
 can be partitioned into sets of fate-sharing objects with common
 lifetimes, which makes them good candidates for a region-based memory
@@ -110,7 +112,7 @@ perspective, a region may be seen as a user-controlled generation.
 This ensures that we can safely free one dynamic region (\eg, the
 input-message in our example) without affecting the validity of
 pointers in another dynamic region (\eg, the output-message).
-However, this is not sufficient! When processing the input-message
+However, this is not sufficient! \dv{for what} When processing the input-message
 $D$, we necessarily will have to create pointers that point to objects
 that are internal to $D$. Such pointers may be stack-allocated or even
 reside in the heap (\eg, consider the iterator object used to iterate
