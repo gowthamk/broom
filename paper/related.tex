@@ -50,14 +50,11 @@ equipped with full type inference that eliminates the need to write
 region annotations on types to convince the type checker that the
 program is safe. 
 
-~\cite{tofte97} proposes to extend Standard ML, a higher-order
-functional language, with lexically-scoped stack regions, and defines
-an elaboration from Standard ML to the region-annotated version of
-Standard ML. The aim of the elaboration is to introduce stack regions
-and do away with GC in a transparent fashion without jeopardizing
-memory safety. We too define an elaboration, but our focus is on
-introducing region annotations necessary to prove the safety of an
-object-oriented program that already uses (stack and dynamic) regions.
+~\cite{tofte97} elaborates SML programs to introduce stack regions and
+do away with GC in a transparent fashion. We too define an
+elaboration, but our focus is on introducing region annotations
+necessary to prove the safety of an object-oriented program that
+already uses regions.
 % Similar to their region inference algorithm, our region type inference
 % algorithm can deal with region-polymorphic recursion by computing
 % fixed points for recursive constraints. 
@@ -118,8 +115,9 @@ block for transferable regions traces its orgins to the \C{let!}
 expression in~\cite{WW01} and~\cite{wadler90}, which safely relaxes
 linear typing restrictions, allowing variables to be temporarily
 aliased. We don't have linear typing, thus admit unrestricted
-aliasing. Non-linear typing keeps our type system simple, and makes it
-possible to infer types, thus eliminating the annotation burden.
+aliasing. 
+% Non-linear typing keeps our type system simple, and makes it
+% possible to infer types, thus eliminating the annotation burden.
 Moreover, ~\cite{WW01}'s linear type system is insufficient to enforce
 the invariants needed to ensure safety under region transfers, such as
 the absence of references that escape a transferable region.

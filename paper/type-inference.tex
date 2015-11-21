@@ -1,3 +1,4 @@
+\vspace*{-0.1in}
 \section{Type Inference}
 \label{sec:type-inference}
 
@@ -44,6 +45,7 @@ elaboration are described below.
 % the constraints and determine assignments for unknown region and
 % predicate variables.
 
+\vspace*{-0.1in}
 \subsection{Region Type Templates}
 \label{sec:fb-templatization}
 
@@ -161,17 +163,17 @@ Elaborating $\absof{\FB}$ expressions to $\FB$ expressions involves
 (a). replacing core types occurring in expressions with fresh region
 type templates, and (b). explicitly instantiating region parameters
 with fresh region variables in method calls and function applications.
-This elaboration is performed with respect to the polymorphic type
-templates of classes and methods computed as per
-\S\ref{sec:fb-templatization}. Our expression elaboration
-function\footnote{Supplement contains the pseudocode for all the
-elaboration functions.} traverses expressions in a syntax-directed
-manner of a type checker, introducing fresh region type templates for
-unknown region types, while generating constraints over region and
-predicate variables. The precise nature of generated constraints is
-explained in \S\ref{sec:constraints}, but in summary, they
-capture the relationships between the type templates of various
-subexpressions and their well-formedness.
+% This elaboration is performed with respect to the polymorphic type
+% templates of classes and methods computed as per
+% \S\ref{sec:fb-templatization}. 
+Our expression elaboration function\footnote{Supplement contains the
+pseudocode for all the elaboration functions.} traverses expressions
+in a syntax-directed manner of a type checker, introducing fresh
+region type templates for unknown region types, while generating
+constraints over region and predicate variables. The precise nature of
+generated constraints is explained in \S\ref{sec:constraints}, but in
+summary, they capture the relationships between the type templates of
+various subexpressions and their well-formedness.
 
 % Function $\elabExpr$, shown in Fig.~\ref{fig:fb-elabexpr}, performs
 % this elaboration for a subset of expressions in $\absof{\FB}$
@@ -198,16 +200,16 @@ accumulating constraints. Besides such constraints, elaboration
 functions for methods and classes also generate new constraints by
 checking well-formedness and subtype relationships among the types of
 their constituents. For instance, method elaboration generates a new
-constraint that captures the requirement that, under the guarantees
-provided by the context, the region type of a method body must be a
-subtype\footnote{Subtyping is type equality in \FB. In \name,
-subtyping between region types is a straightforward extension of
-subtyping between core types.} of method's return type.  Likewise, the
-elaboration function for a class generates a fresh constraint that
-captures a couple of safety conditions: first, the allocation regions
-of objects referred by the instance variables should outlive the
-allocation region of the instance itself, and second, the allocation
-regions of a class type and its superclass type must be the same.
+constraint by typechecking the method body against its return type.
+% subtype\footnote{Subtyping is type equality in \FB. In \name,
+% subtyping between region types is a straightforward extension of
+% subtyping between core types.} of method's return type.  
+Likewise, the elaboration function for a class generates a fresh
+constraint that captures a couple of safety conditions: first, the
+allocation regions of objects referred by the instance variables
+should outlive the allocation region of the instance itself, and
+second, the allocation regions of a class type and its superclass type
+must be the same.
 
 Elaborating a class table ($CT$) entails elaborating every class
 definition in $CT$, while collecting constraints. The constraints thus
@@ -295,6 +297,7 @@ $\phicx$ and $\phi$ are region constraints (Fig.~\ref{fig:fb-syntax})
 extended with predicate variables and \emph{pending
 substitutions}\footnote{we borrowed this terminology
 from~\cite{ltpldi08}}:
+\vspace*{-0.05in}
 \begin{smathpar}
 \begin{array}{lcl}
 \phicx,\phi & \coloneqq & true \ALT \rho \outlives \rho \ALT \rho = \rho 
@@ -302,6 +305,7 @@ from~\cite{ltpldi08}}:
 F & \coloneqq & \cdot \ALT [\rho/\rho]F \\
 \end{array}
 \end{smathpar}
+\vspace*{-0.1in}
 \end{itemize}
 A pending substitution ($F$) is a substitution function over region
 variables/identifiers. They represent the substitutions that need to
@@ -589,6 +593,7 @@ number of edges that need to be added to $G(\phictxt)$ such that it is
 ``as connected as'' $G(\phicstr)$. Using this technique, we obtain the
 following solutions to $\varphi_0$ and $\varphi_1$ for constraints in
 the running example:
+\vspace*{-0.05in}
 \begin{center}
 \(
   \varphi_0 \Leftrightarrow \rho_0 \outlives \rhoalloc_0 \conj \rho_1
@@ -599,13 +604,16 @@ the running example:
   \varphi_1 \Leftrightarrow \rho_5 = \rho_0
 \)
 \end{center}
+\vspace*{-0.1in}
 Substituting the above solutions for $\varphi_0$ and $\varphi_1$ in
 $c_{14}$ gives us a recursive constraint of the following form:
+\vspace*{-0.05in}
 \begin{center}
 \(
   \isvalid{\phictxt \conj \varphi}{\phicstr \conj F(\varphi)}
 \)
 \end{center}
+\vspace*{-0.05in}
 Where $\phictxt$ and $\phicstr$ are concrete constraint formulas, and $F$ is
 a substitution function, not necessarily idempotent. Our solution to the
 constraints of the above form is based on the observation that $H(\varphi) =

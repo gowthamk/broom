@@ -58,7 +58,7 @@ creation of a transferable region, whose root is an object of type
 \C{A}.
 % (\C{r}) of type \C{T}:
 \begin{codejava} 
-  Region<A> rgn = new Region<T>(() => new A())
+  Region<A> rgn = new Region<A>(() => new A())
 \end{codejava} 
 In the above code, \C{rgn} is called the \emph{handler} to the newly
 created region, and is required to read the contents of the region, or

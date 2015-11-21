@@ -4,19 +4,21 @@
 The purpose of \name's region type system is to enforce the key
 invariant required for memory safety, namely that an object $o_1$ in a
 region $R_1$ contains a reference to an object $o_2$ in $R_2$, only if
-$R_2$ is guaranteed to outlive $R_1$. Intuitively, the invariant can
-be enforced by (a). tracking \emph{outlives} relationships between
-various regions in the program (b). tagging the C\# type of every
-object in the program with its allocation region, and (c).  ensuring
-that, when a reference is created, its target object ($o_2$) is
-allocated in a region that is known to be in outlives relationship
-with the object containing the reference. We now formally develop this
-intuition via \fbname (\FB), our explicitly typed core language (with region
-types) that incorporates the features introduced in the previous
-section. \fbname builds on the Featherweight Generic Java
-(FGJ)~\cite{fgj} formalism, and reuses notations and various
-definitions from~\cite{fgj}, such as the definition of type
-well-formedness for the core (region-free) language. 
+$R_2$ is guaranteed to outlive $R_1$. 
+% Intuitively, the invariant can
+% be enforced by (a). tracking \emph{outlives} relationships between
+% various regions in the program (b). tagging the C\# type of every
+% object in the program with its allocation region, and (c).  ensuring
+% that, when a reference is created, its target object ($o_2$) is
+% allocated in a region that is known to be in outlives relationship
+% with the object containing the reference. 
+We now formally develop this intuition via \fbname (\FB), our
+explicitly typed core language (with region types) that incorporates
+the features introduced in the previous section. \fbname builds on the
+Featherweight Generic Java (FGJ)~\cite{fgj} formalism, and reuses
+notations and various definitions from~\cite{fgj}, such as the
+definition of type well-formedness for the core (region-free)
+language. 
 
 % In this section, we formally develop \fbname, a language that
 % incorporates the features introduced in the previous section, as well
@@ -585,17 +587,19 @@ transfers across address spaces:
 \emph{(\textbf{Transfer Safety})}
 \label{thm:fb-type-safety}
 $\forall$ $v$, $\rhoenv$, $\rhoenv'$, $\rhomap$, $\rhomap'$, $\phicx$,
-$\phicx'$, $\rgn$, $\rgn'$, such that $\rgn \in \rhoenv$, $\rgn' \in \rhoenv'$, and
-$\rgn_i \notin dom(\rhomap')$, if $\hastyp{\emptyA,\rgn,
-\cdot}{\C{new}\; \RgnZT{\rgn_i}}{\RgnZT{\toprgn}}$, then
+$\phicx'$, $\rgn$, $\rgn'$, such that $\rgn \in \rhoenv$, $\rgn' \in
+\rhoenv'$, $\rgn_i \neq \toprgn$ and
+$\rgn_i \notin dom(\rhomap') \cup \rhoenv'$, if $\hastyp{\emptyA,\rgn,
+\cdot}{\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$, then
 $\hastyp{(\rhomap'[\rgn_i \mapsto \CLOSED],\rhoenv',\cdot,\phicx')}
-{\C{new}\; \RgnZT{\rgn_i}}{\RgnZT{\toprgn}}$
+{\\\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$
 \end{theorem}
 The above theorem states that if a $\C{new}\; \RgnZT{\rgn_i}(v)$ value
 is well-typed under one context, then it is also well-typed under
 every other context, whose $\rhomap$ maps $\rgn_i$ to closed
 ($\CLOSED$) state.  Thus, a recipient of a transferable region only
 needs to add a binding for the region to its $\rhomap$ in order to
-preserve its type safety. Notably, this result could not have been
-established if it were possible for a transferable region to contain
-references to objects outside the region.
+preserve its type safety. 
+% Notably, this result could not have been
+% established if it were possible for a transferable region to contain
+% references to objects outside the region.

@@ -13,8 +13,7 @@ Our implementation of region type inference and constraint solving
 closely follows the description given in
 Sec.~\ref{sec:type-inference}. The one difference is that our
 constraint solver uses an approximation algorithm to compute the
-minimal graph augmentation (\S~\ref{sec:csolve}), since the general
-problem is NP-hard~\cite{siam92}.
+minimal graph augmentation (\S~\ref{sec:csolve}).
 % To solve the
 % constraints that arise during type inference, we built a solver called
 % \csolve that implements constraint solving approach based on fixpoint
@@ -50,6 +49,7 @@ class LinkedList<T><R5,R4 | R4$\outlives$R5> {
 
 \caption{Region-annotated definition of \C{rev} computed by \namec}
 \label{fig:rev}
+\vspace*{-0.15in}
 \end{figure}
 
 To evaluate the practical utility of our region type system and type
