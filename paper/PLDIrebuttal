@@ -1,0 +1,70 @@
+We thank the reviewers for their constructive comments and
+thoughtful suggestions.
+
+Reviewer #1:
+1. The formal language uses a distinguished "open" construct for
+clarity. In practice, it can be implemented via C#'s "using"
+statement. Extension to syntax is not necessary. 
+2. If a library maintains a cache that persists across multiple method
+calls, then it escapes the scope of a single method (for example, via
+an instance variable of the library object). In such case, type
+inference will not allocate it in the "letregion" context of methods.
+The constraints force it to allocate the cache outside.
+
+Reviewer #2: 
+1. We think reviewer's comparison with Cyclone is fair; full region
+type inference, a dynamic component, and the OO setting are the
+primary distinguishing aspects.
+2. Allocations need not always happen in the top-most region. A method
+can contain nested "letregion" or "open" constructs, and the type
+system admits allocations in any of the regions live during
+allocation. Inference, however, allocates in the latest open region.
+While inference can be generalized by admitting disjunctive
+constraints, we haven't (so far) seen the need for it. 
+3. The type inference is not global (whole program). We clarify (in
+Sec.  4.4) that "although we collect constraints for the entire
+program during elaboration, we solve the constraints in a
+compositional fashion", thus leading to an inference algorithm that
+admits separate compilation and modular reasoning. 
+4. Initial versions of FB had classes parameterized on region types
+(\tau), instead of regions (\rho) and types(T). Unfortunately, it was
+too weak to support instance variables with region-polymorphic
+function types (for eg., there do not exist \tau_1 and \tau_2 s.t.
+\tau_1 -> \tau_2 is equivalent to the type <\rho> T1@\rho -> T2@\rho).
+Existential types were considered briefly, but that led to a
+significant additional complexity in the type system - an antithesis
+to pratical adoption. We finally settled on the current approach.
+Supporting two kinds of parameterizations on classes should be
+possible (if one doesn't mind verbose types), but we didn't pursue it
+for the lack of practical motivation. 
+
+Reviewer #3:
+1. Broom's region management runtime (described in [4]) is designed to
+coexist with GC. However, the formal language presented in the paper
+is independent of GC.
+2. We consistently distinguish between stack regions (created by
+"letregion") with lexically-scoped lifetimes , and transferable
+regions (created by "new", and managed by "open") with dynamic
+lifetimes. The distinction is also captured in the formal language.
+The sort of interactions allowed between these two kinds of regions
+are captured in Fig.2., described formally in the type rules of
+"letregion" and "open", and informally in the discussion about the
+type rules. Nonetheless, we agree that maybe a summary figure would've
+helped. 
+
+Reviewer #4:
+1. Assuming that a language is defined by its syntax and semantics
+(static and dynamic), the language Broom is indeed the contribution of
+the current paper. The HotOS paper [4] does not define the Broom
+language, but rather its region management runtime. The
+benchmarks used in [4] were written in vanilla C# patched with a new
+run-time, and come with no safety guarantees whatsover. 
+2. Broomc is an ahead-of-time compiler.
+
+Reviewer #5:
+1. Supplementary includes rigorous treatment of type inference. We
+could not include it in the paper due to space constraints.
+2. The complexity incurred from full higher-order region type
+inference cannot be justifed in the context of dataflow systems
+(primary users of Broom), where the only form of higher-order control
+flow is via user-defined functions (eg., the predicate in SELECT). 
