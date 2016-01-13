@@ -69,10 +69,12 @@ come with no safety guarantees whatsover.
 2. Broomc is an ahead-of-time compiler.
 
 Reviewer #5:
-1. Supplementary includes rigorous treatment of type inference. We
-could not include it in the paper due to space constraints.
-2. Note that higher-rank types do not admit principal typing. So, a
-higher-order type inference algorithm would still need to use
-heuristics even if the approach in [14] is used to infer maximally
-general types. Such an approach is more complex than our approach, but
-does not give any additional theoretical guarantees.
+1. Supplement includes rigorous treatment of type inference. We could
+not include it in the paper due to space constraints.  
+2. Note that higher-rank types do not admit principal typing. Due to
+the inevitable parameterization over allocation context, every
+higher-order type in FB is also a higher-rank type. So, a higher-order
+type inference algorithm would still need to use heuristics even if
+the approach in [14] is used to infer maximally general types. Such an
+approach is more complex than our approach, but does not give any
+additional theoretical guarantees.
