@@ -6,8 +6,8 @@ Reviewer #1:
 clarity. In practice, it can be implemented via C#'s "using"
 statement. Extension to syntax is not necessary. 
 2. For a library method to add objects to library's cache, it has to
-be called under the context that lives at least as long as the cache
-itself. That it is indeed a downside of the region type inference
+be called under a context that lives at least as long as the cache
+itself. This is indeed a downside of the region type inference
 presented in the paper. However, this problem can be adressed by
 generalizing inference to not always unify \rho in new@\rho with the
 current allocation context (\rho^a). Instead, it can generate a
