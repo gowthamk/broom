@@ -7,12 +7,15 @@ clarity. In practice, it can be implemented via C#'s "using"
 statement. Extension to syntax is not necessary. 
 2. For a library method to add objects to library's cache, it has to
 be called under a context that lives at least as long as the cache
-itself. Type inference is capable of enforcing this condition.
+itself. Type inference is capable of enforcing this condition. This
+condition can be met, for example, by creating the library object in a
+dynamic region, and "open"ing it to set the context everytime the
+method is called.
 
 Reviewer #2: 
 1. We agree with reviewer's comparison with Cyclone; full region type
-inference, a dynamic component, and the OO setting are the primary
-distinguishing aspects.
+inference, a dynamic component to enforce typestate invariants, and
+the OO setting are the primary distinguishing aspects.
 2. We appreciate the manner in which Rust brought to bear unique
 pointers and ownership types on practical systems programming.
 Nonetheless, programming around Rust's borrow checker is still
