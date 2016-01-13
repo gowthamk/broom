@@ -17,21 +17,31 @@ larger-living region (say, R) without necessarily unifying the \rho^a
 with R.
 
 Reviewer #2: 
-1. We think reviewer's comparison with Cyclone is fair; full region
-type inference, a dynamic component, and the OO setting are the
-primary distinguishing aspects.
-2. Allocations need not always happen in the top-most region. A method
+1. We agree with reviewer's comparison with Cyclone; full region type
+inference, a dynamic component, and the OO setting are the primary
+distinguishing aspects.
+2. Authors very much appreciate the manner in which Rust brought to
+bear unique pointers and ownership types on practical systems
+programming. Nonetheless, programming around Rust's borrow checker is
+still considered hard for an average newcomer to Rust, as evident from
+the queries on various internet forums, and acknowledged by Rust's own
+documentation ("Many new users to Rust experience something we like to
+call ‘fighting with the borrow checker’"). Moreover, unlike Broom,
+Rust doesn't support programmer-managed dynamic memory. Unique
+pointers and linear typing under this general setting can be even more
+restrictive than under Rust.
+3. Allocations need not always happen in the top-most region. A method
 can contain nested "letregion" or "open" constructs, and the language
 permits the programmer to specify the region in which a new object
 should be allocated. Allocation in the latest open region is used as a
 default only if the programmer does not specify the region of
 allocation.
-3. The type inference is not global (whole program). We clarify (in
+4. The type inference is not global (whole program). We clarify (in
 Sec.  4.4) that "although we collect constraints for the entire
 program during elaboration, we solve the constraints in a
 compositional fashion", thus leading to an inference algorithm that
 admits separate compilation and modular reasoning. 
-4. Initial versions of FB had classes parameterized on region types
+5. Initial versions of FB had classes parameterized on region types
 (\tau), instead of regions (\rho) and types(T). Unfortunately, it was
 too weak to support instance variables with region-polymorphic
 function types (for eg., there do not exist \tau_1 and \tau_2 s.t.
@@ -50,10 +60,9 @@ is independent of GC.
 2. We consistently distinguish between stack regions (created by
 "letregion") with lexically-scoped lifetimes , and transferable
 regions (created by "new", and managed by "open") with dynamic
-lifetimes. The distinction is also captured in the formal language.
-The sort of interactions allowed between these two kinds of regions
-are captured in Fig.2., described formally in the type rules of
-"letregion" and "open", and informally in the discussion about the
+lifetimes. The sort of interactions allowed between these two kinds of
+regions are captured in Fig.2., described formally in the type rules
+of "letregion" and "open", and informally in the discussion about the
 type rules. Nonetheless, we agree that maybe a summary figure would've
 helped. 
 
