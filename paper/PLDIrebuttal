@@ -27,9 +27,9 @@ still considered hard for an average newcomer to Rust, as evident from
 the queries on various internet forums, and acknowledged by Rust's own
 documentation ("Many new users to Rust experience something we like to
 call ‘fighting with the borrow checker’"). Moreover, unlike Broom,
-Rust doesn't support programmer-managed dynamic memory. Unique
-pointers and linear typing under this general setting can be even more
-restrictive than under Rust.
+Rust doesn't support programmer-managed dynamic memory (there is no
+"free" in Rust). Unique pointers and linear typing under this general
+setting can be even more restrictive than under Rust.
 3. Allocations need not always happen in the top-most region. A method
 can contain nested "letregion" or "open" constructs, and the language
 permits the programmer to specify the region in which a new object
