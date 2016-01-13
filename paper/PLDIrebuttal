@@ -20,11 +20,11 @@ Reviewer #2:
 1. We agree with reviewer's comparison with Cyclone; full region type
 inference, a dynamic component, and the OO setting are the primary
 distinguishing aspects.
-2. Authors very much appreciate the manner in which Rust brought to
-bear unique pointers and ownership types on practical systems
-programming. Nonetheless, programming around Rust's borrow checker is
-still considered hard for an average newcomer to Rust, as evident from
-the queries on various internet forums, and acknowledged by Rust's own
+2. Authors appreciate the manner in which Rust brought to bear unique
+pointers and ownership types on practical systems programming.
+Nonetheless, programming around Rust's borrow checker is still
+considered hard for an average newcomer to Rust, as evident from the
+queries on various internet forums, and acknowledged by Rust's own
 documentation ("Many new users to Rust experience something we like to
 call ‘fighting with the borrow checker’"). Moreover, unlike Broom,
 Rust doesn't support programmer-managed dynamic memory (there is no
