@@ -41,7 +41,7 @@ function types (for eg., there do not exist \tau_1 and \tau_2 s.t.
 \tau_1 -> \tau_2 is equivalent to the type <\rho> T1@\rho -> T2@\rho).
 Existential types were considered briefly, but that led to a
 significant additional complexity in the type system - an antithesis
-to pratical adoption. We finally settled on the current approach.
+to practical adoption. We finally settled on the current approach.
 Supporting two kinds of parameterizations on classes should be
 possible (if one doesn't mind verbose types), but we didn't pursue it
 for the lack of practical motivation. 
@@ -65,7 +65,7 @@ Reviewer #4:
 the current paper. The HotOS paper [4] does not define the Broom
 language, but rather its region management runtime. The benchmarks
 used in [4] were written in vanilla C# patched with a new runtime, and
-come with no safety guarantees whatsover. 
+come with no safety guarantees whatsoever. 
 2. Broomc is an ahead-of-time compiler.
 
 Reviewer #5:
