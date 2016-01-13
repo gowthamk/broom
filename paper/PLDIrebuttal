@@ -7,14 +7,7 @@ clarity. In practice, it can be implemented via C#'s "using"
 statement. Extension to syntax is not necessary. 
 2. For a library method to add objects to library's cache, it has to
 be called under a context that lives at least as long as the cache
-itself. This is indeed a downside of the region type inference
-presented in the paper. However, this problem can be adressed by
-generalizing inference to not always unify \rho in new@\rho with the
-current allocation context (\rho^a). Instead, it can generate a
-disjunctive constraint with each disjunct unifying \rho with an
-existing live region. Constraint solving can then unify \rho with a
-larger-living region (say, R) without necessarily unifying the \rho^a
-with R.
+itself. Type inference is capable of enforcing this condition.
 
 Reviewer #2: 
 1. We agree with reviewer's comparison with Cyclone; full region type
@@ -78,7 +71,8 @@ come with no safety guarantees whatsover.
 Reviewer #5:
 1. Supplementary includes rigorous treatment of type inference. We
 could not include it in the paper due to space constraints.
-2. The complexity incurred from full higher-order region type
-inference cannot be justifed in the context of dataflow systems
-(primary users of Broom), where the only form of higher-order control
-flow is via user-defined functions (eg., the predicate in SELECT). 
+2. Note that higher-rank types do not admit principal typing. So, a
+higher-order type inference algorithm would still need to use
+heuristics even if the approach in [14] is used to infer maximally
+general types. Such an approach is more complex than our approach, but
+does not give any additional theoretical guarantees.
