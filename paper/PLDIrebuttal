@@ -5,22 +5,27 @@ Reviewer #1:
 1. The formal language uses a distinguished "open" construct for
 clarity. In practice, it can be implemented via C#'s "using"
 statement. Extension to syntax is not necessary. 
-2. If a library maintains a cache that persists across multiple method
-calls, then it escapes the scope of a single method (for example, via
-an instance variable of the library object). In such case, type
-inference will not allocate it in the "letregion" context of methods.
-The constraints force it to allocate the cache outside.
+2. For a library method to add objects to library's cache, it has to
+be called under the context that lives at least as long as the cache
+itself. That it is indeed a downside of the region type inference
+presented in the paper. However, this problem can be adressed by
+generalizing inference to not always unify \rho in new@\rho with the
+current allocation context (\rho^a). Instead, it can generate a
+disjunctive constraint with each disjunct unifying \rho with an
+existing live region. Constraint solving can then unify \rho with a
+larger-living region (say, R) without necessarily unifying the \rho^a
+with R.
 
 Reviewer #2: 
 1. We think reviewer's comparison with Cyclone is fair; full region
 type inference, a dynamic component, and the OO setting are the
 primary distinguishing aspects.
 2. Allocations need not always happen in the top-most region. A method
-can contain nested "letregion" or "open" constructs, and the type
-system admits allocations in any of the regions live during
-allocation. Inference, however, allocates in the latest open region.
-While inference can be generalized by admitting disjunctive
-constraints, we haven't (so far) seen the need for it. 
+can contain nested "letregion" or "open" constructs, and the language
+permits the programmer to specify the region in which a new object
+should be allocated. Allocation in the latest open region is used as a
+default only if the programmer does not specify the region of
+allocation.
 3. The type inference is not global (whole program). We clarify (in
 Sec.  4.4) that "although we collect constraints for the entire
 program during elaboration, we solve the constraints in a
@@ -56,9 +61,9 @@ Reviewer #4:
 1. Assuming that a language is defined by its syntax and semantics
 (static and dynamic), the language Broom is indeed the contribution of
 the current paper. The HotOS paper [4] does not define the Broom
-language, but rather its region management runtime. The
-benchmarks used in [4] were written in vanilla C# patched with a new
-run-time, and come with no safety guarantees whatsover. 
+language, but rather its region management runtime. The benchmarks
+used in [4] were written in vanilla C# patched with a new runtime, and
+come with no safety guarantees whatsover. 
 2. Broomc is an ahead-of-time compiler.
 
 Reviewer #5:
