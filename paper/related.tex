@@ -69,14 +69,53 @@ constraints over region arguments of polymorphic recursive functions.
 
 Cyclone~\cite{cyclone02} equips C with programmer-managed stack
 regions, and a typing discipline that statically guarantees the safety
-of all pointer dereferences. However, types need to be written
-explicitly. While some region annotations can be inferred, type
-inference is purely intraprocedural, and cannot infer region types for
-functions. Later proposal~\cite{cyclone04} extends Cyclone with
-dynamic regions, imposes unique pointer restrictions to guarantee
-safety. Objects that need to be shared within data structures are
-allowed to have multiple references, and safety for such objects was
-ensured via runtime reference counting.
+of all pointer dereferences. Later
+proposals~\cite{cyclone04,cycloneSCP} extends Cyclone with dynamic
+regions. \name differs from Cyclone fundamentally because of its
+non-intrusiveness design principle, which requires its safety
+mechanisms to not intrude on the the programming practices of C\#.
+\name programmers, for example, shouldn’t be forced to abandon
+iterators in favor of for-loops, annotate region types, or rewrite
+C\#'s standard libraries to use in \name.  Non-intrusiveness is not a
+design consideration for Cyclone, which requires C programmers to use
+new language constructs and abandon some standard programming idioms
+in the interest of preserving safety. For instance, Cyclone
+programmers are required to write region types for functions; the type
+inference is only intraprocedural. Ensuring safety in presence of
+dynamic regions requires using either unique pointers or
+reference-counted objects.  Both approaches are intrusive. For
+example, unique pointers constrain, or in some cases forbid, the use
+of the familiar iterator pattern, which requires creation of aliases
+to objects in a collection. Some standard library functions, for
+example, those that use caching, may need to be rewritten.  Moreover,
+even with unique pointers, safety cannot be guaranteed statically;
+checks against \C{NULL} are needed at run-time to enforce safety. For
+ref-counted objects, Cyclone requires programmers to use special
+functions (\C{alias\_refptr} and \C{drop\_refptr}) to create and
+destroy aliases.  Reference count is affected only by these
+functions. An alias going out of scope, for instance, does not
+decrement the ref-count. The requirement to use additional constructs
+to manage aliases makes reference counting more-or-less as intrusive
+as unique pointers.
+
+Our work differs from Cyclone also in terms of its technical
+contributions. While Cyclone equips C with a range of region
+constructs~\cite{cycloneSCP}, the semantics of (a significant subset
+of) such constructs, and the safety guarantees of the language are not
+formalized. In contrast, the (static and dynamic) semantics of Broom
+has been rigorously defined with respect to a well-understood formal
+system (FGJ). The safety guarantees have been formalized and proved.
+The core of Broom is very simple; the rules that make up static and
+dynamic semantics occupy less than a page each. We believe that the
+rigor and simplicity of Broom makes it easy to understand the the
+underlying ideas, and apply them in various problem settings. Similar
+contrast can be made of region type inference in both the languages.
+Cyclone’s type inference was only ever described as being similar to
+Tofte and Talpin’s, and it’s effectiveness in presence of tracked
+pointers is not clear. In contrast, the complete Ocaml (pseudo) code
+of Broom's inference algorithm, was given in the supplement and the
+ideas underlying type inference have been described elaborately in the
+paper
 
 An ownership type system for safe region-based memory management in
 real-time Java has been proposed by~\cite{MIT03}.  
