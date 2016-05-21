@@ -19,7 +19,7 @@
     \headerOf{B}\{...\}\spc
     \env = \cdot[\xbar\mapsto\bar{\tau^1}][\thisZ\mapsto
             B\inang{\bar{\tyvar}}\inang{\rhoalloc\rhobar}] \\
-    \override(m,\fbN,\inang{\rhoallocm\rhobarm \,|\, \phi_m}\bar{\tau^1} 
+    \A \vdash \override(m,\fbN,\inang{\rhoallocm\rhobarm \,|\, \phi_m}\bar{\tau^1} 
              \rightarrow \tau^2) \spc
 %   \stmtsem{\rhoallocm}{s}{\stmtsemcx}{\stmtsemcxp}\spc
     \hastyp{\exptycx{\rhoallocm}{\env}}{e}{\tau} \spc
@@ -55,9 +55,9 @@
     \tywf{\A}{\fbN,\bar{\tau^f}} \spc
     \shape(\fbN) \neq \RgnZ\inang{T}\spc 
 %   \tywf{\A}{\bar{\tau^f}} \spc
-    \isvalid{\phicx}{allocRgn(\bar{\tau^f}) \outlives \rho^a} \\
+    \isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rho^a} \\
     \ctype(\fbN) = \bar{\tau^{\fbN}} \spc
-    k = B(\bar{\tau^f}\;\xbar,\bar{\tau^{\fbN}}\;\bar{y})
+    k = B(\bar{\tau^{\fbN}}\;\xbar,\bar{\tau^f}\;\bar{y})
         \{\superZ(\xbar);\,\thisZ.\bar{f} = \bar{y};\} \spc
     \okin{\bar{d}}{B}
   }

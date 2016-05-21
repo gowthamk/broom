@@ -21,7 +21,7 @@
 
 
 %\documentclass[10pt,pldi]{sigplanconf}
-\documentclass[pldi]{sigplanconf-pldi16}
+\documentclass[pldi-cameraready]{sigplanconf-pldi16}
 
 % The following \documentclass options may be useful:
 
@@ -364,9 +364,25 @@ morekeywords={foreach, do, done, not, : , /\\}
 
 %The Paper
 %---------------------
-\title{Safe Transferable Regions}
+\title{Safe Memory Regions for Big Data Processing}
 
-%\authorinfo{} {} {}
+\authorinfo{Gowtham Kaki}
+           {Purdue University, USA}
+           {gkaki@purdue.edu}
+
+\authorinfo{G Ramalingam}
+           {Microsoft Research, India}
+           {grama@microsoft.com}
+
+\authorinfo{Kapil Vaswani}
+           {Microsoft Research, India}
+           {kapilv@microsoft.com}
+
+\authorinfo{Dimitrios Vytiniotis}
+           {Microsoft Research, UK}
+           {dimitris@microsoft.com}
+
+
 \maketitle
 
 \begin{abstract}
@@ -389,6 +405,8 @@ morekeywords={foreach, do, done, not, : , /\\}
 \input{implementation}
 
 \input{related}
+
+
 % \appendix
 % \section{Appendix Title}
 
@@ -398,6 +416,9 @@ morekeywords={foreach, do, done, not, : , /\\}
 
 \bibliographystyle{abbrvnat}
 \bibliography{broom}
+
+\appendix
+\input{fb-proofs}
 
 
 \end{document}

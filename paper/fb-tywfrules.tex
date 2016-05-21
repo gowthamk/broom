@@ -6,6 +6,7 @@
 \RULE
   {
     \\
+    \\
     \rgn \in \A.\rhoenv
   }
   {
@@ -46,16 +47,16 @@
 % \end{smathpar}
 % \end{minipage}
 %
-\begin{minipage}{3.3in}
+\begin{minipage}{2.75in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \{\rhoalloc,\rhobar\} \notin \A.\rhoenv \spc
+    \rgn \in \A.\rhoenv \spc
+    \{\rhoalloc,\rhobar\} \notin \A.\rhoenv \\
     \A' = (\A.\rhoset, \A.\rhoenv \cup \{\rhoalloc,\rhobar\}, 
            \A.\aenv, \A.\phicx \conj \phi) \\
-    \rgn \in \A.\rhoenv \spc
     \tywf{\A'.\rhoenv}{\phi}\spc 
     \tywf{\A'}{\bar{\tau^1}} \spc
     \tywf{\A'}{\tau^2}
@@ -68,17 +69,18 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1in}
+\begin{minipage}{1.5in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
-  {
+  { 
+    \\
     \\
     \fgjtywf{\A.\aenv}{T}
   }
   {
-    \RgnZ\inang{T}\inang{\rgn}
+    \tywf{\A}{\RgnZ\inang{T}\inang{\rgn}}
   }
 \end{array}
 \end{smathpar}
@@ -90,6 +92,7 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
     \\
     \rho_0,\rho_1 \in \rhoenv
   }

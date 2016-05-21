@@ -316,11 +316,12 @@
                      \@setflag \@ninepoint = \@false
                      \@setflag \@tenpoint = \@true
                      \@setflag \@explicitsize = \@true
-         \@setflag \@authoryear = \@true
+         \@setflag \@authoryear = \@false
                      \@setflag \@squareay = \@true
                      \@setflag \@blind = \@false
                      \@setflag \@preprint = \@false
                      \@setflag \@clearpagebib = \@true
+                     \@setflag \@copyrightwanted = \@false
          }
 
 \DeclareOption{pldinumbers}{\PassOptionsToClass{10pt}{article} %
@@ -338,7 +339,7 @@
                      \@setflag \@ninepoint = \@false
                      \@setflag \@tenpoint = \@true
                      \@setflag \@explicitsize = \@true
-         \@setflag \@authoryear = \@false
+         \@setflag \@authoryear = \@true
                      \@setflag \@squareay = \@true
                      \@setflag \@blind = \@true
                      \@setflag \@preprint = \@true
@@ -657,7 +658,7 @@
 
 \def \@copyrightspace {%
   \@float{copyrightbox}[b]%
-  \vbox to 0in{%
+  \vbox to 1.5in{%
     \vfill
     \parbox[b]{20pc}{%
       \scriptsize
@@ -1183,13 +1184,13 @@
   {\leftskip = 0pt plus 0.25\linewidth
    \rightskip = 0pt plus 0.25 \linewidth
    \parfillskip = 0pt
-   %\spaceskip = .7em
+   \spaceskip = .7em
    \noindent \LARGE \bfseries \@titletext \par}
-  %\vskip 6pt
+  \vskip 6pt
   \noindent \Large \@subtitletext \par
-  %\vskip 12pt
+  \vskip 12pt
   \if \@blind
-    \vskip 24pt% vspace to compensate for missing author info
+    \vskip 64pt% vspace to compensate for missing author info
   \else
   \ifcase \@authorcount
     \@latex@error{No authors were specified for this paper}{}\or

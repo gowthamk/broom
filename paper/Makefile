@@ -9,7 +9,7 @@ full:
 	bibtex broom
 	pdflatex -shell-escape broom
 
-fast:
+haste:
 	pdflatex broom
 clean:
 	rm *.log *.aux *.bbl
