@@ -567,10 +567,15 @@ transfers across address spaces:
 \label{thm:fb-transfer-safety-stmt}
 $\forall$ $v$, $\rhoenv$, $\rhoenv'$, $\rhomap$, $\rhomap'$, $\phicx$,
 $\phicx'$, $\rgn$, $\rgn'$, such that $\rgn \in \rhoenv$, $\rgn' \in \rhoenv'$, and
-$\rgn_i \notin dom(\rhomap') \cup \rhoenv \cup \{\toprgn\}$, if $\hastyp{\emptyA,\rgn,
-\cdot}{\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$, then
-$\hastyp{(\rhomap'[\rgn_i \mapsto \CLOSED],\rhoenv',\cdot,\phicx')}
-{\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$
+$\rgn_i \notin dom(\rhomap') \cup \rhoenv \cup \{\toprgn\}$, if
+\[
+  \hastyp{\emptyA,\rgn, \cdot}{\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}
+\]
+, then
+\[
+  \hastyp{(\rhomap'[\rgn_i \mapsto \CLOSED],\rhoenv',\cdot,\phicx')}
+{\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}
+\]
 \end{theorem}
 The above theorem states that if a $\C{new}\; \RgnZT{\rgn_i}(v)$ value
 is well-typed under one context, then it is also well-typed under
