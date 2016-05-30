@@ -11,35 +11,63 @@ algorithm is an elaboration function from programs in $\absof{\FB}$
 expressions, similar to the language introduced in
 \S~\ref{sec:overview}) to programs in \FB.
 
-The elaboration consists of the following steps:
+Fig.~\ref{fig:type-inference-algo} presents the high-level outline of the type
+inference algorithm.
+The algorithm consists of the following steps:
 \begin{enumerate}
- \item The first step consists of the following two mutually dependent steps:
-   \begin{enumerate}
-     \item for every class determine a set of region variable parameters ($\rho$)
-       it should be parametrized over, and
-     \item for every field of the class, determine its region parametrized type by
-       generating as many fresh region variables as required by its class (type).
-   \end{enumerate}
- \item  For every method and function type, determine its corresponding region
-   type template by introducing fresh region variable parameters as required by
+ \item The first step elaborates the input program by introducing \emph{(formal and actual) region parameters},
+and \emph{region variables} (representing yet undetermined \emph{actual region parameters})
+as follows:
+\begin{enumerate}
+\item For every class determine a set of \emph{region parameters} ($\rho$)
+       it should be parametrized over.
+\item For every field of the class, determine its region parametrized type by
+       generating as many fresh \emph{actual region parameters} as required by its class (type),
+       which in turn become formal region parameters of the containing class.
+\item  For every method and function type, determine its corresponding region
+   type template by introducing fresh region parameters as required by
    the type of each parameter and return value (in addition to the allocation region
    parameter).
  \item Elaborate every \C{new} expression, method call or function application by
-   introducing fresh region variable parameters (as required by the region type
+   introducing \emph{fresh region variables} (as required by the region type
    template of the called method or function).
- \item Introduce for each class and method, a predicate variable ($\varphi$) to denote
-   an undetermined set of constraints over the region variable parameters of that
+\item Introduce for each class and method, a \emph{predicate variable} ($\varphi$) to denote
+   an undetermined set of constraints over the region parameters of that
    class/method.
- \item We analyze each method, to generate a set of constraints that capture
+\end{enumerate}
+ \item In the second step, we analyze the program to generate a set of constraints that capture
    well-formedness requirements and subtyping relationships between type templates
    that must hold (as per the static semantics in Fig.~\ref{fb-staticsem}).
  \item We solve the generated set of constraints using our fixpoint constraint
    solving algorithm \csolvestar, which reduces the constraint solving problem to
    an abduction problem in a Herbrand constraint system, and then relies on \csolve,
    our abduction solver for that domain. 
- \item We finally simplify the elaborated program by coalescing region variables
-   determined to be the same in the constraint solution.
+ \item We finally simplify the elaborated program by substituting the solution determined
+   (for the region variables and predicate variables).
 \end{enumerate}
+
+\begin{figure}
+\begin{numcodeml}
+Infer ($p$) =
+  let $q$ = IntroduceVariables($p$) in
+  let $(r,C)$ = GenerateConstraints($q$) in
+  match (SolveConstraints($C$) with
+  | None $\longrightarrow$ None
+  | Some ($s$) $\longrightarrow$ Some (ApplySolution $(s,r)$)
+\end{numcodeml}
+
+\caption{The type inference algorithm}
+\label{fig:type-inference-algo}
+\end{figure}
+
+\begin{theorem}
+\emph{(\textbf{Soundness})}
+For any $p \in \absof{\FB}$, if Infer($p$) returns Some($t$), then
+(1) $\absof{t} = p$, and
+(2) $t$ is well-typed.
+\end{theorem}
+
+
 
 %%    This is used to replace every FGJ type in the program
 %%    compute a polymorphic region type template

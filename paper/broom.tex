@@ -342,10 +342,19 @@ morekeywords={foreach, do, done, not, : , /\\}
 \lstnewenvironment{codeml}
     { % \centering
 			\lstml
-      \lstset{mathescape=true}%
+      \lstset{mathescape=true,numbers=none}%
       \csname lst@setfirstlabel\endcsname}
     { %\centering
       \csname lst@savefirstlabel\endcsname}
+
+\lstnewenvironment{numcodeml}
+    { % \centering
+			\lstml
+      \lstset{mathescape=true,numbers=left}%
+      \csname lst@setfirstlabel\endcsname}
+    { %\centering
+      \csname lst@savefirstlabel\endcsname}
+
 
 \begin{document}
 
