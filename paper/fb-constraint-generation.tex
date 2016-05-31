@@ -1,0 +1,23 @@
+\newcommand{\genconstraint}[2]{\inferrule*{#1}{#2}}
+\newcommand{\gcarrow}{\leadsto}
+\newcommand{\gctransforms}{\models}
+
+\begin{figure*}[t]
+\begin{mathpar}
+
+  \genconstraint
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\taubar} \spc
+    \tywf{\A}{\fbN} \spc
+    \fields(\fbN) = \bar{f} : \taubar 
+  }
+  {
+    {\exptycx{\ralloc}{\env}} \gctransforms
+    \C{new} \fgjN(\bar{e}) \gcarrow
+    ({\C{new}\; \fbN(\bar{e})} : {\fbN}, \cup_{i=1}^4 C_i)
+  }
+
+\end{mathpar}
+\caption{Constraint generation}
+\label{fig:constraint-gen}
+\end{figure*}
