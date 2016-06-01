@@ -40,11 +40,20 @@ as follows:
    that must hold (as per the static semantics in Fig.~\ref{fb-staticsem}).
  \item We solve the generated set of constraints using our fixpoint constraint
    solving algorithm \csolvestar, which reduces the constraint solving problem to
-   an abduction problem in a Herbrand constraint system, and then relies on \csolve,
-   our abduction solver for that domain. 
- \item We finally simplify the elaborated program by substituting the solution determined
-   (for the region variables and predicate variables).
+   an abduction problem. 
+% in a Herbrand constraint system, and then relies on \csolve,
+% our abduction solver for that domain. 
+ \item If the solver succeeds, it returns substitution functions $\substFn_\rho$ and
+  $\substFn_\varphi$ for free region and predicate variables, respectively, introduced in the earlier
+phases. We apply these substitutions to the elaborated program to produce the final program.
+Note that if the original program in $\absof{\FB}$ contains unsafe
+references, for example, a reference from a transferable region to a
+stack regions, then the constraints generated during the elaboration
+are not satisfiable. In such case, $\solve$ fails to solve
+constraints, causing the program to be rejected.
 \end{enumerate}
+
+
 
 \begin{figure}
 \begin{numcodeml}
@@ -266,20 +275,7 @@ regions of a class type and its superclass type must be the same.
 
 Function $\elabClassTable$ (Fig.~\ref{fig:fb-elabmeth}) elaborates
 every definition in the class table $CT$, while accumulating
-constraints. The constraints are finally solved by $\solve$
-(\S\ref{sec:fb-constraintsolving}), which returns substitution
-functions $\substFn_\rho$ and $\substFn_\varphi$ for free region and
-predicate variables, respectively, introduced during templatization
-and elaboration stages. The substitutions are applied to the class
-table (and to the artifacts that make up the class table, recursively)
-to compute a class table that maps classes to their fully
-region-annotated definitions in $\FB$.
-
-Note that if the original program in $\absof{\FB}$ contains unsafe
-references, for example, a reference from a transferable region to a
-stack regions, then the constraints generated during the elaboration
-are not satisfiable. In such case, $\solve$ fails to solve
-constraints, causing the program to be rejected.
+constraints.
 
 \subsection{Constraints}
 \label{sec:fb-constraintsem}
