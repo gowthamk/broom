@@ -1,17 +1,33 @@
 \section{Type Inference}
 \label{sec:type-inference}
 
-\name's region type system imposes a heavy annotation burden, and the
-cost of manually annotating C\# standard libraries with region types
-is prohibitive. We now present our region type inference algorithm
-that completely eliminates the need to write region type annotations,
-except on some higher-order functions. Formally, the type inference
+\textbf{TO DO:}
+\begin{itemize}
+\item Add destructive object-field-update \emph{x.f := y} to the language.
+\item Add if-then-else to the language.
+\item Note that the claim that all region variables will be unified with some concrete
+region fails in the case of a method that recursively calls itself (and, hence, does not
+terminate). In this case, the region variables in the return type are not constrained.
+Similarly for non-terminating mutual recursion. These are uninteresting (in essence, the
+return type can be taken to be unit instead).
+\item Discuss the safety of virtual method invocation, which provides a limited form
+of existentially quantifying regions and instantiating (unpacking) them because a
+derived class may have more region parameters than a base class.
+\item Discuss the subtyping rule used to check an overriding method (in the static
+semantics).
+\item Mention that constraints are in the theory of partial orders?
+\end{itemize}
+
+\name's region type system imposes a heavy annotation burden, and
+manually annotating C\# standard libraries with region types
+can be tedious. We now present our region type inference algorithm
+that eliminates the need to write region type annotations.
+% except on some higher-order functions.
+Formally, the type inference
 algorithm is an elaboration function from programs in $\absof{\FB}$
 (i.e., \FB without region types, but with \C{letregion} and \C{open}
 expressions, similar to the language introduced in
 \S~\ref{sec:overview}) to programs in \FB.
-
-\textbf{TODO: Mention that constraints are in the theory of partial orders?}
 
 Fig.~\ref{fig:type-inference-algo} presents the high-level outline of the type
 inference algorithm.
@@ -115,6 +131,24 @@ For any $p \in \absof{\FB}$, if Infer($p$) returns Some($t$), then
 
 \subsection{Region Type Templates}
 \label{sec:fb-templatization}
+
+The first step involves the following two mutually dependent ideas.
+
+\emph{Region Parametrization}. For every class \C{C}, we identify
+a sequence of region parameters $\pi_0, \cdots \pi_n$ that \C{C}
+should be parametric over.
+
+\emph{Instantiation of Region Parametric Classes}. For every region
+parametric class $\C{C}\langle \pi_0, \cdots, \pi_n \rangle$ so determined,
+we replace every instance of class \C{C} in the program by an instance
+$\C{C}\langle \rho_0, \cdots, \rho_n \rangle$, where $\rho_0, \cdots, \rho_n$
+are fresh identifiers.
+
+In particular, we determine the sequence of region parameters for a class \C{C}
+by starting with the sequence of region parameters required for the type of
+the base class of \C{C}, and adding fresh region parameters for the type of every field
+in the class.
+The class \C{Object} has a single region parameter $\pi_0$ (the allocation region).
 
 Region type templates are FGJ types extended with fresh region
 variables ($\rho$) and predicate variables ($\varphi$) to denote
