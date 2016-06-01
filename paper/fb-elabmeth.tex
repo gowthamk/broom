@@ -4,8 +4,7 @@
 \begin{codeml}
 $\elabMeth(CT, B, \tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \; \xbar)\{\C{return} e;\})$ = 
   let $\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;k\;\bar{d}\}$ = $CT(B)$ in
-  let ($\rhoenv$,$\aenv$,$\phicx$) as $\A$ = 
-            $(\{\rhoalloc,\rhobar,\rhoalloc_m,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN},\varphi \conj \varphi_m)$ in
+  let ($\rhoenv$,$\aenv$,$\phicx$) as $\A$ = $(\{\rhoalloc,\rhobar,\rhoalloc_m,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN},\varphi_m)$ in
   let $C_1$ = $\{\tywf{\rhoenv}{\varphi_m}\}$ in
   let $\env$ = $\cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhoalloc\rhobar}][\xbar \mapsto \taubar]$ in
   let ($e':\tau'$,$C_2$) = $\elabExpr (\A,\rhoalloc_m,\env,e)$ in
