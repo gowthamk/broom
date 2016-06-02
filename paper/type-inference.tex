@@ -29,6 +29,17 @@ algorithm is an elaboration function from programs in $\absof{\FB}$
 expressions, similar to the language introduced in
 \S~\ref{sec:overview}) to programs in \FB.
 
+\paragraph{Terminology.}
+In the sequel, we will be using \emph{region identifiers} in four different roles.
+A region identifier may serve as
+(a) A \emph{formal region parameter} of a class or method, or
+(b) a \emph{static region identifier} introduced by a \C{letregion} construct, or
+(c) an  \emph{open transferable region identifier} introduced by an \C{open} construct, or
+(d) a \emph{region variable}, introduced to represent an unknown actual region parameter
+of a method invocation or object alloation,
+which will be bound to a region identifier of one of the three
+preceding kinds by the end of the type inference.
+
 Fig.~\ref{fig:type-inference-algo} presents the high-level outline of the type
 inference algorithm.
 The algorithm consists of the following steps:
@@ -132,23 +143,32 @@ For any $p \in \absof{\FB}$, if Infer($p$) returns Some($t$), then
 \subsection{Region Type Templates}
 \label{sec:fb-templatization}
 
-The first step involves the following two mutually dependent ideas.
+The first phase is an iterative process involving the following two
+mutually dependent steps.
 
 \emph{Region Parametrization}. For every class \C{C}, we identify
 a sequence of region parameters $\pi_0, \cdots \pi_n$ that \C{C}
 should be parametric over.
 
-\emph{Instantiation of Region Parametric Classes}. For every region
+\emph{Parameter Instantiation of Types}. For every region
 parametric class $\C{C}\langle \pi_0, \cdots, \pi_n \rangle$ so determined,
 we replace every instance of class \C{C} in the program by an instance
 $\C{C}\langle \rho_0, \cdots, \rho_n \rangle$, where $\rho_0, \cdots, \rho_n$
 are fresh identifiers.
 
-In particular, we determine the sequence of region parameters for a class \C{C}
-by starting with the sequence of region parameters required for the type of
-the base class of \C{C}, and adding fresh region parameters for the type of every field
-in the class.
-The class \C{Object} has a single region parameter $\pi_0$ (the allocation region).
+We identify the region parameters of classes as follows.
+The class \C{Object} is defined to have a single region parameter $\pi_0$ (the allocation region).
+The region parameters for any other non-recursive class \C{C} is determined
+only after the region parameters of any class that \C{C} depends on have been
+determined: this includes the base-class \C{B} of \C{C} and the class (type)
+of any of its fields.
+We replace the type \C{T} of every field in \C{C} by its instantiated type,
+using fresh region parameters as needed.
+The sequence of region parameters for \C{C} is defined to be
+the sequence of region parameters for the base class \C{B} concatenated
+with the list of all  fresh region parameters introduced while instantiating the types
+of the fields in the class.
+
 
 Region type templates are FGJ types extended with fresh region
 variables ($\rho$) and predicate variables ($\varphi$) to denote
