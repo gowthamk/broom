@@ -140,7 +140,7 @@ For any $p \in \absof{\FB}$, if Infer($p$) returns Some($t$), then
 % the constraints and determine assignments for unknown region and
 % predicate variables.
 
-\subsection{Region Parametrization and Instantiation}
+\subsection{Region Parametrization/Instantiation for Classes}
 \label{sec:fb-templatization}
 
 The first phase is an iterative process involving the following two
@@ -247,35 +247,43 @@ The parametric type \C{T} is instantiated using the number of region parameters
 that its bound \C{B} has. If no bound is specified for \C{T}, the bound is taken
 to be \C{Object}, and \C{T} is instantiated with one region parameter.
 
+\TODO{Discuss function-typed fields}
 
-Likewise, given the region-annotated definition of
-\C{Pair} class from \S\ref{sec:fb-syntax} a region type template for a
-method with FGJ type $\C{Pair}\inang{\C{A},\C{B}} \rightarrow \C{A}$
-is \footnote{In our exposition, we assume that classes $\C{A}$ and
-$\C{B}$ are trivial subclasses of $\ObjZ$ with no fields/methods. Like
-$\ObjZ$, they accept one region parameter - the allocation region of
-their objects.}\footnote{We abuse arrow notation to also represent
-types of methods, but unlike function types, there is no allocation
-region annotation atop the arrow in a method type.}
-$\inang{\rhoalloc_0,\rho_1,\rho_2,\rho_3 \,|\, \varphi_0}
-\C{Pair}\inang{\C{A},\C{B}} \inang{\rho_1,\rho_2,\rho_3} \rightarrow
-\unitZ$, where $\rhoalloc_0$ and $\rho_{1-3}$ are fresh region
-variables, and $\varphi_0$ is a fresh predicate variable denoting
-unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.
+%% Likewise, given the region-annotated definition of
+%% \C{Pair} class from \S\ref{sec:fb-syntax} a region type template for a
+%% method with FGJ type $\C{Pair}\inang{\C{A},\C{B}} \rightarrow \C{A}$
+%% is \footnote{In our exposition, we assume that classes $\C{A}$ and
+%% $\C{B}$ are trivial subclasses of $\ObjZ$ with no fields/methods. Like
+%% $\ObjZ$, they accept one region parameter - the allocation region of
+%% their objects.}\footnote{We abuse arrow notation to also represent
+%% types of methods, but unlike function types, there is no allocation
+%% region annotation atop the arrow in a method type.}
+%% $\inang{\rhoalloc_0,\rho_1,\rho_2,\rho_3 \,|\, \varphi_0}
+%% \C{Pair}\inang{\C{A},\C{B}} \inang{\rho_1,\rho_2,\rho_3} \rightarrow
+%% \unitZ$, where $\rhoalloc_0$ and $\rho_{1-3}$ are fresh region
+%% variables, and $\varphi_0$ is a fresh predicate variable denoting
+%% unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.
 
+\subsection{Region Parametrization/Instantiation for Methods}
+
+As the next step, we introduce region parameters for every method.
+We do this by instantiating the types of all parameters and the
+return value (of the method) using fresh region identifiers (as explained previously),
+and then generalizing these region identifiers as formal region parameters
+of the method.
+
+We then consider every method invocation in the program, and introduce
+fresh region variables representing the (yet unknown) actual region
+parameters for this particular invocation.
+%
+We similarly perform instantiation for every constructor invocation
+of the form \C{new T($\ldots$)}, by instantiating the type \C{T} as
+before, turning it into \C{new T$\langle \rho_0, \cdots, \rho_n \rangle$($\ldots$)},
+where $\rho_0, \cdots, \rho_n$ are fresh region variables.
 
 Fresh predicate variable $\varphi_0$ denotes unknown constraints over
 $\rhoalloc_0$ and $\rho_{0-4}$ that need to hold for template to be a
 well-formed region-annotated class definition in $\FB$. 
-
-
-% Observe that our strategy of trivially templatizing the recursive
-% occurrences of a class type in its definition ensures that no new
-% region variables are introduced.
-Using the
-techniques outlined above, we compute region type templates for all
-classes bound in the class table of the $\absof{\FB}$ program before
-we proceed to elaborate expressions.
 
 \input{fb-constraint-generation}
 
