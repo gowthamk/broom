@@ -140,21 +140,20 @@ For any $p \in \absof{\FB}$, if Infer($p$) returns Some($t$), then
 % the constraints and determine assignments for unknown region and
 % predicate variables.
 
-\subsection{Region Type Templates}
+\subsection{Region Parametrization and Instantiation}
 \label{sec:fb-templatization}
 
 The first phase is an iterative process involving the following two
 mutually dependent steps.
 
 \emph{Region Parametrization}. For every class \C{C}, we identify
-a sequence of region parameters $\pi_0, \cdots \pi_n$ that \C{C}
+a sequence of formal region parameters $\pi_0, \cdots \pi_n$ that \C{C}
 should be parametric over.
 
-\emph{Parameter Instantiation of Types}. For every region
-parametric class $\C{C}\langle \pi_0, \cdots, \pi_n \rangle$ so determined,
-we replace every instance of class \C{C} in the program by an instance
+\emph{Parameter Instantiation}.
+We then replace every instance of class \C{C} in the program by an instance
 $\C{C}\langle \rho_0, \cdots, \rho_n \rangle$, where $\rho_0, \cdots, \rho_n$
-are fresh identifiers.
+are fresh identifiers denoting actual region parameters.
 
 We identify the region parameters of classes as follows.
 The class \C{Object} is defined to have a single region parameter $\pi_0$ (the allocation region).
@@ -162,20 +161,94 @@ The region parameters for any other non-recursive class \C{C} is determined
 only after the region parameters of any class that \C{C} depends on have been
 determined: this includes the base-class \C{B} of \C{C} and the class (type)
 of any of its fields.
-We replace the type \C{T} of every field in \C{C} by its instantiated type,
+We replace every dependee type \C{T} in \C{C} by its instantiated type,
 using fresh region parameters as needed.
 The sequence of region parameters for \C{C} is defined to be
 the sequence of region parameters for the base class \C{B} concatenated
 with the list of all  fresh region parameters introduced while instantiating the types
 of the fields in the class.
+(The class inherits its allocation region from its base class. Note that if
+a class does not specify an explicit base class, it has an implicit base class
+\C{Object}.)
+
+This transformation is illustrated below, using a non-generic \C{Pair} class:
+
+\begin{tabular}{ccc}
+\begin{minipage}{0.28\linewidth}
+\begin{codejava}
+class Pair
+  $\extends$ $\ObjZ$
+{
+  $\ObjZ$ fst;
+  $\ObjZ$ snd;
+}
+\end{codejava}
+\end{minipage}
+&
+$\Rightarrow$
+&
+\begin{minipage}{0.5\linewidth}
+\begin{codejava}
+class Pair $\langle \rho_0, \rho_1, \rho_2 \rangle$
+  $\extends$ $\ObjZ \langle \rho_0 \rangle$
+{
+  $\ObjZ \langle \rho_1 \rangle$ fst;
+  $\ObjZ \langle \rho_2 \rangle$ snd;
+}
+\end{codejava}
+\end{minipage}
+\end{tabular}
+
+The region parameters for a recursive class is computed in
+a similar fashion, with the following difference: any recursive
+field is ignored while instantiating region parameters for the fields of
+the class, and the region parameters of the recursive class are computed
+as before. We then do parameter instantiation for all recursive fields,
+such that their region annotations (the actial region parameters) are
+exactly the same as the (formal) region parameters of the class.
+The following example illustrates this for a non-generic \C{List} class.
+The resulting class represents a linked list with spine in the region
+$\rho_0$ and data objects in the region $\rho_1$.
+
+\begin{tabular}{ccc}
+\begin{minipage}{0.28\linewidth}
+\begin{codejava}
+class List
+  $\extends$ $\ObjZ$
+{
+  $\ObjZ$ data;
+  List next;
+}
+\end{codejava}
+\end{minipage}
+&
+$\Rightarrow$
+&
+\begin{minipage}{0.5\linewidth}
+\begin{codejava}
+class List $\langle \rho_0, \rho_1 \rangle$
+  $\extends$ $\ObjZ \langle \rho_0 \rangle$
+{
+  $\ObjZ \langle \rho_1 \rangle$ data;
+  List $\langle \rho_0, \rho_1 \rangle$ next;
+}
+\end{codejava}
+\end{minipage}
+\end{tabular}
+
+The above technique can be extended to mutually recursive classes in a
+straightforward manner, by simultaneously parametrizing them (and
+then instantiating them).
+
+\emph{Extensions for parametrized classes.}
+The techniques described above can be used for parametrized classes
+with the following extension. Consider a parametrized class \C{C $\langle$ T $\extends$ B $\rangle$}.
+The parametric type \C{T} is instantiated using the number of region parameters
+that its bound \C{B} has. If no bound is specified for \C{T}, the bound is taken
+to be \C{Object}, and \C{T} is instantiated with one region parameter.
 
 
-Region type templates are FGJ types extended with fresh region
-variables ($\rho$) and predicate variables ($\varphi$) to denote
-unknown region annotations and region constraints, respectively. For
-instance, if a variable $x$ has type $\ObjZ$ in FGJ, its region type
-template is of form $\ObjZ\inang{\rho_0}$, where $\rho_0$ is a fresh
-region variable. Likewise, given the region-annotated definition of
+Likewise, given the region-annotated definition of
 \C{Pair} class from \S\ref{sec:fb-syntax} a region type template for a
 method with FGJ type $\C{Pair}\inang{\C{A},\C{B}} \rightarrow \C{A}$
 is \footnote{In our exposition, we assume that classes $\C{A}$ and
@@ -188,78 +261,18 @@ $\inang{\rhoalloc_0,\rho_1,\rho_2,\rho_3 \,|\, \varphi_0}
 \C{Pair}\inang{\C{A},\C{B}} \inang{\rho_1,\rho_2,\rho_3} \rightarrow
 \unitZ$, where $\rhoalloc_0$ and $\rho_{1-3}$ are fresh region
 variables, and $\varphi_0$ is a fresh predicate variable denoting
-unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.  Region type
-template of a type variable $\C{a}$ is $\C{a}@\rho$, where $\rho$ is
-fresh.
-\textbf{TODO: What about bounded types?}
-For a class, a template is computed in two steps. In the first
-step, we templatize the types of all its fields, constructor
-arguments, and arguments and return values of all its methods, along
-with the type of its superclass. In the second step, we generalize all
-the free region variables occuring in the templates computed in the
-first step as region parameters of the class. Finally, we add a fresh
-allocation region parameter ($\rhoalloc$) to the list of parameters,
-and introduce a new predicate variable ($\varphi$) to denote unknown
-constraints on region parameters. For example, consider the standard
-FGJ definition of $\C{Pair}\inang{\C{a},\C{b}}$ class, where $\C{a}$
-and $\C{b}$ are the types of $\C{fst}$ and $\C{snd}$ fields,
-respectively. It can be templatized as following:
-\begin{center}
-\begin{codejava}
-class Pair$\inang{a\extends\ObjZ, b\extends\ObjZ}$
-          $\inang{\rhoalloc_0,\rho_{0-4}\,|\,\varphi_0} \extends \ObjZ\inang{\rho_4}$ {
-  $a@\rho_0$ fst;
-  $b@\rho_1$ snd;
-  Pair($a@\rho_2$ fst, $b@\rho_3$ snd) { $...$ }
-  $...$
-}
-\end{codejava}
-\end{center}
-% \footnote{In reality, the generalized region variables only come
-% from the type templates of class's fields and superclass. Method
-% types do not contain any free region variables.}
-The template elides $\C{Pair}$'s methods, whose region type templates
-contain no free variables. Among the region parameters of the class
-template, $\rho_{0-4}$ are obtained by generalizing free region
-variables in the types of its class's fields, constructor arguments,
-and its superclass type.  The remaining parameter ($\rhoalloc_0$) is a
-fresh region variable denoting the allocation region argument. Fresh
-predicate variable $\varphi_0$ denotes unknown constraints over
+unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.
+
+
+Fresh predicate variable $\varphi_0$ denotes unknown constraints over
 $\rhoalloc_0$ and $\rho_{0-4}$ that need to hold for template to be a
 well-formed region-annotated class definition in $\FB$. 
 
-\textbf{TODO: discuss base class parameters}
-
-The type template for a recursively defined class is computed in two
-steps. First, all recursive occurrences of the class among the types of
-its fields are ignored and the class is templatized as if it is a
-non-recursive class. Next, all the recursive occurrences are
-templatized with respect to the class template computed in the first
-step, such that their region annotations are exactly same as the
-region parameters of the class. For example, consider a generic
-$\C{ListNode}\inang{\C{a}}$ class containing two fields: $\C{data}$ of
-type $\C{a}$ and $\C{next}$ of type $\C{ListNode}\inang{\C{a}}$.
-where $\C{a}$ is the type of the data stored in the linked list node.
-To templatize the $\C{ListNode}\inang{a}$ class, we first ignore its
-recursive occurrence in the type of $\C{next}$ field, and templatize
-the type $\C{a}$ of $\C{data}$ field as $\C{a}@\rho_0$. Based on this
-type template of $\C{data}$ field, we compute the class's template as
-following:
-\begin{center}
-$\C{ListNode}\inang{\C{a}\extends\ObjZ}
-\inang{\rhoalloc_0,\rho_0\,|\,\varphi_0} \extends \ObjZ \{...\}$
-\end{center}
-Next, we trivially templatize the type of $\C{next}$ field in the body
-of the class as $\C{ListNode}\inang{\C{a}}\inang{\rhoalloc_0,\rho_0}$.
-The resulting class represents a linked list with spine in the region
-$\rhoalloc_0$ and data objects in the region $\rho_0$.
 
 % Observe that our strategy of trivially templatizing the recursive
 % occurrences of a class type in its definition ensures that no new
 % region variables are introduced.
-The templatization technique we described above for recursive class
-definitions can be extended to mutually recursive definitions in a
-straightforward manner, by simultaneously templatizing them. Using the
+Using the
 techniques outlined above, we compute region type templates for all
 classes bound in the class table of the $\absof{\FB}$ program before
 we proceed to elaborate expressions.
