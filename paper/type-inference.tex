@@ -1,7 +1,5 @@
-\section{Type Inference}
-\label{sec:type-inference}
+\section{TO DO Items}
 
-\textbf{TO DO:}
 \begin{itemize}
 \item Add destructive object-field-update \emph{x.f := y} to the language.
 \item Add if-then-else to the language.
@@ -18,6 +16,9 @@ derived class may have more region parameters than a base class.
 semantics).
 \item Mention that constraints are in the theory of partial orders?
 \end{itemize}
+
+\section{Type Inference}
+\label{sec:type-inference}
 
 \name's region type system imposes a heavy annotation burden, and
 manually annotating C\# standard libraries with region types
@@ -45,7 +46,8 @@ Fig.~\ref{fig:type-inference-algo} presents the high-level outline of the type
 inference algorithm.
 The algorithm consists of the following steps:
 \begin{enumerate}
- \item The first step elaborates the input program by introducing \emph{formal region parameters}
+ \item \emph{Region Parametrization}.
+   The first step elaborates the input program by introducing \emph{formal region parameters}
    (for each class and method), and \emph{region variables} (representing yet undetermined
    \emph{actual region parameters}). We also introduce for each class and method, a
    \emph{predicate variable} ($\varphi$) to denote an undetermined set of constraints
@@ -70,11 +72,13 @@ The algorithm consists of the following steps:
 %%    class/method.
 %% \end{enumerate}
 
- \item In the second step, we analyze the program to generate a set of constraints
+ \item \emph{Constraint Generation}.
+   In the second step, we analyze the program to generate a set of constraints
    (over the region identifiers and the predicate variables)
-   that must hold (as per the static semantics in Fig.~\ref{fb-staticsem}).
+   that must hold (as per the static semantics in Fig.~\ref{fig:fb-staticsem}).
 
- \item We solve the generated set of constraints using our fixpoint constraint
+ \item \emph{Constraint Solving}.
+   We solve the generated set of constraints using our fixpoint constraint
    solving algorithm \csolvestar, which reduces the constraint solving problem to
    an abduction problem. If the original program in $\absof{\FB}$ contains unsafe
    references, for example, a reference from a transferable region to a
@@ -96,7 +100,7 @@ The algorithm consists of the following steps:
 \begin{figure}
 \begin{numcodeml}
 Infer ($p$) =
-  let $q$ = IntroduceVariables($p$) in
+  let $q$ = IntroduceRegionParameters($p$) in
   let $(r,C)$ = GenerateConstraints($q$) in
   match (SolveConstraints($C$) with
   | None $\longrightarrow$ None
@@ -152,8 +156,8 @@ For any $p \in \absof{\FB}$, if Infer($p$) returns Some($t$), then
 \subsection{Region Parametrization/Instantiation for Classes}
 \label{sec:fb-templatization}
 
-The first phase is an iterative process involving the following two
-mutually dependent steps.
+The first phase is an iterative process involving the following three steps,
+the first two of which are mutually dependent on each other.
 
 \emph{Region Parametrization}. For every class \C{C}, we identify
 a sequence of formal region parameters $\pi_0, \cdots \pi_n$ that \C{C}
@@ -164,7 +168,13 @@ We then replace every instance of class \C{C} in the program by an instance
 $\C{C}\langle \rho_0, \cdots, \rho_n \rangle$, where $\rho_0, \cdots, \rho_n$
 are fresh identifiers denoting actual region parameters.
 
+\emph{Predicate Variable Introduction}. For every class \C{C}, we introduce
+a fresh predicate variable $\varphi$, which represents the yet undetermined
+outlives constraints between the formal region parameters of class \C{C}.
+
 We identify the region parameters of classes as follows.
+
+\emph{Non-Recursive Classes}.
 The class \C{Object} is defined to have a single region parameter $\pi_0$ (the allocation region).
 The region parameters for any other non-recursive class \C{C} is determined
 only after the region parameters of any class that \C{C} depends on have been
@@ -198,7 +208,7 @@ $\Rightarrow$
 &
 \begin{minipage}{0.5\linewidth}
 \begin{codejava}
-class Pair $\langle \rho_0, \rho_1, \rho_2 \rangle$
+class Pair $\langle \rho_0, \rho_1, \rho_2 \; | \; \varphi \rangle$
   $\extends$ $\ObjZ \langle \rho_0 \rangle$
 {
   $\ObjZ \langle \rho_1 \rangle$ fst;
@@ -208,6 +218,7 @@ class Pair $\langle \rho_0, \rho_1, \rho_2 \rangle$
 \end{minipage}
 \end{tabular}
 
+\emph{Recursive Classes}.
 The region parameters for a recursive class is computed in
 a similar fashion, with the following difference: any recursive
 field is ignored while instantiating region parameters for the fields of
@@ -235,7 +246,7 @@ $\Rightarrow$
 &
 \begin{minipage}{0.5\linewidth}
 \begin{codejava}
-class List $\langle \rho_0, \rho_1 \rangle$
+class List $\langle \rho_0, \rho_1 \; | \; \varphi \rangle$
   $\extends$ $\ObjZ \langle \rho_0 \rangle$
 {
   $\ObjZ \langle \rho_1 \rangle$ data;
@@ -249,14 +260,20 @@ The above technique can be extended to mutually recursive classes in a
 straightforward manner, by simultaneously parametrizing them (and
 then instantiating them).
 
-\emph{Extensions for parametrized classes.}
+\emph{Type-Parametric Classes}.
 The techniques described above can be used for parametrized classes
 with the following extension. Consider a parametrized class \C{C $\langle$ T $\extends$ B $\rangle$}.
 The parametric type \C{T} is instantiated using the number of region parameters
 that its bound \C{B} has. If no bound is specified for \C{T}, the bound is taken
 to be \C{Object}, and \C{T} is instantiated with one region parameter.
 
-\TODO{Discuss function-typed fields}
+\emph{Function Types}.
+Since \FB{} is higher-order, fields of function type are allowed. The parameter instantiation step
+instantiates function types as follows: the type of every parameter as well as the return value is
+instantiated with fresh region identifiers, as described earlier, and finally these region identifiers
+are generalized as formal region parameters of the function type.
+For example, the function type $\C{List} \rightarrow \C{Object}$ is instantiated as
+$\inang{\rho_0, \rho_1, \rho_2} \C{List} \inang{\rho_0,\rho_1} \rightarrow \C{Object}\inang{\rho_2}$.
 
 %% Likewise, given the region-annotated definition of
 %% \C{Pair} class from \S\ref{sec:fb-syntax} a region type template for a
@@ -279,7 +296,8 @@ As the next step, we introduce region parameters for every method.
 We do this by instantiating the types of all parameters and the
 return value (of the method) using fresh region identifiers (as explained previously),
 and then generalizing these region identifiers as formal region parameters
-of the method.
+of the method. As for the classes, we also introduce a fresh predicate variable
+$\varphi$ for every method.
 
 We then consider every method invocation in the program, and introduce
 fresh region variables representing the (yet unknown) actual region
@@ -295,9 +313,9 @@ where $\rho_0, \cdots, \rho_n$ are fresh region variables.
 
 \input{fb-constraint-generation}
 
-Fresh predicate variable $\varphi_0$ denotes unknown constraints over
-$\rhoalloc_0$ and $\rho_{0-4}$ that need to hold for template to be a
-well-formed region-annotated class definition in $\FB$. 
+%Fresh predicate variable $\varphi_0$ denotes unknown constraints over
+%$\rhoalloc_0$ and $\rho_{0-4}$ that need to hold for template to be a
+%well-formed region-annotated class definition in $\FB$. 
 
 Our constraint generation algorithm generates the following kinds of constraints:
 \begin{itemize}
