@@ -317,6 +317,18 @@ where $\rho_0, \cdots, \rho_n$ are fresh region variables.
 %$\rhoalloc_0$ and $\rho_{0-4}$ that need to hold for template to be a
 %well-formed region-annotated class definition in $\FB$. 
 
+The constraint generation algorithm mimics the static type checker, but accumulates
+constraints that must hold for the type checking to succeed.
+
+\emph{Class Constraints}. 
+Computing the class constraint $\varphi_{\C{C}}$ corresponding to a class \C{C} is
+fairly straightforward. It is the conjunction of
+\begin{itemize}
+\item $\conj_{1 \leq i \leq n} (\rho_i \outlives \rho_0)$
+\item $\varphi_{\C{B}}$
+\item $[\rho_a/\rho_f]\varphi_{\C{F}}$
+\end{itemize}
+
 Our constraint generation algorithm generates the following kinds of constraints:
 \begin{itemize}
 \item Well-formedness constraints of form $\rho \in \rhoenv$,
