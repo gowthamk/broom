@@ -32,15 +32,6 @@ expressions, similar to the language introduced in
 \S~\ref{sec:overview}) to programs in \FB.
 
 \paragraph{Overview.}
-In the sequel, we will be using \emph{region identifiers} in four different roles.
-A region identifier may serve as
-(a) A \emph{formal region parameter} of a class or method, or
-(b) a \emph{static region identifier} introduced by a \C{letregion} construct, or
-(c) an  \emph{open transferable region identifier} introduced by an \C{open} construct, or
-(d) a \emph{region variable}, introduced to represent an unknown actual region parameter
-of a method invocation or object alloation,
-which will be bound to a region identifier of one of the three
-preceding kinds by the end of the type inference.
 
 Fig.~\ref{fig:type-inference-algo} presents the high-level outline of the type
 inference algorithm.
@@ -313,31 +304,68 @@ where $\rho_0, \cdots, \rho_n$ are fresh region variables.
 
 \input{fb-constraint-generation}
 
-%Fresh predicate variable $\varphi_0$ denotes unknown constraints over
-%$\rhoalloc_0$ and $\rho_{0-4}$ that need to hold for template to be a
-%well-formed region-annotated class definition in $\FB$. 
-
 The constraint generation algorithm mimics the static type checker, but accumulates
 constraints that must hold for the type checking to succeed.
 
-\emph{Class Constraints}. 
-Computing the class constraint $\varphi_{\C{C}}$ corresponding to a class \C{C} is
-fairly straightforward. It is the conjunction of
-\begin{itemize}
-\item $\conj_{1 \leq i \leq n} (\rho_i \outlives \rho_0)$
-\item $\varphi_{\C{B}}$
-\item $[\rho_a/\rho_f]\varphi_{\C{F}}$
-\end{itemize}
+\paragraph{Syntax of Constraints.}
+The constraints are expressed in terms of region identifiers ($\pi$ and $\rho$)
+and predicate variables ($\varphi$).
 
-Our constraint generation algorithm generates the following kinds of constraints:
+Recall that \emph{region identifiers} are used in four different roles.
+A region identifier may serve as
+(a) A \emph{formal region parameter} of a class or method, or
+(b) a \emph{static region identifier} introduced by a \C{letregion} construct, or
+(c) an  \emph{open transferable region identifier} introduced by an \C{open} construct, or
+(d) a \emph{region variable}, introduced to represent an unknown actual region parameter
+of a method invocation or object alloation,
+which will be bound to a region identifier of one of the three
+preceding kinds by the end of the type inference.
+
+Every predicate variable $\varphi$ denotes an unknown \emph{region-constraint},
+%% over a set of fixed formal region parameters,
+where the set of region-constraints $\phi$ is defined by:
+\begin{smathpar}
+\begin{array}{lcl}
+\phi & \coloneqq & true \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi \\
+\end{array}
+\end{smathpar}
+
+Our constraints also make uses of \emph{pending substitutions}\footnote{we borrowed this terminology from~\cite{ltpldi08}} $F$.
+A pending substitution serves to bind formal region parameters in $\varphi$ to the actual region parameters
+used in a particular context:
+\begin{smathpar}
+\begin{array}{lcl}
+F & \coloneqq & \cdot \ALT [\rho/\rho]F \\
+\end{array}
+\end{smathpar}
+For instance, in the validity constraint $\isvalid{\rgn_1 \outlives
+\rgn_2}{[\rgn_1/\rho_1][\rgn_2/\rho_2]\varphi}$, the pending substitution
+is $[\rgn_1/\rho_1][\rgn_2/\rho_2]$. Any concrete formula (call it
+$\phisol$) over variables $\rho_1$ and $\rho_2$ is a solution to
+$\varphi$ if and only the formula obtained by substituting $\rgn_1$
+and $\rgn_2$ for $\rho_1$ and $\rho_2$ (resp.) in $\phisol$ is
+deducible from $\rgn_1 \outlives \rgn_2$.
+
+The constraints generated are of the following kinds:
 \begin{itemize}
+
 \item Well-formedness constraints of form $\rho \in \rhoenv$,
 restricting the domain of unification for a region variable ($\rho$)
-to the set ($\rhoenv$) of regions in scope,
-\item Well-formedness constraints of form
-$\tywf{\rhoenv}{\varphi}$, restricting the domain of a predicate
-variable ($\varphi$) to the set of all possible constraint formulas
-over region variables ($\rhoenv$) in scope, and
+to a constant set $\rhoenv = \{ \pi_1, \cdots, \pi_n \}$ of regions in scope,
+
+\item Well-formedness constraints of form $\tywf{\rhoenv}{\varphi}$, restricting the domain of a predicate
+variable ($\varphi$) to the set of all possible constraint formulas over a fixed set of 
+regions ($\rhoenv = \{ \pi_1, \cdots, \pi_n \}$) in scope, and
+
+\item Validity constraints of the form $\isvalid{\varphi_{\C{C}}}{\varphi_{\C{B}}}$
+  (e.g., to indicate that the region-constraint of a derived class \C{C} is stricter than
+  the region-constraint of its base class \C{B}).
+
+\item Validity constraints of the form $\isvalid{\varphi_{\C{C}}}{{F(\varphi_{\C{T}})}}$
+  (e.g., to indicate the region-constraint of a class \C{C} must imply the
+  region-constraint of each of its fields).
+
+
 \item Validity constraints of form $\isvalid{\phictxt \conj \varphi_i} {\phicstr}$
 where $\varphi_i$ is a predicate variable (representing the precondition of a
 method to be determined), $\phicstr$ is a region constraint that is \emph{required}
@@ -358,30 +386,18 @@ Each $\phi$ is a region constraint over region variables and region parameters:
 %% among region varibles (i.e., $\rho$'s), or relationships between
 %% region variables and identifiers.
 %
+
 \item Validity constraints of the form $\isvalid{\phictxt \conj \varphi_i} {F_j(\varphi_j)}$
 generated by an invocation of a method with precondition $\varphi_j$ (where $\phictxt$ and
 $\varphi_i$ are as above).
-Here, $F$ denotes \emph{pending substitutions}\footnote{we borrowed this terminology from~\cite{ltpldi08}}:
-it serves to bind formal region parameters in $\varphi_j$ to the actual region parameters
-at a particular invocation site.
-\begin{smathpar}
-\begin{array}{lcl}
-F & \coloneqq & \cdot \ALT [\rho/\rho]F \\
-\end{array}
-\end{smathpar}
+
+
 \end{itemize}
 
-A pending substitution ($F$) is a substitution function over region
-variables/identifiers. They represent the substitutions that need to
-be carried out when a predicate variable ($\varphi$) is replaced by a
-concrete formula in a validity constraint. For instance, in the
-validity constraint $\isvalid{\rgn_1 \outlives
-\rgn_2}{[\rgn_1/\rho_1][\rgn_2/\rho_2]\varphi}$, pending substitution
-is $[\rgn_1/\rho_1][\rgn_2/\rho_2]$. Any concrete formula (call it
-$\phisol$) over variables $\rho_1$ and $\rho_2$ is a solution to
-$\varphi$ if and only the formula obtained by substituting $\rgn_1$
-and $\rgn_2$ for $\rho_1$ and $\rho_2$ (resp.) in $\phisol$ is
-deducible from $\rgn_1 \outlives \rgn_2$.
+% A pending substitution ($F$) is a substitution function over region
+% variables/identifiers. They represent the substitutions that need to
+% be carried out when a predicate variable ($\varphi$) is replaced by a
+% concrete formula in a validity constraint.
 
 % Validity constraints primarily result from checking if a region type
 % template of form $B\inang{\tbar}\inang{\rhoalloc,\rhobar}$ is
@@ -407,6 +423,15 @@ Each region variable occuring in $\phicstr$ has an associated well-formedness
 constraint, which specifies its unification domain. The unification domain of a
 constraint is the union of unification domains of all region variables
 occuring in the constraint.
+
+\emph{Class Constraints}. 
+Computing the class constraint $\varphi_{\C{C}}$ corresponding to a class \C{C} is
+fairly straightforward. It is the conjunction of
+\begin{itemize}
+\item $\conj_{1 \leq i \leq n} (\rho_i \outlives \rho_0)$
+\item $\varphi_{\C{B}}$
+\item $[\rho_a/\rho_f]\varphi_{\C{F}}$
+\end{itemize}
 
 \paragraph{Constraints Example 1} Consider the $\C{Pair}$ class
 template from \S\ref{sec:fb-templatization}. Following constraints are
