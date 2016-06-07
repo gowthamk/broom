@@ -144,17 +144,17 @@ For any $p \in \absof{\FB}$, if Infer($p$) returns Some($t$), then
 % the constraints and determine assignments for unknown region and
 % predicate variables.
 
-\subsection{Region Parametrization/Instantiation for Classes}
+\subsection{Region Parametrization for Classes}
 \label{sec:fb-templatization}
 
-The first phase is an iterative process involving the following three steps,
+Region parametrization is an iterative process involving the following three steps,
 the first two of which are mutually dependent on each other.
 
-\emph{Region Parametrization}. For every class \C{C}, we identify
-a sequence of formal region parameters $\pi_0, \cdots \pi_n$ that \C{C}
-should be parametric over.
+\emph{Introduction of Formal Region Parameters}.
+For every class \C{C}, we identify a sequence of formal region parameters
+$\pi_0, \cdots \pi_n$ that \C{C} should be parametric over.
 
-\emph{Parameter Instantiation}.
+\emph{Introduction of Actual Region Parameters}.
 We then replace every instance of class \C{C} in the program by an instance
 $\C{C}\langle \rho_0, \cdots, \rho_n \rangle$, where $\rho_0, \cdots, \rho_n$
 are fresh identifiers denoting actual region parameters.
@@ -241,7 +241,7 @@ class List $\langle \rho_0, \rho_1 \; | \; \varphi \rangle$
   $\extends$ $\ObjZ \langle \rho_0 \rangle$
 {
   $\ObjZ \langle \rho_1 \rangle$ data;
-  List $\langle \rho_0, \rho_1 \rangle$ next;
+  $\C{List} \langle \rho_0, \rho_1 \rangle$ next;
 }
 \end{codejava}
 \end{minipage}
@@ -252,8 +252,8 @@ straightforward manner, by simultaneously parametrizing them (and
 then instantiating them).
 
 \emph{Type-Parametric Classes}.
-The techniques described above can be used for parametrized classes
-with the following extension. Consider a parametrized class \C{C $\langle$ T $\extends$ B $\rangle$}.
+Type parameters of classes are handled as follows.
+Consider a type-parametric class \C{C $\langle$ T $\extends$ B $\rangle$}.
 The parametric type \C{T} is instantiated using the number of region parameters
 that its bound \C{B} has. If no bound is specified for \C{T}, the bound is taken
 to be \C{Object}, and \C{T} is instantiated with one region parameter.
@@ -281,7 +281,7 @@ $\inang{\rho_0, \rho_1, \rho_2} \C{List} \inang{\rho_0,\rho_1} \rightarrow \C{Ob
 %% variables, and $\varphi_0$ is a fresh predicate variable denoting
 %% unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.
 
-\subsection{Region Parametrization/Instantiation for Methods}
+\subsection{Region Parametrization for Methods}
 
 As the next step, we introduce region parameters for every method.
 We do this by instantiating the types of all parameters and the
@@ -329,6 +329,8 @@ where the set of region-constraints $\phi$ is defined by:
 \phi & \coloneqq & true \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi \\
 \end{array}
 \end{smathpar}
+We will use the term \emph{validity constraint} to denote an entailment constraint
+of the form $\isvalid{\varphi}{\rho_1 \outlives \rho_2}$.
 
 Our constraints also make uses of \emph{pending substitutions}\footnote{we borrowed this terminology from~\cite{ltpldi08}} $F$.
 A pending substitution serves to bind formal region parameters in $\varphi$ to the actual region parameters
@@ -338,7 +340,7 @@ used in a particular context:
 F & \coloneqq & \cdot \ALT [\rho/\rho]F \\
 \end{array}
 \end{smathpar}
-For instance, in the validity constraint $\isvalid{\rgn_1 \outlives
+E.g., in the validity constraint $\isvalid{\rgn_1 \outlives
 \rgn_2}{[\rgn_1/\rho_1][\rgn_2/\rho_2]\varphi}$, the pending substitution
 is $[\rgn_1/\rho_1][\rgn_2/\rho_2]$. Any concrete formula (call it
 $\phisol$) over variables $\rho_1$ and $\rho_2$ is a solution to
@@ -365,18 +367,12 @@ regions ($\rhoenv = \{ \pi_1, \cdots, \pi_n \}$) in scope, and
   (e.g., to indicate the region-constraint of a class \C{C} must imply the
   region-constraint of each of its fields).
 
-
-\item Validity constraints of form $\isvalid{\phictxt \conj \varphi_i} {\phicstr}$
+\item Validity constraints of form $\isvalid{\varphi_i \conj \phictxt} {\phicstr}$
 where $\varphi_i$ is a predicate variable (representing the precondition of a
 method to be determined), $\phicstr$ is a region constraint that is \emph{required}
 to hold at a particular program point (within the method), and $\phictxt$ is
 a region constraint that is \emph{known} to hold at that program point.
-Each $\phi$ is a region constraint over region variables and region parameters:
-\begin{smathpar}
-\begin{array}{lcl}
-\phi & \coloneqq & true \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi \\
-\end{array}
-\end{smathpar}
+
 %
 %% Formulas $\phictxt$ and $\phicstr$ are concrete, i.e., free
 %% of predicate variables and pending substitutions. While $\phictxt$
@@ -387,51 +383,61 @@ Each $\phi$ is a region constraint over region variables and region parameters:
 %% region variables and identifiers.
 %
 
-\item Validity constraints of the form $\isvalid{\phictxt \conj \varphi_i} {F_j(\varphi_j)}$
+\item Validity constraints of the form $\isvalid{\varphi_i \conj \phictxt} {F_j(\varphi_j)}$
 generated by an invocation of a method with precondition $\varphi_j$ (where $\phictxt$ and
 $\varphi_i$ are as above).
 
-
 \end{itemize}
 
-% A pending substitution ($F$) is a substitution function over region
-% variables/identifiers. They represent the substitutions that need to
-% be carried out when a predicate variable ($\varphi$) is replaced by a
-% concrete formula in a validity constraint.
 
-% Validity constraints primarily result from checking if a region type
-% template of form $B\inang{\tbar}\inang{\rhoalloc,\rhobar}$ is
-% well-formed (i.e., $\typeOk$). The corresponding well-formedness rule
-% (Fig.~\ref{fig:fb-staticsem}) requires that the instantiation of $B$'s
-% formal region parameters with actual region arguments satisfy its
-% precondition, where actuals are subsituted for formals. Since $B$'s
-% precondition could be unknown, the requirement results in a in a
-% validity constraint with predicate variables and pending
-% substitutions. Other sources of validity constraints are calls to
-% region-polymorphic methods, where similar situation arises. 
+\paragraph{Constraint Solution}
+Solving the set ($C$) of constraints entails finding an
+assignment for each predicate variable $(\varphi$) and each region
+variable ($\rho$) that occurs free in $C$, that satisfies all
+the validity constraints as well as the well-formedness constraints on
+$\varphi$ and $\rhobar$.
+% To simplify presentation, we think of $C$ as being parameterized on
+% $\varphi$ and $\rhobar$, and write it as $C\lbrack \varphi,\rhobar
+% \rbrack$. We now formalize the constraint satisfaction problem, and
+% its solution.
 
-%
-%% If the constraint is generated while checking the well-formedness of a
-%% type or elaborating an expression, then $\varphi_j$'s denote the unknown
-%% preconditions of classes and methods that were used in that type or expression.
-%
-% Each use of a (region-polymorphic) class or a method may instantiate region
-% parameters differently, resulting in a different pending substitution
-% ($F_j$).
-
-Each region variable occuring in $\phicstr$ has an associated well-formedness
-constraint, which specifies its unification domain. The unification domain of a
-constraint is the union of unification domains of all region variables
-occuring in the constraint.
-
-\emph{Class Constraints}. 
-Computing the class constraint $\varphi_{\C{C}}$ corresponding to a class \C{C} is
-fairly straightforward. It is the conjunction of
+\begin{definition}
+\emph{(\textbf{Constraint Satisfaction Problem (CSP)})}
+A constraint satisfaction problem is a tuple
+$(\bar{\pi}, \bar{\rho}, \bar{\varphi}, \regionDeltaMap, \predDeltaMap, C)$,
+where $\bar{\pi}$ is a set of region constants,
+$\bar{\rho}$ is a set of region variables,
+$\bar{\varphi}$ is a set of predicate variables,
+$regionDeltaMap : \bar{\rho} \rightarrow 2^{\bar{\pi}}$ is a function that
+specifies a unification domain for each region variable,
+$\predDeltaMap : \bar{\varphi} \rightarrow 2^{\bar{\pi}}$ is a function that
+specifies the domain for each predicate variable,
+and $C$ is a set of validity constraints, where the $i$'th validity constraint
+assumes one of the following forms:
+\begin{center}
+\(
+    \isvalid{\phictxt^{i} \conj \varphi}
+            {\phicstr^{i}}\qquad
+    \isvalid{\phictxt^{i} \conj \varphi}
+            {F_i(\varphi)}
+\)
+\end{center}
+The solution to the constraint satisfaction problem is a pair $(\regionSubstFn,\predSubstFn)$,
+where $\regionSubstFn$ is a map from $\rhobar$ to $\bar{\pi}$
+and $\predSubstFn$ is a map from $\bar{\varphi}$ to a region-constraint formula such that
 \begin{itemize}
-\item $\conj_{1 \leq i \leq n} (\rho_i \outlives \rho_0)$
-\item $\varphi_{\C{B}}$
-\item $[\rho_a/\rho_f]\varphi_{\C{F}}$
+  \item $\regionSubstFn(\rho) \in \regionDeltaMap(\rho)$, for every $\rho \in \bar{\rho}$,
+
+  \item $\predSubstFn$ is well-formed under $\predDeltaMap$
+    (i.e., $\tywf{\predDeltaMap(\varphi)}{\predSubstFn(\varphi)}$, for every $\varphi \in \bar{\varphi}$).
+
+  \item Every sequent in $C$ is valid after substitutions $\predSubstFn$ and $
+    \regionSubstFn$.
+  %% $C\lbrack (\regionSubstFn,\predSubstFn) \rbrack$ is valid.
 \end{itemize}
+\end{definition}
+
+\textbf{TODO: The following not yet integrated into above.}
 
 \paragraph{Constraints Example 1} Consider the $\C{Pair}$ class
 template from \S\ref{sec:fb-templatization}. Following constraints are
@@ -545,49 +551,48 @@ Constraints generated during the elaboration are shown below
 % Second and third are generated by the the assignment expressions, and
 % the last constraint is generated from the recursive call.
 
-\paragraph{Constraint Solution}
-Solving the set ($C$) of constraints entails finding an
-assignment for each predicate variable $\varphi$) and each region
-variable ($\rho$) that occurs free in $C$, such that the solution
-satisfies well-formedness constraints on $\varphi$ and $\rhobar$.
-% To simplify presentation, we think of $C$ as being parameterized on
-% $\varphi$ and $\rhobar$, and write it as $C\lbrack \varphi,\rhobar
-% \rbrack$. We now formalize the constraint satisfaction problem, and
-% its solution.
+\subsection{Solving the CSP}
 
-\begin{definition}
-\emph{(\textbf{Constraint Satisfaction Problem (CSP)})} A constraint
-satisfaction problem is a tuple $\CSP$, where $C\lbrack
-\varphi,\rhobar \rbrack$ is a set of validity constraints, where
-$i$'th validity constraint assumes one of the following forms:
-\begin{center}
-\(
-    \isvalid{\phictxt^{i} \conj \varphi}
-            {\phicstr^{i}}\qquad
-    \isvalid{\phictxt^{i} \conj \varphi}
-            {F_i(\varphi)}
-\)
-\end{center}
-$\bar{\rhoenv}$ are the unification domains for $\rhobar$. We call the
-union of all unification domains ($\bigcup\bar{\rhoenv}$) as the
-unification domain ($\rhoenv$) of the CSP.  The solution to the
-constraint satisfaction problem is a pair $(\substFn,\phisol)$, where
-$\substFn$ is a map from $\rhobar$ to $\rhoenv$ such that
-$\substFn(\rho_j) \in \rhoenv_j$, for every $j$, and $\phisol$ is a
-constraint formula such that:
-\begin{itemize}
-\item $\phisol$ is well-formed under $\rhoenv_{\varphi}$ (i.e.,
-$\tywf{\rhoenv_{\varphi}}{\phisol}$).
-\item Every sequent in $C\lbrack (\phisol,\substFn(\rhobar)) \rbrack$
-is valid.
-% \begin{center}
-% \(
-%   \isvalid{\phictxt^{i} \conj \bigwedge_j(\rho_j = \substFn(\rho_j)) \conj \phisol}
-%           {\phicstr^{i} \conj  F_i(\phisol))}
-% \)
-% \end{center}
-\end{itemize}
-\end{definition}
+Solving the constraints is an iterative process, consisting of the following
+steps, and this process fails at any point if it determines that no solution
+exists for the set of constraints:
+
+\begin{enumerate}
+
+\item
+    A constraint of the form $\isvalid{\varphi}{\rho_i = \rho_j}$ unifies
+$\rho_i$ and $\rho_j$ if at least one of them is a region variable.
+If $\rho_i$ and $\rho_j$ are distinct region constants, then the constraint
+solver fails.
+
+\item
+When a region variable $\rho$ is unified with a region constant $\pi$,
+if $\pi \in \regionDeltaMap(\rho)$, we update $\regionSubstFn(\rho)$ to be $\pi$,
+and replace every occurrence of $\rho$ by $\pi$ in the set of constraints.
+If $\pi \not\in \regionDeltaMap(\rho)$, the constraint solver fails.
+
+\item
+Consider any constraint of the form $\isvalid{\varphi}{\pi_i \outlives \pi_j}$,
+where $\pi_i$ and $\pi_j$ are both region constants.
+If $\{ \pi_i, \pi_j \} \subseteq \predDeltaMap(\varphi)$, then we simply add
+$\pi_i \outlives \pi_j$ as an additional conjunct to $\predSubstFn(\varphi)$.
+Otherwise, the constraint solver fails, since no valid solution is possible.
+
+\item
+  When any outlives constraint $\phi$ is added to $\predSubstFn(\varphi)$,
+  then for every existing validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\varphi)}$,
+  we produce a new validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\phi)}$. 
+
+\end{enumerate}
+
+%% \emph{Class Constraints}. 
+%% Computing the class constraint $\varphi_{\C{C}}$ corresponding to a class \C{C} is
+%% fairly straightforward. It is the conjunction of
+%% \begin{itemize}
+%% \item $\conj_{1 \leq i \leq n} (\rho_i \outlives \rho_0)$
+%% \item $\varphi_{\C{B}}$
+%% \item $[\rho_a/\rho_f]\varphi_{\C{F}}$
+%% \end{itemize}
 
 \paragraph{Properties of generated constraints}
 The set of generated constraints have certain properties that allow us to
@@ -595,55 +600,6 @@ solve the constraints efficiently.
 %
 Since $\FB$ does not admit null values or uninitialized variables, every region
 variable is forced to be unified with some concrete region, by the constraints.
-
-
-\subsection{Solving the CSP}
-
-The first step of solving the CSP $\CSP$ is to cast it as an
-equivalent problem $\csp$ involving a single validity constraint. The
-single constraint ($\lbrack \varphi,\rhobar \rbrack$) is:
-\begin{center}
-\(
-  \isvalid{ \Phicx \conj \varphi}
-        {\Phics \conj  \bigwedge_i F_i(\varphi)}
-\)
-\end{center}
-Where $\Phicx = \bigwedge_i \phictxt^{i}$ and $\Phics = \bigwedge_i
-\phicstr^{i}$. To see why both CSPs are equivalent, consider two
-distinct constraints, $c_i\lbrack \varphi,\rhobar_i \rbrack$ and
-$c_j\lbrack \varphi,\rhobar_j \rbrack$. Since $i\neq j$, $\rhobar_i
-\neq \rhobar_j$. Without the loss of generality, assume that $c_i$ was
-generated before $c_j$ by the constraint generation algorithm. Observe
-that when our constraint generation algorithm generates a constraint,
-all relationships between concrete region identifiers referred by the
-consequent of constraint are already present in its antecedent (this
-includes the unification domains of region variables referred by the
-consequent).  Since no new relationships between existing regions are
-added when a new constraints is generated, $\phictxt^j$ either
-describes the same relationships that are already described by
-$\phictxt^i$, or describes relationships among region identifiers that
-are new, and not relevant to $c_i$. Therefore, strengthening the
-context of $c_i$ with that of $c_j$ (or vice versa) neither weakens
-nor strengthens $c_i$ (resp.  $c_j$).
-
-For the constraint sets $C_1$, $C_2$, and $C_3$ in the running
-example, equivalent constraints are $c_{12}$, $c_{13}$, and $c_{14}$,
-respectively, shown below:
-\begin{smathpar}
-\begin{array}{l}
-  \csid{12} \isvalid{\varphi_0}{\rho_0 \outlives \rhoalloc_0 \conj \rho_1
-     \succeq \rhoalloc_0 \conj \rho_4 = \rhoalloc_0 \conj 
-     \rho_2 = \rho_0 \conj \rho_3 = \rho_1}\\
-  \csid{13} \isvalid{\varphi_0 \conj \varphi_1} {\rho_5 = \rho_0}\\
-  \csid{14} \isvalid{\varphi_1 \conj \varphi_2 \conj \rgn_0 \outlives \rgn_1} 
-    {
-        \rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6 \conj 
-        \rho_7 = \rho_9 \conj 
-    }\\
-  \hspace*{1.4in} \rho_{8} = \rho_9 \conj
-        [\rgn_1/\rhoalloc_2][\rgn_1/\rho_6][\rgn_0/\rho_{7-9}]\varphi_2
-\end{array}
-\end{smathpar}
 
 \subsubsection{Non-Recursive Constraints}
 \label{sec:csolve}
