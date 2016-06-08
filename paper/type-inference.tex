@@ -389,6 +389,7 @@ $\varphi_i$ are as above).
 
 \end{itemize}
 
+\paragraph{Constraint Generation.}
 
 \paragraph{Constraint Solution}
 Solving the set ($C$) of constraints entails finding an
@@ -408,7 +409,7 @@ $(\bar{\pi}, \bar{\rho}, \bar{\varphi}, \regionDeltaMap, \predDeltaMap, C)$,
 where $\bar{\pi}$ is a set of region constants,
 $\bar{\rho}$ is a set of region variables,
 $\bar{\varphi}$ is a set of predicate variables,
-$regionDeltaMap : \bar{\rho} \rightarrow 2^{\bar{\pi}}$ is a function that
+$\regionDeltaMap : \bar{\rho} \rightarrow 2^{\bar{\pi}}$ is a function that
 specifies a unification domain for each region variable,
 $\predDeltaMap : \bar{\varphi} \rightarrow 2^{\bar{\pi}}$ is a function that
 specifies the domain for each predicate variable,
@@ -553,6 +554,28 @@ Constraints generated during the elaboration are shown below
 
 \subsection{Solving the CSP}
 
+\paragraph{Properties of generated constraints}
+The set of generated constraints have two interesting properties that allow us to
+solve the constraints efficiently.
+%
+The first property is that every region variable is forced to be unified with some
+region constant by the constraints, except in one special case.
+This follows because $\FB$ does not admit uninitialized variables.
+(The only case where this does not hold is in the case of a recursive function
+that calls itself in a non-terminating fashion: in this case, the function never
+returns a value, and so the return-value can be typed as anything. In the sequel,
+we assume that the return value of such a function is typed to be \C{unit}.)
+% , and the type system uniquely determines the region parameters of every value
+%
+The second property is that the \emph{context region constraint} $\phictxt$
+occurring on the antecedent of any validity constraint is a conjunction of
+outlives-constraints of the form $\pi \outlives \pi_s$ where $\pi_s$
+is a static region identifier and $\pi$ is a region constant (either a formal
+region parameter, or static region identifier, or open transferable region identifier).
+Furthermore, if $\phictxt$ includes any conjunct $\pi \outlives \pi_s$, then
+it includes every conjunct $\pi_f \outlives \pi_s$ for every $\pi_f \in \predDeltaMap(\varphi)$.
+
+\paragraph{Constraint Solver.}
 Solving the constraints is an iterative process, consisting of the following
 steps, and this process fails at any point if it determines that no solution
 exists for the set of constraints:
@@ -572,18 +595,33 @@ and replace every occurrence of $\rho$ by $\pi$ in the set of constraints.
 If $\pi \not\in \regionDeltaMap(\rho)$, the constraint solver fails.
 
 \item
-Consider any constraint of the form $\isvalid{\varphi}{\pi_i \outlives \pi_j}$,
+\label{item:context}
+Consider any constraint of the form $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$,
 where $\pi_i$ and $\pi_j$ are both region constants.
 If $\{ \pi_i, \pi_j \} \subseteq \predDeltaMap(\varphi)$, then we simply add
 $\pi_i \outlives \pi_j$ as an additional conjunct to $\predSubstFn(\varphi)$.
-Otherwise, the constraint solver fails, since no valid solution is possible.
+Otherwise, we check if $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$.
+If this entailment does not hold, the constraint solver fails, since no valid solution is possible.
 
 \item
   When any outlives constraint $\phi$ is added to $\predSubstFn(\varphi)$,
   then for every existing validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\varphi)}$,
   we produce a new validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\phi)}$. 
-
 \end{enumerate}
+
+Point~\ref{item:context} makes use of the special structure of the generated
+constraints: namely that $\phictxt$  is a conjunction of outlives-constraints of the
+form $\pi \outlives \pi_s$ where $\pi_s$ is a static region identifier and $\pi$ is a
+region constant. As a result, we can show that $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$
+iff $\isvalid{\varphi}{\pi_i \outlives \pi_j}$ or $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$.
+
+This iterative process is a standard fixed point computation process.
+It is possible to encode this computation using a set of Datalog rules, and compute the
+solution using any Datalog engine.
+Alternatively, note that the above computation, in the absence of context constraints
+$\phictxt$ on the left-hand-side of the entailment, is a special instance of context-free
+reachability in graphs. Algorithms for context-free reachability can be adapted to
+incorporate the above treatment of context constraints $\phictxt$.
 
 %% \emph{Class Constraints}. 
 %% Computing the class constraint $\varphi_{\C{C}}$ corresponding to a class \C{C} is
@@ -593,13 +631,6 @@ Otherwise, the constraint solver fails, since no valid solution is possible.
 %% \item $\varphi_{\C{B}}$
 %% \item $[\rho_a/\rho_f]\varphi_{\C{F}}$
 %% \end{itemize}
-
-\paragraph{Properties of generated constraints}
-The set of generated constraints have certain properties that allow us to
-solve the constraints efficiently.
-%
-Since $\FB$ does not admit null values or uninitialized variables, every region
-variable is forced to be unified with some concrete region, by the constraints.
 
 \subsubsection{Non-Recursive Constraints}
 \label{sec:csolve}
