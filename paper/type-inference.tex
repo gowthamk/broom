@@ -482,8 +482,9 @@ form $\pi \outlives \pi_s$ where $\pi_s$ is a static region identifier and $\pi$
 region constant. As a result, we can show that $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$
 iff $\isvalid{\varphi}{\pi_i \outlives \pi_j}$ or $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$.
 
-This iterative process is a standard fixed point computation process.
-It is possible to encode this computation using a set of Datalog rules,
+\paragraph{Algorithmic Aspects.}
+The iterative process described above is a standard fixed point computation.
+We can encode this computation using a set of Datalog rules,
 and compute the solution using any Datalog engine.
 Alternatively, algorithms for context-free reachability can be adapted
 to solve the constraints, as explained below.
@@ -514,6 +515,13 @@ Algorithms for context-free reachability can also be adapted to incorporate
 the above treatment of context constraints $\phictxt$.
 %
 Further details omitted.
+
+\paragraph{Modularity Aspects.}
+The type inference algorithm, as presented, traverses the entire program to
+generate the set of constraints, which are solved en masse, using an iterative
+fixed point computation. However, the type inference can be realized in a
+modular and compositional fashion, subject only to the restrictions imposed
+by recursion.
 
 %% \emph{Class Constraints}. 
 %% Computing the class constraint $\varphi_{\C{C}}$ corresponding to a class \C{C} is
