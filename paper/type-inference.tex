@@ -1,22 +1,3 @@
-\section{TO DO Items}
-
-\begin{itemize}
-\item Add destructive object-field-update \emph{x.f := y} to the language.
-\item Add if-then-else to the language.
-\item Omit constructors from classes (and use an implicit constructor).
-\item Note that the claim that all region variables will be unified with some concrete
-region fails in the case of a method that recursively calls itself (and, hence, does not
-terminate). In this case, the region variables in the return type are not constrained.
-Similarly for non-terminating mutual recursion. These are uninteresting (in essence, the
-return type can be taken to be unit instead).
-\item Discuss the safety of virtual method invocation, which provides a limited form
-of existentially quantifying regions and instantiating (unpacking) them because a
-derived class may have more region parameters than a base class.
-\item Discuss the subtyping rule used to check an overriding method (in the static
-semantics).
-\item Mention that constraints are in the theory of partial orders?
-\end{itemize}
-
 \section{Type Inference}
 \label{sec:type-inference}
 
@@ -438,7 +419,140 @@ and $\predSubstFn$ is a map from $\bar{\varphi}$ to a region-constraint formula 
 \end{itemize}
 \end{definition}
 
-\textbf{TODO: The following not yet integrated into above.}
+\subsection{Solving the CSP}
+
+\paragraph{Properties of generated constraints}
+The set of generated constraints have two interesting properties that allow us to
+solve the constraints efficiently.
+%
+The first property is that every region variable is forced to be unified with some
+region constant by the constraints, except in one special case.
+This follows because $\FB$ does not admit uninitialized variables.
+(The only case where this does not hold is in the case of a recursive function
+that calls itself in a non-terminating fashion: in this case, the function never
+returns a value, and so the return-value can be typed as anything. In the sequel,
+we assume that the return value of such a function is typed to be \C{unit}.)
+% , and the type system uniquely determines the region parameters of every value
+%
+The second property is that the \emph{context region constraint} $\phictxt$
+occurring on the antecedent of any validity constraint is a conjunction of
+outlives-constraints of the form $\pi \outlives \pi_s$ where $\pi_s$
+is a static region identifier and $\pi$ is a region constant (either a formal
+region parameter, or static region identifier, or open transferable region identifier).
+Furthermore, if $\phictxt$ includes any conjunct $\pi \outlives \pi_s$, then
+it includes every conjunct $\pi_f \outlives \pi_s$ for every $\pi_f \in \predDeltaMap(\varphi)$.
+
+\paragraph{Constraint Solver.}
+Solving the constraints is an iterative process, consisting of the following
+steps, and this process fails at any point if it determines that no solution
+exists for the set of constraints:
+
+\begin{enumerate}
+
+\item
+    A constraint of the form $\isvalid{\varphi}{\rho_i = \rho_j}$ unifies
+$\rho_i$ and $\rho_j$ if at least one of them is a region variable.
+If $\rho_i$ and $\rho_j$ are distinct region constants, then the constraint
+solver fails.
+
+\item
+When a region variable $\rho$ is unified with a region constant $\pi$,
+if $\pi \in \regionDeltaMap(\rho)$, we update $\regionSubstFn(\rho)$ to be $\pi$,
+and replace every occurrence of $\rho$ by $\pi$ in the set of constraints.
+If $\pi \not\in \regionDeltaMap(\rho)$, the constraint solver fails.
+
+\item
+\label{item:context}
+Consider any constraint of the form $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$,
+where $\pi_i$ and $\pi_j$ are both region constants.
+If $\{ \pi_i, \pi_j \} \subseteq \predDeltaMap(\varphi)$, then we simply add
+$\pi_i \outlives \pi_j$ as an additional conjunct to $\predSubstFn(\varphi)$.
+Otherwise, we check if $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$.
+If this entailment does not hold, the constraint solver fails, since no valid solution is possible.
+
+\item
+  When any outlives constraint $\phi$ is added to $\predSubstFn(\varphi)$,
+  then for every existing validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\varphi)}$,
+  we produce a new validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\phi)}$. 
+\end{enumerate}
+
+Point~\ref{item:context} makes use of the special structure of the generated
+constraints: namely that $\phictxt$  is a conjunction of outlives-constraints of the
+form $\pi \outlives \pi_s$ where $\pi_s$ is a static region identifier and $\pi$ is a
+region constant. As a result, we can show that $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$
+iff $\isvalid{\varphi}{\pi_i \outlives \pi_j}$ or $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$.
+
+This iterative process is a standard fixed point computation process.
+It is possible to encode this computation using a set of Datalog rules,
+and compute the solution using any Datalog engine.
+Alternatively, algorithms for context-free reachability can be adapted
+to solve the constraints, as explained below.
+
+Given a set $S$ of outlives constraints, we define the directed
+graph $G(S)=(V(S),E(S))$ as follows.
+Every distinct region identifier $\rho$ in $S$ is represented by a vertex,
+which we will also refer to as $\rho$.
+Every outlives constraint $\rho_1 \outlives \rho_2$ is represented by
+an edge from $\rho_1$ to $\rho_2$.
+Recall that an equality constraint $\rho_1 = \rho_2$ is shorthand
+for the pair of constraints $\rho_1 \outlives \rho_2$ and
+$\rho_2 \outlives \rho_1$: thus, an equality constraint is represented
+by a pair of edges.
+%
+It is easy to see that $S \models \rho_1 \outlives \rho_2$ iff
+there exists a path from $\rho_1$ to $\rho_2$ in $G(S)$.
+%
+Thus, simple graph reachability (transitive closure) algorithms can be
+used to identify all the logical consequences of a set of outlives
+constraints.
+
+Given a set of context-free validity constraints, we can generalize the
+above approach and reduce the problem to one of context-free reachability
+in graph~\cite{Reps:Reachability} (as usual for context-sensitive interprocedural analysis).
+%
+Algorithms for context-free reachability can also be adapted to incorporate
+the above treatment of context constraints $\phictxt$.
+%
+Further details omitted.
+
+%% \emph{Class Constraints}. 
+%% Computing the class constraint $\varphi_{\C{C}}$ corresponding to a class \C{C} is
+%% fairly straightforward. It is the conjunction of
+%% \begin{itemize}
+%% \item $\conj_{1 \leq i \leq n} (\rho_i \outlives \rho_0)$
+%% \item $\varphi_{\C{B}}$
+%% \item $[\rho_a/\rho_f]\varphi_{\C{F}}$
+%% \end{itemize}
+
+\section{TO DO Items}
+
+\begin{itemize}
+\item Add destructive object-field-update \emph{x.f := y} to the language.
+\item Add if-then-else to the language.
+\item Omit constructors from classes (and use an implicit constructor).
+\item Discuss the safety of virtual method invocation, which provides a limited form
+of existentially quantifying regions and instantiating (unpacking) them because a
+derived class may have more region parameters than a base class.
+\item Discuss the subtyping rule used to check an overriding method (in the static
+semantics).
+\item Mention that constraints are in the theory of partial orders?
+\item Update discussion of examples
+\end{itemize}
+
+\textbf{TODO: Miscellaneous points to be integrated.}
+
+To see why, recall that all the constraints on
+identifiers in $\rhoenv_{\varphi}$ occuring in $\Phicx$ are subsumed
+by $(\rhoenv - \rhoenv_{\varphi}) \outlives \rhoenv_{\varphi}$.
+Therefore, it is impossible to derive $\phi_{ij}$ from $\Phicx$ by
+only adding constraints on $\rgn \in \rhoenv_{\varphi}$. Hence, such a
+solution $\phisol$ cannot exist.
+
+\textbf{TODO: Is the above inequality correct?}
+
+
+
+\subsection{Example}
 
 \paragraph{Constraints Example 1} Consider the $\C{Pair}$ class
 template from \S\ref{sec:fb-templatization}. Following constraints are
@@ -552,333 +666,7 @@ Constraints generated during the elaboration are shown below
 % Second and third are generated by the the assignment expressions, and
 % the last constraint is generated from the recursive call.
 
-\subsection{Solving the CSP}
 
-\paragraph{Properties of generated constraints}
-The set of generated constraints have two interesting properties that allow us to
-solve the constraints efficiently.
-%
-The first property is that every region variable is forced to be unified with some
-region constant by the constraints, except in one special case.
-This follows because $\FB$ does not admit uninitialized variables.
-(The only case where this does not hold is in the case of a recursive function
-that calls itself in a non-terminating fashion: in this case, the function never
-returns a value, and so the return-value can be typed as anything. In the sequel,
-we assume that the return value of such a function is typed to be \C{unit}.)
-% , and the type system uniquely determines the region parameters of every value
-%
-The second property is that the \emph{context region constraint} $\phictxt$
-occurring on the antecedent of any validity constraint is a conjunction of
-outlives-constraints of the form $\pi \outlives \pi_s$ where $\pi_s$
-is a static region identifier and $\pi$ is a region constant (either a formal
-region parameter, or static region identifier, or open transferable region identifier).
-Furthermore, if $\phictxt$ includes any conjunct $\pi \outlives \pi_s$, then
-it includes every conjunct $\pi_f \outlives \pi_s$ for every $\pi_f \in \predDeltaMap(\varphi)$.
-
-\paragraph{Constraint Solver.}
-Solving the constraints is an iterative process, consisting of the following
-steps, and this process fails at any point if it determines that no solution
-exists for the set of constraints:
-
-\begin{enumerate}
-
-\item
-    A constraint of the form $\isvalid{\varphi}{\rho_i = \rho_j}$ unifies
-$\rho_i$ and $\rho_j$ if at least one of them is a region variable.
-If $\rho_i$ and $\rho_j$ are distinct region constants, then the constraint
-solver fails.
-
-\item
-When a region variable $\rho$ is unified with a region constant $\pi$,
-if $\pi \in \regionDeltaMap(\rho)$, we update $\regionSubstFn(\rho)$ to be $\pi$,
-and replace every occurrence of $\rho$ by $\pi$ in the set of constraints.
-If $\pi \not\in \regionDeltaMap(\rho)$, the constraint solver fails.
-
-\item
-\label{item:context}
-Consider any constraint of the form $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$,
-where $\pi_i$ and $\pi_j$ are both region constants.
-If $\{ \pi_i, \pi_j \} \subseteq \predDeltaMap(\varphi)$, then we simply add
-$\pi_i \outlives \pi_j$ as an additional conjunct to $\predSubstFn(\varphi)$.
-Otherwise, we check if $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$.
-If this entailment does not hold, the constraint solver fails, since no valid solution is possible.
-
-\item
-  When any outlives constraint $\phi$ is added to $\predSubstFn(\varphi)$,
-  then for every existing validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\varphi)}$,
-  we produce a new validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\phi)}$. 
-\end{enumerate}
-
-Point~\ref{item:context} makes use of the special structure of the generated
-constraints: namely that $\phictxt$  is a conjunction of outlives-constraints of the
-form $\pi \outlives \pi_s$ where $\pi_s$ is a static region identifier and $\pi$ is a
-region constant. As a result, we can show that $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$
-iff $\isvalid{\varphi}{\pi_i \outlives \pi_j}$ or $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$.
-
-This iterative process is a standard fixed point computation process.
-It is possible to encode this computation using a set of Datalog rules, and compute the
-solution using any Datalog engine.
-Alternatively, note that the above computation, in the absence of context constraints
-$\phictxt$ on the left-hand-side of the entailment, is a special instance of context-free
-reachability in graphs. Algorithms for context-free reachability can be adapted to
-incorporate the above treatment of context constraints $\phictxt$.
-
-%% \emph{Class Constraints}. 
-%% Computing the class constraint $\varphi_{\C{C}}$ corresponding to a class \C{C} is
-%% fairly straightforward. It is the conjunction of
-%% \begin{itemize}
-%% \item $\conj_{1 \leq i \leq n} (\rho_i \outlives \rho_0)$
-%% \item $\varphi_{\C{B}}$
-%% \item $[\rho_a/\rho_f]\varphi_{\C{F}}$
-%% \end{itemize}
-
-\subsubsection{Non-Recursive Constraints}
-\label{sec:csolve}
-
-We first describe how we solve a non-recursive CSP $\csp$ where
-$c\lbrack \varphi,\rhobar \rbrack$ is of the form $\isvalid{\Phicx
-\conj \varphi}{\Phics}$. 
-
-Our approach is based on the observation that $\FB$ does not admit
-null values or uninitialized variables, thus forcing every region
-variable to be unified with some concrete region.
-%
-The constraint formula $\Phics$ captures all such unification constraints on $\rhobar$.
-Since the set of all concrete region identifiers is the
-unification domain ($\rhoenv$) of CSP, this means for every $\rho_i$
-with a well-formedness constraint as $\rho_i \in \rhoenv_i$, there
-exists a $\rgn \in \rhoenv$ such that and $\isvalid{\Phicx \conj
-\Phics}{\rho = \rgn}$. However, $\rgn$ may not belong to $\rhoenv_i$,
-in which case the well-formedness constraint on $\rho_i$ is not
-satisfied, and constraint solving must fail.  Therefore, there exists
-a unique assignment $\substFn$ such that $c\lbrack
-\phi_{sol},\substFn(\rhobar)$ is satisfied, regardless of
-$\phi_{sol}$.
-
-To obtain $\phisol$, we make use of another observation. Let $c\lbrack
-\varphi, \substFn(\rhobar) \rbrack$ be the following constraint:
-\begin{center}
-\(
-  \isvalid{ \Phicx \conj \varphi}
-        {\Phics'}
-\)
-\end{center}
-Consider a maximally weak formula $\phi$ such that
-$\isvalid{\Phicx}{\phi \Leftrightarrow \Phics'}$. 
-% Since $\phi$ is
-% maximally weak, there does not exist a $\phi'$ satisfying all the
-% below three conditions:
-% \begin{itemize}
-% \item $\isvalid{\Phicx}{\phi' \Leftrightarrow \Phics'}$.
-% \item $\isvalid{\cdot} {\phi \Rightarrow \phi'}$.
-% \item $\isnotvalid{\cdot}{\phi' \Rightarrow \phi}$.
-% \end{itemize}
-Clearly, $\tywf{\rhoenv}{\phi}$. However, since $\rhoenv_{\varphi}
-\subseteq \rhoenv$, we have two cases:
-\begin{itemize}
-
-\item Case $\tywf{\rhoenv_{\varphi}}{\phi}$: This means that $\phi$ is
-a solution to $\varphi$. 
-% Furthermore, it is the weakest solution, because it is equivalent to
-% $\Phics$ under $\Phicx \conj \bigwedge_j(\rho_j =
-% \substFn(\rho_j))$, and any other solution has to stronger than
-% $\Phics$ under the same context.  
-
-\item Case $\tynwf{\rhoenv_{\varphi}}{\phi}$: In this case, $\phi$
-contains at least one equality or outlives constraint on two region
-identifiers, $\rgn_i$ and $\rgn_j$, where (a). $\rgn_i,\rgn_j \in
-\rhoenv - \rhoenv_{\varphi}$, or (b). $\rgn_i \in \rhoenv -
-\rhoenv_{\varphi}$ and $\rgn_j \in \rhoenv_{\varphi}$, such that the
-constraint is not implied by $\Phicx$ (if it is implied, then $\phi$
-is not maximally weak). Let us denote such constraint on $\rgn_i$ and
-$\rgn_j$ as $\phi_{ij}$. Now, let us consider a solution $\phisol$ to
-$\varphi$, which means that $\isvalid{\Phicx \conj \phisol}{\Phics'}$.
-Since $\isvalid{\Phicx}{\phi \Leftrightarrow \Phics'}$, we have
-$\isvalid {\Phicx \conj \phisol}{\phi}$. Since
-$\isvalid{\phi}{\phi_{ij}}$, we have $\isvalid {\Phicx \conj
-\phisol}{\phi_{ij}}$, although $\isnotvalid{\Phicx}{\phi_{ij}}$. But
-this is impossible. To see why, recall that all the constraints on
-identifiers in $\rhoenv_{\varphi}$ occuring in $\Phicx$ are subsumed
-by $(\rhoenv - \rhoenv_{\varphi}) \outlives \rhoenv_{\varphi}$.
-Therefore, it is impossible to derive $\phi_{ij}$ from $\Phicx$ by
-only adding constraints on $\rgn \in \rhoenv_{\varphi}$. Hence, such a
-solution $\phisol$ cannot exist.
-\end{itemize}
-
-\textbf{TODO: Is the above inequality correct?}
-
-The above discussion hints at an algorithm to compute a solution to
-$\varphi$: find a maximally weak $\phisol$ such that $\isvalid{\Phicx}
-{\phisol \Leftrightarrow \Phics'}$. If $\tywf{\rhoenv_{\varphi}}
-{\phisol}$, then $\phisol$ is the solution. Otherwise, there is no
-solution to $\varphi$. We now describe a graph-based algorithm to
-compute maximally weak $\phisol$.
-
-\paragraph{Definitions} Given a constraint formula $\phi$, we define
-its graph encoding $G(\phi)=(V(\phi),E(\phi))$ as a digraph whose
-vertices ($V(\phi)$) are free region variables and identifiers in
-$\phi$, and whose edges ($E(\phi)$) denote outlives constraints
-in\footnote{We alternate between viewing a constraint formula ($\phi$)
-as a set of constraints and a conjunction of constraints in this
-description} $\phi$.  That is, if $\phi$ contains a constraint $\rho_1
-\outlives \rho_2$, then $\rho_1,\rho_2 \in V(\phi)$ and
-$(\rho_1,\rho_2) \in E(\phi)$. Equality constraints are treated as a
-conjunction of symmetric outlives constraints for the purpose of graph
-encoding. Conversely, given a digraph $G$, we define its constraint
-encoding $\Phi(G)$ in a straightforward manner. We say that a graph
-$G_1=(V_1,E_1)$ is as connected as graph $G_2=(V_2,E_2)$ if $V_2
-\subseteq V_1$, and for every $\rho_1, \rho_2 \in V_2$, if there
-exists a path between $\rho_1$ and $\rho_2$ in $G_2$, then there must
-exist a path between same pair of vertices in $G_1$. 
-
-A maximally weak $\phisol$ that satisfies $\isvalid{\phictxt}{\phisol
-\Leftrightarrow \phicstr}$ is a constraint encoding of the smallest
-graph $G$ (i.e., $\Phi(G)$) such that $G(\phictxt) \cup G$ is as
-connected as $G(\phicstr)$. The problem of computing such a $G$ is
-equivalent to the problem finding of finding minimum number of edges
-to add to $G(\phictxt)$ such that it is as connected as $G(\phicstr)$.
-Algorithms to solve the later problem are known to
-exist~\cite{siam92}.
-
-Solving the constraints $c_{12}$ and $c_{13}$ by reducing them to
-graph augmentation problems, as described above, results in the
-following solutions for $\varphi_0$ and $\varphi_1$ (symmetric
-outlives constraints are replaced with equalities):
-\begin{center}
-\(
-  \varphi_1 \Leftrightarrow \rho_0 \outlives \rhoalloc_0 \conj \rho_1
-     \succeq \rhoalloc_0 \conj \rho_4 = \rhoalloc_0 \conj 
-     \rho_2 = \rho_0 \conj \rho_3 = \rho_1
-\)\\
-\(
-  \varphi_2 \Leftrightarrow \rho_5 = \rho_0
-\)
-\end{center}
-
-\subsubsection{Solving Recursive Constraints}
-
-\textbf{TODO: FP iteration should use $\Phicx$}
-
-Substituting the above solutions for $\varphi_0$ and $\varphi_1$ in
-$c_{14}$ gives us a recursive constraint of the following form:
-\begin{center}
-\(
-  \isvalid{\phictxt \conj \varphi}{\phicstr \conj F(\varphi)}
-\)
-\end{center}
-Where $\phictxt$ and $\phicstr$ are concrete constraint formulas, and
-$F$ is a substitution function, not necessarily idempotent. We now
-extend constraint solving to recursive CSP $\csp$, where $c\lbrack
-\varphi,\rhobar \rbrack$ assumes the form $\isvalid{\Phicx \conj
-\varphi}{\Phics \conj \bigwedge_i F_i(\varphi)}$. For the sake of
-brevity, we define $G(\varphi) = \Phics \conj \bigwedge_i
-F_i(\varphi)$, and use $F$ in $c\lbrack \varphi,\rhobar \rbrack$: 
-\begin{center}
-\(
-  \isvalid{\Phicx \conj \varphi}{G(\varphi)}
-\)
-\end{center}
-To solve the above recursive constraint, we start with the observation
-that the set of all constaints ($\phi$) over $\rhoenv \cup
-\{\rhobar\}$ is a lattice, where $\phi_1 \le \phi_2 \triangleq
-\isvalid{\cdot}{\phi_1 \Rightarrow \phi_2}$. Note that $G$ is a
-monotone over the lattice:
-\begin{center}
-  $\forall \phi_1,\phi_2.\; \isvalid{\cdot}{(\phi_1 \Rightarrow
-  \phi_2) \Rightarrow (G(\phi_1) \Rightarrow G(\phi_2))}$
-\end{center}
-From Knaster-Tarski's theorem, we know that $G$ has a greatest fixed
-point ($\phi_f$), with following properties:
-\begin{itemize}
-\item \textbf{Property 1} $\phi_f = G(\phi_f)$, which means
-$\isvalid{\cdot}{\phi_f \Leftrightarrow G(\phi_f)}$
-\item \textbf{Property 2} $\forall \phi_f'$ such that $\phi_f' =
-G(\phi_f')$, we have $\phi_f' \le \phi_f$, which means $\isvalid
-{\cdot} {\phi_f' \Rightarrow \phi_f}$.
-\end{itemize}
-We therefore compute the greatest fixed point ($\phi_f$) of $G$, and
-convert the recursive constraint to the following non-recursive
-constraint:
-\begin{center}
-\(
-  \isvalid{\Phicx \conj \varphi}{\phi_f}
-\)
-\end{center}
-The technique described in \S~\ref{sec:csolve} now suffices to solve
-the above constraint.
-
-Let $H(\varphi_2)$ denote the consequent of the recursive constraint
-$c_{14}$. Its greatest fixed point ($\phi_f$) is shown below:
-\begin{center}
-\(
-  \rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6 \conj \rho_7 =
-  \rho_9 \conj \rho_8 = \rho_9 \conj \rgn_0 \outlives \rgn_1 \conj
-  \rgn_0 = \rgn_0
-\)
-\end{center}
-Computing a maximally weak $\phisol$ such that $\isvalid{\varphi_1
-\conj \rgn_0 \outlives \rgn_1}{\phisol \Leftrightarrow \phi_f}$
-results in the following solution for $\varphi_2$ that meets its
-well-formedness requirement ($\tywf{\{\rhoalloc_0,\rho_{}0-4,
-\rhoalloc_2, \rho_{6-9}\}}{\varphi_2} $):
-\begin{center}
-\(
-  \rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6 \conj \rho_7 =
-  \rho_9 \conj \rho_8 = \rho_9
-\)
-\end{center}
-
-
-
-% Note that $F$ is a non-idempotent substitution function with following
-% properties:
-% \begin{itemize}
-% \item $F$ is a monotone: 
-% \begin{center}
-%   $\forall \phi_1,\phi_2.\; \isvalid{\cdot}{(\phi_1 \Rightarrow
-%   \phi_2) \Rightarrow (F(\phi_1) \Rightarrow F(\phi_2))}$
-% \end{center}
-
-% \item $F$ distributes over conjunction (mind the syntactic equality):
-% \begin{center}
-%   $\forall \phi_1,\phi_2.\; F(\phi_1 \conj \phi_2) = F(\phi_1) \conj
-%   F(\phi_2)$
-% \end{center}
-% \end{itemize}
-
-% Define $G(\varphi) = \Phics \conj F(\varphi)$. Note that $G$ is also a
-% monotone, hence $G$ has greatest fixed point (GFP) in the lattice. Let
-% $\phi_f$ be the GFP of $G$. Following properties ensue:
-% \begin{itemize}
-% \item \textbf{Property 1} $\phi_f = G(\phi_f)$, which means
-% $\isvalid{\cdot}{\phi_f \Leftrightarrow G(\phi_f)}$
-% \item \textbf{Property 2} $\forall \phi_f'$ such that $\phi_f' =
-% G(\phi_f')$, we have $\phi_f' \le \phi_f$, which means $\isvalid
-% {\cdot} {\phi_f' \Rightarrow \phi_f}$.
-% \end{itemize}
-
-% \begin{theorem}
-% $\phi_f$ is a solution.
-% \end{theorem}
-% \begin{proof}
-% $\phi_f$ is GFP of $G$. Therefore, $\isvalid{\cdot}{\phi_f
-% \Leftrightarrow G(\phi_f)}$. By strengthening the context, we get
-% $\isvalid{\Phicx}{\phi_f \Leftrightarrow G(\phi_f)}$. It follows that
-% $\isvalid{\Phicx \conj \phi_f}{G(\phi_f)}$. Hence, $\phi_f$ is a
-% solution for $\varphi$.
-% \end{proof}
-
-% \begin{theorem}
-% If $\phisol$ is a solution of $\varphi$, then $\isvalid{\Phicx \conj
-% \phisol}{\phi_f}$
-% \end{theorem}
-% \begin{proof}
-%   Since $\phisol$ is a solution, $\isvalid{\Phicx}{\phisol \Rightarrow
-%   G(\phisol)}$. Therefore, $\isvalid{}{\Phicx \conj \phisol \Rightarrow
-%   \Phicx \conj G(\phisol)}$. Therefore, $\isvalid{}{G(\Phicx) \conj
-%   G(\phisol) \Rightarrow G(\Phicx) \conj G^2(\phisol)}$
-
-% \end{proof}
 
 \subsection{Modular Constraint Solving}
 \label{sec:fb-constraintsolving}
