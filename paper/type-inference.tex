@@ -523,6 +523,27 @@ fixed point computation. However, the type inference can be realized in a
 modular and compositional fashion, subject only to the restrictions imposed
 by recursion.
 
+In the elaboration phase, we can process a class \C{C} only after any class
+\C{B} that \C{C} depends on has been processed: class \C{C} depends on
+class \C{B} if \C{B} is either \C{C}'s base class or the type of any field
+of \C{C} depends on \C{B}. In effect, this means that any collection of
+mutually recursive classes must be processed together. Non-recursive
+dependences can be handled in a compositional fashion: if class \C{C}
+depends on \C{B} non-recursively, then the elaboration can be done for
+\C{B} first, and then \C{C} can be processed.
+
+The same idea applies to the constraint-solving phase as well.
+Given a set of constraints, we say that a predicate variable $\varphi_1$
+\emph{directly-depends} on another predicate variable $\varphi_2$ if the set of
+constraints includes a constraint $\isvalid{\varphi_1 \conj \phictxt}{F(\varphi_2)}$.
+We say that $\varphi_1$ \emph{depends} on $\varphi_2$ if $\varphi_1$ transitively
+depends on $\varphi_2$.
+The constraint solver needs to process any collection of mutually dependent
+predicate variables together.
+In effect, this requires the type inference to process any collection of
+mutually recursive methods together.
+However, methods that are not mutually recursive can be processed separately.
+
 %% \emph{Class Constraints}. 
 %% Computing the class constraint $\varphi_{\C{C}}$ corresponding to a class \C{C} is
 %% fairly straightforward. It is the conjunction of
@@ -531,6 +552,77 @@ by recursion.
 %% \item $\varphi_{\C{B}}$
 %% \item $[\rho_a/\rho_f]\varphi_{\C{F}}$
 %% \end{itemize}
+
+\subsection{Elaboration and Constraint Generation}
+
+\input{fb-elabexpr}
+\input{fb-elabmeth}
+
+%Elaborating $\absof{\FB}$ expressions to $\FB$ expressions involves
+%(a). replacing core types in variable declarations and \C{new}
+%expressions with fresh region type templates, and (b). explicitly
+%instantiating region parameters of methods with fresh region variables
+%in method calls and function applications. This elaboration is
+%performed with respect to the polymorphic type templates of classes
+%and methods computed as per \S\ref{sec:fb-templatization}. 
+
+We now present an integrated algorithm that processes all the methods
+in a given program, elaborating them (by introducing region variables
+to stand for actual region parameters) and simultaneously generating
+the set of constraints that must be solved.
+
+Function $\elabExpr$, shown in Fig.~\ref{fig:fb-elabexpr}, performs
+this elaboration for a subset of expressions in $\absof{\FB}$, whose
+corresponding $\FB$ expressions have been ascribed static semantics in
+Fig.~\ref{fig:fb-staticsem}. $\elabExpr$ is defined under the same
+context as the expression typing judgment in
+Fig.~\ref{fig:fb-staticsem} with symbols $\A$,$\ralloc$, and $\env$
+retaining their meaning. The function traverses expressions in a
+syntax-directed manner of a type checker, introducing fresh region
+type templates for unknown region types, while generating constraints
+over region and predicate variables.
+Note that $\elabExpr$ returns the type of the subexpression,
+which is used to generate constraints for the expression. Functions
+$\typeOk$ and $\subtypeOk$ (definitions not shown) used by $\elabExpr$
+implement type well-formedness and subtype judgments from
+Fig.~\ref{fig:fb-staticsem}, respectively.
+
+Functions $\elabMeth$ and $\elabClass$ shown in
+Fig.~\ref{fig:fb-elabmeth} lift expression elaboration to method and
+class definitions, respectively. Both functions first build a context
+($\A$) containing a set ($ \rhoenv$) of region variables denoting
+regions that are currently live, a map ($\aenv$) mapping type
+variables to their bounds, and a constraint formula ($\phicx$)
+capturing constraints over live region variables. We use predicate
+variables ($\varphi$ and $\varphi_m$) to capture constraints over
+variables in $\rhoenv$ denoting the fact that such constraints are yet
+to be inferred.
+
+Function $\elabMeth$ elaborates a method definition of class $B$. It
+calls $\elabExpr$ with the context $\A$, its allocation context
+parameter ($\rhoallocm$), and a type environment ($\env$) that
+contains region type bindings for all the arguments of the method,
+including the implicit $\C{this}$ argument. The type 
+returned by $\elabExpr$ for the method body is checked against its
+expected type (derived from the type of the method)
+generating more constraints. The function then returns the elaborated
+method definition and the set of constraints.
+
+$\elabClass$ elaborates the definition of a class $B$. It relies on
+$\elabCons$\footnote{The definition of $\elabCons$ is straightforward,
+hence not shown.} and $\elabMeth$ functions to elaborate $B$'s
+constructor ($k$) and method definitions ($\bar{d}$), respectively. To
+the set of constraints returned by these functions, $\elabClass$ adds
+constraints generated by checking the well-formedness of the type
+templates of its superclass and fields, and also a new constraint
+capturing a couple of safety conditions: first, the allocation regions
+of objects referred by the instance variables should outlive the
+allocation region of the instance itself, and second, the allocation
+regions of a class type and its superclass type must be the same.
+
+Function $\elabClassTable$ (Fig.~\ref{fig:fb-elabmeth}) elaborates
+every definition in the class table $CT$, while accumulating
+constraints.
 
 \section{TO DO Items}
 
@@ -674,181 +766,3 @@ Constraints generated during the elaboration are shown below
 % Second and third are generated by the the assignment expressions, and
 % the last constraint is generated from the recursive call.
 
-
-
-\subsection{Modular Constraint Solving}
-\label{sec:fb-constraintsolving}
-
-Our constraint generation algorithm traverses the entire program,
-performing elaboration and collecting constraints, which are
-subsequently solved en masse. The motivation behind the whole-program
-approach to constraint generation is twofold: it simplifies
-elaboration functions and makes presentation easier, and second, it
-naturally generalizes to mutual recursion. Nonetheless, we do not
-intend our type inference to be a whole-program analysis for (a). it
-preempts opportunities for separate compilation and dynamic linking,
-and (b). it is expensive and an overkill in most practical cases. We
-therefore reclaim the compositionality of type inference by solving
-the constraints in a compositional fashion. In more practical terms
-this means that our constraint solving algorithm visits and solves
-every constraint (or, every set of mutually dependent constraints)
-only once. It composes computed solutions to solve other constraints
-that depend on the solved constraints. Importantly, the failure to
-solve a dependent constraint does not result in backtracking. We now
-describe our compositional constraint solving algorithm in detail. To
-simplify the presentation of our algorithm, we assume that are no
-mutually recursive definitions in the source program. Recursive
-definitions are nonetheless allowed.
-
-\paragraph{Terminology} In a validity constraint, a predicate variable
-occuring on the left side of the turnstile is said to occur
-negatively, or with \emph{negative polarity}. In contrast, a predicate
-variable occuring on the right side is said to occur positively, or
-with \emph{positive polarity}. A validity constraint
-\emph{constrains} the set of predicate variables that occur
-negatively in the constraint, while it \emph{uses} the set of
-predicate variables that occur positively. A constraint is said to be
-\emph{recursive} if it constrains and uses a predicate variable.
-% A pair of validity
-% constraints are said to be \emph{mutually dependent} if there exists a
-% pair ($\varphi_1$, $\varphi_2$) of predicate variables that occur
-% with opposite polarities in both the constraints. In such case, the
-% pair ($\varphi_1$,$\varphi_2$) of predicate variables are also said to
-% be mutually dependent. We call the transitive closure of mutual
-% dependency relation as \emph{transitive dependency} relation. Like
-% mutual dependency, transitive dependency is also extended to predicate
-% variables.
-
-Given a set of validity constraints, we first build a dependency graph
-($G_c$) with constraints as nodes, and dependencies between them
-captured as edges. There exists an edge from a constraint $c_2$ to a
-constraint $c_1$ in the graph (i.e., $c_2$ \emph{depends on} $c_1$) if
-$c_1$ constrains a predicate variable that $c_2$ uses. 
-
-The above condition intuitively corresponds to a case, where
-expression or type, whose region elaboration is constrained by $c_2$
-refers to a method or a class, whose unknown precondition is
-constrained by $c_1$. The common predicate variable ($\varphi$)
-represents the unknown precondition in this case. The dependency from
-$c_2$ to $c_1$ means that $c_1$ must be solved to compute $\varphi$
-before $c_2$ is solved, thus enforcing the rule that the precondition
-of a method must not depend on its calling context. 
-% Note that the first condition results in self-loops over recursive
-% constraints in the dependency graph.  Since mutually recursive
-% definitions refer each other, the first condition also results in
-% bidirectional dependencies between mutually recursive constraints
-% (and self-loops over recursive constraints). 
-
-Next, we convert the dependency graph over constraints into a
-dependency DAG ($G_C$) over sets of constraints, where each set
-represents a strongly connected component in the dependency graph.
-
-%% \paragraph{Example} The dependency DAG ($G_C$) over validity
-%% constraints from the \C{Pair} example (\S~\ref{sec:constraints}) is
-%% shown below: %in Fig.~\ref{fig:pair-deps}. 
-%% \vspace*{-0.08in}
-%% \begin{figure}[H]
-%% \includegraphics[scale=0.6]{DepDAG.png}
-%% \end{figure}
-%% \vspace*{-0.08in}
-%% Each node (labeled $C_i$) is a set of constraints that belong to a
-%% strongly connected component in the dependency graph ($G_c$), hence
-%% are mutually dependent. All dependencies, except the self-dependency
-%% on $\mathbf{c_{10}}$, are type-2 dependencies.
-
-A dependency DAG makes the dependencies between constraints explicit.
-Constraints in each set are mutually dependent, and need to be solved
-simultaneously, whereas constraints in different sets can be solved as
-per any valid topological ordering of the graph's transpose.
-Accordingly, we obtain a topological ordering of nodes in the graph
-$G_{{C}}^{T}$ ($G_C$'s transpose), and solve the sets of constraints
-in that order. The solutions obtained after solving a constraint set
-are applied to the constraints in subsequent sets before attempting to
-solve them.  Consequently, when the turn of a constraint set ($C$)
-arrives during the constraint solving process, it satisfies certain
-properties:
-\begin{itemize}
-\item There exists only one predicate variable ($\varphi$) that is either
-constrained or used by the constraints in the set ($C$). The variable is
-called set's \emph{subject}. This property follows from (a). the fact
-that all the dependency constraints have already been solved (and
-solutions applied), and (b). the assumption that there are no mutually
-recursive definitions. 
-\item All the constraints that constrain the set's subject are present
-in the set. This follows from our definition of the dependency relation.
-\end{itemize}
-
-%% For the DAG in figure above, we consider the topological order $[C_1,
-%% C_2, C_3]$ of its transpose, and solve the sets of constraints in that
-%% order.
-
-\subsection{Expression Elaboration}
-
-\input{fb-elabexpr}
-\input{fb-elabmeth}
-
-%Elaborating $\absof{\FB}$ expressions to $\FB$ expressions involves
-%(a). replacing core types in variable declarations and \C{new}
-%expressions with fresh region type templates, and (b). explicitly
-%instantiating region parameters of methods with fresh region variables
-%in method calls and function applications. This elaboration is
-%performed with respect to the polymorphic type templates of classes
-%and methods computed as per \S\ref{sec:fb-templatization}. 
-
-Function $\elabExpr$, shown in Fig.~\ref{fig:fb-elabexpr}, performs
-this elaboration for a subset of expressions in $\absof{\FB}$, whose
-corresponding $\FB$ expressions have been ascribed static semantics in
-Fig.~\ref{fig:fb-staticsem}. $\elabExpr$ is defined under the same
-context as the expression typing judgment in
-Fig.~\ref{fig:fb-staticsem} with symbols $\A$,$\ralloc$, and $\env$
-retaining their meaning. The function traverses expressions in a
-syntax-directed manner of a type checker, introducing fresh region
-type templates for unknown region types, while generating constraints
-over region and predicate variables. The precise nature of generated
-constraints is explained in \S\ref{sec:fb-constraintsem}, but in
-summary, they capture the relationships between the type templates of
-various subexpressions and their well-formedness. Note that
-$\elabExpr$ returns the region type template of the subexpression,
-which is used to generate constraints for the expression. Functions
-$\typeOk$ and $\subtypeOk$ (definitions not shown) used by $\elabExpr$
-implement type well-formedness and subtype judgments from
-Fig.~\ref{fig:fb-staticsem}, respectively.
-
-\subsection{Method and Class Elaboration}
-
-Functions $\elabMeth$ and $\elabClass$ shown in
-Fig.~\ref{fig:fb-elabmeth} lift expression elaboration to method and
-class definitions, respectively. Both functions first build a context
-($\A$) containing a set ($ \rhoenv$) of region variables denoting
-regions that are currently live, a map ($\aenv$) mapping type
-variables to their bounds, and a constraint formula ($\phicx$)
-capturing constraints over live region variables. We use predicate
-variables ($\varphi$ and $\varphi_m$) to capture constraints over
-variables in $\rhoenv$ denoting the fact that such constraints are yet
-to be inferred.
-
-Function $\elabMeth$ elaborates a method definition of class $B$. It
-calls $\elabExpr$ with the context $\A$, its allocation context
-parameter ($\rhoallocm$), and a type environment ($\env$) that
-contains region type bindings for all the arguments of the method,
-including the implicit $\C{this}$ argument. The region type template
-returned by $\elabExpr$ for the method body is checked against its
-expected type (derived from the type template of the method)
-generating more constraints. The function then returns the elaborated
-method definition and the set of constraints.
-
-$\elabClass$ elaborates the definition of a class $B$. It relies on
-$\elabCons$\footnote{The definition of $\elabCons$ is straightforward,
-hence not shown.} and $\elabMeth$ functions to elaborate $B$'s
-constructor ($k$) and method definitions ($\bar{d}$), respectively. To
-the set of constraints returned by these functions, $\elabClass$ adds
-constraints generated by checking the well-formedness of the type
-templates of its superclass and fields, and also a new constraint
-capturing a couple of safety conditions: first, the allocation regions
-of objects referred by the instance variables should outlive the
-allocation region of the instance itself, and second, the allocation
-regions of a class type and its superclass type must be the same.
-
-Function $\elabClassTable$ (Fig.~\ref{fig:fb-elabmeth}) elaborates
-every definition in the class table $CT$, while accumulating
-constraints.
