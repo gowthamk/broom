@@ -2,19 +2,26 @@
 \newcommand{\gcarrow}{\leadsto}
 \newcommand{\gctransforms}{\models}
 
+\newcommand{\subtypesym}{<:}
+
+\newcommand{\typeok}[3]{{#1\,\vdash\,#2 \; \texttt{ok} \, \lhd #3}}
+\newcommand{\exprok}[4]{{#1} \, \vdash \, {#2} : {#3} \, \lhd {#4}}
+\newcommand{\subtypeok}[4]{{#1} \, \vdash \, {#2}  \subtypesym {#3} \, \lhd {#4}} 
+
+
 \begin{figure*}[t]
 \begin{mathpar}
 
   \genconstraint
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\taubar} \spc
-    \tywf{\A}{\fbN} \spc
-    \fields(\fbN) = \bar{f} : \taubar 
+    \typeok {\A} {\fbN} {C_1} \spc
+    \exprok {\exptycx{\ralloc}{\env}} {\bar{e}} {\bar{\tau'}} {C_2} \spc
+    C_3 = \{ \isvalid{\A.\phicx}{\allocRgn(\fbN)=\ralloc} \} \spc
+    \fields(\fbN) = \bar{f} : \taubar \spc
+    \subtypeok {\A} {\bar{\tau'}} {\bar{\tau}} {C_4}
   }
   {
-    {\exptycx{\ralloc}{\env}} \gctransforms
-    \C{new} \fbN(\bar{e}) \gcarrow
-    ({\fbN}, \cup_{i=1}^4 C_i)
+    \exprok {\exptycx{\ralloc}{\env}}   {\C{new} \fbN(\bar{e})} {\fbN} {\cup_{i=1}^4 C_i}
   }
 
 \end{mathpar}

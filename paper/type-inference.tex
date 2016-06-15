@@ -283,8 +283,6 @@ where $\rho_0, \cdots, \rho_n$ are fresh region variables.
 \subsection{Constraints}
 \label{sec:fb-constraintsem}
 
-\input{fb-constraint-generation}
-
 The constraint generation algorithm mimics the static type checker, but accumulates
 constraints that must hold for the type checking to succeed.
 
@@ -370,7 +368,15 @@ $\varphi_i$ are as above).
 
 \end{itemize}
 
+\input{fb-constraint-generation}
+
 \paragraph{Constraint Generation.}
+The constraint generation algorithm is a direct adaption of the type checker:
+each type checking rule is modified to produce a set of constraints that must hold
+for the type checker to succeed.
+%
+Fig.~\ref{fig:constraint-gen} illustrates this for the object allocator \C{new} construct.
+
 
 \paragraph{Constraint Solution}
 Solving the set ($C$) of constraints entails finding an
@@ -553,7 +559,7 @@ However, methods that are not mutually recursive can be processed separately.
 %% \item $[\rho_a/\rho_f]\varphi_{\C{F}}$
 %% \end{itemize}
 
-\subsection{Elaboration and Constraint Generation}
+\subsection{Elaboration and Constraint Generation: Details}
 
 \input{fb-elabexpr}
 \input{fb-elabmeth}
