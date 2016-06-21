@@ -196,7 +196,7 @@ a similar fashion, with the following difference: any recursive
 field is ignored while instantiating region parameters for the fields of
 the class, and the region parameters of the recursive class are computed
 as before. We then do parameter instantiation for all recursive fields,
-such that their region annotations (the actial region parameters) are
+such that their region annotations (the actual region parameters) are
 exactly the same as the (formal) region parameters of the class.
 The following example illustrates this for a non-generic \C{List} class.
 The resulting class represents a linked list with spine in the region
@@ -311,7 +311,8 @@ where the set of region-constraints $\phi$ is defined by:
 We will use the term \emph{validity constraint} to denote an entailment constraint
 of the form $\isvalid{\varphi}{\rho_1 \outlives \rho_2}$.
 
-Our constraints also make uses of \emph{pending substitutions}\footnote{we borrowed this terminology from~\cite{ltpldi08}} $F$.
+Our constraints also make uses of \emph{pending substitutions} $F$:
+% \footnote{we borrowed this terminology from~\cite{ltpldi08}}
 A pending substitution serves to bind formal region parameters in $\varphi$ to the actual region parameters
 used in a particular context:
 \begin{smathpar}
@@ -323,7 +324,7 @@ E.g., in the validity constraint $\isvalid{\rgn_1 \outlives
 \rgn_2}{[\rgn_1/\rho_1][\rgn_2/\rho_2]\varphi}$, the pending substitution
 is $[\rgn_1/\rho_1][\rgn_2/\rho_2]$. Any concrete formula (call it
 $\phisol$) over variables $\rho_1$ and $\rho_2$ is a solution to
-$\varphi$ if and only the formula obtained by substituting $\rgn_1$
+$\varphi$ if and only if the formula obtained by substituting $\rgn_1$
 and $\rgn_2$ for $\rho_1$ and $\rho_2$ (resp.) in $\phisol$ is
 deducible from $\rgn_1 \outlives \rgn_2$.
 
@@ -558,6 +559,15 @@ However, methods that are not mutually recursive can be processed separately.
 %% \item $\varphi_{\C{B}}$
 %% \item $[\rho_a/\rho_f]\varphi_{\C{F}}$
 %% \end{itemize}
+
+\paragraph{Soundness and Completeness.}
+
+\textbf{TO DO:}
+The entire algorithm is sound.
+The second phase is complete as well: if there is any possible instantiation (of the
+region variables and predicate variables) of the elaborated program produced by the first
+phase that type checks, then the second phase will identify it.
+Incompleteness exists only in a few choices made during the first phase (elaboration phase).
 
 \subsection{Elaboration and Constraint Generation: Details}
 
