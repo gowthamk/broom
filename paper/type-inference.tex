@@ -393,32 +393,29 @@ $\varphi$ and $\rhobar$.
 \begin{definition}
 \emph{(\textbf{Constraint Satisfaction Problem (CSP)})}
 A constraint satisfaction problem is a tuple
-$(\bar{\pi}, \bar{\rho}, \bar{\varphi}, \regionDeltaMap, \predDeltaMap, C)$,
-where $\bar{\pi}$ is a set of region constants,
-$\bar{\rho}$ is a set of region variables,
-$\bar{\varphi}$ is a set of predicate variables,
-$\regionDeltaMap : \bar{\rho} \rightarrow 2^{\bar{\pi}}$ is a function that
+$(\regionConstants, \regionVars, \predVars, \regionDeltaMap, \predDeltaMap, \constraintSet)$,
+where $\regionConstants$ is a set of region constants,
+$\regionVars$ is a set of region variables,
+$\predVars$ is a set of predicate variables,
+$\regionDeltaMap : \regionVars \rightarrow 2^{\regionConstants}$ is a function that
 specifies a unification domain for each region variable,
-$\predDeltaMap : \bar{\varphi} \rightarrow 2^{\bar{\pi}}$ is a function that
+$\predDeltaMap : \predVars \rightarrow 2^{\regionConstants}$ is a function that
 specifies the domain for each predicate variable,
-and $C$ is a set of validity constraints, where the $i$'th validity constraint
-assumes one of the following forms:
+and $\constraintSet$ is a set of validity constraints in one of the following forms:
 \begin{center}
 \(
-    \isvalid{\phictxt^{i} \conj \varphi}
-            {\phicstr^{i}}\qquad
-    \isvalid{\phictxt^{i} \conj \varphi}
-            {F_i(\varphi)}
+    \isvalid{\phictxt \conj \varphi}{\phicstr}\qquad
+    \isvalid{\phictxt \conj \varphi}{F(\varphi)}
 \)
 \end{center}
 The solution to the constraint satisfaction problem is a pair $(\regionSubstFn,\predSubstFn)$,
-where $\regionSubstFn$ is a map from $\rhobar$ to $\bar{\pi}$
-and $\predSubstFn$ is a map from $\bar{\varphi}$ to a region-constraint formula such that
+where $\regionSubstFn$ is a map from $\regionVars$ to $\regionConstants$
+and $\predSubstFn$ is a map from $\predVars$ to a region-constraint formula such that
 \begin{itemize}
-  \item $\regionSubstFn(\rho) \in \regionDeltaMap(\rho)$, for every $\rho \in \bar{\rho}$,
+  \item $\regionSubstFn(\rho) \in \regionDeltaMap(\rho)$, for every $\rho \in \regionVars$,
 
   \item $\predSubstFn$ is well-formed under $\predDeltaMap$
-    (i.e., $\tywf{\predDeltaMap(\varphi)}{\predSubstFn(\varphi)}$, for every $\varphi \in \bar{\varphi}$).
+    (i.e., $\tywf{\predDeltaMap(\varphi)}{\predSubstFn(\varphi)}$, for every $\varphi \in \predVars$).
 
   \item Every sequent in $C$ is valid after substitutions $\predSubstFn$ and $
     \regionSubstFn$.
