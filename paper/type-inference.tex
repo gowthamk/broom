@@ -538,9 +538,35 @@ explained below.
 incorporates a specific heuristic, namely that the recursive occurrence of the class has
 the same parameters, in the same order, as the class itself. This technique will fail, for
 example. if the program uses a recursive list type whose elements alternatively come
-from two different regions.
+from two different regions. Such a program would require the following elaboration,
+which is beyond the scope of our approach:
 % , $R_1$ and $R_2$.
 % both of which are region parameters of the class.
+\begin{tabular}{ccc}
+\begin{minipage}{0.3\linewidth}
+\begin{codejava}
+class List
+  $\extends$ $\ObjZ$
+{
+  $\ObjZ$ data;
+  List next;
+}
+\end{codejava}
+\end{minipage}
+&
+$\Rightarrow$
+&
+\begin{minipage}{0.5\linewidth}
+\begin{codejava}
+class List $\langle \rho_0, \rho_1, \rho_2 \; | \; \varphi \rangle$
+  $\extends$ $\ObjZ \langle \rho_0 \rangle$
+{
+  $\ObjZ \langle \rho_1 \rangle$ data;
+  $\C{List} \langle \rho_0, \rho_2, \rho_1 \rangle$ next;
+}
+\end{codejava}
+\end{minipage}
+\end{tabular}
 
 \item Our technique for region parametrization also uses a heuristic in the case of
 higher order programs. Consider a higher-order method that has a function $f$ as a
