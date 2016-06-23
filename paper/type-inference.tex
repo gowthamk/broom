@@ -237,7 +237,7 @@ of the form \C{new T($\ldots$)}, by instantiating the type \C{T} as
 before, turning it into \C{new T$\langle \rho_0, \cdots, \rho_n \rangle$($\ldots$)},
 where $\rho_0, \cdots, \rho_n$ are fresh region variables.
 
-\subsection{Constraints}
+\subsection{The Constraint Satisfaction Problem (CSP)}
 \label{sec:fb-constraintsem}
 
 The constraint generation algorithm mimics the static type checker, but accumulates
@@ -379,11 +379,10 @@ and $\predSubstFn$ is a map from $\predVars$ to a region-constraint formula such
 \end{itemize}
 \end{definition}
 
-\subsection{Solving the CSP}
-
 \paragraph{Properties of generated constraints}
-The set of generated constraints have two interesting properties that allow us to
-solve the constraints efficiently.
+In the sequel, we will restrict our attention to a special class of CSPs that satisfy
+two interesting properties that allow us to solve the constraints efficiently.
+The constraints generated our type inference algorithm satisfy these two properties.
 %
 The first property is that every region variable is guaranteed to be unified with some
 region constant by the constraints\footnote{
@@ -402,6 +401,8 @@ is a static region identifier and $\pi$ is a region constant (either a formal
 region parameter, or static region identifier, or open transferable region identifier).
 Furthermore, if $\phictxt$ includes any conjunct $\pi \outlives \pi_s$, then
 it includes every conjunct $\pi_f \outlives \pi_s$ for every $\pi_f \in \predDeltaMap(\varphi)$.
+
+\subsection{Solving the CSP}
 
 \paragraph{Constraint Solver.}
 Solving the constraints is an iterative process, consisting of the following

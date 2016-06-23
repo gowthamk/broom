@@ -22,10 +22,10 @@ T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \ALT \unitZ
 C  & \in & \M{Class \; definitions} & \coloneqq & 
      \C{class} \; cn\inang{\bar{\tyvar} \extends \bar{\fgjN}} 
                     \inang{\rhoalloc \rhobar \,|\, \phi}\extends \fbN 
-                    \{\bar{\tau} \; \bar{f};\; k\; \bar{d}\}\;\\
-k  & \in & \M{Constructors} & \coloneqq & 
-     cn(\bar{\tau} \; \bar{x})\{\C{super}(\bar{x}); \;
-                                \C{this}.\bar{f}\,=\,\bar{x};\}\\
+                    \{\bar{\tau} \; \bar{f};\; \bar{d}\}\;\\
+%k  & \in & \M{Constructors} & \coloneqq & 
+%     cn(\bar{\tau} \; \bar{x})\{\C{super}(\bar{x}); \;
+%                                \C{this}.\bar{f}\,=\,\bar{x};\}\\
 d  & \in & \M{Methods} & \coloneqq & 
      \tau \; m\inang{\rhoalloc \rhobar \,|\, \phi} (\taubar \; \xbar)
      \{\C{return}\;e;\}\\
