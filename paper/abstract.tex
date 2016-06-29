@@ -1,10 +1,10 @@
 Recent work in high-performance systems written in managed languages
 (such as Java or C\#) has shown that garbage-collection can be a
 significant performance bottleneck.  A class of these systems, focused
-on big-data, create many and often large data structures with
-well-defined lifetimes.  In this paper, we present a language and a
-memory management scheme based on user-managed memory regions (called
-\emph{transferable regions}) that allow programmers to exploit
+on big-data, create numerous large data structures with well-defined
+lifetimes.  In this paper, we present a language and a memory
+management scheme based on user-managed memory regions (called
+\emph{transferable regions}) that allow programmers to exploit the
 knowledge of data structures' lifetimes to achieve significant
 performance improvements.
 
@@ -18,8 +18,3 @@ for higher-order programs. This eliminates the need for programmers to
 write region annotations on types, while facilitating the reuse of
 existing C\# libraries with no modifications. Experiments demonstrate
 the practical utility of our approach.
-
-%As a testament to efficacy of our approach, we demonstrate performance
-%improvements over a range of realistic dataflow programs that were
-%rewritten to use region-based manual memory management, but are
-%nevertheless judged to be safe by our type system.

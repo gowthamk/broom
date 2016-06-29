@@ -30,7 +30,7 @@ seminal work, static type systems for safe region-based memory
 management have been extensively studied in the context of various
 languages and problem settings~\cite{cyclone02, cyclone04, yates99,
 MIT03, DPJ09, HMN01, WW01, rust, gpu14}. Our work differs from the
-existing proposals in a number of ways. Firstly, our problem setting
+existing proposals in the following ways. Firstly, our problem setting
 includes lexically scoped stack regions and dynamic transferable
 regions (both programmer-managed) in context of an object-oriented
 programming language equipped with higher-order functions. Second, we
@@ -42,13 +42,13 @@ checks.
 % discipline on memory accesses over a small subset of objects in the
 % program. The later can be done efficiently at runtime. This lets us
 % guarantee safety in presence of
-In particular, our approach requires neither restrictive static
-mechanisms (e.g., linear types and unique pointers) nor expensive
-runtime mechanisms (e.g., garbage collection and reference counting)
-in order to guarantee safety. Lastly, our region type system comes
-equipped with full type inference that eliminates the need to write
-region annotations on types to convince the type checker that the
-program is safe. 
+In particular, our approach circumvents the need for restrictive
+static mechanisms (e.g., linear types and unique pointers) and
+expensive runtime mechanisms (e.g., garbage collection and reference
+counting) in order to guarantee safety. Lastly, our region type system
+comes equipped with full type inference that eliminates the need to
+write region annotations on types to convince the type checker that
+the program is safe. 
 
 ~\cite{tofte97} elaborates SML programs to introduce stack regions and
 do away with GC in a transparent fashion. We too define an
@@ -76,13 +76,12 @@ non-intrusiveness design principle, which requires its safety
 mechanisms to not intrude on the the programming practices of C\#.
 \name programmers, for example, shouldn’t be forced to abandon
 iterators in favor of for-loops, annotate region types, or rewrite
-C\#'s standard libraries to use in \name.  Non-intrusiveness is not a
-design consideration for Cyclone, which requires C programmers to use
-new language constructs and abandon some standard programming idioms
-in the interest of preserving safety. For instance, Cyclone
-programmers are required to write region types for functions; the type
-inference is only intraprocedural. Ensuring safety in presence of
-dynamic regions requires using either unique pointers or
+C\#'s standard libraries to use in \name. Cyclone requires C
+programmers to use new language constructs and abandon some standard
+programming idioms in the interest of preserving safety. For instance,
+Cyclone programmers are required to write region types for functions;
+the type inference is only intraprocedural. Ensuring safety in
+presence of dynamic regions requires using either unique pointers or
 reference-counted objects.  Both approaches are intrusive. For
 example, unique pointers constrain, or in some cases forbid, the use
 of the familiar iterator pattern, which requires creation of aliases
@@ -92,9 +91,9 @@ even with unique pointers, safety cannot be guaranteed statically;
 checks against \C{NULL} are needed at run-time to enforce safety. For
 ref-counted objects, Cyclone requires programmers to use special
 functions (\C{alias\_refptr} and \C{drop\_refptr}) to create and
-destroy aliases.  Reference count is affected only by these
-functions. An alias going out of scope, for instance, does not
-decrement the ref-count. The requirement to use additional constructs
+destroy aliases.  Reference count is affected only by these functions.
+An alias going out of scope, for instance, does not decrement the
+ref-count. The requirement to use additional constructs
 to manage aliases makes reference counting more-or-less as intrusive
 as unique pointers.
 

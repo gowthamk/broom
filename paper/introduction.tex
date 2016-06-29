@@ -3,15 +3,15 @@
 
 \section{Introduction} \label{sec:introduction}
 
-Consider the example, from~\cite{Broom:HotOS}, shown in
-Fig.~\ref{fig:motivating-eg}.  This code represents the logic for a
-streaming query operator.  The operator receives a stream of input
-messages, each associated with a time (window) $t$, processed by
-method \texttt{onReceive}.  Each input message contains a list of
-inputs, each of which is processed by applying a user-defined function
-to create a corresponding output.  The operator may receive multiple
+Consider the example shown in Fig.~\ref{fig:motivating-eg}.  This code
+represents the logic for a \C{SELECT} query operator for streaming
+data.  The operator receives a stream of input messages, each
+associated with a time (window) $t$, processed by method
+\texttt{onReceive}.  Each input message contains a list of inputs,
+each of which is processed by applying a user-defined function to
+create a corresponding output.  The operator may receive multiple
 messages with the same timestamp (and messages with different
-timestamps may be delivered out of order).  A timing-message (an
+timestamps may be delivered out of order). A timing-message (an
 invocation of method \texttt{OnNotify}) indicates that no more input
 messages with a timestamp $t$ will be subsequently delivered.  At this
 point, the operator completes the processing for time window $t$ and
@@ -19,34 +19,21 @@ sends a corresponding output message to its successor.
 
 \input{motivating-eg}
 
-This example is an instance of a general pattern, where a producer creates a
-data structure and passes it to a consumer. In a system where most of the
-computation takes this form, and these data structures are very large, as is
-the case with many streaming big-data analysis systems, garbage collection
-overhead becomes significant~\cite{Broom:HotOS}.  Furthermore, in a
-distributed dataflow system, the GC pause at one node can have a cascading
-adverse effect on the performance of other nodes, particularly when real-time
-streaming performance is required~\cite{Broom:HotOS, harris15}.  In
-particular, a GC pause at an upstream actor can block downstream actors that
-are waiting for messages.  However, often much of the GC overhead results
-from the collector performing avoidable or unproductive work.  For example,
-in the process executing the code from Fig.~\ref{fig:motivating-eg}, GC might
-repeatedly traverse the \C{map} data structure, although its objects cannot
-be collected until a suitable timing message arrives.
-
-% actors.
-% performance degradation due to
-% GC overhead becomes aggravated in the distributed 
-% For example, a consumer process may trigger a
-% GC as soon as it receives a large data structure from a producer
-% process, which has just finished its GC. In such case, consumer's GC
-% traverses the entire data structure performing little or no work.
-
-% as the collector scans these large data structures For instance, in
-% the above example, the list at \C{map[t]} cannot be collected until
-% the the timing message arrives, and the list is transferred.
-% \C{transfer} operation is complete.  using alternative memory
-% management techniques.
+This example is an instance of a general pattern, where a producer
+creates a data structure and passes it to a consumer. In a system
+where most of the computation takes this form, and these data
+structures are very large, as is the case with many streaming big-data
+analysis systems, garbage collection overhead becomes
+significant~\cite{Broom:HotOS}.  Furthermore, in a distributed
+dataflow system, the GC pause at one node can have a cascading adverse
+effect on the performance of other nodes, particularly when real-time
+streaming performance is required.  In particular, a GC pause at an
+upstream actor can block downstream actors that are waiting for
+messages.  However, often much of the GC overhead results from the
+collector performing avoidable or unproductive work.  For example, in
+the process executing the code from Fig.~\ref{fig:motivating-eg}, GC
+might repeatedly traverse the \C{map} data structure, although its
+objects cannot be collected until a suitable timing message arrives.
 
 An important observation, in the context of processes of the kind
 described above, is that the data-structures exchanged between them
@@ -57,10 +44,8 @@ and freed in one shot, consuming constant time. A region may contain
 one or more contiguous range of memory locations, and individual
 objects may be dynamically allocated within the region over time,
 while they are deallocated en masse when the region is freed.  Thus, a
-region is a good fit for a set of fate-sharing objects.
-% that is used to realize a data structure with a well-defined
-% lifetime. 
-In Fig.~\ref{fig:motivating-eg}, the output to be constructed for each
+region is a good fit for a set of fate-sharing objects.  In
+Fig.~\ref{fig:motivating-eg}, the output to be constructed for each
 time window $t$ (i.e., \C{map[t]}) can be a separate region that is
 allocated when the first message with timestamp $t$ arrives, and
 deallocated after \C{map[t]} is transferred in \C{onNotify}.
@@ -68,20 +53,21 @@ deallocated after \C{map[t]} is transferred in \C{onNotify}.
 Region-based memory management, both manual as well as automatic, has
 been known for a long time. Manual region-based memory management
 suffers from the usual drawbacks, namely the potential for invalid
-references and the consequent lack of memory safety. Automatic region-based memory
-management systems guarantee memory safety, but impose various
-restrictions.  MLKit, which implements the approach pioneered by Tofte
-and Talpin~\cite{tofte94,tofte97}, for example, uses lexically scoped
-regions.  At runtime, the set of all regions (existing at a point in
-time) forms a stack. Thus, the lifetimes of all regions must be
-well-nested: it is not possible to have two regions whose lifetimes
-overlap, with neither one's lifetime contained within the other.
-Unfortunately, the data structures in the above example do not satisfy
-this restriction (as the output messages for multiple time windows may
-be simultaneously live, without any containment relation between their
-lifetimes).  We refer to regions with lexically scoped lifetimes as
-\emph{stack regions} and to regions that do not have such a lexically
-scoped region as \emph{dynamic} regions.
+references and the consequent lack of memory safety. Automatic
+region-based memory management systems guarantee memory safety, but
+impose various restrictions.  MLKit, which implements the approach
+pioneered by Tofte and Talpin~\cite{tofte94,tofte97}, for example,
+uses lexically scoped regions.  At runtime, the set of all regions
+(existing at a point in time) forms a stack. Thus, the lifetimes of
+all regions must be well-nested: it is not possible to have two
+regions whose lifetimes overlap, with neither one's lifetime contained
+within the other.  Unfortunately, the data structures in the above
+example do not satisfy this restriction (as the output messages for
+multiple time windows may be simultaneously live, without any
+containment relation between their lifetimes).  We refer to regions
+with lexically scoped lifetimes as \emph{stack regions} and to regions
+that do not have such a lexically scoped region as \emph{dynamic}
+regions.
 
 The goal of this work is a \emph{memory-safe} region-based memory
 management technique that supports dynamic regions as first-class
@@ -91,14 +77,35 @@ regions as \emph{transferable} regions. As with allocation and
 deallocation, transferring a memory region is fast, and therefore,
 transferring a data structure contained in a region is more efficient
 that traversing its objects in heap, and transferring them
-independently\footnote{Empirical studies in~\cite{Broom:HotOS} support
-this claim}. In the \C{SelectVertex} example from
+independently. In the \C{SelectVertex} example from
 Fig.~\ref{fig:motivating-eg}, the proposed region to contain the
 output for each time window $t$ must be transferable due to the
 \C{transfer} operation on Line 16. As it is the case with
 \C{SelectVertex}, the transferred data is no longer accessed by the
 producer, so the transfer operation in our system deallocates the
 region once the transfer is complete.
+
+\begin{figure}
+\centering
+\subcaptionbox {
+  Before transfer.
+  \label{fig:after-transfer}
+} [
+  0.35\columnwidth
+] {
+  \includegraphics[scale=0.36]{producer-heap}
+}
+\subcaptionbox {
+  After transfer.
+  \label{fig:before-transfer}
+} {
+  \includegraphics[scale=0.36]{producer-consumer-heap}
+}
+
+\caption{References in and out of a transferable region ($R$) become
+invalid after transfer.}
+\label{fig:transfer-violations}
+\end{figure}
 
 With respect to memory safety, the key property we wish to ensure is
 that there are no invalid references: i.e., references to objects that
@@ -108,21 +115,20 @@ producer of the data structure, and its (possibly remote) consumer. At
 the producer, any existing references into the data structure become
 invalid post transfer. If the data structure contains references to
 objects outside its (transferable) region, then such references become
-invalid in the context of the consumer. Safety violations of this kind
-are particularly unwelcome as the program with GC did not have them to
-begin with. Note that, while the references of later kind (i.e.,
-references that escape a region) defeat the very purpose of a
-transferable region, hence need to be prohibited, references of the
-former kind (i.e., references into a region from outside) are not at
-odds with the concept of a transferable region, hence need to be
-permitted. In fact, allowing such references is crucial to
-performance, as any non-trivial program creates temporary objects, and
-it is undesirable to allocate them in a transferable region; such
-regions are meant for the data being transferred. Since transferable
-regions are first class objects in our setting, controlling references
-to and from such regions while ensuring their safety without
-significantly diluting the performance advantage of regions over GC is
-a challenging exercise.
+invalid in the context of the consumer. Both scenarios are depicted in
+Fig.~\ref{fig:transfer-violations}. Safety violations of this kind are
+particularly unwelcome in the context of languages like C\# and Java
+that are otherwise memory-safe. While references that escape a
+transferable region can be disallowed in the interest of safety,
+references into a transferable region need to be allowed while the
+region is not yet transferred. In fact, allowing such references is
+crucial to performance, as any non-trivial program creates temporary
+objects, and it is undesirable to allocate them in a transferable
+region; such regions are meant for the data being transferred. Since
+transferable regions are first class objects in our setting,
+controlling references to and from such regions while ensuring their
+safety without significantly diluting the performance advantage of
+regions over GC is a challenging exercise.
 
 In this paper, we describe an approach that restores memory safety in
 presence of transferable regions through a combination of a static
@@ -130,62 +136,54 @@ typing discipline and lightweight runtime checks. The cornerstone of
 our approach is an \C{open} lexical block for transferable regions,
 that ``opens'' a transferable region and guarantees that the region
 won't be transferred/freed while it is open. Our observation is that
-by nesting a~\cite{tofte94}-style \C{letregion} lexical block, that
-delimits the lifetime of a stack region, inside an \C{open} lexical
-block for a transferable region, we can guarantee that the
-transferable region will remain live as long as the stack region is
-live. We say that the former ``outlives'' the later\footnote{We borrow
-the \emph{outlives} relation from~\cite{MIT03}. A comparison of our
-approach with~\cite{MIT03} can be found in
-\S~\ref{sec:related-work}.}, and any references from the stack region
-to the transferable region are therefore safe. 
-% In general, we can allow references from a region
-% $R_0$ to another region $R_1$, provided that we establish that $R_1$ outlives
-% $R_0$. 
-Next, we note that by controlling the ``outlives'' relationships
-between various regions, we only allow safe cross-region references,
-while prohibiting unsafe ones. In the above example, an outlives
-relationship \emph{from} the stack region \emph{to} the transferable
-region means that the references in that direction are allowed, but
-not the references in the opposite direction. In contrast, if an
-\C{open} block of a transferable region $R_0$ is nested inside an
-\C{open} block of another transferable region $R_1$, we do not
-establish any outlives relationships, thus declaring our intention to
-not allow any cross-region references between $R_0$ and $R_1$.
-Finally, we observe that outlives relationships are established based
-on the lexical structure of the program, hence a static type system
-can enforce them effectively. By assigning region types to objects,
-which capture the regions such objects are allocated in, and by
-maintaining outlives relationships between various regions, we can
-statically decide the safety of all references in the program.
+by nesting an MLKit-style \C{letregion} lexical block, that delimits
+the lifetime of a stack region, inside an \C{open} lexical block for a
+transferable region, we can guarantee that the transferable region
+will remain live as long as the stack region is live. We say that the
+former \emph{outlives} the later., and any references from the stack
+region to the transferable region are therefore safe.  Next, we note
+that by controlling the outlives relationships between various
+regions, we only allow safe cross-region references, while prohibiting
+unsafe ones. In the above example, an outlives relationship
+\emph{from} the stack region \emph{to} the transferable region means
+that the references in that direction are allowed, but not the
+references in the opposite direction. In contrast, if an \C{open}
+block of a transferable region $R_0$ is nested inside an \C{open}
+block of another transferable region $R_1$, we do not establish any
+outlives relationships, thus declaring our intention to not allow any
+cross-region references between $R_0$ and $R_1$.  Finally, we observe
+that outlives relationships are established based on the lexical
+structure of the program, hence a static type system can enforce them
+effectively. By assigning region types to objects, which capture the
+regions such objects are allocated in, and by maintaining outlives
+relationships between various regions, we can statically decide the
+safety of all references in the program.
 
-Indeed, the utility of our approach described above is predicated
-on the assumption that we can enforce certain invariants on
-transferable regions. Firstly, a transferable region cannot be
-transferred/freed inside an open block of that region (i.e, while it
-is still open).  Secondly, a transferred/freed region cannot be
-opened. These are typestate invariants on the transferable region
-objects, which are hard to enforce statically due to the presence of
-unrestricted aliasing. Techniques like linear types and unique
-pointers can be used to restrict aliasing, but the constraints they
-impose are often hard to program around. We therefore enforce
-typestate invariants at runtime via lightweight checks. In
-particular, we define an acceptable state transition discipline for
-transferable regions (Fig.~\ref{fig:region-fsm}), and check, at
-runtime, whether a given transition of a transferable region (\eg,
-from \emph{open} state to \emph{freed} state) is valid or not. The
-check is lightweight since it only involves checking a single tag that
-captures the current state.  We believe that this is a reasonable
-choice since regions are coarse-grained objects manipulated
-infrequently, when compared to the fine-grained objects that are
-present inside these regions, for which safety is enforced statically.
-An added advantage of delegating the enforcement of typestate
-invariants to runtime is that our region type system is
-simple\footnote{Supplement lists all the type rules of our language,
-which occupy less than a page.}, which made it possible to formulate a
-type inference that completely eliminates the need to write region
-type annotations. This, we believe, significantly reduces the
-impediment to adopt our approach in practical setting.
+Indeed, the utility of our approach described above is predicated on
+the assumption that we can enforce certain invariants on transferable
+regions. Firstly, a transferable region cannot be transferred/freed
+inside an open block of that region (i.e, while it is still open).
+Secondly, a transferred/freed region cannot be opened. These are
+typestate invariants on the transferable region objects, which are
+hard to enforce statically due to the presence of unrestricted
+aliasing. Techniques like linear types and unique pointers can be used
+to restrict aliasing, but the constraints they impose are often hard
+to program around. We therefore enforce typestate invariants at
+runtime via lightweight checks. In particular, we define an acceptable
+state transition discipline for transferable regions
+(Fig.~\ref{fig:region-fsm}), and check, at runtime, whether a given
+transition of a transferable region (\eg, from \emph{open} state to
+\emph{freed} state) is valid or not. The check is lightweight since it
+only involves checking a single tag that captures the current state.
+We believe that this is a reasonable choice since regions are
+coarse-grained objects manipulated infrequently, when compared to the
+fine-grained objects that are present inside these regions, for which
+safety is enforced statically.  An added advantage of delegating the
+enforcement of typestate invariants to runtime is that our region type
+system is simple, which made it possible to formulate a type inference
+that completely eliminates the need to write region type annotations.
+This, we believe, significantly reduces the impediment to adopt our
+approach in practical setting.
 
 % transferableally checking for the second category of
 % invariants is easy and does not pose a performance concern (unlike,
