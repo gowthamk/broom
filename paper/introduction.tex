@@ -3,9 +3,9 @@
 
 \section{Introduction} \label{sec:introduction}
 
-Consider the example shown in Fig.~\ref{fig:motivating-eg}.  This code
-represents the logic for a \C{SELECT} query operator for streaming
-data.  The operator receives a stream of input messages, each
+The motivating example in Fig.~\ref{fig:motivating-eg} represents
+a \C{SELECT} query operator for streaming data. 
+The operator receives a stream of input messages, each
 associated with a time (window) $t$, processed by method
 \texttt{onReceive}.  Each input message contains a list of inputs,
 each of which is processed by applying a user-defined function to
@@ -19,28 +19,84 @@ sends a corresponding output message to its successor.
 
 \input{motivating-eg}
 
-This example is an instance of a general pattern, where a producer
-creates a data structure and passes it to a consumer. In a system
-where most of the computation takes this form, and these data
-structures are very large, as is the case with many streaming big-data
+This example (of  a producer creating a data structure and transferring it to a consumer)
+is an instance of a general idiom of a set of concurrent actors interacting via messages
+(representing data-structures).
+Our focus in this paper is a region-based approach to realizing such transferable
+data, motivated by the following concerns.
+
+\emph{Performance}.
+When the transferred data structures are large, as is the case with many streaming big-data
 analysis systems, garbage collection overhead becomes
 significant~\cite{Broom:HotOS}.  Furthermore, in a distributed
 dataflow system, the GC pause at one node can have a cascading adverse
-effect on the performance of other nodes, particularly when real-time
-streaming performance is required.  In particular, a GC pause at an
-upstream actor can block downstream actors that are waiting for
+effect on the performance of other nodes~\cite{Broom:HotOS,harris15}:
+a GC pause at an upstream actor can block downstream actors that are waiting for
 messages.  However, often much of the GC overhead results from the
-collector performing avoidable or unproductive work.  For example, in
-the process executing the code from Fig.~\ref{fig:motivating-eg}, GC
-might repeatedly traverse the \C{map} data structure, although its
-objects cannot be collected until a suitable timing message arrives.
+collector performing avoidable or unproductive work.  For the example
+in Fig.~\ref{fig:motivating-eg}, GC might repeatedly traverse the
+\C{map} data structure, although its objects cannot be collected until a
+suitable timing message arrives.
+
+
+\begin{figure}
+\centering
+\subcaptionbox {
+  Before transfer.
+  \label{fig:after-transfer}
+} [
+  0.35\columnwidth
+] {
+  \includegraphics[scale=0.36]{producer-heap}
+}
+\subcaptionbox {
+  After transfer.
+  \label{fig:before-transfer}
+} {
+  \includegraphics[scale=0.36]{producer-consumer-heap}
+}
+
+\caption{References in and out of a transferable region ($R$) become
+invalid after transfer.}
+\label{fig:transfer-violations}
+\end{figure}
+
+\emph{Safety}.
+These systems are designed to allow the producer and consumer to
+execute in the same address space or in different address spaces
+(as determined by the compiler and runtime).
+We wish to ensure memory safety in the presence of such transferred data by ensuring
+that there are no invalid references. A transfer operation, with no
+additional checks, may cause memory safety violations, both at the
+producer of the data structure, and its (possibly remote) consumer. At
+the producer, any existing references into the transferred data structure become
+invalid post transfer. If the data structure contains references to
+objects outside (the transferred data), then such references become
+invalid in the context of the consumer. Both scenarios are depicted in
+Fig.~\ref{fig:transfer-violations}. Safety violations of this kind are
+particularly unwelcome in the context of languages like C\# and Java
+that are otherwise memory-safe. While references from within the
+transferable data to outside can be disallowed in the interest of safety,
+references into transferable data needs to be allowed before the data
+is transferred. Allowing such references is crucial to performance,
+as any non-trivial program creates temporary references to the internal
+objects of a data-structure.
+
+% , and it is undesirable to allocate them in a transferable
+% region; such regions are meant for the data being transferred.
+
+Since
+transferable regions are first class objects in our setting,
+controlling references to and from such regions while ensuring their
+safety without significantly diluting the performance advantage of
+regions over GC is a challenging exercise.
 
 An important observation, in the context of processes of the kind
 described above, is that the data-structures exchanged between them
 can be partitioned into sets of fate-sharing objects with common
 lifetimes, which makes them good candidates for a region-based memory
 management discipline. A region is a block of memory that is allocated
-and freed in one shot, consuming constant time. A region may contain
+and freed in one shot, often in constant time. A region may contain
 one or more contiguous range of memory locations, and individual
 objects may be dynamically allocated within the region over time,
 while they are deallocated en masse when the region is freed.  Thus, a
@@ -85,50 +141,7 @@ output for each time window $t$ must be transferable due to the
 producer, so the transfer operation in our system deallocates the
 region once the transfer is complete.
 
-\begin{figure}
-\centering
-\subcaptionbox {
-  Before transfer.
-  \label{fig:after-transfer}
-} [
-  0.35\columnwidth
-] {
-  \includegraphics[scale=0.36]{producer-heap}
-}
-\subcaptionbox {
-  After transfer.
-  \label{fig:before-transfer}
-} {
-  \includegraphics[scale=0.36]{producer-consumer-heap}
-}
 
-\caption{References in and out of a transferable region ($R$) become
-invalid after transfer.}
-\label{fig:transfer-violations}
-\end{figure}
-
-With respect to memory safety, the key property we wish to ensure is
-that there are no invalid references: i.e., references to objects that
-were deallocated, or simply never existed. Transfer operation, with no
-additional checks, may cause memory safety violations, both at the
-producer of the data structure, and its (possibly remote) consumer. At
-the producer, any existing references into the data structure become
-invalid post transfer. If the data structure contains references to
-objects outside its (transferable) region, then such references become
-invalid in the context of the consumer. Both scenarios are depicted in
-Fig.~\ref{fig:transfer-violations}. Safety violations of this kind are
-particularly unwelcome in the context of languages like C\# and Java
-that are otherwise memory-safe. While references that escape a
-transferable region can be disallowed in the interest of safety,
-references into a transferable region need to be allowed while the
-region is not yet transferred. In fact, allowing such references is
-crucial to performance, as any non-trivial program creates temporary
-objects, and it is undesirable to allocate them in a transferable
-region; such regions are meant for the data being transferred. Since
-transferable regions are first class objects in our setting,
-controlling references to and from such regions while ensuring their
-safety without significantly diluting the performance advantage of
-regions over GC is a challenging exercise.
 
 In this paper, we describe an approach that restores memory safety in
 presence of transferable regions through a combination of a static
