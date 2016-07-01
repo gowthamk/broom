@@ -3,8 +3,11 @@
 
 \section{Introduction} \label{sec:introduction}
 
-The motivating example in Fig.~\ref{fig:motivating-eg} represents
-a \C{SELECT} query operator for streaming data. 
+In this paper, we present a \emph{safe} and \emph{efficient} region-based approach
+to \emph{transferring data} between a set of concurrent actors, motivated by the following concerns.
+
+Consider the example (of  a producer creating a data structure and transferring it to a consumer)
+in Fig.~\ref{fig:motivating-eg}. This represents a \C{SELECT} query operator for streaming data. 
 The operator receives a stream of input messages, each
 associated with a time (window) $t$, processed by method
 \texttt{onReceive}.  Each input message contains a list of inputs,
@@ -19,11 +22,6 @@ sends a corresponding output message to its successor.
 
 \input{motivating-eg}
 
-This example (of  a producer creating a data structure and transferring it to a consumer)
-is an instance of a general idiom of a set of concurrent actors interacting via messages
-(representing data-structures).
-Our focus in this paper is a region-based approach to realizing such transferable
-data, motivated by the following concerns.
 
 \paragraph{Performance.}
 When the transferred data structures are large, as is the case with many streaming big-data
@@ -125,16 +123,17 @@ containment relation between their lifetimes).  We refer to regions
 with lexically scoped lifetimes as \emph{stack regions} and to regions
 that do not have such a lexically scoped region as \emph{dynamic}
 regions.
-%
+
 Our focus, in this paper, is on first-class \emph{memory-safe} dynamic regions
 that can be safely transferred across address spaces. We refer to such dynamic
 regions as \emph{transferable} regions.
-
+%
 Our approach is based on a variation of ideas introduced by~\cite{WW01,cyclone04}
 that combine linear types and regions to suport dynamic regions.
 Unlike the prior work, we ensure memory safety in the presence of
-transferable regions through a combination of a static
-typing discipline and lightweight runtime checks (in place of linear types).
+transferable regions through a \emph{combination of a static
+typing discipline and lightweight runtime checks in place of linear types}.
+
 The cornerstone of this approach is an \C{open} lexical block for transferable regions,
 that ``opens'' a transferable region and guarantees that the region
 won't be transferred/freed while it is open. By nesting an
@@ -163,9 +162,9 @@ safety of all references in the program.
 
 Ensuring memory safety using this approach requires ensuring
 that the use of transferable regions satisfies certain temporal properties.
-Firstly, a transferable region cannot be transferred/freed
+Firstly, a transferable region should not be transferred/freed
 inside an open block of that region (i.e, while it is still open).
-Secondly, a transferred/freed region cannot be opened. These are
+Secondly, a transferred/freed region should not be opened. These are
 typestate invariants on the transferable region objects, which are
 hard to enforce statically in the presence of unrestricted
 aliasing. Techniques like linear types and unique pointers can be used
@@ -180,14 +179,12 @@ only involves checking a single tag that captures the current state.
 We believe that this is a reasonable choice since regions are
 coarse-grained objects manipulated infrequently, when compared to the
 fine-grained objects that are present inside these regions, for which
-safety is enforced statically.  An added advantage of delegating the
-enforcement of typestate invariants to runtime is that our region type
-system is simple, which made it possible to formulate a type inference
-that completely eliminates the need to write region type annotations.
+safety is enforced statically. 
+
+One of the novel contributions of this paper is a type inference algorithm
+that eliminates the need for users to write region type annotations.
 This, we believe, significantly reduces the impediment to adopt our
 approach in practical setting.
-
-
 
 
 % transferableally checking for the second category of
