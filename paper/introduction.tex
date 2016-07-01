@@ -97,7 +97,9 @@ allocated when the first message with timestamp $t$ arrives, and
 deallocated after \C{map[t]} is transferred in \C{onNotify}.
 
 The use of regions alleviates the performance concern related to
-garbage collection described earlier.
+garbage collection described earlier. (It also enables more efficient
+serialization/deserialization of data-structures across address spaces,
+which is also a significant performance bottleneck in such systems.)
 However, manual region memory management introduces memory safety
 issues such as dangling pointers.
 We present a single type system that simultaneously addresses
@@ -160,6 +162,11 @@ regions such objects are allocated in, and by maintaining outlives
 relationships between various regions, we can statically decide the
 safety of all references in the program.
 
+Formally, our type system introduces \emph{region parameters} (for both
+classes and methods) and uses constrained parametric polymorphism
+over these parameters, where the constraints capture outlives constraints
+between the region parameters.
+
 Ensuring memory safety using this approach requires ensuring
 that the use of transferable regions satisfies certain temporal properties.
 Firstly, a transferable region should not be transferred/freed
@@ -181,10 +188,15 @@ coarse-grained objects manipulated infrequently, when compared to the
 fine-grained objects that are present inside these regions, for which
 safety is enforced statically. 
 
-One of the novel contributions of this paper is a type inference algorithm
+One of the novel contributions of this paper is a sound type inference algorithm
 that eliminates the need for users to write region type annotations.
 This, we believe, significantly reduces the impediment to adopt our
 approach in practical setting.
+Our inference algorithm proceeds in two stages: in the first stage,
+we introduce region parameters (for classes and methods), and in
+the second stage we infer the outlives constraints between these
+parameters (using an interprocedural fixed point computation).
+% While the first 
 
 
 % transferableally checking for the second category of
@@ -428,27 +440,25 @@ The paper makes the following contributions:
 % , and it is undesirable to allocate them in a transferable
 % region; such regions are meant for the data being transferred.
 
-\textbf{TO DO:}
-
-As with allocation and deallocation, transferring a memory region is fast, and therefore,
-transferring a data structure contained in a region is more efficient
-that traversing its objects in heap, and transferring them
-independently.
-In the \C{SelectVertex} example from
-Fig.~\ref{fig:motivating-eg}, the proposed region to contain the
-output for each time window $t$ must be transferable due to the
-\C{transfer} operation on Line 16. As it is the case with
-\C{SelectVertex}, the transferred data is no longer accessed by the
-producer, so the transfer operation in our system deallocates the
-region once the transfer is complete.
-
-Since transferable regions are first class objects in our setting,
-controlling references to and from such regions while ensuring their
-safety without significantly diluting the performance advantage of
-regions over GC is a challenging exercise.
-
-An important observation, in the context of processes of the kind
-described above, is that the data-structures exchanged between them
-can be partitioned into sets of fate-sharing objects with common
-lifetimes, which makes them good candidates for a region-based memory
-management discipline.
+%As with allocation and deallocation, transferring a memory region is fast, and therefore,
+%transferring a data structure contained in a region is more efficient
+%that traversing its objects in heap, and transferring them
+%independently.
+%In the \C{SelectVertex} example from
+%Fig.~\ref{fig:motivating-eg}, the proposed region to contain the
+%output for each time window $t$ must be transferable due to the
+%\C{transfer} operation on Line 16. As it is the case with
+%\C{SelectVertex}, the transferred data is no longer accessed by the
+%producer, so the transfer operation in our system deallocates the
+%region once the transfer is complete.
+%
+%Since transferable regions are first class objects in our setting,
+%controlling references to and from such regions while ensuring their
+%safety without significantly diluting the performance advantage of
+%regions over GC is a challenging exercise.
+%
+%An important observation, in the context of processes of the kind
+%described above, is that the data-structures exchanged between them
+%can be partitioned into sets of fate-sharing objects with common
+%lifetimes, which makes them good candidates for a region-based memory
+%management discipline.
