@@ -86,12 +86,12 @@ letregion $\rgn_0$ in
   let snd = new Object<$\rgn_0$>() in
   letregion $\rgn_1$ in
     let fst = new Object<$\rgn_1$>() in
-    let p = new Pair<Object,Object><$\rgn_1$,$\rgn_0$,$\rgn_1$>
+    let p = new Pair<Object,Object><$\rgn_1$,$\rgn_1$,$\rgn_0$>
                   (fst,snd);
 \end{codejava}
 %\vspace*{-0.1in}
 In the above code, the instantiation of $\rhoalloc$ and $\rho_1$ with
-$\rgn_0$, and $\rho_2$ with $\rgn_1$ is allowed because (a) $\rgn_0$
+$\rgn_1$, and $\rho_2$ with $\rgn_0$ is allowed because (a) $\rgn_0$
 and $\rgn_1$ are live during the instantiation, and (b). $\rgn_0
 \outlives \rgn_1$ and $\rgn_1 \outlives \rgn_1$ (since outlives is
 reflexive). Observe that the region type of \C{p} conveys
@@ -536,7 +536,7 @@ closure.
 
 The supplement defines a small-step operational semantics for \fbname
 via a five-place reduction relation:
-\vspace*{-0.15in}
+% \vspace*{-0.15in}
 \begin{smathpar}
   \redstoo{(e,\rhomap)}{(e',\rhomap')}
 \end{smathpar}
@@ -568,7 +568,9 @@ $\C{new}\; \RgnZT{\rgn}(v)$ value that is tagged with a unique
 identifier ($\rgn$) for this region. A binding is also added to
 $\rhomap$, mapping $\rgn$ to the ``closed'' state. The supplement
 defines a type rule for such values, allowing them to be typed.
-Type safety theorem is now stated thus:
+The following type safety theorem shows that a well-typed program will never
+attempt to dereference an ``invalid'' reference (a reference to an object
+in a region that has been transferred or freed):
 \begin{theorem}
 \emph{(\textbf{Type Safety})}
 \label{thm:fb-type-safety}

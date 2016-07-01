@@ -680,14 +680,14 @@ $\mathbf{c_i}$'s. Some trivial constraints, such as $\rho_4 \in
 
 \paragraph{Constraints Example 2} Let us add to the \C{Pair} class a
 contrived method $\C{alt}$ that accepts a \C{Region} object \C{r}, a
-\C{Pair<A,A>} object \C{q}, and an \C{A} object \C{y}. It assigns
+\C{Pair} object \C{q}, and an object \C{y}. It assigns
 \C{y} to \C{fst} and \C{snd} fields of \C{q}, and calls itself
 recursively with the same region, a new \C{Pair} object allocated in a
-local region, and an \C{A} object referred by the \C{snd} field of the
+local region, and an object referred by the \C{snd} field of the
 pair inside the region. \C{alt} never terminates.  Elaboration phase
 elaborates the method to the following region-annotated
 definition\footnote{In reality, elaboration uses new region variables
-as parameters to the constructor and method calls, and then generates
+as parameters to the method calls, and then generates
 constraints that unify them with actuals. In our examples, to avoid
 clutter due to trivial constraints,we coalesced both steps and show
 the actuals instead.}(The original definition of \C{alt} can be
@@ -701,12 +701,12 @@ version):
 % }
 % \end{codejava}
 \begin{codejava}
-unit alt<$\rhoalloc_2$,$\rho_{6-9}\,$|$\,\varphi_2$>(Region<Pair<A,A>><$\toprgn$> r, 
-                Pair<A,A><$\rho_{6-8}$> q, A<$\rho_{9}$> y) {
+unit alt<$\rhoalloc_2$,$\rho_{6-9}\,$|$\,\varphi_2$>(Region<Pair><$\toprgn$> r, 
+                Pair<$\rho_{6-8}$> q, Object<$\rho_{9}$> y) {
   q.fst := y; q.snd := y; 
   open r as p@$\rgn_0$ in
     letregion $\rgn_1$ in
-      let x = new Pair<A,A><$\rgn_1$,$\rgn_0$,$\rgn_0$>
+      let x = new Pair<$\rgn_1$,$\rgn_0$,$\rgn_0$>
                       (p.fst,p.fst) in
         alt<$\rgn_{1}$,$\rgn_{1}$,$\rgn_{0}$,$\rgn_{0}$,$\rgn_{0}$>(r,x,p.snd)
 }
