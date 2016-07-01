@@ -25,7 +25,7 @@ is an instance of a general idiom of a set of concurrent actors interacting via 
 Our focus in this paper is a region-based approach to realizing such transferable
 data, motivated by the following concerns.
 
-\emph{Performance}.
+\paragraph{Performance.}
 When the transferred data structures are large, as is the case with many streaming big-data
 analysis systems, garbage collection overhead becomes
 significant~\cite{Broom:HotOS}.  Furthermore, in a distributed
@@ -61,7 +61,7 @@ invalid after transfer.}
 \label{fig:transfer-violations}
 \end{figure}
 
-\emph{Safety}.
+\paragraph{Safety.}
 These systems are designed to allow the producer and consumer to
 execute in the same address space or in different address spaces
 (as determined by the compiler and runtime).
@@ -82,38 +82,39 @@ is transferred. Allowing such references is crucial to performance,
 as any non-trivial program creates temporary references to the internal
 objects of a data-structure.
 
-% , and it is undesirable to allocate them in a transferable
-% region; such regions are meant for the data being transferred.
-
-Since
-transferable regions are first class objects in our setting,
-controlling references to and from such regions while ensuring their
-safety without significantly diluting the performance advantage of
-regions over GC is a challenging exercise.
-
-An important observation, in the context of processes of the kind
-described above, is that the data-structures exchanged between them
-can be partitioned into sets of fate-sharing objects with common
-lifetimes, which makes them good candidates for a region-based memory
-management discipline. A region is a block of memory that is allocated
+\paragraph{Safe Transferable Regions.}
+In this paper, we present a language-based approach to safely and
+efficiently realize such transferable data that uses regions as
+the implementation technique.
+%
+A region is a block of memory that is allocated
 and freed in one shot, often in constant time. A region may contain
 one or more contiguous range of memory locations, and individual
 objects may be dynamically allocated within the region over time,
 while they are deallocated en masse when the region is freed.  Thus, a
-region is a good fit for a set of fate-sharing objects.  In
+region is a good fit for a transferable data-structure.  In
 Fig.~\ref{fig:motivating-eg}, the output to be constructed for each
 time window $t$ (i.e., \C{map[t]}) can be a separate region that is
 allocated when the first message with timestamp $t$ arrives, and
 deallocated after \C{map[t]} is transferred in \C{onNotify}.
 
-Region-based memory management, both manual as well as automatic, has
-been known for a long time. Manual region-based memory management
-suffers from the usual drawbacks, namely the potential for invalid
-references and the consequent lack of memory safety. Automatic
-region-based memory management systems guarantee memory safety, but
-impose various restrictions.  MLKit, which implements the approach
-pioneered by Tofte and Talpin~\cite{tofte94,tofte97}, for example,
-uses lexically scoped regions.  At runtime, the set of all regions
+The use of regions alleviates the performance concern related to
+garbage collection described earlier.
+However, manual region memory management introduces memory safety
+issues such as dangling pointers.
+We present a single type system that simultaneously addresses
+this safety concern, as well as those described above related to
+the use of \emph{transferable data}.
+
+% Region-based memory management, both manual as well as automatic, has
+% been known for a long time. Manual region-based memory management
+% suffers from the usual drawbacks, namely the potential for invalid
+% references and the consequent lack of memory safety. Automatic
+% region-based memory management systems guarantee memory safety, but
+% impose various restrictions.  MLKit, which implements the approach
+Safe region-based memory management using types was
+pioneered by Tofte and Talpin~\cite{tofte94,tofte97}, who 
+use only lexically scoped regions.  At runtime, the set of all regions
 (existing at a point in time) forms a stack. Thus, the lifetimes of
 all regions must be well-nested: it is not possible to have two
 regions whose lifetimes overlap, with neither one's lifetime contained
@@ -124,32 +125,20 @@ containment relation between their lifetimes).  We refer to regions
 with lexically scoped lifetimes as \emph{stack regions} and to regions
 that do not have such a lexically scoped region as \emph{dynamic}
 regions.
+%
+Our focus, in this paper, is on first-class \emph{memory-safe} dynamic regions
+that can be safely transferred across address spaces. We refer to such dynamic
+regions as \emph{transferable} regions.
 
-The goal of this work is a \emph{memory-safe} region-based memory
-management technique that supports dynamic regions as first-class
-objects. Our focus, in this paper, is on dynamic regions, which can be
-safely transferred across address spaces. We refer to such dynamic
-regions as \emph{transferable} regions. As with allocation and
-deallocation, transferring a memory region is fast, and therefore,
-transferring a data structure contained in a region is more efficient
-that traversing its objects in heap, and transferring them
-independently. In the \C{SelectVertex} example from
-Fig.~\ref{fig:motivating-eg}, the proposed region to contain the
-output for each time window $t$ must be transferable due to the
-\C{transfer} operation on Line 16. As it is the case with
-\C{SelectVertex}, the transferred data is no longer accessed by the
-producer, so the transfer operation in our system deallocates the
-region once the transfer is complete.
-
-
-
-In this paper, we describe an approach that restores memory safety in
-presence of transferable regions through a combination of a static
-typing discipline and lightweight runtime checks. The cornerstone of
-our approach is an \C{open} lexical block for transferable regions,
+Our approach is based on a variation of ideas introduced by~\cite{WW01,cyclone04}
+that combine linear types and regions to suport dynamic regions.
+Unlike the prior work, we ensure memory safety in the presence of
+transferable regions through a combination of a static
+typing discipline and lightweight runtime checks (in place of linear types).
+The cornerstone of this approach is an \C{open} lexical block for transferable regions,
 that ``opens'' a transferable region and guarantees that the region
-won't be transferred/freed while it is open. Our observation is that
-by nesting an MLKit-style \C{letregion} lexical block, that delimits
+won't be transferred/freed while it is open. By nesting an
+MLKit-style \C{letregion} lexical block, that delimits
 the lifetime of a stack region, inside an \C{open} lexical block for a
 transferable region, we can guarantee that the transferable region
 will remain live as long as the stack region is live. We say that the
@@ -172,13 +161,13 @@ regions such objects are allocated in, and by maintaining outlives
 relationships between various regions, we can statically decide the
 safety of all references in the program.
 
-Indeed, the utility of our approach described above is predicated on
-the assumption that we can enforce certain invariants on transferable
-regions. Firstly, a transferable region cannot be transferred/freed
+Ensuring memory safety using this approach requires ensuring
+that the use of transferable regions satisfies certain temporal properties.
+Firstly, a transferable region cannot be transferred/freed
 inside an open block of that region (i.e, while it is still open).
 Secondly, a transferred/freed region cannot be opened. These are
 typestate invariants on the transferable region objects, which are
-hard to enforce statically due to the presence of unrestricted
+hard to enforce statically in the presence of unrestricted
 aliasing. Techniques like linear types and unique pointers can be used
 to restrict aliasing, but the constraints they impose are often hard
 to program around. We therefore enforce typestate invariants at
@@ -197,6 +186,9 @@ system is simple, which made it possible to formulate a type inference
 that completely eliminates the need to write region type annotations.
 This, we believe, significantly reduces the impediment to adopt our
 approach in practical setting.
+
+
+
 
 % transferableally checking for the second category of
 % invariants is easy and does not pose a performance concern (unlike,
@@ -435,3 +427,31 @@ The paper makes the following contributions:
   %\S~\ref{sec:evaluation} presents experimental evaluation and case
   %studies.  \S~\ref{sec:related} discusses the related work, and
   %\S~\ref{sec:conclusion} concludes.
+
+% , and it is undesirable to allocate them in a transferable
+% region; such regions are meant for the data being transferred.
+
+\textbf{TO DO:}
+
+As with allocation and deallocation, transferring a memory region is fast, and therefore,
+transferring a data structure contained in a region is more efficient
+that traversing its objects in heap, and transferring them
+independently.
+In the \C{SelectVertex} example from
+Fig.~\ref{fig:motivating-eg}, the proposed region to contain the
+output for each time window $t$ must be transferable due to the
+\C{transfer} operation on Line 16. As it is the case with
+\C{SelectVertex}, the transferred data is no longer accessed by the
+producer, so the transfer operation in our system deallocates the
+region once the transfer is complete.
+
+Since transferable regions are first class objects in our setting,
+controlling references to and from such regions while ensuring their
+safety without significantly diluting the performance advantage of
+regions over GC is a challenging exercise.
+
+An important observation, in the context of processes of the kind
+described above, is that the data-structures exchanged between them
+can be partitioned into sets of fate-sharing objects with common
+lifetimes, which makes them good candidates for a region-based memory
+management discipline.
