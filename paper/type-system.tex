@@ -5,13 +5,6 @@ The purpose of \name's region type system is to enforce the key
 invariant required for memory safety, namely that an object $o_1$ in a
 region $R_1$ contains a reference to an object $o_2$ in $R_2$, only if
 $R_2$ is guaranteed to outlive $R_1$. 
-% Intuitively, the invariant can
-% be enforced by (a). tracking \emph{outlives} relationships between
-% various regions in the program (b). tagging the C\# type of every
-% object in the program with its allocation region, and (c).  ensuring
-% that, when a reference is created, its target object ($o_2$) is
-% allocated in a region that is known to be in outlives relationship
-% with the object containing the reference. 
 We now formally develop this intuition via \fbname (\FB), our
 explicitly typed core language (with region types) that incorporates
 the features introduced in the previous section. \fbname builds on the
@@ -43,15 +36,16 @@ class Pair<a $\extends$ Object, b $\extends$ Object>
           <$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a \conj \rho_2 \outlives \rho^a$> $\extends$ Object<$\rho^a$> {
   a@$\rho_1$ fst; 
   b@$\rho_2$ snd;
-  Pair(a@$\rho_1$ fst, b@$\rho_2$ snd) {
-    super(); this.fst = fst; this.snd = snd;
-  }
   a@$\rho_1$ getFst() { 
     return this.fst; 
   }
 }
 \end{codejava}
-\vspace*{-0.15in}
+% \vspace*{-0.15in}
+
+%  Pair(a@$\rho_1$ fst, b@$\rho_2$ snd) {
+%    super(); this.fst = fst; this.snd = snd;
+%  }
 
 A class in \FB is parametric over zero or more type variables (as in
 FGJ) as well as one or more region variables $\rho$.
@@ -318,24 +312,6 @@ Like the judgments in FGJ~\cite{fgj}, all the judgments defined by the
 rules in Fig.~\ref{fig:fb-staticsem} are implicitly parameterized on a
 class table ($CT \in cn \mapsto D$) that maps class names to their
 definitions in \FB.
-% \begin{figure}
-
-% \begin{codejava}
-% class Region<a $\extends$ Object><${\rhoalloc}$> $\extends$ Object<$\rhoalloc$>{
-%   <${\rho}$>unit$\xrightarrow{\rhoalloc}$a@$\rho$ thunk;
-%   Region(<${\rho}$>unit$\xrightarrow{\rhoalloc}$a@$\rho$ thunk) {
-%     super(); 
-%     this.thunk = thunk;
-%   }
-%   unit transfer$\inang{\rho}$(unit u) {
-%     return u;
-%   }
-% }
-% \end{codejava}
-
-% \caption{The stub used for $\RgnZ$ class}
-% \label{fig:region-stub}
-% \end{figure}
 
 \noindent The well-formedness judgment on region types
 ($\tywf{\A}{\tau}$) makes use of the well-formedness and subtyping
