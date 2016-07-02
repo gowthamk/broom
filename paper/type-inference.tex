@@ -190,11 +190,12 @@ straightforward manner, by simultaneously parametrizing them (and
 then instantiating them).
 
 \emph{Type-Parametric Classes}.
-Type parameters of classes are handled as follows.
-Consider a type-parametric class \C{C $\langle$ T $\extends$ B $\rangle$}.
-The parametric type \C{T} is instantiated using the number of region parameters
-that its bound \C{B} has. If no bound is specified for \C{T}, the bound is taken
-to be \C{Object}, and \C{T} is instantiated with one region parameter.
+% Type parameters of classes are handled as follows.
+% Consider a type-parametric class \C{C $\langle$ T $\extends$ B $\rangle$}.
+The type parameter \C{T} of a class \C{C} is instantiated as $\C{T}@\rho$ using a single region parameter $\rho$. 
+% number of region parameters
+% that its bound \C{B} has. If no bound is specified for \C{T}, the bound is taken
+% to be \C{Object}, and \C{T} is instantiated with one region parameter.
 
 \emph{Function Types}.
 Since \FB{} is higher-order, fields of function type are allowed. The parameter instantiation step
