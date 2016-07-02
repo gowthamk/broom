@@ -514,7 +514,7 @@ However, methods that are not mutually recursive can be processed separately.
 
 \paragraph{Soundness and Completeness.}
 
-The type inference algorithm is sound:
+We now state the soundness theorem:
 
 \begin{theorem}
 \emph{(\textbf{Soundness})}
@@ -523,13 +523,31 @@ For any $p \in \absof{\FB}$, if Infer($p$) returns Some($t$), then
 (2) $t$ is well-typed.
 \end{theorem}
 
-Furthermore, the second phase of the type inference algorithm is complete as well.
-If there is any possible instantiation (of the region variables and predicate variables) of
-the elaborated program produced by the first phase that type checks, then the second phase
-will identify it.
+We do not present a formal proof of the theorem. The proof essentially requires
+establishing the following lemma inductively: if
+$
+ \exprok {\exptycx{\ralloc}{\env}}{e}{\tau}{C}
+$
+and $(\regionSubstFn,\predSubstFn)$ satisfies $C$, then
+$
+ \hastyp {\exptycx{\ralloc}{\env}}{e[\regionSubstFn,\predSubstFn]}{\tau}
+$,
+where $e[\regionSubstFn,\predSubstFn]$ indicates $e$ with the substitutions
+in the solution $(\regionSubstFn,\predSubstFn)$,
+as well as analogous lemmas for type well-formedness.
 
-Incompleteness exists only in a few choices made during the first phase (elaboration phase), as
-explained below.
+However, in this context, completeness is more interesting than soundness.
+(Note that an unsound inference algorithm can be made sound by simply type-checking
+the resulting program.)
+We believe that the converse of the above lemma can also be established:
+any substitution for the region variables and the predicate variables that makes the
+expression well-typed will also satisfy the generated constraints.
+Thus, if there is any possible instantiation (of the region variables and predicate variables) of
+the elaborated program produced by the first phase that type checks, then the generated
+constraints are satisfiable, and the second phase will identify it.
+
+However, the entire type inference algorithm is not complete, because of some heuristic
+choices made during the first phase (elaboration phase), as explained below.
 
 \begin{enumerate}
 \item Our technique for determining the set of region parameters for a recursive class
@@ -581,80 +599,80 @@ heuristic.
 Region annotations provided by the user can help the type-inference overcome these
 sources of incompleteness.
 
-\textbf{TODO: Update example discussion}
-
-\subsection{Example}
-
-\paragraph{Constraints Example 1} Consider the $\C{Pair}$ class
-template from \S\ref{sec:fb-templatization}. Following constraints are
-generated during its elaboration (Constrains are identified with
-$\mathbf{c_i}$'s. Some trivial constraints, such as $\rho_4 \in
-\rhoenv_0$ and $\rho_5 \in \rhoenv_1$, where $\rhoenv_0 =
-\{\rhoalloc_0,\rho_{0-4}\}$ and $\rhoenv_1 = \rhoenv_0 \cup
-\{\rho_5\}$, have been elided): 
-\begin{smathpar}
-\begin{array}{l}
-  \csid{1} \tywf{\rhoenv_0}{\varphi_0} \qquad
-  \csid{2} \isvalid{\varphi_0}{\rho_0 \outlives \rhoalloc_0 \conj \rho_1
-     \succeq \rhoalloc_0 \conj \rho_4 = \rhoalloc_0} \\
-  \csid{3} \isvalid{\varphi_0}{\rho_2 = \rho_0} \spc
-  \csid{4} \isvalid{\varphi_0}{\rho_3 = \rho_1} \\
-  \csid{5} \isvalid{\varphi_0 \conj \varphi_1} {\rho_5 = \rho_0}\spc
-  \csid{6} \tywf{\rhoenv_1}{\varphi_1} \qquad
-\end{array}
-\end{smathpar}
-
-\paragraph{Constraints Example 2} Let us add to the \C{Pair} class a
-contrived method $\C{alt}$ that accepts a \C{Region} object \C{r}, a
-\C{Pair} object \C{q}, and an object \C{y}. It assigns
-\C{y} to \C{fst} and \C{snd} fields of \C{q}, and calls itself
-recursively with the same region, a new \C{Pair} object allocated in a
-local region, and an object referred by the \C{snd} field of the
-pair inside the region. \C{alt} never terminates.  Elaboration phase
-elaborates the method to the following region-annotated
-definition\footnote{In reality, elaboration uses new region variables
-as parameters to the method calls, and then generates
-constraints that unify them with actuals. In our examples, to avoid
-clutter due to trivial constraints,we coalesced both steps and show
-the actuals instead.}(The original definition of \C{alt} can be
-obtained by erasing all the region annotations from the elaborated
-version):
-% \begin{codejava}
-% unit alt<$\rhoalloc_2$,$\rho_{6-10}$ | $\varphi_2$>(Pair<A,A><$\rho_6$,$\rho_7$,$\rho_8$> p,
-%                           A<$\rho_9$> x, A<$\rho_{10}$> y) {
-%   p.fst = x; p.snd = y; 
-%   this.alt<$\rhoalloc_2$,$\rho_7$,$\rho_8$,$\rho_{10}$,$\rho_9$>(A,y,x);
-% }
-% \end{codejava}
-\begin{codejava}
-unit alt<$\rhoalloc_2$,$\rho_{6-9}\,$|$\,\varphi_2$>(Region<Pair><$\toprgn$> r, 
-                Pair<$\rho_{6-8}$> q, Object<$\rho_{9}$> y) {
-  q.fst := y; q.snd := y; 
-  open r as p@$\rgn_0$ in
-    letregion $\rgn_1$ in
-      let x = new Pair<$\rgn_1$,$\rgn_0$,$\rgn_0$>
-                      (p.fst,p.fst) in
-        alt<$\rgn_{1}$,$\rgn_{1}$,$\rgn_{0}$,$\rgn_{0}$,$\rgn_{0}$>(r,x,p.snd)
-}
-\end{codejava}
-% Note that, to avoid clutter, we have already resolved appropriate
-% region arguments to the recursive call, instead of introducing new
-% region variables and generating equality constraints on them. 
-Constraints generated during the elaboration are shown below
-(let $\rhoenv_2 = \{\rhoalloc_0,\rho_{0-4},\rhoalloc_2,\rho_{6-9}\}$ ):
-\begin{smathpar}
-\begin{array}{l}
-\csid{7} \tywf{\rhoenv_2}{\varphi_2}\qquad
-\csid{8} \isvalid{\varphi_1 \conj \varphi_2}
-    {\rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6} \\
-\csid{9} \isvalid{\varphi_1 \conj \varphi_2}{\rho_7 = \rho_9} \qquad
-\csid{10} \isvalid{\varphi_1 \conj \varphi_2}{\rho_{8} = \rho_9} \\
-\csid{11} \isvalid{\varphi_1 \conj \varphi_2 \conj \rgn_0 \outlives
-\rgn_1} 
-    {[\rgn_1/\rhoalloc_2][\rgn_1/\rho_6][\rgn_0/\rho_{7-9}]\varphi_2}
-\end{array}
-\end{smathpar}
-
+%\textbf{TODO: Update example discussion}
+%
+%\subsection{Example}
+%
+%\paragraph{Constraints Example 1} Consider the $\C{Pair}$ class
+%template from \S\ref{sec:fb-templatization}. Following constraints are
+%generated during its elaboration (Constrains are identified with
+%$\mathbf{c_i}$'s. Some trivial constraints, such as $\rho_4 \in
+%\rhoenv_0$ and $\rho_5 \in \rhoenv_1$, where $\rhoenv_0 =
+%\{\rhoalloc_0,\rho_{0-4}\}$ and $\rhoenv_1 = \rhoenv_0 \cup
+%\{\rho_5\}$, have been elided): 
+%\begin{smathpar}
+%\begin{array}{l}
+%  \csid{1} \tywf{\rhoenv_0}{\varphi_0} \qquad
+%  \csid{2} \isvalid{\varphi_0}{\rho_0 \outlives \rhoalloc_0 \conj \rho_1
+%     \succeq \rhoalloc_0 \conj \rho_4 = \rhoalloc_0} \\
+%  \csid{3} \isvalid{\varphi_0}{\rho_2 = \rho_0} \spc
+%  \csid{4} \isvalid{\varphi_0}{\rho_3 = \rho_1} \\
+%  \csid{5} \isvalid{\varphi_0 \conj \varphi_1} {\rho_5 = \rho_0}\spc
+%  \csid{6} \tywf{\rhoenv_1}{\varphi_1} \qquad
+%\end{array}
+%\end{smathpar}
+%
+%\paragraph{Constraints Example 2} Let us add to the \C{Pair} class a
+%contrived method $\C{alt}$ that accepts a \C{Region} object \C{r}, a
+%\C{Pair} object \C{q}, and an object \C{y}. It assigns
+%\C{y} to \C{fst} and \C{snd} fields of \C{q}, and calls itself
+%recursively with the same region, a new \C{Pair} object allocated in a
+%local region, and an object referred by the \C{snd} field of the
+%pair inside the region. \C{alt} never terminates.  Elaboration phase
+%elaborates the method to the following region-annotated
+%definition\footnote{In reality, elaboration uses new region variables
+%as parameters to the method calls, and then generates
+%constraints that unify them with actuals. In our examples, to avoid
+%clutter due to trivial constraints,we coalesced both steps and show
+%the actuals instead.}(The original definition of \C{alt} can be
+%obtained by erasing all the region annotations from the elaborated
+%version):
+%% \begin{codejava}
+%% unit alt<$\rhoalloc_2$,$\rho_{6-10}$ | $\varphi_2$>(Pair<A,A><$\rho_6$,$\rho_7$,$\rho_8$> p,
+%%                           A<$\rho_9$> x, A<$\rho_{10}$> y) {
+%%   p.fst = x; p.snd = y; 
+%%   this.alt<$\rhoalloc_2$,$\rho_7$,$\rho_8$,$\rho_{10}$,$\rho_9$>(A,y,x);
+%% }
+%% \end{codejava}
+%\begin{codejava}
+%unit alt<$\rhoalloc_2$,$\rho_{6-9}\,$|$\,\varphi_2$>(Region<Pair><$\toprgn$> r, 
+%                Pair<$\rho_{6-8}$> q, Object<$\rho_{9}$> y) {
+%  q.fst := y; q.snd := y; 
+%  open r as p@$\rgn_0$ in
+%    letregion $\rgn_1$ in
+%      let x = new Pair<$\rgn_1$,$\rgn_0$,$\rgn_0$>
+%                      (p.fst,p.fst) in
+%        alt<$\rgn_{1}$,$\rgn_{1}$,$\rgn_{0}$,$\rgn_{0}$,$\rgn_{0}$>(r,x,p.snd)
+%}
+%\end{codejava}
+%% Note that, to avoid clutter, we have already resolved appropriate
+%% region arguments to the recursive call, instead of introducing new
+%% region variables and generating equality constraints on them. 
+%Constraints generated during the elaboration are shown below
+%(let $\rhoenv_2 = \{\rhoalloc_0,\rho_{0-4},\rhoalloc_2,\rho_{6-9}\}$ ):
+%\begin{smathpar}
+%\begin{array}{l}
+%\csid{7} \tywf{\rhoenv_2}{\varphi_2}\qquad
+%\csid{8} \isvalid{\varphi_1 \conj \varphi_2}
+%    {\rho_7 \outlives \rho_6 \conj \rho_8 \outlives \rho_6} \\
+%\csid{9} \isvalid{\varphi_1 \conj \varphi_2}{\rho_7 = \rho_9} \qquad
+%\csid{10} \isvalid{\varphi_1 \conj \varphi_2}{\rho_{8} = \rho_9} \\
+%\csid{11} \isvalid{\varphi_1 \conj \varphi_2 \conj \rgn_0 \outlives
+%\rgn_1} 
+%    {[\rgn_1/\rhoalloc_2][\rgn_1/\rho_6][\rgn_0/\rho_{7-9}]\varphi_2}
+%\end{array}
+%\end{smathpar}
+%
 % \paragraph{Constraints Example 1} The original source of all
 % outlives constraints is the validity constraint $C_3$ in $\elabClass$
 % function (Fig.~\ref{fig:fb-elabmeth}). In context of the $\C{Pair}$
