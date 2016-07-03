@@ -95,9 +95,21 @@ one actor.}. We eliminated such unsafe references by creating a clone
 of \C{inMsg.payload[i]} in \C{outMsg}, and our compiler was
 subsequently able to certify the safety of all references. 
 
+\dv{Hmmmm what is \C{inMsg.payload[i]} in this case? Is it an object? The example
+  demonstrates that we should really have passed in a region that stored other
+  transferrable regions inside, i.e. we should proably make the \C{inMsg.payload[i]} a
+  region itself. This way we don't have to pay the cost of clone. I think that might be
+  an interesting additional discussion in this paragraph. Otherwise I am left as a reader
+  with this bittersweat feeling that ``ok you fixed it but you introduced a copy''. But if
+  the payload was also on it own transferrable region we would be fine right? We probably
+  need a \C{GiveUp} primitive of a region too as we will transfer only the root transferrable
+  region (\C{inMsg}) but we want to declare that we've given up ownership on all the nested
+  ones too.}
+
 Our experience with Naiad benchmarks suggests that, although our
-approach cannot statically enforce memory safety, it is nonetheless
-useful, particularly because the static verification comes at no
+approach cannot statically enforce memory safety, \dv{Valid point,
+  also worth re-visiting in the light of the above?}
+it is nonetheless useful, particularly because the static verification comes at no
 additional cost to the developer. If the developer is satisfied with
 the confidence gained by static verification, she may even choose to
 turn the runtime safety checks off. Since we did not implement code
