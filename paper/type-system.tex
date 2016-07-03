@@ -53,10 +53,13 @@ class Pair<a $\extends$ Object, b $\extends$ Object>
 \end{codejava}
 \vspace*{-0.15in}
 
-\dv{Why do we have the type parameters of $a$ and $b$ extending \C{Object} versus
-  the actual class extending \C{Object<$\rho^a$>}? Also, instead of explicitly introducing
+\dv{Explain why do we have the type parameters of $a$ and $b$ extending \C{Object} versus
+  the actual class extending \C{Object<$\rho^a$>}? What is the point of having it in \C{Object<$\rho^a$>?}.
+  I think it does not make sense to include it there, exactly as we do not include regions in the type parameters,
+  it's all about the type inheritance hierarchy. A second point: instead of explicitly introducing
   all those $\rho^a$ variables, wouldn't it be nicer if we overloaded \C{this} to be a valid region,
   meaning {\bf the} region of this object? I think notationally that might be more lightweight?}
+
 
 A class in \FB is parametric over zero or more type variables (as in
 FGJ) as well as one or more region variables $\rho$.
@@ -547,7 +550,7 @@ closure.
 
 The supplement defines a small-step operational semantics for \fbname
 via a five-place reduction relation:
-\vspace*{-0.15in}
+%\vspace*{-0.15in}
 \begin{smathpar}
   \redstoo{(e,\rhomap)}{(e',\rhomap')}
 \end{smathpar}
