@@ -53,6 +53,11 @@ class Pair<a $\extends$ Object, b $\extends$ Object>
 \end{codejava}
 \vspace*{-0.15in}
 
+\dv{Why do we have the type parameters of $a$ and $b$ extending \C{Object} versus
+  the actual class extending \C{Object<$\rho^a$>}? Also, instead of explicitly introducing
+  all those $\rho^a$ variables, wouldn't it be nicer if we overloaded \C{this} to be a valid region,
+  meaning {\bf the} region of this object? I think notationally that might be more lightweight?}
+
 A class in \FB is parametric over zero or more type variables (as in
 FGJ) as well as one or more region variables $\rho$.
 % In the above example, the class \C{Pair} is parameterized over
@@ -90,6 +95,11 @@ letregion $\rgn_0$ in
                   (fst,snd);
 \end{codejava}
 %\vspace*{-0.1in}
+
+\dv{Note that we slightly changed notation here compared to the introduction, which
+  had introduded n\C{new C@r} for new object allocations. I think we should make the
+  connection in the beginning of this section.}
+
 In the above code, the instantiation of $\rhoalloc$ and $\rho_1$ with
 $\rgn_0$, and $\rho_2$ with $\rgn_1$ is allowed because (a) $\rgn_0$
 and $\rgn_1$ are live during the instantiation, and (b). $\rgn_0
