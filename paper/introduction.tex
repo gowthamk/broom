@@ -23,7 +23,7 @@ This example is an instance of a general pattern, where a producer creates a
 data structure and passes it to a consumer. In a system where most of the
 computation takes this form, and these data structures are very large, as is
 the case with many streaming big-data analysis systems, garbage collection
-overhead becomes significant~\cite{Broom:HotOS}.  Furthermore, in a
+overhead becomes significant~\cite{Broom:HotOS,Nguyen+:facade}.  Furthermore, in a
 distributed dataflow system, the GC pause at one node can have a cascading
 adverse effect on the performance of other nodes, particularly when real-time
 streaming performance is required~\cite{Broom:HotOS, harris15}.  In
