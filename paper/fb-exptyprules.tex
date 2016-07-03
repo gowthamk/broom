@@ -1,20 +1,16 @@
 %
-\begin{minipage}{2.7in}
+% LET expression
+\begin{minipage}{2in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \A = (\subtypcx) \spc
-    \tywf{\A}{\tau}\\
-    \phicx' = \phicx \conj (\rhoenv \outlives \rgn) \spc
-    \rhoenv' =\rhoenv \cup \{\rgn\} \\
-    \rgn \notin \rhoenv \spc
-    \A' = (\rhoset, \rhoenv', \aenv, \phicx')\spc
-    \hastyp{\A',\rgn,\env}{e}{\tau}
+    \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\tau_1}\\
+    \hastyp{\exptycx{\ralloc}{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}\\
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{\letregion{\rgn}{e}}{\tau}
+    \hastyp{\exptycx{\ralloc}{\env}}{\letexp{x}{e_1}{e_2}}{\tau_2}
   }
 \end{array}
 \end{smathpar}
@@ -108,6 +104,29 @@
 % %
 % \smallskip
 
+% LET REGION
+%
+\begin{minipage}{2.7in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx) \spc
+    \tywf{\A}{\tau}\\
+    \phicx' = \phicx \conj (\rhoenv \outlives \rgn) \spc
+    \rhoenv' =\rhoenv \cup \{\rgn\} \\
+    \rgn \notin \rhoenv \spc
+    \A' = (\rhoset, \rhoenv', \aenv, \phicx')\spc
+    \hastyp{\A',\rgn,\env}{e}{\tau}
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{\letregion{\rgn}{e}}{\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
 %
 \begin{minipage}{3.5in}
 \begin{smathpar}
@@ -178,6 +197,78 @@
                       {\xbar:\bar{\tau^1}}{e}}
            {\inang{\rhoalloc\rhobar \,|\, \phi}
             \bar{\tau^1} \xrightarrow{\ralloc} \tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+% FUNCTION APPLICATION
+%
+\begin{minipage}{3.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rbar \in \A.\rhoenv \spc
+    \hastyp{\exptycx{\ralloc}{\env}}{e}
+        {\inang{\rhoalloc\rhobar \,|\, \phi}
+            \bar{\tau^1} \xrightarrow{\rgn} \tau^2}\\
+    \substFn = \subst{\rbar}{\rhobar}
+               \subst{\ralloc}{\rhoalloc} \spc
+    \isvalid{\A.\phicx}{\substFn(\phi)} \spc
+    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}
+        {\substFn(\bar{\tau^1})}\spc
+%   \subtyp{\A}{\taubar}{\bar{\tau^1}}
+  }
+  {
+    \hastyp{\A,\ralloc,\env}{e\inang{\ralloc\rbar}(\bar{e})}
+           {\substFn(\tau^2)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+% METHOD INVOCATION
+\begin{minipage}{3.7in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{e_0}{\tau} \spc
+    \rbar \in \A.\rhoenv \\
+    \mtype(m,\bound_{\A.\aenv}(\tau)) = \inang{\rhoalloc\rhobar \,|\, 
+        \phi}\bar{\tau^1}\rightarrow{\tau^2} \spc
+    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc] \\
+    \tywf{\A}{\inang{\rhoalloc\rhobar \,|\,
+    \phi}\bar{\tau^1}\rightarrow{\tau^2}}\spc
+%   \tywf{\A}{\substFn(\bar{\tau^1})} \spc
+%   \tywf{\A}{\substFn(\tau^2)} \\
+    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\substFn(\bar{\tau^1})} \spc
+%   \subtyp{\A}{\bar{\tau'}}{\substFn(\bar{\tau^1})} \spc
+    \isvalid{\A.\phicx}{\substFn(\phi)}
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{e_0.m\inang{\ralloc\rbar}(\bar{e})} 
+           {\substFn(\tau^2)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+% TRANSFER
+\begin{minipage}{2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    \hastyp{\exptycx{\ralloc}{\env}}{e}{\RgnZ\inang{T}\inang{\toprgn}}
+  }
+  {
+    \hastyp{\exptycx{\ralloc}{\env}}{e.\transfer\inang{\ralloc}()}{\unitZ}
   }
 \end{array}
 \end{smathpar}
