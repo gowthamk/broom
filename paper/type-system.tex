@@ -487,7 +487,8 @@ preventing cross-region references originating from transferable
 regions\footnote{The body of the function ($e$) might, however, create
 new (transferable) regions while execution, but that is fine as long
 as such regions, and objects allocated in them, don't find their way
-into the result of evaluating $e$}.
+into the result of evaluating $e$}. \dv{Which one is that rule? If it's the upper
+  left rule, is there a typo? What is it's type? What is the context?}
 
 The type rule for \C{letregion} expression requires that the static
 identifier introduced by the expression be unique under the current
