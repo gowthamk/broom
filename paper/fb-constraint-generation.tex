@@ -23,6 +23,7 @@
 \newcommand{\exprok}[4]{{#1} \, \vdash \, {#2} : {#3} \, \lhd {#4}}
 \newcommand{\subtypeok}[4]{{#1} \, \vdash \, {#2}  \subtypesym {#3} \, \lhd {#4}} 
 
+\newcommand{\stdcontext}{\exptycx{\ralloc}{\env}}
 
 \begin{figure*}[t]
 % \begin{mathpar}
@@ -31,29 +32,30 @@
   \gcrule
   {
     \typeok {\A} {\fbN} {C_1} \spc
-    \exprok {\exptycx{\ralloc}{\env}} {\bar{e}} {\bar{\tau'}} {C_2} \spc
+    \exprok {\stdcontext} {\bar{e}} {\bar{\tau'}} {C_2} \spc
     C_3 = \{ \isvalid{\A.\phicx}{\allocRgn(\fbN)=\ralloc} \} \spc
     \fields(\fbN) = \bar{f} : \taubar \spc
     \subtypeok {\A} {\bar{\tau'}} {\bar{\tau}} {C_4}
   }
   {
-    \exprok {\exptycx{\ralloc}{\env}}   {\C{new} \fbN(\bar{e})} {\fbN} {\cup_{i=1}^4 C_i}
+    \exprok {\stdcontext}   {\C{new} \fbN(\bar{e})} {\fbN} {\cup_{i=1}^4 C_i}
   }
 
 % FUNCTION INVOCATION
 \gcrule
 {
-\exprok {\exptycx{\ralloc}{\env}} {e_a} {\inang{\rho_0 \rhobar\,|\,\phi}\taubar \xrightarrow{\rgn} \tau} {C_1} \spc
-\exprok {\exptycx{\ralloc}{\env}} {\bar{e}} {\bar{\tau'}} {C_2} \spc
+\exprok {\stdcontext} {e_a} {\inang{\rho_0 \rhobar\,|\,\phi}\taubar \xrightarrow{\rgn} \tau} {C_1} \spc
+\exprok {\stdcontext} {\bar{e}} {\bar{\tau'}} {C_2} \spc
 \substFn = [\bar{\rho'}/\rhobar][\rho_0'/\rho_0]
 \\
 C_3 = \{\rho_0' \bar{\rho'} \in \A.\rhoenv\} \spc
 C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
 \subtypeok {\A} {\bar{\tau'}} {\substFn(\bar{tau})} {C_5}
 }{
-\exprok {\exptycx{\ralloc}{\env}} {e_a\inang{\rho_0'\bar{\rho'}}(\bar{e})} {\tau} {\cup_{i=1}^5 C_i}
+\exprok {\stdcontext} {e_a\inang{\rho_0'\bar{\rho'}}(\bar{e})} {\tau} {\cup_{i=1}^5 C_i}
 }
 
+% Original from elaboration algorithm:
 % $e_a(\bar{e})$ $\longrightarrow$ 
 %    let ($e_a':\inang{\rhoalloc\rhobar\,|\,\phi}\taubar \xrightarrow{\rgn} \tau$,$C_1$) = 
 %                $\elabExpr(\A,\ralloc,\env,e_a)$ in
@@ -65,6 +67,28 @@ C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
 %*)   let $(\bar{e'}:\bar{\tau'}, C_4)$ = $\elabExpr(\A,\ralloc,\env,\bar{e})$ in
 %    let $C_5$ = $\subtypeOk({\A},{\bar{\tau'}},{\bar{\substFn(\tau)}})$ in
 %      ($e_a'\inang{\ralloc\bar{\rho'}}(\bar{e'}):\substFn(\tau)$,$\bigcup_{i=1}^5 C_i$)
+
+% LET-REGION
+\gcrule{
+\A= (\rhoenv,\aenv,\phicx)  \spc
+\rgn \notin \rhoenv \spc
+\A' = (\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn))  \spc
+\exprok{\A',\rgn,\env} {e_a} {\tau} {C_1} \spc
+\typeok {\A} {\tau} {C_2}
+}{
+\exprok{\stdcontext} {\letregion{\rgn}{e_a}} {\tau} {(C_1 \cup C_2)}
+}
+
+
+% Original from elaboration algorithm:
+%  | $\letregion{\rgn}{e_a}$ $\longrightarrow$
+%    let $\rgn'$ = $\fresh_{\rgn}()$ in 
+%    let $(\rhoenv,\aenv,\phicx)$ = $\A$ in
+%    let $\A'$ = ($\rhoenv \cup \{\rgn'\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn')$) in
+%    let ($e_a':\tau$,$C_1$) = $\elabExpr(\A',\rgn',\env,[\rgn'/\rgn]e_a)$ in
+%      ($\letregion{\rgn'}{e_a'}:\tau$,$C_1$)
+
+
 
 
 % \end{mathpar}
