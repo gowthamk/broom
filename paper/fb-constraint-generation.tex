@@ -1,3 +1,5 @@
+\newcommand{\hdOf}[2]{\C{class}\; #1\angAlpha\inang{\rhoalloc\rhobar \,|\, #2} \extends \fbN}
+
 % mathpartir's inferrule: seems to have problems with linebreaks
 \newcommand{\genconstraint}[2]{\inferrule*{#1}{#2}}
 \newcommand{\gcarrow}{\leadsto}
@@ -27,6 +29,12 @@
 
 \begin{figure*}[t]
 % \begin{mathpar}
+\fbox{  \(
+    \typeok{\A}{\tau}{C}, \spc
+    \exprok{\stdcontext}{e}{\tau}{C}
+%   \tywf{\rhoenv}{\phi}
+  \)}
+\\
 
 % NEW
   \gcrule
@@ -87,6 +95,7 @@ C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
 %    let ($e_a':\tau$,$C_1$) = $\elabExpr(\A',\rgn',\env,[\rgn'/\rgn]e_a)$ in
 %      ($\letregion{\rgn'}{e_a'}:\tau$,$C_1$)
 
+% OPEN-REGION
 \gcrule{
 \exprok {\stdcontext} {e_a} {\RgnZ\inang{T}\inang{\rho}} {C_1} \spc
 \A = (\rhoenv,\aenv,\phicx) \spc
@@ -94,7 +103,7 @@ C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
 (\A',\env') = ((\rhoenv \cup \{\rgn\},\aenv,\phicx),\env[y\mapsto T@\rgn] \spc
 \exprok {\A',\rgn,\env'} {e_b} {\tau} {C_2}
 }{
-\exprok {\stdcontext} {\open{e_a}{\rgn}{y}{e_b}} {\tau} {C_1 \cup C_2}
+\exprok {\stdcontext} {\open{e_a}{\rgn}{y}{e_b}} {\tau} {(C_1 \cup C_2)}
 }
 
 % Original from elaboration algorithm:
@@ -107,7 +116,53 @@ C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
 %    let ($e_b':\tau$,$C_2$) = $\elabExpr(\A',\rgn',\env',[\rgn'/\rgn]e_a)$ in
 %      ($\open{e_a'}{\rgn'}{y}{e_b'} : \tau$, $C_1 \cup C_2$)
 
+% 
+% METHOD OK
+\gcrule{
+CT(B) = \hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\} \\
+\A = (\rhoenv,\aenv,\phicx) = (\{\rhoalloc,\rhobar,\rhoalloc_m,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN}, \varphi_m) \spc\spc
+C_1 = \{ \tywf{\rhoenv}{\varphi_m} \} \\
+\env = \cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhoalloc\rhobar}][\xbar \mapsto \taubar] \spc\spc
+\exprok {\A,\rhoalloc_m,\env}{e} {\tau'} {C_2} \spc\spc
+\subtypeok {\A} {\tau'} {\tau} {C_3}
+}{
+\typeok{} {(B, \tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \;  \xbar)\{\C{return} e;\})} {(C_1 \cup C_2 \cup C_3)}
+}
 
+% Original from elaboration algorithm
+%$\elabMeth(CT, B, \tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \; \xbar)\{\C{return} e;\})$ = 
+%  let $\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}$ = $CT(B)$ in
+%  let ($\rhoenv$,$\aenv$,$\phicx$) as $\A$ = 
+%            $(\{\rhoalloc,\rhobar,\rhoalloc_m,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN},\varphi \conj \varphi_m)$ in
+%  let $C_1$ = $\{\tywf{\rhoenv}{\varphi_m}\}$ in
+%  let $\env$ = $\cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhoalloc\rhobar}][\xbar \mapsto \taubar]$ in
+%  let ($e':\tau'$,$C_2$) = $\elabExpr (\A,\rhoalloc_m,\env,e)$ in
+%  let $C_3$ = $\subtypeOk({\A},{\tau'},{\tau})$ in
+%    ($\tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \;
+%    \xbar)\{\C{return} e';\}$, $C_1 \cup C_2 \cup C_3$)
+
+% 
+% CLASS OK
+\gcrule{
+\A = (\rhoenv, \aenv, \phicx) = (\{\rhoalloc,\rhobar\},\bar{\tyvar} \extends \bar{\fgjN},\varphi) \\
+C_1 = \{ \tywf{\rhoenv}{\varphi} \} \spc\spc
+\typeok {\A} {\fbN} {C_2} \spc\spc
+\typeok {\A} {\bar{\tau^f}} {C_3} \\
+C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allocRgn(\fbN) = \rhoalloc}\} \\
+\typeok {} {\bar{d}} {C_6}
+}{
+\typeok {} {\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}} {\bigcup_{i=1}^6 C_i}
+}
+
+% Original from elaboration algorithm
+%  let $\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}$ = $CT(B)$ in
+%  let ($\rhoenv$,$\aenv$,$\phicx$) as $\A$ = $(\{\rhoalloc,\rhobar\},\bar{\tyvar} \extends \bar{\fgjN},\varphi)$ in
+%  let $C_1$ = $\tywf{\rhoenv}{\varphi}$ in
+%  let ($C_2$,$C_3$) = ($\typeOk({\A},{\fbN})$,$\typeOk({\A},{\bar{\tau^f}})$) in
+%  let $C_4$ = $\{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allocRgn(\fbN) = \rhoalloc}\}$ in
+%  let ($k'$,$C_5$) = $\elabCons(B,k)$ in
+%  let ($\bar{d'}$,$C_6$) = $\elabMeth(B,\bar{d})$ in
+%    ($\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;k'\;\bar{d'}\}$, $\bigcup_{i=1}^6 C_i$)
 
 % \end{mathpar}
 \caption{Constraint generation}
