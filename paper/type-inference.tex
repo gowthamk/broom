@@ -332,15 +332,24 @@ $\varphi_i$ are as above).
 The constraint generation algorithm is a direct adaption of the type checker:
 each type checking rule is modified to produce a set of constraints that must hold
 for the type checker to succeed.
-%
-Fig.~\ref{fig:constraint-gen} illustrates this for a few selected language constructs.
+
+Fig.~\ref{fig:constraint-gen} illustrates this for selected language constructs.
+These rules use the same context as the expression typing judgment in
+Fig.~\ref{fig:fb-staticsem} with symbols $\A$,$\ralloc$, and $\env$
+retaining their meaning.
 The algorithm proceeds top-down, analyzes an expression $e$ in a context
 $\exptycx{\ralloc}{\env}$, and returns a type $\tau$ and a set of constraints $C$
 (expressed in the rules as $\exprok {\exptycx{\ralloc}{\env}} {e} {\tau} {C}$ ),
 indicating that the expression will have a type $\tau$ provided the constraints $C$ hold.
-%
-The appendix presents a more detailed algorithm that performs the elaboration and
-constraint generation in a single integrated pass.
+
+The rules for generating constraints from a method and
+class definition first build a context ($\A$) containing a set ($ \rhoenv$) of region variables denoting
+regions that are currently live, a map ($\aenv$) mapping type
+variables to their bounds, and a constraint formula ($\phicx$)
+capturing constraints over live region variables. We use predicate
+variables ($\varphi$ and $\varphi_m$) to capture constraints over
+variables in $\rhoenv$ denoting the fact that such constraints are yet
+to be inferred.
 
 \paragraph{Constraint Solution}
 Solving the set ($C$) of constraints entails finding an
