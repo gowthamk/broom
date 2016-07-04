@@ -1,6 +1,21 @@
+% mathpartir's inferrule: seems to have problems with linebreaks
 \newcommand{\genconstraint}[2]{\inferrule*{#1}{#2}}
 \newcommand{\gcarrow}{\leadsto}
 \newcommand{\gctransforms}{\models}
+
+\newcommand{\gcrule}[2]{%
+\begin{smathpar}\begin{array}{c}%
+\renewcommand*{\arraystretch}{1.2}%
+\RULE {#1} {#2}%
+\end{array}\end{smathpar}%
+}
+
+\newcommand{\minigcrule}[3]{%
+\begin{minipage}{#1}\begin{smathpar}\begin{array}{c}%
+\renewcommand*{\arraystretch}{1.2}%
+\RULE {#2} {#3}%
+\end{array}\end{smathpar}\end{minipage}%
+}
 
 \newcommand{\subtypesym}{<:}
 
@@ -10,9 +25,10 @@
 
 
 \begin{figure*}[t]
-\begin{mathpar}
+% \begin{mathpar}
 
-  \genconstraint
+% NEW
+  \gcrule
   {
     \typeok {\A} {\fbN} {C_1} \spc
     \exprok {\exptycx{\ralloc}{\env}} {\bar{e}} {\bar{\tau'}} {C_2} \spc
@@ -24,7 +40,34 @@
     \exprok {\exptycx{\ralloc}{\env}}   {\C{new} \fbN(\bar{e})} {\fbN} {\cup_{i=1}^4 C_i}
   }
 
-\end{mathpar}
+% FUNCTION INVOCATION
+\gcrule
+{
+\exprok {\exptycx{\ralloc}{\env}} {e_a} {\inang{\rho_0 \rhobar\,|\,\phi}\taubar \xrightarrow{\rgn} \tau} {C_1} \spc
+\exprok {\exptycx{\ralloc}{\env}} {\bar{e}} {\bar{\tau'}} {C_2} \spc
+\substFn = [\bar{\rho'}/\rhobar][\rho_0'/\rho_0]
+\\
+C_3 = \{\rho_0' \bar{\rho'} \in \A.\rhoenv\} \spc
+C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
+\subtypeok {\A} {\bar{\tau'}} {\substFn(\bar{tau})} {C_5}
+}{
+\exprok {\exptycx{\ralloc}{\env}} {e_a\inang{\rho_0'\bar{\rho'}}(\bar{e})} {\tau} {\cup_{i=1}^5 C_i}
+}
+
+% $e_a(\bar{e})$ $\longrightarrow$ 
+%    let ($e_a':\inang{\rhoalloc\rhobar\,|\,\phi}\taubar \xrightarrow{\rgn} \tau$,$C_1$) = 
+%                $\elabExpr(\A,\ralloc,\env,e_a)$ in
+%    let $\bar{\rho'}$ = $\bar{\fresh_\rho()}$ in
+%    let $C_2$ = $\{\bar{\rho'} \in \A.\rhoenv\}$ in
+%    let $\substFn$ = $[\bar{\rho'}/\rhobar][\ralloc/\rhoalloc]$ in
+%    let $C_3$ = $\{\isvalid{\A.\phicx}{\substFn(\phi)}\}$ in
+%%*   %let $(C_3,C_4)$ = $(\typeOk(\substFn(\taubar)), \typeOk(\substFn(\tau)))$ in 
+%*)   let $(\bar{e'}:\bar{\tau'}, C_4)$ = $\elabExpr(\A,\ralloc,\env,\bar{e})$ in
+%    let $C_5$ = $\subtypeOk({\A},{\bar{\tau'}},{\bar{\substFn(\tau)}})$ in
+%      ($e_a'\inang{\ralloc\bar{\rho'}}(\bar{e'}):\substFn(\tau)$,$\bigcup_{i=1}^5 C_i$)
+
+
+% \end{mathpar}
 \caption{Constraint generation}
 \label{fig:constraint-gen}
 \end{figure*}

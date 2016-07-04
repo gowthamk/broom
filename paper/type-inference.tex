@@ -333,7 +333,11 @@ The constraint generation algorithm is a direct adaption of the type checker:
 each type checking rule is modified to produce a set of constraints that must hold
 for the type checker to succeed.
 %
-Fig.~\ref{fig:constraint-gen} illustrates this for the object allocator \C{new} construct.
+Fig.~\ref{fig:constraint-gen} illustrates this for a couple of rules.
+The algorithm proceeds top-down, analyzes an expression $e$ in a context
+$\exptycx{\ralloc}{\env}$, and returns a type $\tau$ and a set of constraints $C$
+(expressed in the rules as $\exprok {\exptycx{\ralloc}{\env}} {e} {\tau} {C}$ ),
+indicating that the expression will have a type $\tau$ provided the constraints $C$ hold.
 %
 The appendix presents a more detailed algorithm that performs the elaboration and
 constraint generation in a single integrated pass.
