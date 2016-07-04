@@ -12,6 +12,13 @@
 \end{array}\end{smathpar}%
 }
 
+\newcommand{\lgcrule}[3]{%
+\begin{smathpar}\begin{array}{c}%
+\renewcommand*{\arraystretch}{1.2}%
+[\rulelabel{#1}] \spc \RULE {#2} {#3}%
+\end{array}\end{smathpar}%
+}
+
 \newcommand{\minigcrule}[3]{%
 \begin{minipage}{#1}\begin{smathpar}\begin{array}{c}%
 \renewcommand*{\arraystretch}{1.2}%
@@ -37,7 +44,7 @@
 \\
 
 % NEW
-  \gcrule
+  \lgcrule{NEW}
   {
     \typeok {\A} {\fbN} {C_1} \spc
     \exprok {\stdcontext} {\bar{e}} {\bar{\tau'}} {C_2} \spc
@@ -50,7 +57,7 @@
   }
 
 % FUNCTION INVOCATION
-\gcrule
+\lgcrule{FUN-APPLY}
 {
 \exprok {\stdcontext} {e_a} {\inang{\rho_0 \rhobar\,|\,\phi}\taubar \xrightarrow{\rgn} \tau} {C_1} \spc
 \exprok {\stdcontext} {\bar{e}} {\bar{\tau'}} {C_2} \spc
@@ -77,7 +84,7 @@ C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
 %      ($e_a'\inang{\ralloc\bar{\rho'}}(\bar{e'}):\substFn(\tau)$,$\bigcup_{i=1}^5 C_i$)
 
 % LET-REGION
-\gcrule{
+\lgcrule{LET-REGION}{
 \A= (\rhoenv,\aenv,\phicx)  \spc
 \rgn \notin \rhoenv \spc
 \A' = (\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn))  \spc
@@ -96,7 +103,7 @@ C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
 %      ($\letregion{\rgn'}{e_a'}:\tau$,$C_1$)
 
 % OPEN-REGION
-\gcrule{
+\lgcrule{OPEN}{
 \exprok {\stdcontext} {e_a} {\RgnZ\inang{T}\inang{\rho}} {C_1} \spc
 \A = (\rhoenv,\aenv,\phicx) \spc
 \rgn \notin \rhoenv \spc
@@ -118,7 +125,7 @@ C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
 
 % 
 % METHOD OK
-\gcrule{
+\lgcrule{METHOD}{
 CT(B) = \hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\} \\
 \A = (\rhoenv,\aenv,\phicx) = (\{\rhoalloc,\rhobar,\rhoalloc_m,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN}, \varphi_m) \spc\spc
 C_1 = \{ \tywf{\rhoenv}{\varphi_m} \} \\
@@ -143,7 +150,7 @@ C_1 = \{ \tywf{\rhoenv}{\varphi_m} \} \\
 
 % 
 % CLASS OK
-\gcrule{
+\lgcrule{CLASS}{
 \A = (\rhoenv, \aenv, \phicx) = (\{\rhoalloc,\rhobar\},\bar{\tyvar} \extends \bar{\fgjN},\varphi) \\
 C_1 = \{ \tywf{\rhoenv}{\varphi} \} \spc\spc
 \typeok {\A} {\fbN} {C_2} \spc\spc
