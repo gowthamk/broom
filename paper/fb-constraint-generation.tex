@@ -79,7 +79,6 @@ C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
 \exprok{\stdcontext} {\letregion{\rgn}{e_a}} {\tau} {(C_1 \cup C_2)}
 }
 
-
 % Original from elaboration algorithm:
 %  | $\letregion{\rgn}{e_a}$ $\longrightarrow$
 %    let $\rgn'$ = $\fresh_{\rgn}()$ in 
@@ -88,6 +87,25 @@ C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
 %    let ($e_a':\tau$,$C_1$) = $\elabExpr(\A',\rgn',\env,[\rgn'/\rgn]e_a)$ in
 %      ($\letregion{\rgn'}{e_a'}:\tau$,$C_1$)
 
+\gcrule{
+\exprok {\stdcontext} {e_a} {\RgnZ\inang{T}\inang{\rho}} {C_1} \spc
+\A = (\rhoenv,\aenv,\phicx) \spc
+\rgn \notin \rhoenv \spc
+(\A',\env') = ((\rhoenv \cup \{\rgn\},\aenv,\phicx),\env[y\mapsto T@\rgn] \spc
+\exprok {\A',\rgn,\env'} {e_b} {\tau} {C_2}
+}{
+\exprok {\stdcontext} {\open{e_a}{\rgn}{y}{e_b}} {\tau} {C_1 \cup C_2}
+}
+
+% Original from elaboration algorithm:
+%  | $\open{e_a}{\rgn}{y}{e_b}$ $\longrightarrow$ 
+%    let ($e_a':\RgnZ\inang{T}\inang{\rho}$,$C_1$) = 
+%                $\elabExpr(\A,\ralloc,\env,e_a)$ in
+%    let $\rgn'$ = $\fresh_{\rgn}()$ in 
+%    let $(\rhoenv,\aenv,\phicx)$ = $\A$ in
+%    let ($\A'$,$\env'$) = ($(\rhoenv \cup \{\rgn'\},\aenv,\phicx)$,$\env[y\mapsto T@\rgn']$) in
+%    let ($e_b':\tau$,$C_2$) = $\elabExpr(\A',\rgn',\env',[\rgn'/\rgn]e_a)$ in
+%      ($\open{e_a'}{\rgn'}{y}{e_b'} : \tau$, $C_1 \cup C_2$)
 
 
 
