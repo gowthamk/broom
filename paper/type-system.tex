@@ -27,10 +27,10 @@ language.
 Fig~\ref{fig:fb-syntax} describes the syntax of \FB.
 We refer to the class types of FGJ as \emph{core types}.
 %
-The following definition of \C{Pair} class in \FB illustrates some
-of the key elements of the formal language\footnote{The symbol
-$\extends$ should be read \emph{extends}, and the symbol $\outlives$
-stands for \emph{outlives}}:
+The following definition of \C{Pair} class in \FB illustrates some of
+the key elements of the formal language (the symbol $\extends$ should
+be read \emph{extends}, and the symbol $\outlives$ stands for
+\emph{outlives}):
 \begin{codejava}[mathescape=true]
 class Pair<a $\extends$ Object, b $\extends$ Object>
           <$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a \conj \rho_2 \outlives \rho^a$> $\extends$ Object<$\rho^a$> {
@@ -42,13 +42,15 @@ class Pair<a $\extends$ Object, b $\extends$ Object>
 }
 \end{codejava}
 % \vspace*{-0.15in}
-
 %  Pair(a@$\rho_1$ fst, b@$\rho_2$ snd) {
 %    super(); this.fst = fst; this.snd = snd;
 %  }
+Note that we elide showing constructors since they are uninteresting
+from the type system's standpoint; their behavior in \FB is same as in
+FGJ. 
 
-A class in \FB is parametric over zero or more type variables (as in
-FGJ) as well as one or more region variables $\rho$.
+A class in \FB is parametric over zero or more type variables (as
+in FGJ) as well as one or more region variables $\rho$.
 % In the above example, the class \C{Pair} is parameterized over
 % $\rho^a, \rho_1, \rho_2$.
 We refer to the first region parameter, usually denoted $\rho^a$, as
@@ -165,7 +167,8 @@ instantiated with \C{Pair<\ObjZ,\ObjZ>}, the result is the type of a
 % When objects of a class are allocated in a region $\rgn$, it means
 % that the class's constructor is run with $\rgn$ as its allocation
 % context. Every class definition in \FB is necessarily polymorphic with
-% respect to the allocation region of its objects, i.e., the allocation
+% respect to the allocation region of its objects, i.e., the
+% allocation
 % context of its constructor. We adopt a convention that requires the
 % allocation region parameter (denoted $\rho^a$) to be the first region
 % parameter of a class.  Besides the allocation region of its objects,
@@ -224,11 +227,11 @@ with constraints ($\phi$).
 % (Fig.~\ref{fig:fb-morewfrules}). Allocation context (usually $\rho^a$
 % or $\rho^a_m$) is the first and inevitable region parameter of every
 % method in \FB. 
-Note that if a method is not intended to be polymorphic with respect
-to its allocation context (for example, if its allocation context
-needs to be same as the allocation region of its \emph{this}
-argument), then the required monomorphism can be captured as an
-equality constraint in $\phi$.  
+If a method is not intended to be polymorphic with respect to its
+allocation context (for example, if its allocation context needs to be
+same as the allocation region of its \emph{this} argument), then the
+required monomorphism can be captured as an equality constraint in
+$\phi$.  
 
 % Like methods, functions can also be region-polymorphic. 
 % A lambda expression defines a region-polymorphic
@@ -288,9 +291,8 @@ supplement}. The rules refer to a context ($\A$), which is a tuple of:
 \item A set ($\rhoenv \in 2^\rgn$) of static identifiers of regions
 that are estimated to be live,
 \item A finite map ($\aenv \in \tyvar \mapsto \fgjN$) of type
-variables to their bounds\footnote{A bound of a type variable
-($\tyvar$) in FGJ~\cite{fgj} is the class ($\fgjN$) that type variable
-was declared to extend.}, and
+variables to their \emph{bounds}, i.e., classes they are declared to
+extend, and
 \item A constraint formula ($\phicx$) that captures the outlives
 constraints on regions in $\rhoenv$.
 \end{itemize}
@@ -315,11 +317,11 @@ definitions in \FB.
 
 \noindent The well-formedness judgment on region types
 ($\tywf{\A}{\tau}$) makes use of the well-formedness and subtyping
-judgments on core types \footnote{We use a double-piped turnstile
-($\Vdash$) for judgments in FGJ~\cite{fgj}, and a simple turnstile
-($\vdash$) for those in \FB.}. The class table ($\absof{CT}$) for such
-judgments is derived from \FB's class table ($CT$) by erasing all
-region annotations on types, and region arguments in expressions
+judgments on core types. We use a double-piped turnstile ($\Vdash$)
+for judgments in FGJ~\cite{fgj}, and a simple turnstile ($\vdash$) for
+those in \FB. The class table ($\absof{CT}$) for FGJ judgments is
+derived from \FB's class table ($CT$) by erasing all region
+annotations on types, and region arguments in expressions
 ($\absof{\cdot}$ denotes the region erasure operation). 
 % For judgments in FGJ, we use a
 % class table that maps class names to their region-erased definitions.
@@ -336,8 +338,7 @@ the safety property that prevents objects from containing unsafe
 references. It does so by insisting that regions $\ralloc\rbar$
 satisfy the constraints ($\phi$) imposed by the class on its region
 parameters. The later is enforced by checking the validity of $\phi$,
-with actual region arguments substituted\footnote{The notation
-$[a/b](e)$ stands for "$a$ is substituted for $b$ in $e$"} for formal
+with actual region arguments substituted for formal
 region parameters, under the conditions ($\A.\phicx$) guaranteed by
 the context. The semantics of this sequent is straightforward, and
 follows directly from the properties of outlives and equality
@@ -433,7 +434,7 @@ objects, as described below.
 
 The type rules distinguish between the \C{new} expressions that create
 objects of  the \RgnZ class, and \C{new} expressions that create
-objects of other classes. The rule for the later relies on an
+objects of other classes. The rule for the latter relies on an
 auxiliary definition called $\fields$ that returns the sequence of
 type bindings for fields (instance variables) of a given class type.
 Like in FGJ, the names and types of a constructor's arguments in \FB
@@ -450,10 +451,10 @@ the allocation context of the function. This step ensures that the
 value returned by the function stores no references to objects
 allocated elsewhere, including the top region ($\toprgn$), thus
 preventing cross-region references originating from transferable
-regions\footnote{The body of the function ($e$) might, however, create
+regions. The body ($e$) of the function might, however, create
 new (transferable) regions while execution, but that is fine as long
 as such regions, and objects allocated in them, don't find their way
-into the result of evaluating $e$}.
+into the result of evaluating $e$.
 
 The type rule for \C{letregion} expression requires that the static
 identifier introduced by the expression be unique under the current
