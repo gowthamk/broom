@@ -11,9 +11,8 @@ includes assignments, conditionals, loops, more primitive datatypes
 % for higher-order functions can also be provided. 
 Our implementation of region type inference and constraint solving
 closely follows the description given in
-Sec.~\ref{sec:type-inference}. The one difference is that our
-constraint solver uses an approximation algorithm to compute the
-minimal graph augmentation (\S~\ref{sec:csolve}).
+Sec.~\ref{sec:type-inference}.
+
 % To solve the
 % constraints that arise during type inference, we built a solver called
 % \csolve that implements constraint solving approach based on fixpoint
@@ -95,10 +94,13 @@ one actor.}. We eliminated such unsafe references by creating a clone
 of \C{inMsg.payload[i]} in \C{outMsg}, and our compiler was
 subsequently able to certify the safety of all references. 
 
-Our experience with Naiad benchmarks suggests that, although our
-approach cannot statically enforce memory safety, it is nonetheless
-useful, particularly because the static verification comes at no
-additional cost to the developer. If the developer is satisfied with
+Our experience with Naiad benchmarks shows the utility of our
+type inference/checking tool,
+%suggests that, although our
+%approach cannot statically enforce memory safety, it is nonetheless
+%useful, 
+particularly because it comes at no additional cost to the developer.
+If the developer is satisfied with
 the confidence gained by static verification, she may even choose to
 turn the runtime safety checks off. Since we did not implement code
 generation in \namec, we could not measure the runtime overhead of

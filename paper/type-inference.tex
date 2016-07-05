@@ -330,11 +330,11 @@ $\varphi_i$ are as above).
 
 \paragraph{Constraint Generation.}
 The constraint generation algorithm is a direct adaption of the type checker:
-each type checking rule is modified to produce a set of constraints that must hold
+each type checking judgment is modified to produce a set of constraints that must hold
 for the type checker to succeed.
 
 Fig.~\ref{fig:constraint-gen} illustrates this for selected language constructs.
-These rules use the same context as the expression typing judgment in
+These rules use the same context as the corresponding typing judgment in
 Fig.~\ref{fig:fb-staticsem} with symbols $\A$,$\ralloc$, and $\env$
 retaining their meaning.
 The algorithm proceeds top-down, analyzes an expression $e$ in a context
@@ -350,6 +350,18 @@ capturing constraints over live region variables. We use predicate
 variables ($\varphi$ and $\varphi_m$) to capture constraints over
 variables in $\rhoenv$ denoting the fact that such constraints are yet
 to be inferred.
+
+One notable aspect here is the following. Consider a method with predicate
+variable $\varphi_m$ in a class with predicate variable $\varphi_c$. 
+We use $\varphi_m$ as the constraint formula in the initial context used for
+the method (instead of $\varphi_m \conj \varphi_c$ as in the static semantics).
+It is possible to show that there is no loss of generality in doing so.
+Specifically, it can be shown for any well-typed program, replacing the constraint
+$\varphi_m$ of every method by the constraint $\varphi_m \conj \varphi_c$,
+where $\varphi_c$ is the constraint of the class containing the method,
+produces a well-typed program.
+%
+This simplification produces a restricted form of constraints that is easier to solve.
 
 \paragraph{Constraint Solution}
 Solving the set ($C$) of constraints entails finding an
@@ -598,14 +610,46 @@ class List $\langle \rho_0, \rho_1, \rho_2 \; | \; \varphi \rangle$
 \end{tabular}
 
 \item Our technique for region parametrization also uses a heuristic in the case of
-higher order programs. Consider a higher-order method that has a function $f$ as a
-parameter. We have a choice in terms of where the region-parameters introduced for
-$f$ are bound (i.e., quantified). We always bind these region-parameters within the type
-of $f$ (essentially, requiring $f$ to be region-polymorphic). This may also be a potential
-source of incompleteness in the type-inference.
+higher order programs. The following examples illustrates that principal types may
+not exist for higher order functions.
+\begin{codejava}
+unit apply ( T $\rightarrow$ unit f, T x, T y) {
+   f(x); f(y);
+}
+\end{codejava}
+This method may be typed assuming either that \C{f} is polymorphic over the region
+that its parameter is allocated in (permitting \C{x} and \C{y} to be allocated in any
+regions), or by assuming that \C{x} and \C{y} are allocated in the same region $\rho_1$
+that \C{f} expects its parameters to be allocated in. Neither type subsumes the other.
+Our algorithm heuristically chooses the first option, as it appears to be the more likely
+and useful candidate.
 
-The treatment of class fields with a function type also uses the same (incomplete)
-heuristic.
+%as either\\
+%$
+%\inang{ \rho_0 \rho_1 \rho_2}
+%    (\inang{\rho_0 \rho_3} (T \inang{\rho_3} \xrightarrow{} unit, 
+%      T \inang{\rho_1}, 
+%      T \inang{\rho_2})
+%   \xrightarrow{} 
+%      unit
+%$\\
+%or as\\
+%$
+%\inang{ \rho_0 \rho_1}
+%    (\inang{\rho_0} (T \inang{\rho_1} \xrightarrow{} unit, 
+%      T \inang{\rho_1}, 
+%      T \inang{\rho_1})
+%   \xrightarrow{} 
+%      unit
+%$\\
+
+%Consider a higher-order method that has a function $f$ as a
+%parameter. We have a choice in terms of where the region-parameters introduced for
+%$f$ are bound (i.e., quantified). We always bind these region-parameters within the type
+%of $f$ (essentially, requiring $f$ to be region-polymorphic). This may also be a potential
+%source of incompleteness in the type-inference.
+
+% The treatment of class fields with a function type also uses the same (incomplete) heuristic.
 
 \end{enumerate}
 

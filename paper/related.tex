@@ -43,7 +43,7 @@ checks.
 % program. The later can be done efficiently at runtime. This lets us
 % guarantee safety in presence of
 In particular, our approach circumvents the need for restrictive
-static mechanisms (e.g., linear types and unique pointers) and
+static mechanisms (e.g., linear types and unique pointers) or
 expensive runtime mechanisms (e.g., garbage collection and reference
 counting) in order to guarantee safety. Lastly, our region type system
 comes equipped with full type inference that eliminates the need to
@@ -111,10 +111,11 @@ underlying ideas, and apply them in various problem settings. Similar
 contrast can be made of region type inference in both the languages.
 Cyclone’s type inference was only ever described as being similar to
 Tofte and Talpin’s, and it’s effectiveness in presence of tracked
-pointers is not clear. In contrast, the complete Ocaml (pseudo) code
-of Broom's inference algorithm, was given in the supplement and the
-ideas underlying type inference have been described elaborately in the
-paper
+pointers is not clear.
+%In contrast, the complete Ocaml (pseudo) code
+%of Broom's inference algorithm, was given in the supplement and the
+%ideas underlying type inference have been described elaborately in the
+%paper
 
 An ownership type system for safe region-based memory management in
 real-time Java has been proposed by~\cite{MIT03}.  
