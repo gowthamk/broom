@@ -556,7 +556,7 @@ $\forall e, \tau, \rhoenv, \rhomap, \rgn$, such that $\rgn \in
 \cdot}{e}{\tau}$, then either $e$ is a value, or $e$ raises an
 exception ($\redstoo{(e,\rhomap)}{\invalidexn}$), or there exists an
 $e'$ and a $\rhomap'$ such that $\redstoo{(e,\rhomap)}{(e',\rhomap')}$
-and $\hastyp{\emptyASigp,\rgn, \cdot}{e}{\tau}$.
+and $\hastyp{\emptyASigp,\rgn, \cdot}{e'}{\tau}$.
 \end{theorem}
 
 Furthermore, we prove the following theorem about \FB, which, in
