@@ -74,6 +74,20 @@ and stack regions. Consequently, our constraint solving algorithm is
 more sophisticated, and is capable of inferring unknown outlives
 constraints over region arguments of polymorphic recursive functions.
 
+Walker and Watkins~\cite{WW01} extend lambda calculus with first-class regions
+with dynamic lifetimes, and imposes linear typing to control accesses to regions.
+Our open/close lexical block for transferable regions traces its orgins to the \C{let!}
+expression in~\cite{WW01} and~\cite{wadler90}, which safely relaxes
+linear typing restrictions, allowing variables to be temporarily
+aliased.
+We don't use linear typing (for references to regions), thus admit unrestricted aliasing,
+but use lightweight runtime checks for safety.
+% Non-linear typing keeps our type system simple, and makes it
+% possible to infer types, thus eliminating the annotation burden.
+Moreover, ~\cite{WW01}'s linear type system is insufficient to enforce
+the invariants needed to ensure safety under region transfers, such as
+the absence of references that escape a transferable region.
+
 Cyclone~\cite{cyclone02} equips C with programmer-managed stack
 regions, and a typing discipline that statically guarantees the safety
 of all pointer dereferences. Later
@@ -155,19 +169,9 @@ for first-order programs that proposes to overcome some of the
 drawbacks of~\cite{tofte97} by generalizing~\cite{tofte97}'s approach
 to regions with dynamic lifetimes. However, dynamic regions are still
 not first-class values of the language, and reference counting is
-nonetheless needed to ensure memory safety.~\cite{WW01} extends lambda
-calculus with first-class regions with dynamic lifetimes, and imposes
-linear typing to control accesses to regions. Our open/close lexical
-block for transferable regions traces its orgins to the \C{let!}
-expression in~\cite{WW01} and~\cite{wadler90}, which safely relaxes
-linear typing restrictions, allowing variables to be temporarily
-aliased. We don't have linear typing, thus admit unrestricted
-aliasing. 
-% Non-linear typing keeps our type system simple, and makes it
-% possible to infer types, thus eliminating the annotation burden.
-Moreover, ~\cite{WW01}'s linear type system is insufficient to enforce
-the invariants needed to ensure safety under region transfers, such as
-the absence of references that escape a transferable region.
+nonetheless needed to ensure memory safety.
+
+
 
 The idea of using region-based memory management to facilitate the
 safe transfer of rich data structures between computational nodes has
