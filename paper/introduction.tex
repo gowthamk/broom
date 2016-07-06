@@ -35,7 +35,10 @@ collector performing avoidable or unproductive work.  For the example
 in Fig.~\ref{fig:motivating-eg}, GC might repeatedly traverse the
 \C{map} data structure, although its objects cannot be collected until a
 suitable timing message arrives.
-
+There has been increasing interest in off-heap memory management for better performance
+in the context of several  systems and languages (e.g., Spark~\cite{SPARK:2015}, Scala, Rust).
+Several systems (e.g.,~\cite{TRILL:2014}) resort to using ``free object pools'' to partially alleviate this problem, in
+the absence of language support.
 
 \begin{figure}
 \centering
@@ -60,7 +63,7 @@ invalid after transfer.}
 \end{figure}
 
 \paragraph{Safety.}
-These systems are designed to allow the producer and consumer to
+Several of these systems are designed to allow the producer and consumer to
 execute in the same address space or in different address spaces
 (as determined by the compiler and runtime).
 We wish to ensure memory safety in the presence of such transferred data by ensuring
@@ -136,16 +139,20 @@ Unlike the prior work, we ensure memory safety in the presence of
 transferable regions through a \emph{combination of a static
 typing discipline and lightweight runtime checks in place of linear types}.
 
+\paragraph{Language.}
 The cornerstone of this approach is an \C{open} lexical block for transferable regions,
 that ``opens'' a transferable region and guarantees that the region
-won't be transferred/freed while it is open. By nesting an
-MLKit-style \C{letregion} lexical block, that delimits
+won't be transferred/freed while it is open. By nesting a
+Tofte-Talpin style \C{letregion} lexical block, that delimits
 the lifetime of a stack region, inside an \C{open} lexical block for a
 transferable region, we can guarantee that the transferable region
 will remain live as long as the stack region is live. We say that the
 former \emph{outlives} the later., and any references from the stack
-region to the transferable region are therefore safe.  Next, we note
-that by controlling the outlives relationships between various
+region to the transferable region are therefore safe.
+This is particular useful, since such stack regions serve as temporary
+working storage while working with the (opened) transferable regions.
+
+By controlling the outlives relationships between various
 regions, we only allow safe cross-region references, while prohibiting
 unsafe ones. In the above example, an outlives relationship
 \emph{from} the stack region \emph{to} the transferable region means
@@ -162,11 +169,13 @@ regions such objects are allocated in, and by maintaining outlives
 relationships between various regions, we can statically decide the
 safety of all references in the program.
 
+\paragraph{Type System.}
 Formally, our type system introduces \emph{region parameters} (for both
 classes and methods) and uses constrained parametric polymorphism
 over these parameters, where the constraints capture outlives constraints
 between the region parameters.
 
+\paragraph{Lightweight Runtime Checks.}
 Ensuring memory safety using this approach requires ensuring
 that the use of transferable regions satisfies certain temporal properties.
 Firstly, a transferable region should not be transferred/freed
@@ -188,6 +197,7 @@ coarse-grained objects manipulated infrequently, when compared to the
 fine-grained objects that are present inside these regions, for which
 safety is enforced statically. 
 
+\paragraph{Type Inference.}
 One of the novel contributions of this paper is a sound type inference algorithm
 that eliminates the need for users to write region type annotations.
 This, we believe, significantly reduces the impediment to adopt our
@@ -462,3 +472,4 @@ The paper makes the following contributions:
 %can be partitioned into sets of fate-sharing objects with common
 %lifetimes, which makes them good candidates for a region-based memory
 %management discipline.
+
