@@ -198,20 +198,12 @@ The type parameter \C{T} of a class \C{C} is instantiated as $\C{T}@\rho$ using 
 % to be \C{Object}, and \C{T} is instantiated with one region parameter.
 
 \emph{Function Types}.
-Since \FB{} is higher-order, fields of function type are allowed. The parameter instantiation step
-instantiates function types as follows: the type of every parameter as well as the return value is
-instantiated with fresh region identifiers, as described earlier, and finally these region identifiers
-are generalized as formal region parameters of the function type.
-For example, the function type $\C{List} \rightarrow \C{Object}$ is instantiated as
-$\inang{\rho_0, \rho_1, \rho_2} \C{List} \inang{\rho_1,\rho_2} \rightarrow \C{Object}\inang{\rho_0}$.
+Since \FB{} is higher-order, fields of function type are allowed.We explain how the parameter instantiation step
+instantiates function types below, after discussing parametrization for methods.
 
-%% Likewise, given the region-annotated definition of
-%% \C{Pair} class from \S\ref{sec:fb-syntax} a region type template for a
-%% method with FGJ type $\C{Pair}\inang{\C{A},\C{B}} \rightarrow \C{A}$
-%% is \footnote{In our exposition, we assume that classes $\C{A}$ and
-%% $\C{B}$ are trivial subclasses of $\ObjZ$ with no fields/methods. Like
-%% $\ObjZ$, they accept one region parameter - the allocation region of
-%% their objects.}\footnote{We abuse arrow notation to also represent
+
+
+%% \footnote{We abuse arrow notation to also represent
 %% types of methods, but unlike function types, there is no allocation
 %% region annotation atop the arrow in a method type.}
 %% $\inang{\rhoalloc_0,\rho_1,\rho_2,\rho_3 \,|\, \varphi_0}
@@ -220,14 +212,21 @@ $\inang{\rho_0, \rho_1, \rho_2} \C{List} \inang{\rho_1,\rho_2} \rightarrow \C{Ob
 %% variables, and $\varphi_0$ is a fresh predicate variable denoting
 %% unknown constraints over $\rhoalloc_0$ and $\rho_{1-3}$.
 
-\subsection{Region Parametrization for Methods}
+\subsection{Region Parametrization for Methods and Function Types}
 
 As the next step, we introduce region parameters for every method.
 We do this by instantiating the types of all parameters and the
 return value (of the method) using fresh region identifiers (as explained previously),
 and then generalizing these region identifiers as formal region parameters
-of the method. As for the classes, we also introduce a fresh predicate variable
-$\varphi$ for every method.
+of the method. In addition, a fresh region identifier is introduced to represent the
+allocation region.
+As for the classes, we also introduce a fresh predicate variable $\varphi$ for every method.
+Thus, the method
+
+\C{Object m (List x) \{...\} } \\
+is instantiated as
+
+\C{Object$\inang{\rho_3}$ m$\inang{\rho_0,\rho_1,\rho_2,\rho_3}$ (List$\inang{\rho_1,\rho_2}$ x) \{...\} }
 
 We then consider every method invocation in the program, and introduce
 fresh region variables representing the (yet unknown) actual region
@@ -237,6 +236,18 @@ We similarly perform instantiation for every constructor invocation
 of the form \C{new T($\ldots$)}, by instantiating the type \C{T} as
 before, turning it into \C{new T$\langle \rho_0, \cdots, \rho_n \rangle$($\ldots$)},
 where $\rho_0, \cdots, \rho_n$ are fresh region variables.
+
+Function types (of fields and parameters) are instantiated just like methods above, except that
+an additional fresh region identifier is introduced to represent the region where the closure is
+allocated.
+For example, the function type $\C{List} \rightarrow \C{Object}$ is instantiated as
+$\inang{\rho_0, \rho_1, \rho_2, \rho_3, \rho_4 \,|\, \varphi } \C{List} \inang{\rho_1,\rho_2} \xrightarrow{\rho_4} \C{Object}\inang{\rho_3}$.
+Note that the newly introduced region identifiers are generalized as formal region parameters of the function type.
+This is a (heuristic) choice made in the case of higher order functions.
+Consider a higher order function \emph{f} with a function typed parameter $g$.
+The fresh region identifiers introduced while instantiating the type of $g$ could be
+alternatively generalized as formal region parameters of $f$, but we choose to
+generalize them as formal region parameters of $g$.
 
 \subsection{The Constraint Satisfaction Problem (CSP)}
 \label{sec:fb-constraintsem}
