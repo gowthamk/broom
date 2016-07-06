@@ -372,8 +372,11 @@ Specifically, it can be shown for any well-typed program, replacing the constrai
 $\varphi_m$ of every method by the constraint $\varphi_m \conj \varphi_c$,
 where $\varphi_c$ is the constraint of the class containing the method,
 produces a well-typed program.
-%
-This simplification produces a restricted form of constraints that is easier to solve.
+
+We use the above simplification to avoid generating validity constraints of the form
+$\isvalid{\varphi_m \conj \varphi_c \conj \phi_{cx}}{\phi_{cs}}$ (i.e., constraints
+with more than one predicate variable on the left hand side, which introduce complications).
+%  ensures that the generated constraints produces a restricted form of constraints that is easier to solve.
 
 \paragraph{Constraint Solution}
 Solving the set ($C$) of constraints entails finding an
