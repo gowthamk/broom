@@ -30,39 +30,46 @@ seminal work, static type systems for safe region-based memory
 management have been extensively studied in the context of various
 languages and problem settings~\cite{cyclone02, cyclone04, yates99,
 MIT03, DPJ09, HMN01, WW01, rust, gpu14}. Our work differs from the
-existing proposals in the following ways. Firstly, our problem setting
-includes lexically scoped stack regions and dynamic transferable
-regions (both programmer-managed) in context of an object-oriented
-programming language equipped with higher-order functions. Second, we
-adopt a two-pronged approach to memory safety that relies on a
+existing proposals in one or more of the following respects.
+
+\begin{enumerate}
+\item 
+   Our design choice focuses on ensuring memory-safety while giving programmers
+   control over  region management and allocation of objects in regions.
+   In constrast, some systems automate all aspects of memory management.
+   This is a convenience-performance tradeoff.
+
+\item We support both lexically scoped (stack) regions and dynamic transferable
+regions (both programmer-managed).
+
+\item We adopt a two-pronged approach to memory safety that relies on a
 combination of a simple static type discipline and lightweight runtime
-checks. 
-% The type system reduces the problem of ensuring safety of all memory
-% accesses in a program into a problem of enforcing a state-transition
-% discipline on memory accesses over a small subset of objects in the
-% program. The later can be done efficiently at runtime. This lets us
-% guarantee safety in presence of
-In particular, our approach circumvents the need for restrictive
+checks. In particular, our approach circumvents the need for restrictive
 static mechanisms (e.g., linear types and unique pointers) or
 expensive runtime mechanisms (e.g., garbage collection and reference
-counting) in order to guarantee safety. Lastly, our region type system
-comes equipped with full type inference that eliminates the need to
-write region annotations on types to convince the type checker that
-the program is safe. 
+counting) in order to guarantee safety.
 
-~\cite{tofte97} elaborates SML programs to introduce stack regions and
-do away with GC in a transparent fashion. We too define an
-elaboration, but our focus is on introducing region annotations
-necessary to prove the safety of an object-oriented program that
-already uses regions.
+\item We present a full (interprocedural) type inference algorithm
+that eliminates the need to write region annotations on types.
+
+\item Our underlying language is an object-oriented programming language,
+equipped with higher-order functions and parametrized (generic) types.
+These language features necessitate some non-trivial choices in the design
+of the region-parametricity aspect of the language, which also have an
+impact on aspects such type inference.
+
+\end{enumerate}
+
+Tofte and Talpin's approach~\cite{tofte97} uses compiler-managed lexically
+scoped (stack) regions (as a replacement for GC).
 % Similar to their region inference algorithm, our region type inference
 % algorithm can deal with region-polymorphic recursion by computing
 % fixed points for recursive constraints. 
-Our type inference is analogous to their region inference. While their
-inference algorithm only ever generates equality constraints, which
+Our type inference is analogous to their region inference in some respects,
+while differing in others. While their inference algorithm only generates equality constraints, which
 can be solved via unification, our type inference algorithm also
 generates partial order outlives constraints, which are required to
-capture subtle relationships between lifetimes of transferable regions
+capture relationships between lifetimes of transferable regions
 and stack regions. Consequently, our constraint solving algorithm is
 more sophisticated, and is capable of inferring unknown outlives
 constraints over region arguments of polymorphic recursive functions.
@@ -104,14 +111,15 @@ of) such constructs, and the safety guarantees of the language are not
 formalized. In contrast, the (static and dynamic) semantics of Broom
 has been rigorously defined with respect to a well-understood formal
 system (FGJ). The safety guarantees have been formalized and proved.
-The core of Broom is very simple; the rules that make up static and
-dynamic semantics occupy less than a page each. We believe that the
-rigor and simplicity of Broom makes it easy to understand the the
-underlying ideas, and apply them in various problem settings. Similar
-contrast can be made of region type inference in both the languages.
+%The core of Broom is very simple; the rules that make up static and
+%dynamic semantics occupy less than a page each. We believe that the
+%rigor and simplicity of Broom makes it easy to understand the the
+%underlying ideas, and apply them in various problem settings.
+Similar contrast can be made of region type inference in both the languages.
 Cyclone’s type inference was only ever described as being similar to
 Tofte and Talpin’s, and it’s effectiveness in presence of tracked
 pointers is not clear.
+In contrast, a detailed type inference algorithm is one of our core contributions.
 %In contrast, the complete Ocaml (pseudo) code
 %of Broom's inference algorithm, was given in the supplement and the
 %ideas underlying type inference have been described elaborately in the
