@@ -36,8 +36,8 @@ existing proposals in one or more of the following respects.
 \item 
    Our design choice focuses on ensuring memory-safety while giving programmers
    control over  region management and allocation of objects in regions.
-   In constrast, some systems automate all aspects of memory management.
-   This is a convenience-performance tradeoff.
+   In contrast, some systems automate all aspects of memory management.
+   This is a convenience-performance trade-off.
 
 \item We support both lexically scoped (stack) regions and dynamic transferable
 regions (both programmer-managed).
@@ -53,7 +53,7 @@ counting) in order to guarantee safety.
 that eliminates the need to write region annotations on types.
 
 \item Our underlying language is an object-oriented programming language,
-equipped with higher-order functions and parametrized (generic) types.
+equipped with higher-order functions and parameterized (generic) types.
 These language features necessitate some non-trivial choices in the design
 of the region-parametricity aspect of the language, which also have an
 impact on aspects such type inference.
@@ -76,7 +76,7 @@ constraints over region arguments of polymorphic recursive functions.
 
 Walker and Watkins~\cite{WW01} extend lambda calculus with first-class regions
 with dynamic lifetimes, and imposes linear typing to control accesses to regions.
-Our open/close lexical block for transferable regions traces its orgins to the \C{let!}
+Our open/close lexical block for transferable regions traces its or gins to the \C{let!}
 expression in~\cite{WW01} and~\cite{wadler90}, which safely relaxes
 linear typing restrictions, allowing variables to be temporarily
 aliased.

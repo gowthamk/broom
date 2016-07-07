@@ -2,7 +2,7 @@
 \label{sec:overview}
 
 Stripped of its region-specific constructs, the core language of \name
-is a familar subset of \csharp that includes features such as
+is a familiar subset of \csharp that includes features such as
 class-based inheritance, dynamic dispatch, parametric polymorphism,
 and lambdas.  We therefore elide a discussion of the core language,
 focusing instead on the concepts specific to region-based memory
@@ -11,7 +11,7 @@ management in \name.
 \subsection{Stack Regions and Outlives Relation}
 
 Simplest of the region-specific constructs in \name is a \C{letregion}
-lexical block that creates a new memory region adressable via its
+lexical block that creates a new memory region addressable via its
 static identifier. The semantics of the \C{letregion} block is similar
 to Tofte and Talpin~\cite{ttpopl94}'s \C{letregion} expression; the
 newly introduced region is live only inside the block, where its
@@ -100,7 +100,7 @@ for (int i=0; i<=10; i++) {
 %\end{codejava}
 %\end{minipage}
 The identifiers \C{R0} and \C{R1} are bound to new stack regions each
-time the loop is evaulated. Nonetheless, the propositions (a). $\C{R0}
+time the loop is evaluated. Nonetheless, the propositions (a). $\C{R0}
 \outlives \C{R1}$, and (b). $\C{a1}:\C{A@R1}$ (read as \emph{\C{a1}
 refers to an object of type \C{A} contained in region \C{R1}}) are
 true at line 5, as they are true under all possible bindings of \C{R0}
@@ -349,7 +349,7 @@ The protocol for transferable regions is presented as a finite state machine in 
 \end{figure}
 
 A transferable region starts its lifetime in a \emph{closed} state,
-when it is created through \C{new Region} expresion. \name provides
+when it is created through \C{new Region} expression. \name provides
 \C{open} lexical construct to \emph{open} a transferable region as an
 allocation context, and to access its root object:
 \begin{codejava}
@@ -434,7 +434,7 @@ Typestate verification in the presence of aliases is hard.
 The checking can be done statically by preventing the creation of aliases using, \eg, linear types
 or unique types. However, this would be quite restrictive, in terms of expressiveness.
 
-\name chooses a reasonable tradeoff. Regions are coarse-grained objects, manipulated relatively infrequently,
+\name chooses a reasonable trade-off. Regions are coarse-grained objects, manipulated relatively infrequently,
 in comparison to manipulations of the fine-grained objects that reside inside regions. Hence, the programmer burden
 as well as the runtime overhead of checking the region's state transition discipline is acceptable.
 
@@ -469,5 +469,5 @@ Fortunately, \name's region type system (\S~\ref{sec:type-system}) is
 capable of capturing such nuances in the type of \C{selector}
 and the type checker will ensure correctness.
 Furthermore, the type can be automatically inferred by \name's region type
-inference (\S~\ref{sec:type-inference}), which can peform the above
+inference (\S~\ref{sec:type-inference}), which can perform the above
 non-trivial reasoning on behalf of the programmer.
