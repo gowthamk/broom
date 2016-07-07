@@ -66,14 +66,14 @@ The algorithm consists of the following steps:
 \end{enumerate}
 
 \begin{figure}
-\begin{numcodeml}
+\begin{codeml}
 Infer ($p$) =
   let $q$ = IntroduceRegionParameters($p$) in
   let $(r,C)$ = GenerateConstraints($q$) in
   match (SolveConstraints($C$) with
   | None $\longrightarrow$ None
   | Some ($s$) $\longrightarrow$ Some (ApplySolution $(s,r)$)
-\end{numcodeml}
+\end{codeml}
 
 \caption{The type inference algorithm}
 \label{fig:type-inference-algo}
