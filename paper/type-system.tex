@@ -4,16 +4,15 @@
 The purpose of \name's region type system is to enforce the key
 invariant required for memory safety, namely that an object $o_1$ in a
 region $R_1$ contains a reference to an object $o_2$ in $R_2$, only if
-$R_2$ is guaranteed to outlive $R_1$. 
-We now formally develop this intuition via \fbname (\FB), our
-explicitly typed core language (with region types) that incorporates
-the features introduced in the previous section. \fbname builds on the
-Featherweight Generic Java (FGJ)~\cite{fgj} formalism, and reuses
-notations and various definitions from~\cite{fgj}, such as the
-definition of type well-formedness for the core (region-free)
-language. 
-(The language used in Section~\ref{sec:overview} is essentially
-a version of FGJ without region types and with some syntactic sugar.)
+$R_2$ is guaranteed to outlive $R_1$.  We now formally develop this
+intuition via \fbname (\FB), our explicitly typed core language (with
+region types) that incorporates the features introduced in the
+previous section. \fbname builds on the Featherweight Generic Java
+(FGJ)~\cite{fgj} formalism, and reuses notations and various
+definitions from~\cite{fgj}, such as the definition of type
+well-formedness for the core (region-free) language.  (The language
+used in Section~\ref{sec:overview} is essentially a version of FGJ
+without region types and with some syntactic sugar.)
 
 % In this section, we formally develop \fbname, a language that
 % incorporates the features introduced in the previous section, as well
@@ -98,13 +97,22 @@ holds references to objects allocated in region $\rgn_0$ and $\rgn_1$.
 In contrast, if we choose to allocate the \C{snd} object also in
 $\rgn_1$, then \C{p} would be contained in $\rgn_1$, and its region
 type would be \C{Pair<\ObjZ,\ObjZ><$\rgn_1$,$\rgn_1$,$\rgn_1$>}, which
-we abbreviate as \C{Pair<\ObjZ,\ObjZ>@$\rgn_1$}. {In general, we treat
+we abbreviate as \C{Pair<\ObjZ,\ObjZ>@$\rgn_1$}. In general, we treat
 $B\inang{\tbar}@\rgn$ as being equivalent to
-$B\inang{\tbar}\inang{\rbar}$}. Region annotation on type $a$, where
+$B\inang{\tbar}\inang{\rbar}$. Region annotation on type $a$, where
 $a$ is a type variable, assumes the form $a@\rgn$. If $a$ is
 instantiated with \C{Pair<\ObjZ,\ObjZ>}, the result is the type of a
-\C{Pair} object contained in  $\rgn$. The type $\unitZ$ is unboxed in
-\FB, hence it has no region annotations.
+\C{Pair} object contained in  $\rgn$. Separate parameterization over
+types and regions is needed in \FB to support region-polymorphic
+higher-order functions (explained below) as class fields. Class fields
+are not allowed to be type polymorphic, in keeping with C\#, which
+constitutes the core of \name. For class fields that are functions,
+regions are parameterized at the (class) field level whereas types are
+parameterized at the class level.  This choice also simplifies type
+inference in the presence of higher-order functions. The type $\unitZ$
+is unboxed in \FB, hence it has no region annotations.
+
+
 % The region type of $\ObjZ$ class in \FB has no fields, hence its
 % region type is of form $\ObjZ@\rgn$. 
 %Class definitions in \FB extend FGJ's with region parameters

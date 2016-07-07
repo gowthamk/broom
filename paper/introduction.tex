@@ -36,7 +36,8 @@ in Fig.~\ref{fig:motivating-eg}, GC might repeatedly traverse the
 \C{map} data structure, although its objects cannot be collected until a
 suitable timing message arrives.
 There has been increasing interest in off-heap memory management for better performance
-in the context of several  systems and languages (e.g., Spark~\cite{SPARK:2015}, Scala, Rust).
+in the context of several  systems and languages (e.g.,
+Spark~\cite{SPARK:2015}, Scala~\cite{ScalaOffHeap}, Rust).
 Several systems (e.g.,~\cite{TRILL:2014}) resort to using ``free object pools'' to partially alleviate this problem, in
 the absence of language support.
 
