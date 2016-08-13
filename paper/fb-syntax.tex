@@ -14,28 +14,28 @@ cn & \in & \M{Class \; names} & \coloneqq & \ObjZ \ALT \RgnZ \ALT A \ALT B\\
 T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \ALT \unitZ
      \ALT \bar{T} \rightarrow T \\
 \fbN  & \in & \M{Region-annotated \; class \; types} & \coloneqq & 
-     cn\inang{\tbar}\inang{\ralloc \rbar} \\
+     cn\inang{\tbar}\inang{\rbar} \\
 \tau &\in& \M{types} & \coloneqq & T@\rgn  
       \ALT \fbN \ALT \unitZ 
-      \ALT \inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau}
+      \ALT \inang{\rhobar \,|\, \phi}\bar{\tau}
       \xrightarrow{\rgn} \tau \\
 C  & \in & \M{Class \; definitions} & \coloneqq & 
      \C{class} \; cn\inang{\bar{\tyvar} \extends \bar{\fgjN}} 
-                    \inang{\rhoalloc \rhobar \,|\, \phi}\extends \fbN 
+                    \inang{\rhobar \,|\, \phi}\extends \fbN 
                     \{\bar{\tau} \; \bar{f};\; \bar{d}\}\;\\
 %k  & \in & \M{Constructors} & \coloneqq & 
 %     cn(\bar{\tau} \; \bar{x})\{\C{super}(\bar{x}); \;
 %                                \C{this}.\bar{f}\,=\,\bar{x};\}\\
 d  & \in & \M{Methods} & \coloneqq & 
-     \tau \; m\inang{\rhoalloc \rhobar \,|\, \phi} (\taubar \; \xbar)
+     \tau \; m\inang{\rhobar \,|\, \phi} (\taubar \; \xbar)
      \{\C{return}\;e;\}\\
 \phi,\phicx &\in& \M{Region\;constraints} & \coloneqq & true 
       \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi\\
 e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f 
-     \ALT e.m\inang{\ralloc \rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar)
-     \ALT \lambdaexp{\ralloc}{\rhoalloc\rhobar \,|\, \phi}
+     \ALT e.m\inang{\rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar)
+     \ALT \lambdaexp{\rgn}{\rhobar \,|\, \phi}
                     {\xbar:\taubar} {e}
-           \ALT e\inang{\ralloc\rbar}(\bar{e})\\
+           \ALT e\inang{\rbar}(\bar{e})\\
    & & & & \ALT \letexp{x}{e}{e} \ALT \letregion{\rho}{e} 
            \ALT \open{x}{\rgn}{y}{e} \\
 \end{array}

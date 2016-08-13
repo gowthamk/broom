@@ -53,16 +53,16 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \rgn \in \A.\rhoenv \spc
-    \{\rhoalloc,\rhobar\} \notin \A.\rhoenv \\
-    \A' = (\A.\rhoset, \A.\rhoenv \cup \{\rhoalloc,\rhobar\}, 
-           \A.\aenv, \A.\phicx \conj \phi) \\
-    \tywf{\A'.\rhoenv}{\phi}\spc 
+    \rgn \in \rhoenv \spc
+    \rhobar \notin \A.\rhoenv \\
+    \rhoenv' = \rhoenv \cup \{\rhobar\} \spc
+    \A' = (\rhoenv', \aenv, \phicx \conj \phi) \\
+    \tywf{\rhoenv'}{\phi}\spc 
     \tywf{\A'}{\bar{\tau^1}} \spc
     \tywf{\A'}{\tau^2}
   }
   {
-    \tywf{\A}{\inang{\rhoalloc\rhobar \,|\, \phi}
+    \tywf{(\rhoenv,\aenv,\phicx)}{\inang{\rhobar \,|\, \phi}
               \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
   }
 \end{array}
@@ -111,14 +111,14 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    CT(B) = \headerOf{B}\{...\}\spc
-    \ralloc,\rbar \in \A.\rhoenv \\
-    \fgjtywf{\A.\aenv}{B\inang{\tbar}}\spc
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}] \spc
-    \isvalid{\A.\phicx}{\substFn(\phi)}
+    CT(B) = \headerOf{B}\{...\}\\
+    \rbar \in \rhoenv \spc
+    \fgjtywf{\aenv}{B\inang{\tbar}}\spc
+%   \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}] \spc
+    \isvalid{\phicx}{[\rbar/\rhobar, \tbar/\bar{\tyvar}](\phi)}
   }
   {
-    \tywf{\A}{B\inang{\ralloc\rbar}\inang{\tbar}}
+    \tywf{(\rhoenv,\aenv,\phicx)}{B\inang{\rbar}\inang{\tbar}}
   }
 \end{array}
 \end{smathpar}
@@ -131,11 +131,11 @@
 \RULE
   {
     \fgjtywf{\A.\aenv}{T}\spc
-    \ralloc \in \A.\rhoenv\\
+    \rgn \in \A.\rhoenv\\
     \fgjsubtyp{\A.\aenv}{T}{\ObjZ}\spc
   }
   {
-    \tywf{\A}{T@\ralloc}
+    \tywf{\A}{T@\rgn}
   }
 \end{array}
 \end{smathpar}

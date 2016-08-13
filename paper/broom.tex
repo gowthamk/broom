@@ -21,7 +21,7 @@
 
 
 %\documentclass[10pt,pldi]{sigplanconf}
-\documentclass[pldi-cameraready]{sigplanconf-pldi16}
+\documentclass[preprint,numbers,10pt]{sigplanconf}
 
 % The following \documentclass options may be useful:
 
@@ -150,7 +150,7 @@
 \newcommand{\extends}{\triangleleft}
 \newcommand{\rextends}{\blacktriangleleft}
 \renewcommand{\bar}[1]{\overline{#1}}
-\newcommand{\angR}{\inang{\rhoalloc,\rhobar \,|\, \phi}}
+\newcommand{\angR}{\inang{\rhobar \,|\, \phi}}
 \newcommand{\angT}{\inang{\tbar}}
 \newcommand{\tyvar}{a}
 \newcommand{\tyvarb}{b}
@@ -167,7 +167,7 @@
 \newcommand{\constraintSet}{C}
 \newcommand{\regionDeltaMap}{{\Delta_1}}
 \newcommand{\predDeltaMap}{{\Delta_2}}
-\newcommand{\mang}{\inang{\rhoalloc_m,\bar{\rho_m} \,|\, \phi_m}}
+\newcommand{\mang}{\inang{\bar{\rho_m} \,|\, \phi_m}}
 \newcommand{\rhoset}{\Sigma}
 \newcommand{\rhomap}{\Sigma}
 \newcommand{\rhoenv}{\Delta}
@@ -176,9 +176,9 @@
 \newcommand{\phictxt}{\phi_{cx}}
 \newcommand{\phicstr}{\phi_{cs}}
 \newcommand{\phisol}{\phi_{sol}}
-\newcommand{\subtypcx}{\rhoset, \rhoenv,\aenv,\phicx}
+\newcommand{\subtypcx}{\rhoenv,\aenv,\phicx}
 \newcommand{\A}{{\mathcal{A}}}
-\newcommand{\exptycx}[2]{\A,#1,#2}
+\newcommand{\exptycx}[1]{\A,#1}
 \newcommand{\void}{\C{void}}
 \newcommand{\functy}[3]{\FuncZ\inang{#1}\inang{#2,#3}}
 \newcommand{\stmtsemcx}{\A,\env}
@@ -434,8 +434,9 @@ morekeywords={foreach, do, done, not, : , /\\}
 \bibliographystyle{abbrvnat}
 \bibliography{broom}
 
+\onecolumn
 \appendix
-\input{fb-proofs}
+\input{appendix}
 
 
 \end{document}

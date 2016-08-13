@@ -3,8 +3,8 @@
 \begin{smathpar}
 \begin{array}{l}
 \renewcommand*{\arraystretch}{1.2}
-\hastyp{\exptycx{\ralloc}{\env}}{\unitval}{\unitZ}\\
-\hastyp{\exptycx{\ralloc}{\env}}{x}{\env(\tau)}
+\hastyp{\exptycx{\env}}{\unitval}{\unitZ}\\
+\hastyp{\exptycx{\env}}{x}{\env(\tau)}
 \end{array}
 \end{smathpar}
 \end{minipage}
@@ -15,11 +15,11 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{e}{\tau'}\\
+    \hastyp{\exptycx{\env}}{e}{\tau'}\\
     \bar{f}:\taubar \,=\, \fields(\bound_{\A.\aenv}(\tau'))
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{e.f_i}{\tau_i}
+    \hastyp{\exptycx{\env}}{e.f_i}{\tau_i}
   }
 \end{array}
 \end{smathpar}
@@ -31,12 +31,12 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\taubar} \\
+    \hastyp{\exptycx{\env}}{\bar{e}}{\taubar} \\
     \tywf{\A}{\fbN} \spc
     \fields(\fbN) = \bar{f} : \taubar \\
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\; \fbN(\bar{e})}{\fbN}
+    \hastyp{\exptycx{\env}}{\C{new}\; \fbN(\bar{e})}{\fbN}
   }
 \end{array}
 \end{smathpar}
@@ -48,11 +48,11 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\tau_1}\\
-    \hastyp{\exptycx{\ralloc}{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}\\
+    \hastyp{\exptycx{\env}}{e_1}{\tau_1}\\
+    \hastyp{\exptycx{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}\\
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{\letexp{x}{e_1}{e_2}}{\tau_2}
+    \hastyp{\exptycx{\env}}{\letexp{x}{e_1}{e_2}}{\tau_2}
   }
 \end{array}
 \end{smathpar}
@@ -68,12 +68,13 @@
   {
     \fgjtywf{\A.\aenv}{T} \spc
     \fgjN = \RgnZ\inang{T}\\
-    \hastyp{(\emptyset,\{\rhoalloc\},\A.\aenv,true),{\rhoalloc},{\cdot}}{e}
-      {T@\rhoalloc}
+    \rgn \in \A.\rhoenv \spc
+    \hastyp{(\emptyset,\{\rho\},\A.\aenv,true),{\cdot}}{e}
+      {T@\rho}
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\;
-    \fgjN\inang{\toprgn}(\lambdaexp{\ralloc}{\rhoalloc}{}{e})} {\fgjN\inang{\toprgn}}
+    \hastyp{\exptycx{\env}}{\C{new}\;
+    \fgjN\inang{\toprgn}(\lambdaexp{\rgn}{\rho}{}{e})} {\fgjN\inang{\toprgn}}
   }
 \end{array}
 \end{smathpar}
@@ -85,15 +86,20 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \rgn \in \A.\rhoset\spc
-    \A' = (\{\}, \{\rgn\}, \A.\aenv, true) \\
-    \rgn \notin \A.\rhoenv \cup \{\toprgn\} \spc
+%   To preserve type safety, we need to compensate for 
+%   commenting out the below line. One way to do this is
+%   by requiring frv(e) \subseteq dom(\Sigma), where frv(e)
+%   is defined as region identifiers tagging Region objects
+%   in e.
+%   \rgn \in \A.\rhoset\spc
+    \A' = (\{\rgn\}, \A.\aenv, true) \spc
+    \rgn \notin \A.\rhoenv \cup \{\toprgn\} \\
     \tywf{\A'}{T@\rgn} \spc
 %   \fgjN = \RgnZ\inang{T}\spc
-    \hastyp{\A', {\rgn},{\env}}{e}{T@\rgn}
+    \hastyp{\A', {\env}}{e}{T@\rgn}
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\;
+    \hastyp{\exptycx{\env}}{\C{new}\;
     \RgnZT{\rgn}(e)} {\RgnZT{\toprgn}}
   }
 \end{array}
@@ -108,22 +114,22 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{e_0}{\tau} \spc
+    \hastyp{\exptycx{\env}}{e_0}{\tau} \spc
     \rbar \in \A.\rhoenv \\
-    \mtype(m,\bound_{\A.\aenv}(\tau)) = \inang{\rhoalloc\rhobar \,|\, 
-        \phi}\bar{\tau^1}\rightarrow{\tau^2} \spc
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc] \\
-    \tywf{\A}{\inang{\rhoalloc\rhobar \,|\,
+    \mtype(m,\bound_{\A.\aenv}(\tau)) = \inang{\rhobar \,|\, 
+        \phi}\bar{\tau^1}\rightarrow{\tau^2} \\
+%   \substFn = [\rbar/\rhobar] \\
+    \tywf{\A}{\inang{\rhobar \,|\,
     \phi}\bar{\tau^1}\rightarrow{\tau^2}}\spc
 %   \tywf{\A}{\substFn(\bar{\tau^1})} \spc
 %   \tywf{\A}{\substFn(\tau^2)} \\
-    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\substFn(\bar{\tau^1})} \spc
+    \hastyp{\exptycx{\env}}{\bar{e}}{[\rbar/\rhobar](\bar{\tau^1})} \spc
 %   \subtyp{\A}{\bar{\tau'}}{\substFn(\bar{\tau^1})} \spc
-    \isvalid{\A.\phicx}{\substFn(\phi)}
+    \isvalid{\A.\phicx}{[\rbar/\rhobar](\phi)}
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{e_0.m\inang{\ralloc\rbar}(\bar{e})} 
-           {\substFn(\tau^2)}
+    \hastyp{\exptycx{\env}}{e_0.m\inang{\rbar}(\bar{e})} 
+           {[\rbar/\rhobar](\tau^2)}
   }
 \end{array}
 \end{smathpar}
@@ -138,13 +144,13 @@
     \\
     \A = (\subtypcx) \spc
     \rgn \notin \rhoenv \spc
-    \phi = \rhoenv \outlives \rgn \spc
-    \tywf{\A}{\tau}\\
-    \A' = (\rhoset, \rhoenv \cup \{\rgn\}, \aenv, \phicx \conj \phi)\spc
-    \hastyp{\A',\rgn,\env}{e}{\tau}
+    \phi = \rhoenv \outlives \rgn \\
+    \A' = (\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj \phi)\spc
+    \hastyp{\A',\env}{e}{\tau} \spc
+    \tywf{\A}{\tau}
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{\letregion{\rgn}{e}}{\tau}
+    \hastyp{\exptycx{\env}}{\letregion{\rgn}{e}}{\tau}
   }
 \end{array}
 \end{smathpar}
@@ -159,20 +165,20 @@
 \RULE
   {
     \rgn \in \A.\rhoenv \spc
-    \rhoalloc,\rhobar \notin \A.\rhoenv \\
+    \rhobar \notin \A.\rhoenv \\
 %   \rhoenv' = \rhoenv \cup \{\rhoalloc,\rhobar\}\spc
-    \A' = (\A.\rhoset, \A.\rhoenv \cup \{\rhoalloc,\rhobar\}, \A.\aenv, 
+    \A' = (\A.\rhoenv \cup \{\rhobar\}, \A.\aenv, 
           \A.\phicx \conj \phi)\spc
     \tywf{\A'.\rhoenv}{\phi}\\
     \tywf{\A'}{\bar{\tau^1}}\spc
     \tywf{\A'}{\tau^2}\spc
-    \hastyp{\A',\rhoalloc,\env[\xbar \mapsto \bar{\tau^1}]}{e}{\tau^2}
+    \hastyp{\A',\env[\xbar \mapsto \bar{\tau^1}]}{e}{\tau^2}
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}
-           {\lambdaexp{\rgn}{\rhoalloc\rhobar \,|\, \phi}
+    \hastyp{\exptycx{\env}}
+           {\lambdaexp{\rgn}{\rhobar \,|\, \phi}
                       {\xbar:\bar{\tau^1}}{e}}
-           {\inang{\rhoalloc\rhobar \,|\, \phi}
+           {\inang{\rhobar \,|\, \phi}
             \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
   }
 \end{array}
@@ -185,17 +191,17 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-   \hastyp{\exptycx{\ralloc}{\env}}{e_a}
+   \hastyp{\exptycx{\env}}{e_a}
             {\RgnZ\inang{T}\inang{\toprgn}}\\
     \A = (\subtypcx) \spc
     \rgn \notin \rhoenv \spc
-    \A' = (\rhoset, \rhoenv \cup \{\rgn\},\aenv,\phicx) \\
+    \A' = (\rhoenv \cup \{\rgn\},\aenv,\phicx) \\
     \env' =  \env[y\mapsto T@\rgn]\spc
-    \hastyp{\A',\rgn,\env'}{e_b}{\tau} \spc
+    \hastyp{\A',\env'}{e_b}{\tau} \spc
     \tywf{\A}{\tau}
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{\open{e_a}{\rgn}{y}{e_b}}
+    \hastyp{\exptycx{\env}}{\open{e_a}{\rgn}{y}{e_b}}
             {\tau}
   }
 \end{array}
@@ -211,19 +217,18 @@
 \RULE
   {
     \rbar \in \A.\rhoenv \spc
-    \hastyp{\exptycx{\ralloc}{\env}}{e}
-        {\inang{\rhoalloc\rhobar \,|\, \phi}
+    \hastyp{\exptycx{\env}}{e}
+        {\inang{\rhobar \,|\, \phi}
             \bar{\tau^1} \xrightarrow{\rgn} \tau^2}\\
-    \substFn = \subst{\rbar}{\rhobar}
-               \subst{\ralloc}{\rhoalloc} \spc
-    \isvalid{\A.\phicx}{\substFn(\phi)} \spc
-    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}
-        {\substFn(\bar{\tau^1})}\spc
+%   \substFn = \subst{\rbar}{\rhobar} \spc
+    \isvalid{\A.\phicx}{\subst{\rbar}{\rhobar}\phi} \spc
+    \hastyp{\exptycx{\env}}{\bar{e}}
+        {\subst{\rbar}{\rhobar}\bar{\tau^1}}\spc
 %   \subtyp{\A}{\taubar}{\bar{\tau^1}}
   }
   {
-    \hastyp{\A,\ralloc,\env}{e\inang{\ralloc\rbar}(\bar{e})}
-           {\substFn(\tau^2)}
+    \hastyp{\A,\ralloc,\env}{e\inang{\rbar}(\bar{e})}
+           {\subst{\rbar}{\rhobar}\tau^2}
   }
 \end{array}
 \end{smathpar}
@@ -237,12 +242,12 @@
 % \RULE
 %   {
 %     e_1 \in \{x,\,e.f\}\spc
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\tau_1}\\
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_2}{\tau_2}\spc
+%     \hastyp{\exptycx{\env}}{e_1}{\tau_1}\\
+%     \hastyp{\exptycx{\env}}{e_2}{\tau_2}\spc
 %     \subtyp{\A}{\tau_2}{\tau_1}
 %   }
 %   {
-%     \hastyp{\exptycx{\ralloc}{\env}}{e_1\,:=\,e_2}{\unitZ}
+%     \hastyp{\exptycx{\env}}{e_1\,:=\,e_2}{\unitZ}
 %   }
 % \end{array}
 % \end{smathpar}
@@ -255,10 +260,10 @@
 \RULE
   {
     \\
-    \hastyp{\exptycx{\ralloc}{\env}}{e}{\RgnZ\inang{T}\inang{\toprgn}}
+    \hastyp{\exptycx{\env}}{e}{\RgnZ\inang{T}\inang{\toprgn}}
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{e.\transfer\inang{\ralloc}()}{\unitZ}
+    \hastyp{\exptycx{\env}}{e.\transfer\inang()}{\unitZ}
   }
 \end{array}
 \end{smathpar}

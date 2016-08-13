@@ -3,9 +3,9 @@
 \begin{minipage}{2.25in}
 \begin{smathpar}
 \begin{array}{lcl}
-  \allocRgn(A\inang{\ralloc\rbar}\inang{\tbar}) & = & \ralloc\\
-  \allocRgn(\inang{\rhoalloc\rhobar \,|\, \phi}\bar{\tau^1}
-      \xrightarrow{\ralloc} \tau^2) & = & \ralloc\\
+  \allocRgn(A\inang{\rgn\rbar}\inang{\tbar}) & = & \rgn\\
+  \allocRgn(\inang{\rhobar \,|\, \phi}\bar{\tau^1}
+      \xrightarrow{\rgn} \tau^2) & = & \rgn\\
   \shape(A\inang{\rhoalloc\rhobar}\inang{\tbar}) & = & A\inang{\tbar}\\
 \end{array}
 \end{smathpar}
@@ -27,8 +27,8 @@
   \ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
 % ctype(\RgnZ\inang{\rgn}\inang{T}) & = & \inang{\rhoalloc}
 %   {\unitZ}\rightarrow{T@\rhoalloc}\\
-  \ctype(B\inang{\tbar}\inang{\ralloc\rbar}) & = & 
-    \fields(B\inang{\tbar}\inang{\ralloc\rbar})\\
+  \ctype(B\inang{\tbar}\inang{\rbar}) & = & 
+    \fields(B\inang{\tbar}\inang{\rbar})\\
 %% ---- The following are no longer needed since
 %% ---- \exists\rho.\RgnZ<\rho> = \RgnZ<\rgn_\top>
 % mtype(\C{transfer}, \exists\rho.\RgnZ\inang{\rho}\inang{T}) & = & 
@@ -64,11 +64,11 @@
 \RULE
   {
     CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,...\}\\
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}] \qquad 
+    \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}] \qquad 
     \fields(\substFn(\fbN)) = \bar{g}:\bar{\tau^g}
   }
   {
-    \fields(B\inang{\tbar}\inang{\ralloc\rbar}) \;=\;
+    \fields(B\inang{\tbar}\inang{\rbar}) \;=\;
       \bar{g}:\bar{\tau^g},\,\bar{f}:\substFn(\bar{\tau^f})
   }
 \end{array}
@@ -83,10 +83,10 @@
   {
     CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,\bar{d}\}\\
     m \notin \bar{d} \qquad 
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
+    \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}]
   }
   {
-    \mtype (m,B\inang{\tbar}\inang{\ralloc\rbar}) \;=\;
+    \mtype (m,B\inang{\tbar}\inang{\rbar}) \;=\;
     \mtype (m, \substFn(\fbN))
   }
 \end{array}
@@ -104,10 +104,10 @@
     \\
     CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,\bar{d}\}\\
     \tau^2 \; m\mang (\bar{\tau^1}\;\bar{x})\{...\} \in \bar{d} \qquad
-    \substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
+    \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}]
   }
   {
-    \mtype (m,B\inang{\tbar}\inang{\ralloc\rbar}) \;=\;
+    \mtype (m,B\inang{\tbar}\inang{\rbar}) \;=\;
     \substFn(\mang\bar{\tau^1} \rightarrow \tau^2)
   }
 \end{array}
@@ -121,19 +121,18 @@
 \RULE
   {
 
-    \mtype(m,\fbN) = \inang{\rhoalloc_1\bar{\rho_1},|\, \phi_1}\bar{\tau^{11}} 
+    \mtype(m,\fbN) = \inang{\bar{\rho_1}\,|\, \phi_1}\bar{\tau^{11}} 
                       \rightarrow \tau^{12} \\ 
     \texttt{implies} \spc \isvalid{\A.\phicx}
-                  {\phi_2 \Leftrightarrow \substFn(\phi_1)} 
-                  \spc \texttt{and} \spc
-    \bar{\tau^{21}} = \substFn(\bar{\tau^{11}}) \\ \texttt{and} \spc
-    \subtyp{\A}{\tau^{22}} {\substFn(\tau^{12})} \spc
-    \substFn = \subst{\bar{\rho_2}}{\bar{\rho_1}}
-               \subst{\rhoalloc_2}{\rhoalloc_1}
+                  {\phi_2 \Leftrightarrow \subst{\bar{\rho_2}}{\bar{\rho_1}}(\phi_1)} \\
+    \texttt{and} \spc \bar{\tau^{21}} = \subst{\bar{\rho_2}}{\bar{\rho_1}}(\bar{\tau^{11}}) \spc 
+    \texttt{and} \spc \subtyp{\A}{\tau^{22}} {\subst{\bar{\rho_2}}{\bar{\rho_1}}(\tau^{12})}
+%   \substFn = \subst{\bar{\rho_2}}{\bar{\rho_1}}
+%              \subst{\rhoalloc_2}{\rhoalloc_1}
     %\substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
   }
   {
-    \A \vdash \override(m,\fbN,\inang{\rhoalloc_2\bar{\rho_2},|\, \phi_1}
+    \A \vdash \override(m,\fbN,\inang{\bar{\rho_2}\,|\, \phi_1}
               \bar{\tau^{21}} \rightarrow \tau^{22})
   }
 \end{array}

@@ -1,4 +1,4 @@
-\begin{figure*}
+\begin{figure*}[!t]
 
 \textbf{Method Well-formedness}  \; \fbox
   {\(d \; \mathtt{ok \; in} \; B \)}\\
@@ -9,7 +9,7 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \rhoenv = \{\rhoalloc,\rhobar,\rhoalloc_m,\bar{\rho_m}\} \spc
+    \rhoenv = \{\rhobar,\bar{\rho_m}\} \spc
     \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
     \phicx = \phi \conj \phi_m \spc
     \A = (\subtypcx)\spc
@@ -18,16 +18,16 @@
 %   \tywf{\A}{\tau^2} \spc
     \headerOf{B}\{...\}\spc
     \env = \cdot[\xbar\mapsto\bar{\tau^1}][\thisZ\mapsto
-            B\inang{\bar{\tyvar}}\inang{\rhoalloc\rhobar}] \\
-    \A \vdash \override(m,\fbN,\inang{\rhoallocm\rhobarm \,|\, \phi_m}\bar{\tau^1} 
+            B\inang{\bar{\tyvar}}\inang{\rhobar}] \\
+    \A \vdash \override(m,\fbN,\inang{\rhobarm \,|\, \phi_m}\bar{\tau^1} 
              \rightarrow \tau^2) \spc
 %   \stmtsem{\rhoallocm}{s}{\stmtsemcx}{\stmtsemcxp}\spc
-    \hastyp{\exptycx{\rhoallocm}{\env}}{e}{\tau} \spc
+    \hastyp{\exptycx{\env}}{e}{\tau} \spc
     \subtyp{\A}{\tau}{\tau^2}
   }
   {
     \okin 
-        {\tau^2 \; m\inang{\rhoallocm\rhobarm \,|\, \phi_m}
+        {\tau^2 \; m\inang{\rhobarm \,|\, \phi_m}
               (\bar{\tau^1}\;\xbar)\{\C{return}\,e;\}}
         {B}
   }
@@ -46,23 +46,24 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \rhoenv = \{\rhoalloc,\rhobar\} \spc
+    \rhoenv = \{\rho,\rhobar\} \spc
     \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
     \phicx = \phi \spc
     \A = (\subtypcx)\spc
-    \tywf{\rhoenv}{\phi} \\
-    \fgjtywf{\aenv}{\bar{\fgjN}} \spc
+    \tywf{\rhoenv}{\phi} \spc
+    \fgjtywf{\aenv}{\bar{\fgjN}} \\
     \tywf{\A}{\fbN,\bar{\tau^f}} \spc
-    \shape(\fbN) \neq \RgnZ\inang{T}\spc 
+    \shape(\fbN) \neq \RgnZ\inang{T}\spc
 %   \tywf{\A}{\bar{\tau^f}} \spc
-    \isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rho^a} \\
+    \isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rho} \spc
     \ctype(\fbN) = \bar{\tau^{\fbN}} \spc
 %    k = B(\bar{\tau^{\fbN}}\;\xbar,\bar{\tau^f}\;\bar{y})
 %        \{\superZ(\xbar);\,\thisZ.\bar{f} = \bar{y};\} \spc
     \okin{\bar{d}}{B}
   }
   {
-    {\headerOf{B}\{\bar{\tau^f}\;\bar{f};\, \bar{d}\}} \;{\texttt{ok}}
+    \C{class}\; B\angAlpha\inang{\rho\rhobar \,|\, \phi} \extends \fbN
+    \{\bar{\tau^f}\;\bar{f};\, \bar{d}\} \;{\texttt{ok}}
   }
 \end{array}
 \end{smathpar}
