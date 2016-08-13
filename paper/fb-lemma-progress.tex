@@ -1,9 +1,9 @@
 \begin{theorem}
 \emph{(\textbf{Progress})}
 \label{thm:fb-progress}
-$\forall e, \tau, \rhoenv, \rhomap, \phicx, \rgn$, if $\rgn \in \rhoenv$ and
-$\hastyp{\emptyA,\rgn, \cdot}{e}{\tau}$, then one of the
-following holds:\\
+$\forall e, \tau, \rhoenv, \rhomap, \phicx, \rgn$, if $\frv(e)
+\subseteq dom(\rhomap)$ and $\tywf{\Delta}{\phicx}$ and
+$\hastyp{\emptyA,\cdot}{e}{\tau}$, then one of the following holds:\\
   \begin{smathpar}
   \begin{array}{rl}
     (i) & \exists (e',\rhomap').\;\redstoo{(e,\rhomap)}{(e',\rhomap')}\\
@@ -17,8 +17,10 @@ Intros $e$. Induction on $e$. For every subexpressions $e_0$, inductive
 hypothesis gives us the following:
 \begin{smathpar}
 \begin{array}{cr}
-  \hspace*{-2in}\forall (\tau_0, \rhoenv_0, \rhomap_0, \phicx_0, \rgn_0). \rgn_0 \in \rhoenv_0 \conj
-    \hastyp{(dom(\rhomap_0),\rhoenv_0,\cdot,\phi_0),\rgn_0, \cdot}{e_0}{\tau_0} \Rightarrow& IH1\\
+  \hspace*{-1in}\forall (\tau_0, \rhoenv_0, \rhomap_0, \phicx_0, \rgn_0). 
+    (\tywf{\rhoenv_0}{\phicx_0}) \conj
+    (\frv(e_0)\subseteq dom(\rhomap_0)) \conj
+    \hastyp{(\rhoenv_0,\cdot,\phi_0), \cdot}{e_0}{\tau_0} \Rightarrow& IH1\\
        (\exists(e_0',\rhomap_0'). \redstoo{(e_0,\rhomap_0)}
                 {(e_0',\rhomap_0')}) \disj (\valuee(e_0)) 
        \disj (\redstoo{(e_0,\rhomap_0)}{\invalidexn})& \\
@@ -31,14 +33,15 @@ Cases from the induction:
   \item Case ($e = e_0.f_i$): Intros. Hypothesis:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn \in \rhoenv & H2\\
-    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H5\\
+    \frv(e)\subseteq dom(\rhomap) & H2\\
+%   \rgn \in \rhoenv & H2\\
+    \hastyp{\emptyA, \cdot}{e}{\tau} & H5\\
   \end{array}
   \end{smathpar}
   Inverting $H5$:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyA,\rgn, \cdot}{e_0}{\tau'} & H7\\
+    \hastyp{\emptyA, \cdot}{e_0}{\tau'} & H7\\
     \bar{f} :\taubar = \fields(\bound_{\cdot}(\tau')) & H9\\
   \end{array}
   \end{smathpar}
@@ -55,7 +58,7 @@ Cases from the induction:
     $\tau'$, it follows that $e_0$ is $\C{new} \fbN(\vbar)$. From $H7$:
     \begin{smathpar}
     \begin{array}{cr}
-      \hastyp{\emptyA,\rgn, \cdot}{\C{new} \fbN(\vbar)}{\tau'} & H14\\
+      \hastyp{\emptyA, \cdot}{\C{new} \fbN(\vbar)}{\tau'} & H14\\
     \end{array}
     \end{smathpar}
     Inverting $H14$: 
@@ -79,8 +82,8 @@ Cases from the induction:
   \item Case ($e = \letregion{\rgn_0}{e_0}$): Intros. Hypothesis:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn \in \rhoenv & H2\\
-    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H5\\
+    \frv(e)\subseteq dom(\rhomap) & H2\\
+    \hastyp{\emptyA, \cdot}{e}{\tau} & H5\\
   \end{array}
   \end{smathpar}
   Inverting $H5$:
@@ -106,20 +109,27 @@ Cases from the induction:
   \item Case ($e = \open{e_a}{\rgn_0}{y}{e_b}$): Intros. Hypotheses:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn \in \rhoenv & H2\\
-    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H5\\
+    \tywf{\Delta}{\phicx} & H1\\
+    \frv(e)\subseteq dom(\rhomap) & H2\\
+    \hastyp{\emptyA, \cdot}{e}{\tau} & H5\\
 %   \forall (\tau, \rhoenv, \rhomap, \rgn). \rgn \in \rhoenv \conj
-%     \hastyp{\emptyA,\rgn, \cdot}{e_0}{\tau} \;
+%     \hastyp{\emptyA, \cdot}{e_0}{\tau} \;
 %     \Rightarrow \; \exists(e',\rhomap'). \redstoo{(e_0,\rhomap)}
 %                     {(e',\rhomap')} & IH1\\
+  \end{array}
+  \end{smathpar}
+  $H2$ and the definition of $\frv$ imply:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \frv(e_a)\subseteq dom(\rhomap) & H3\\
   \end{array}
   \end{smathpar}
   Inverting $H5$:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyA,\rgn, \cdot}{e_a}{\RgnZ\inang{T}\inang{\toprgn}} & H7\\
+    \hastyp{\emptyA, \cdot}{e_a}{\RgnZ\inang{T}\inang{\toprgn}} & H7\\
     \rgn_0 \notin \rhoenv & H9\\
-    \hastyp{\emptyADelcup{\rgn_0},\rgn_0,[y \mapsto T@\rgn_0]}{e_b}{\tau} & H11\\
+    \hastyp{\emptyADelcup{\rgn_0},[y \mapsto T@\rgn_0]}{e_b}{\tau} & H11\\
   \end{array}
   \end{smathpar}
   We have three cases. First case deals with $(e_a,\rhomap)$ taking a step to $(e_a',\rhomap_a')$
@@ -134,9 +144,8 @@ Cases from the induction:
   \begin{smathpar}
   \begin{array}{cr}
     \rgn_i \notin \rhoenv & H12\\
-    \rgn_i \in dom(\rhomap)& H13\\
-    \hastyp{\emptyADelcup{\rgn_i},\rgn_i, \cdot}{v}{T@\rgn_i} & H16\\
-%   \hastyp{\emptyA,\rgn,
+    \hastyp{(\{\rgn_i\},\cdot,true), \cdot}{v}{T@\rgn_i} & H14\\
+%   \hastyp{\emptyA,
 %   \cdot}{\lambdaexp{\rgn}{\rhoalloc}{}{v}}{\inang{\rhoalloc}\unitZ \xrightarrow{\rgn} T@\rhoalloc} & H14\\
   \end{array}
   \end{smathpar}
@@ -149,28 +158,54 @@ Cases from the induction:
 %   \hastyp{(dom(\rhomap), \rhoenv \cup \{\rhoalloc\},\cdot,true),\rhoalloc, \cdot}{v}{T@\rhoalloc} & H16\\
 % \end{array}
 % \end{smathpar}
-  From $H9$, $H13$, $H16$, and Lemma~\ref{thm:fb-renaming}:
+  Since $e_a$ is $\RgnZ\inang{T}\inang{\rgn_i}(v)$, $H3$ implies: 
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyADelcup{\rgn_0},\rgn_0, \cdot}{[\rgn_0/\rgn_i]v}{T@\rgn_0} & H18\\
+    \rgn_i \in dom(\rhomap) & H13\\
   \end{array}
   \end{smathpar}
-  From $H11$, $H18$ and Lemma~\ref{thm:fb-substitution}:
+  Renaming the region variable in $H14$:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyADelcup{\rgn_0},\rgn_0,\cdot}{[[\rgn_0/\rhoalloc]v/y]e_b}{\tau} & H19\\
+    \hastyp{(\{\rgn_0\},\cdot,true), \cdot}{[\rgn_0/\rgn_i]\,v}{T@\rgn_0} & H15\\
   \end{array}
   \end{smathpar}
-  From $H12$ and $H13$, we know that $\rgn_i \in dom(\rhomap)$. We now have three cases:
+  $H9$ and $H1$ tell us that it is safe to strengthen the context in
+  $H16$ to the following:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyADelcup{\rgn_0},\cdot}{[\rgn_0/\rgn_i]\,v}{T@\rgn_0} & H16\\
+  \end{array}
+  \end{smathpar}
+  Applying substitution lemma (Lemma~\ref{thm:fb-substitution}) on $H11$ and
+  $H16$ gives us:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyADelcup{\rgn_0},\cdot}{[[\rgn_0/\rgn_i]\,v/y]\,e_b}{\tau} & H19\\
+  \end{array}
+  \end{smathpar}
+% From $H9$, $H13$, $H16$, and Lemma~\ref{thm:fb-renaming}:
+% \begin{smathpar}
+% \begin{array}{cr}
+%   \hastyp{\emptyADelcup{\rgn_0},\rgn_0, \cdot}{[\rgn_0/\rgn_i]v}{T@\rgn_0} & H18\\
+% \end{array}
+% \end{smathpar}
+% From $H11$, $H18$ and Lemma~\ref{thm:fb-substitution}:
+% \begin{smathpar}
+% \begin{array}{cr}
+%   \hastyp{\emptyADelcup{\rgn_0},\rgn_0,\cdot}{[[\rgn_0/\rhoalloc]v/y]e_b}{\tau} & H19\\
+% \end{array}
+% \end{smathpar}
+  Since $\rgn_i \in dom(\rhomap)$ (from $H13$), we have three cases:
   \begin{itemize}
     \item SCase ($\rhomap(\rgn_i) \neq \XFERRED$ and $e_b$ is not a value): By inductive hypothesis,
-    $([[\rgn_0/\rhoalloc]v/y]e_b,\rhomap[\rho \mapsto \OPEN]$ can either (a). take a step to
+    $([[\rgn_0/\rgn_i]v/y]e_b,\rhomap[\rho \mapsto \OPEN]$ can either (a). take a step to
     $(e_b',\rhomap')$ under $\rhoenv \cup \{\rgn_0\}$, or (b). $e_b$ evaluates to $\invalidexn$.  In
     the first case, $(e,\rhomap)$ itself evaluates to: 
     \begin{smathpar}
     \begin{array}{cr}
-      (\open{(\C{new} \; \RgnZ\inang{T}\inang{\rho}
-      (\lambdaexp{\rgn}{\rhoalloc}{}{v}))}{y}{e_b'}, \rhomap'[\rho \mapsto \rhomap(\rho)])
+      (\open {(\C{new} \; \RgnZ\inang{T}\inang{\rgn_i}(v))}
+             {\rgn_0}{y}{e_b'}, \rhomap')
     \end{array}
     \end{smathpar}
     In the second case, the evaluation of $e$ also raises $\invalidexn$.
@@ -181,41 +216,58 @@ Cases from the induction:
     \item SCase($\rhomap(\rgn_i) = \XFERRED$): $e$ raises $\invalidexn$.
   \end{itemize}
  
-  \item (e = $e_a.m\inang{\ralloc,\rbar}(\ebar)$): Intros. Hypotheses:
+  \item (e = $e_a.m\inang{\rbar}(\ebar)$): Intros. Hypotheses:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn \in \rhoenv & H2\\
-    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H4\\
+%   \rgn \in \rhoenv & H2\\
+    \tywf{\rhoenv}{\phicx} & H1\\
+    \frv(e)\subseteq dom(\rhomap) & H2\\
+    \hastyp{\emptyA, \cdot}{e}{\tau} & H4\\
+  \end{array}
+  \end{smathpar}
+  From $H2$ and the fact that $e_a$ and $e_i$ (forall $i$) are
+  subexpressions of $e$, we have:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \frv(e_a)\subseteq dom(\rhomap) & H3\\
+    \frv(e_i)\subseteq dom(\rhomap) & H5\\
   \end{array}
   \end{smathpar}
   By inversion on $H4$:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyA,\rgn,\cdot}{e_a}{\tau_a} & H6\\
-    \ralloc = \rgn & H7\\
+    \hastyp{\emptyA,\cdot}{e_a}{\tau_a} & H6\\
+%   \ralloc = \rgn & H7\\
     \rbar \in \rhoenv & H8\\
-    \mtype(m,\bound_{\cdot}(\tau_a)) = \inang{\rhoalloc\rhobar\,|\,\phi}\bar{\tau^1} \rightarrow \tau^2 & H10\\
-    \hastyp{\emptyA,\rgn,\cdot}{\ebar}{[\rbar/\rhobar][\rgn/\rhoalloc]\bar{\tau^1}} & H11\\
-    \isvalid{\phicx}{[\rbar/\rhobar][\rgn/\rhoalloc]\phi}
+    \mtype(m,\bound_{\cdot}(\tau_a)) = \inang{\rhobar\,|\,\phi}\bar{\tau^1} \rightarrow \tau^2 & H10\\
+    \hastyp{\emptyA,\cdot}{\ebar}{[\rbar/\rhobar]\bar{\tau^1}} & H11\\
+    \isvalid{\phicx}{[\rbar/\rhobar]\phi}
   \end{array}
   \end{smathpar}
   Three cases: 
   \begin{itemize}
-    \item SCase ($e_a$ isn't a value): From $H16$ and $IH$, we know that either (a). $e_a$ can take
-    a step, or (b) $e_a$ reduces to $\invalidexn$. In first case, $e$ can also take a step, and in
-    second case, $e$ also reduces to $\invalidexn$.
+    \item SCase ($e_a$ isn't a value): From $H1$, $H3$, $H6$ and $IH$,
+    we know that either (a). $e_a$ can take a step, or (b) $e_a$
+    reduces to $\invalidexn$. In first case, $e$ can also take a step,
+    and in second case, $e$ also reduces to $\invalidexn$.
 
-    \item SCase ($e_a = v_a$, but $\exists i$ such that  $e_i$ isn't a value): From $H11$, we know
-    that $(e_i,\rhomap)$ can either (a). take a step to $(e_i',\rhomap')$ under $\rhoenv$, or (b).
-    $e_i$ reduces to $\invalidexn$. In the first case, we have
-    $\redstoo{(v_a.m\inang{\ralloc,\rbar}(...,e_i,...),\rhomap)}
-    {(v_a.m\inang{\ralloc,\rbar}(...,e_i',...),\rhomap')}$.
+    \item SCase ($e_a = v_a$, but $\exists i$ such that  $e_i$ isn't a
+    value): From $H1$, $H5$, $H11$ and $IH$, we know that
+    $(e_i,\rhomap)$ can either (a). take a step to $(e_i',\rhomap')$
+    under $\rhoenv$, or (b).  $e_i$ reduces to $\invalidexn$. In the
+    first case, we have
+    $\redstoo{(v_a.m\inang{\rbar}(...,e_i,...),\rhomap)}
+    {(v_a.m\inang{\rbar}(...,e_i',...),\rhomap')}$.
 
-    \item SCase ($e_a = v_a$ and $\forall i.\,e_i = v_i$): $H10$ says that bound for $\tau_a$ is
-    defined under empty $\aenv$. This is possible only if $\tau_a = \fbN$ and $v_a = \C{new}\;
-    \fbN(\bar{v'})$. Furthemore, $\fbN$ cannot be of form $\RgnZ\inang{T}\inang{\toprgn}$ because,
-    $\mtype$ isn't defined for $\RgnZ$. Using these facts, and inverting $H6$, we get
-    $\tywf{\emptyA}{\fbN}$. Inverting it again:
+    \item SCase ($e_a = v_a$ and $\forall i.\,e_i = v_i$): $H10$ says
+    that bound for $\tau_a$ is defined under empty $\aenv$. This is
+    possible only if $\tau_a = \fbN$ and $v_a = \C{new}\;
+    \fbN(\bar{v'})$. Furthemore, $\fbN$ cannot be of form
+    $\RgnZ\inang{T}\inang{\toprgn}$ because, $\mtype$ isn't defined
+    for $\RgnZ$ (in short, inverting $H10$ gives us $\tau_a = \fbN$,
+    for some $N \neq \RgnZ\inang{T}\inang{\toprgn}$). Using these
+    facts, and inverting $H6$, we get $\tywf{\emptyA}{\fbN}$.
+    Inverting it again:
     \begin{smathpar}
     \begin{array}{cr}
       \allocRgn(\fbN) \in \rhoenv & H13\\
@@ -224,23 +276,24 @@ Cases from the induction:
     Now, since $\mtype(m,\fbN)$ is defined if and only if $\mbody(m,\fbN)$ is defined, we know that:
     \begin{smathpar}
     \begin{array}{cr}
-      \mbody(m,\fbN) = \xbar.\,e_m & H14\\
+      \mbody(m,\fbN) = \rhobar.\xbar.\,e_m & H14\\
     \end{array}
     \end{smathpar}
-    From $H13$ and $H14$, we know that $\redstoo{((v_a.m\inang{\ralloc,\rbar}(\bar{v}),\rhomap)}
-      {([\bar{v}/\xbar][\C{new}\;\fbN(\bar{v'})/\thisZ]e_m, \rhomap)}$
+    From $H13$ and $H14$, we know that $\redstoo{((v_a.m\inang{\rbar}(\bar{v}),\rhomap)}
+      {([\bar{v}/\xbar][\C{new}\;\fbN(\bar{v'})/\thisZ][\rbar/\rhobar]e_m, \rhomap)}$
   \end{itemize}
 
-  \item Case ($e = e_a\inang{\ralloc\rbar}(\ebar)$). Proof closely follows the proof for
-  $e_a.m\inang{\ralloc\rbar}(\ebar)$. The only difference is that when $e_a$ evaluates to a lambda
-  $\lambdaexp{\rgn_0}{\rhoalloc\rhobar \,|\, \phi}{\taubar \; \xbar}{e_b}$, we need a proof that
-  $\rgn_0 \in \rhoenv$. This can be obtained by inverting the type judgment for the lambda.
+  \item Case ($e = e_a\inang{\rbar}(\ebar)$). Proof closely follows the proof for
+  $e_a.m\inang{\rbar}(\ebar)$. The only difference is that when $e_a$ evaluates to a lambda
+  $\lambdaexp{\rgn}{\rhobar \,|\, \phi}{\taubar \; \xbar}{e_b}$, we need a proof that
+  $\rgn \in \rhoenv$. This can be obtained by inverting the type judgment for the lambda.
 
   \item Case($e = \C{new}\; \fbN(\ebar)$): Intros. Hypotheses:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn \in \rhoenv & H2\\
-    \hastyp{\emptyA,\rgn, \cdot}{\C{new}\; \fbN(\ebar)}{\tau} & H4\\
+    \tywf{\rhoenv}{\phicx} & H1\\
+    \frv(e)\subseteq dom(\rhomap) & H2\\
+    \hastyp{\emptyA, \cdot}{\C{new}\; \fbN(\ebar)}{\tau} & H4\\
   \end{array}
   \end{smathpar}
   Inverting $H4$ leads to two cases:
@@ -250,7 +303,7 @@ Cases from the induction:
     \begin{array}{cr}
       \tywf{\emptyA}{\fbN} & H5\\
       \fields(\fbN) = \bar{f}:\taubar & H7\\
-      \hastyp{\emptyA,\rgn,\cdot}{\ebar}{\taubar} & H8\\
+      \hastyp{\emptyA,\cdot}{\ebar}{\taubar} & H8\\
     \end{array}
     \end{smathpar}
     Inverting $H5$:
@@ -272,15 +325,16 @@ Cases from the induction:
     \RgnZ\inang{T}\inang{\rgn_i}(e_0)$): From $H4$:
     \begin{smathpar}
     \begin{array}{cr}
-      \hastyp{\emptyA,\rgn, \cdot}{\C{new}\; \RgnZ\inang{T}\inang{\rgn_i}(e_0)}{\tau} & H4\\
+      \hastyp{\emptyA, \cdot}{\C{new}\; \RgnZ\inang{T}\inang{\rgn_i}(e_0)}{\tau} & H4\\
     \end{array}
     \end{smathpar}
     Inversion on $H4$ gives two cases:
     \begin{itemize}
-      \item SSCase($\rgn_i = \toprgn$): In this case, $e_0 = \lambdaexp{\rgn}{\rhoalloc}{}{e_1}$. 
-      In this case, $\redstoo{(\C{new}\; \RgnZ\inang{T}\inang{\toprgn}(v_0),\rhomap)} {(\C{new}\;
-      \RgnZ\inang{T}\inang{\rgn_j}([\rgn_j/\rhoalloc]e_1), \rhomap[\rgn_j \mapsto \CLOSED])}$, where
-      $\rgn_j$ is fresh ($\rgn_j \notin \rhoenv \cup dom(\rhomap)$).
+      \item SSCase($\rgn_i = \toprgn$): In this case, $e_0 = \lambdaexp{\rgn}{\rho}{}{e_1}$. 
+      In this case, $\redstoo{(\C{new}\; \RgnZ\inang{T}\inang{\toprgn}(e_0),\rhomap)} {(\C{new}\;
+      \RgnZ\inang{T}\inang{\rgn_j}([\rgn_j/\rho]e_1), \rhomap[\rgn_j \mapsto \CLOSED])}$, where
+      $\rgn_j$ is a new region identifier such that $\rgn_j \notin
+      \rhoset \cup dom(\rhomap)$
 %     Hypotheses:
 %     \begin{smathpar}
 %     \begin{array}{cr}
@@ -302,10 +356,10 @@ Cases from the induction:
       \begin{array}{cr}
         \rgn_i \in dom(\rhomap) & H16\\
         \rgn_i \notin \rhoenv \cup \{\toprgn\} & H18\\
-        \hastyp{\emptyADelcup{\rgn_i},\rgn_i,\cdot} {e_0}{T@\rgn_i} & H20\\
+        \hastyp{\emptyADelcup{\rgn_i},\cdot} {e_0}{T@\rgn_i} & H20\\
       \end{array}
       \end{smathpar}
-      From $IH1$ and $H20$, we have three cases:
+      $H16$ comes from $H2$. Applying $IH1$ using $H1$, $H2$, $H18$ and $H20$, we have three cases:
       \begin{itemize}
         \item SSSCase ($e_0$ is a value $v_0$): In this case, $e = \RgnZ\inang{T}\inang{\rgn_i}(v_0)$ is also
         a value.
@@ -337,24 +391,24 @@ Cases from the induction:
 %   \end{array}
 %   \end{smathpar}
     
-  \item Case ($e = e_0.\transfer\inang{\ralloc}()$): Intros. Hypotheses:
+  \item Case ($e = e_0.\transfer\inang{\rgn}()$): Intros. Hypotheses:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn \in \rhoenv & H2\\
-    \ralloc = \rgn & H3\\
-    \hastyp{\emptyA,\rgn, \cdot}{e_0.\transfer\inang{\ralloc}()}{\tau} & H4\\
+    \tywf{\rhoenv}{\phicx} & H1\\
+    \frv(e)\subseteq dom(\rhomap) & H2\\
+    \hastyp{\emptyA, \cdot}{e_0.\transfer\inang{\ralloc}()}{\tau} & H4\\
   \end{array}
   \end{smathpar}
   By inversion on $H4$:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyA,\rgn,\cdot}{e_0}{\RgnZ\inang{T}\inang{\toprgn}} & H6\\
+    \hastyp{\emptyA,\cdot}{e_0}{\RgnZ\inang{T}\inang{\toprgn}} & H6\\
   \end{array}
   \end{smathpar}
   Now, if $e_0$ can take a step, so can $e$, hence there is progress. Else, if $e_0$ raises an
   exception, so does $e$. The only non-trivial case is when $e_0$ is a value. But, only values of
   type $\RgnZ\inang{T}\inang{\toprgn}$ is $\C{new}\;\RgnZ\inang{T}\inang{\rgn_i}(...)$, where
-  $\rgn_i \neq \toprgn$. By inversion on $H6$, we get:
+  $\rgn_i \neq \toprgn$. From $H2$, we get:
   \begin{smathpar}
   \begin{array}{cr}
     \rgn_i \in dom(\rhomap) & H8\\
