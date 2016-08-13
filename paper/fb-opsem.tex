@@ -43,22 +43,22 @@
 }{FIELD-ACCESS}
 
 \lopsemrule{3.85in}{
-    \allocRgn(\fbN),\ralloc \in \rhoenv \spc
-    \mbody(m\inang{\ralloc \rbar},\fbN) = \bar{x}.e 
+    \allocRgn(\fbN) \in \rhoenv \spc
+    \mbody(m,\fbN) = \rhobar.\bar{x}.e 
 %   \redstoo{(, \rhomap)}{(e',\rhomap')}
 }{
-    \redstoo{((\C{new}\;\fbN(\bar{v})).m\inang{\ralloc \rbar}
+    \redstoo{((\C{new}\;\fbN(\bar{v})).m\inang{\rbar}
                       (\bar{v'}),\rhomap)}
-            {([\bar{v'}/\xbar][\C{new} \; \fbN(\bar{v})/\thisZ]\,e,\rhomap)}
+            {([\rbar/\rhobar][\bar{v'}/\xbar][\C{new} \; \fbN(\bar{v})/\thisZ]\,e,\rhomap)}
 	  }{METHOD-INV}
 
 \lopsemrule{2.85in}{
-    v_a = \lambdaexp{\rgn_a}{\rhoalloc\rhobar}
+    v_a = \lambdaexp{\rgn}{\rhobar}
                         {\taubar \; \xbar}{e} \spc
-    \rgn_a,\ralloc \in \rhoenv \spc 
+    \rgn \in \rhoenv \spc 
 }{
-    \redstoo{(v_a\inang{\ralloc\rbar}(\bar{v}) ,\rhomap)}
-            {([\bar{v}/\xbar][\rbar/\rhobar][\ralloc/\rhoalloc]\,e,\rhomap)}
+    \redstoo{(v_a\inang{\rbar}(\bar{v}) ,\rhomap)}
+            {([\bar{v}/\xbar][\rbar/\rhobar]\,e,\rhomap)}
 	  }{FUN-APPLY}
 
 %
@@ -84,7 +84,7 @@
     \rhomap(\rgn_r) \neq \XFERRED \spc
 %   \fresh(\rgn_1) \spc
 %  \rgn_0 \notin \rhoenv \\
-    \redsto{\Delta \cup \{\rgn\}}{([v_r/x]e_b,
+    \redsto{\Delta \cup \{\rgn\}}{([[\rgn/\rgn_r]v_r/x]e_b,
       \rhomap[\rgn_r \mapsto \OPEN])}{\invalidexn}
 }{
     \redstoo{(\open{(\C{new} \; \RgnZ\inang{T}\inang{\rgn_r}(v_r))}
@@ -98,10 +98,10 @@
 \textbf{Evaluation Context} \fbox {\(E\)}\\
 \begin{smathpar}
 \begin{array}{lcl}
-E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\ralloc\rbar}(\ebar) \ALT
-      v.m\inang{\ralloc\rbar}(...,\bullet,...) \ALT \C{new}\; \fbN(...,\bullet,...) \ALT
-      \C{new} \; \RgnZ\inang{T}\inang{\toprgn}(\bullet) \ALT \bullet\inang{\ralloc\rbar}(\ebar) \\
-  &  & \ALT v\inang{\ralloc\rbar}(...,\bullet,...) \ALT \open{\bullet}{\rgn}{y}{e}
+E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\rbar}(\ebar) \ALT
+      v.m\inang{\rbar}(...,\bullet,...) \ALT \C{new}\; \fbN(...,\bullet,...) \ALT
+      \C{new} \; \RgnZ\inang{T}\inang{\toprgn}(\bullet) \ALT \bullet\inang{\rbar}(\ebar) \\
+  &  & \ALT v\inang{\rbar}(...,\bullet,...) \ALT \open{\bullet}{\rgn}{y}{e}
 \end{array}
 \end{smathpar}
 
@@ -126,16 +126,16 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\ralloc\rbar}(\eba
 
 \lopsemrule{3.3in}{
 %   \fgjN = \RgnZ\inang{T} \spc
-    \ralloc \in \rhoenv \spc
+    \rgn \in \rhoenv \spc
 %   We need Delta here to ensure Delta U {pi_r} in next rule is sound. 
     \rgn_r \notin \Delta \cup dom(\Sigma) \spc
 %   \rgn \notin dom(\rhomap) \cup \rhoenv \spc
     \rhomap' = \rhomap[\rgn_r \mapsto \CLOSED]
 }{
     \redstoo{(\C{new} \; \RgnZ\inang{T}\inang{\toprgn}
-                (\lambdaexp{\ralloc}{\rhoalloc}{}{e}),\rhomap)}
+                (\lambdaexp{\rgn}{\rho}{}{e}),\rhomap)}
             {(\C{new} \; \RgnZ\inang{T}\inang{\rgn_r}
-                ([\rgn_r/\rhoalloc]e),\rhomap')}
+                ([\rgn_r/\rho]e),\rhomap')}
 	      }{NEW-REGION}
 
 \lopsemrule{2.8in}{
@@ -163,7 +163,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\ralloc\rbar}(\eba
     \rhomap(\rgn_r) \neq \XFERRED \\
 %   \fresh(\rgn_1)\\
 %   \rgn_0 \notin \rhoenv \\
-    \redsto{\Delta \cup \{\rgn\}}{([v_r/x]e_b,
+    \redsto{\Delta \cup \{\rgn\}}{([[\rgn/\rgn_r]v_r/x]e_b,
       \rhomap[\rgn_r \mapsto \OPEN])}{(e_b',\rhomap')} \spc
 %   \rhomap'' = \rhomap'[\rgn_r \mapsto \rhomap(\rgn_r)]
 }{
