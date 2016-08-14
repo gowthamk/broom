@@ -1,10 +1,16 @@
 \begin{theorem}
 \emph{(\textbf{Preservation})}
 \label{thm:fb-preservation}
-$\forall e, \tau, \rhoenv, \rhomap, \phicx, \rgn$, such that $\rgn \in
-\rhoenv$, if $\hastyp{\emptyA,\rgn, \cdot}{e}{\tau}$ and
-$\redstoo{(e,\rhomap)}{(e',\rhomap')}$, then 
-$\hastyp{\emptyASigp,\rgn, \cdot}{e'}{\tau}$.
+$\forall e, \tau, \rhoenv, \rhomap, \phicx, \rgn$, such that $\frv(e)
+\subseteq dom(\rhoenv)$ and $\tywf{\rhoenv}{\phicx}$ and
+$\hastyp{\emptyA, \cdot}{e}{\tau}$, if
+$\redstoo{(e,\rhomap)}{(e',\rhomap')}$, then:
+  \begin{smathpar}
+  \begin{array}{rl}
+    (i) & \hastyp{\emptyASigp, \cdot}{e'}{\tau}\\
+    (ii) & \frv(e') \subseteq dom(\rhoenv') \\
+  \end{array}
+  \end{smathpar}
 \end{theorem}
 \begin{proof}
 Intros $e$. Induction on $e$. For every subexpressions $e_0$, inductive
@@ -12,12 +18,12 @@ hypothesis gives us the following:
 \begin{smathpar}
 \begin{array}{cr}
   \forall (\tau_0, \rhoenv_0, \rhomap_0, \phicx_0, \rgn_0). \spc 
-  (\rgn_0 \in \rhoenv_0)
-  \;\conj\; (\hastyp{(dom(\rhomap_0),\rhoenv_0,\cdot,\phicx_0),\rgn_0,
-    \cdot}{e_0}{\tau_0}) \;\conj\; (\redstoo{(e_0,\rhomap_0)}
-                {(e_0',\rhomap_0')}) & IH1\\
-     \Rightarrow \hastyp{(dom(\rhomap_0'),\rhoenv_0,\cdot,\phicx_0),\rgn_0,
-    \cdot}{e_0'}{\tau_0} & \\
+  (\frv(e_0) \subseteq dom(\rhomap_0)) \conj
+  (\tywf{\rhoenv_0}{\phicx_0}) \conj
+  (\hastyp{(\rhoenv_0,\cdot,\phicx_0), \cdot}{e_0}{\tau_0}) \conj 
+  (\redstoo{(e_0,\rhomap_0)} {(e_0',\rhomap_0')}) & IH1\\
+     \Rightarrow \hastyp{(\rhoenv_0,\cdot,\phicx_0), \cdot}{e_0'}{\tau_0} 
+      ~\conj~ \frv(e_0') \subseteq dom(\rhomap_0')& \\
 \end{array}
 \end{smathpar}
 Cases from induction
@@ -26,31 +32,42 @@ Cases from induction
 \item Case ($e = e_0.f_i$): Intros. Hypothesis:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn \in \rhoenv & H2\\
-    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H4\\
+    \tywf{\Delta}{\phicx} & H1\\
+    \frv(e)\subseteq dom(\rhomap) & H2\\
+    \hastyp{\emptyA, \cdot}{e}{\tau} & H4\\
     \redstoo{(e,\rhomap)}{(e',\rhomap')} & H6\\
+  \end{array}
+  \end{smathpar}
+  Since $e_0$ is a subexpression of $e$, $H2$ implies:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \frv(e_0)\subseteq dom(\rhomap) & H3\\
   \end{array}
   \end{smathpar}
   Inverting $H4$:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyA,\rgn, \cdot}{e_0}{\tau'} & H7\\
+    \hastyp{\emptyA, \cdot}{e_0}{\tau'} & H7\\
     \bar{f} :\taubar = \fields(\bound_{\cdot}(\tau')) & H9\\
   \end{array}
   \end{smathpar}
   Inverting $H6$, we get two cases:
   \begin{itemize}
     \item SCase ($\redstoo{(e_0,\rhomap)}{(e_0',\rhomap')}$): In this
-    case, $\redstoo{(e_0.f_i,\rhomap)}{(e_0'.f_i,\rhomap')}$. $H7$ and $IH1$ gives:
+    case, $\redstoo{(e_0.f_i,\rhomap)}{(e_0'.f_i,\rhomap')}$.
+    Applying $IH1$ with $H1$, $H3$ and $H7$ gives:
     \begin{smathpar}
     \begin{array}{cr}
-      \hastyp{\emptyASigp,\rgn, \cdot}{e_0'}{\tau'} & H11\\
+      \hastyp{\emptyASigp, \cdot}{e_0'}{\tau'} & H11\\
+      \frv(e_0') \subseteq dom(\rhomap') & H12\\
     \end{array}
     \end{smathpar}
-    Proof follows from $H11$ and $H9$.
+    $H11$ and $H9$ tell us that $\hastyp{\emptyASigp,
+    \cdot}{e_0'.f_i}{\tau_i}$. $H12$ gives $\frv(e_0'.f_i) \subseteq
+    dom(\rhomap')$. 
 
-    \item SCase ($e_0$ is a value $\C{new} \; \fbN(\vbar)$):
-    Hypotheses:
+    \item SCase ($e_0$ is a value $\C{new} \; \fbN(\vbar)$, where
+    $\fbN \neq \RgnZT{\rgn}$): Hypotheses:
     \begin{smathpar}
     \begin{array}{cr}
       \allocRgn(N) \in \rhoenv & H13\\
@@ -58,11 +75,11 @@ Cases from induction
     \end{array}
     \end{smathpar}
     \end{itemize}
-    We need to prove that $\hastyp{(\emptyA,\rgn,\cdot)}{v_i}{\tau_i}$. 
+    We need to prove that $\hastyp{(\emptyA,\cdot)}{v_i}{\tau_i}$. 
     From $H7$, since $e_0 = \C{new} \; \fbN(\vbar)$:
     \begin{smathpar}
     \begin{array}{cr}
-      \hastyp{\emptyA,\rgn, \cdot}{\C{new} \;\fbN(\vbar)}{\tau'} & H16\\
+      \hastyp{\emptyA, \cdot}{\C{new} \;\fbN(\vbar)}{\tau'} & H16\\
     \end{array}
     \end{smathpar}
     Inverting $H16$ and using $H9$ gives us the proof.
@@ -70,9 +87,16 @@ Cases from induction
   \item Case ($e = \letregion{\rgn_0}{e_0}$): Intros. Hypothesis:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn \in \rhoenv & H2\\
-    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H4\\
+    \tywf{\Delta}{\phicx} & H1\\
+    \frv(e)\subseteq dom(\rhomap) & H2\\
+    \hastyp{\emptyA, \cdot}{e}{\tau} & H4\\
     \redstoo{(e,\rhomap)}{(e',\rhomap')} & H6\\
+  \end{array}
+  \end{smathpar}
+  From the definition of $\frv$ and $H2$
+  \begin{smathpar}
+  \begin{array}{cr}
+    \frv(e_0) \subseteq dom(\rhomap) & H3\\ 
   \end{array}
   \end{smathpar}
   Inverting $H4$:
@@ -80,206 +104,180 @@ Cases from induction
   \begin{array}{cr}
     \rgn_0 \notin \rhoenv & H7\\
     \tywf{\emptyA}{\tau} & H8\\
-    \hastyp{\emptyADelcupPhicap{\rgn_0}{\rgn_0}, \rgn_0, \cdot}{e_0}{\tau} & H9\\
+    \hastyp{\emptyADelcupPhicap{\rgn_0}{\rgn_0}, \cdot}{e_0}{\tau} & H9\\
   \end{array}
   \end{smathpar}
   Inverting $H6$, we get two cases:
   \begin{itemize}
     \item SCase ($\redstocup{\rgn_0}{(e_0,\rhomap)}{(e_0',\rhomap')}$): In this
-    case, $\redstoo{(\letregion{\rgn_0}{e_0},\rhomap)} {(\letregion{\rgn_0}{e_0'},\rhomap')}$. 
-    $H9$ and $IH1$ gives:
+    case, $\redstoo{(\letregion{\rgn_0}{e_0},\rhomap)}
+    {(\letregion{\rgn_0}{e_0'},\rhomap')}$ (i.e., $e'$ is $\letregion{\rgn_0}{e_0'}$).
+    Applying $IH1$ using $H1$, $H3$ and $H9$ gives:
     \begin{smathpar}
     \begin{array}{cr}
-      \hastyp{\emptyADelcupPhicap{\rgn_0}{\rgn_0},\rgn,
+      \hastyp{\emptyADelcupPhicap{\rgn_0}{\rgn_0},
           \cdot}{e_0'}{\tau} & H11\\
+    \frv(e_0') \subseteq dom(\rhomap') & H12\\ 
     \end{array}
     \end{smathpar}
     From $H7$ and $H11$, we can conclude that
-    $\hastyp{\emptyASigp,\rgn, \cdot}{\letregion{\rgn_0}{e_0'}}{\tau}$.
+    $\hastyp{\emptyASigp, \cdot}{\letregion{\rgn_0}{e_0'}}{\tau}$.
+    Furthermore, since $\frv(e') = \frv(e_0')$, from $H12$, we have
+    $\frv(e') \subseteq dom(\rhomap')$.
 
-    \item SCase ($e_0$ is a value $v_0$): In this case, $\redstoo{(\letregion{\rgn_0}{e_0},\rhomap)}
-    {(v_0,\rhomap')}$. From $H2$, $H7-9$, and Lemma~\ref{thm:fb-tywf}, we have:
+    \item SCase ($e_0$ is a value $v_0$): In this case,
+    $\redstoo{(\letregion{\rgn_0}{e_0},\rhomap)} {(v_0,\rhomap')}$
+    (i.e., $e'$ is $v_0$). $H1$ and $H7$ imply:
     \begin{smathpar}
     \begin{array}{cr}
-      \hastyp{\emptyA, \rgn, \cdot}{v_0}{\tau} & H13\\
+      \tywf{\rhoenv \cup \{\rgn_0\}}{\phicx} & H10\\
     \end{array}
     \end{smathpar}
-    Thus, type is preserved. 
+    Applying $IH1$ with $H9$ $H1$ and $H10$ gives:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \hastyp{\emptyADelcupPhicap{\rgn_0}{\rgn_0},
+          \cdot}{v_0}{\tau} & H13\\
+       \frv(v_0) \subseteq dom(\Sigma') & H14\\
+    \end{array}
+    \end{smathpar}
+    From $H13$, $H8$ and Lemma~\ref{thm:fb-tywf}, we have:
+    \begin{smathpar}
+    \begin{array}{cr}
+      \hastyp{\emptyA, \rgn, \cdot}{v_0}{\tau} & H15\\
+    \end{array}
+    \end{smathpar}
+    $H14-15$ give the proof.
   \end{itemize}
 
   \item Case ($e = \open{e_a}{\rgn_0}{y}{e_b}$): Intros. Hypotheses:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn \in \rhoenv & H2\\
-    \hastyp{\emptyA,\rgn, \cdot}{e}{\tau} & H4\\
+    \tywf{\Delta}{\phicx} & H1\\
+    \frv(e)\subseteq dom(\rhomap) & H2\\
+    \hastyp{\emptyA, \cdot}{e}{\tau} & H4\\
     \redstoo{(e,\rhomap)}{(e',\rhomap')} & H6\\
 %   \forall (\tau, \rhoenv, \rhomap, \rgn). \rgn \in \rhoenv \conj
-%     \hastyp{\emptyA,\rgn, \cdot}{e_0}{\tau} \;
+%     \hastyp{\emptyA, \cdot}{e_0}{\tau} \;
 %     \Rightarrow \; \exists(e',\rhomap'). \redstoo{(e_0,\rhomap)}
 %                     {(e',\rhomap')} & IH1\\
+  \end{array}
+  \end{smathpar}
+  $H2$ implies:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \frv(e_a)\subseteq dom(\rhomap) & H3\\
+    \frv(e_b)\subseteq dom(\rhomap) & H5\\
   \end{array}
   \end{smathpar}
   Inverting $H4$:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyA,\rgn, \cdot}{e_a}{\RgnZ\inang{T}\inang{\toprgn}} & H7\\
+    \hastyp{\emptyA, \cdot}{e_a}{\RgnZ\inang{T}\inang{\toprgn}} & H7\\
     \tywf{\emptyA}{\tau} & H8\\
     \rgn_0 \notin \rhoenv & H9\\
-    \hastyp{\emptyASigpDelcup{\rgn_0},\rgn_0,[y \mapsto T@\rgn_0]}{e_b}{\tau} & H11\\
+    \hastyp{\emptyASigpDelcup{\rgn_0},[y \mapsto T@\rgn_0]}{e_b}{\tau} & H11\\
   \end{array}
   \end{smathpar}
   Inverting $H6$, we get many cases:
   \begin{itemize}
-    \item SCase ($\redstoo{(e_a,\rhomap)}{(e_a',\rhomap')}$): Since the domain
-    of $\rhomap$ monotonically increases during the evaluation, we have:
-    \begin{smathpar}
-    \begin{array}{cr}
-      dom(\rhomap) \subseteq dom(\rhomap') & H13\\
-    \end{array}
-    \end{smathpar}
-    Since strenthening the context trivially preserves typing and
-    well-formedness, from $H7-11$ and $H13$, we have:
-    \begin{smathpar}
-    \begin{array}{cr}
-      \hastyp{\emptyASigp,\rgn, \cdot}{e_a}{\RgnZ\inang{T}\inang{\toprgn}} & H15\\
-      \tywf{\emptyASigp}{\tau} & H17\\
-      \rgn_0 \notin \rhoenv & H19\\
-      \hastyp{\emptyASigpDelcup{\rgn_0},\rgn_0,[y \mapsto
-      T@\rgn_0]}{e_b}{\tau} & H20\\
-    \end{array}
-    \end{smathpar}
-    From $H15-20$, we have $\hastyp{\emptyASigp,\rgn, \cdot}{e}{\tau}$.
+    \item SCase ($\redstoo{(e_a,\rhomap)}{(e_a',\rhomap')}$): Proof
+    follows from $IH1$.
 
-    \item SCase ($e_a$ is a value $v_a$, and $e_b$ steps to $e_b'$): Hypotheses:
+    \item SCase ($e_a$ is a value $v_a$, and $e_b$ steps to $e_b'$):
+    Since $e_a$ is a value $v_a$, inverting $H7$ tells us that there
+    exist a value $v_r$ and a region identifier $\rgn_i$ s.t:
     \begin{smathpar}
     \begin{array}{cr}
-      v_a = \C{new}\; \RgnZ\inang{T}\inang{\rgn_i}(v_r) & H22\\
-      \rgn_i \neq \toprgn & H23\\
+%       \rgn_i \in dom(\Sigma) & H13\\
+        \hastyp{(\{\rgn_i\}, \cdot, true), \cdot}{v_r}{T@\rgn_i} & H15\\
+        v_a = \C{new}\; \RgnZ\inang{T}\inang{\rgn_i}(v_r) & H22\\
+    \end{array}
+    \end{smathpar}
+    Changing the region variable name in $H15$:
+    \begin{smathpar}
+    \begin{array}{cr}
+        \hastyp{(\{\rgn_0\}, \cdot, true), \cdot}{[\rgn_0/\rgn_i]
+        v_r}{T@\rgn_0} & H17\\
+    \end{array}
+    \end{smathpar}
+    From $H9$, $H1$ and $H17$:
+    \begin{smathpar}
+    \begin{array}{cr}
+        \hastyp{(\Delta \cup \{\rgn_0\}, \cdot, \phicx),
+        \cdot}{[\rgn_0/\rgn_i] v_r}{T@\rgn_0} & H19\\
+    \end{array}
+    \end{smathpar}
+    From $H11$, $H19$ and the substitution lemma
+    (Lemma~\ref{thm:fb-substitution}):
+    \begin{smathpar}
+    \begin{array}{cr}
+      \hastyp{\emptyASigpDelcup{\rgn_0},\cdot}{[[\rgn_0/\rgn_i]v_r/y]\,e_b}{\tau}
+      & H20\\
+    \end{array}
+    \end{smathpar}
+    Since $e_b$ takes a step, from \rulelabel{OPEN} rule of
+    operational semantics, we get the following hypotheses:
+    \begin{smathpar}
+    \begin{array}{cr}
       \rhomap(\rgn_i) \neq \XFERRED & H24\\
-      \rgn_0 \notin \rhoenv & H26\\
       \redstocup{\rgn_0}{([[\rgn_0/\rgn_i]v_r/y]e_b,
           \rhomap[\rgn_i \mapsto \OPEN])} {(e_b',\rhomap')} & H27\\
-      \rhomap'' = \rhomap'[\rgn_i \mapsto \rhomap(\rgn_i)] & H29\\
+%     \rhomap'' = \rhomap'[\rgn_i \mapsto \rhomap(\rgn_i)] & H29\\
     \end{array}
     \end{smathpar}
-    We need to prove that
-    $\hastyp{\emptyASigpp,\rgn,\cdot}{\open{v_a}{\rgn_0}{y}{ e_b'}}{\tau}$.  Note that $dom(\rhomap'') = dom(\rhomap')$. Hence, the proof
-    obligation is
-    $\hastyp{\emptyASigp,\rgn,\cdot}{\open{v_a}{\rgn_0}{y}{e_b'}}{\tau}$.
-    First, since the domain of $\rhomap$ monotonically increases during the
-    evaluation, we have:
+    Applying $IH1$ using $H1$, ($H5$, $H17$) and $H27$, we get: 
     \begin{smathpar}
     \begin{array}{cr}
-      dom(\rhomap) \subseteq dom(\rhomap') & H31\\
+      \hastyp{\emptyASigpDelcup{\rgn_0},\cdot}{e_b'}{\tau} & H29\\
+      \frv(e_b') \subseteq dom(\Sigma') & H30\\
     \end{array}
     \end{smathpar}
-    Next, since $e_a = v_a$, from $H7$ and $H22$, we have:
+    From $H29$, extending the type environment:
     \begin{smathpar}
     \begin{array}{cr}
-      \hastyp{\emptyA,\rgn, \cdot}{\C{new}\;
-        \RgnZ\inang{T}\inang{\rgn_i}(v_r)}
-        {\RgnZ\inang{T}\inang{\toprgn}} & H33\\
+      \hastyp{\emptyASigpDelcup{\rgn_0},[y\mapsto T@\rgn_0]}{e_b'}{\tau} & H31\\
     \end{array}
     \end{smathpar}
-    Since $H23$, inversion on $H33$ gives:
-    \begin{smathpar}
-    \begin{array}{cr}
-      \hastyp{\emptyADelcup{\rgn_i},\rgn_i,\cdot}{v_r}{T@\rgn_i} & H34\\
-      \rgn_i \notin \rhoenv & H35\\
-    \end{array}
-    \end{smathpar}
-    From $H23$, $H26$, $H34$, $H35$, and Lemma~\ref{thm:fb-renaming}, we have:
-    \begin{smathpar}
-    \begin{array}{cr}
-      \hastyp{\emptyADelcup{\rgn_0},\rgn_0,\cdot}{[\rgn_0/\rgn_i]v_r}{T@\rgn_0} & H36\\
-    \end{array}
-    \end{smathpar}
-    From $H11$, $H36$ and Lemma~\ref{thm:fb-substitution}, we get:
-    \begin{smathpar}
-    \begin{array}{cr}
-      \hastyp{\emptyADelcup{\rgn_0},\rgn_0,
-        \cdot}{[[\rgn_0/\rgn_i]v_r/y]e_b}{\tau} & H38\\
-    \end{array}
-    \end{smathpar}
-    $H24$ says that $\rgn_i \in dom(\rhomap)$. Hence, from $H38$:
-    \begin{smathpar}
-    \begin{array}{cr}
-      \hastyp{\emptyASigxDelcup{[\rgn_i \mapsto \OPEN]}{\rgn_0},
-          \rgn_0, \cdot}{[[\rgn_0/\rgn_i]v_r/y]e_b}{\tau} & H40\\
-    \end{array}
-    \end{smathpar}
-    From $H40$, $H27$ and $IH1$:
-    \begin{smathpar}
-    \begin{array}{cr}
-      \hastyp{\emptyASigpDelcup{\rgn_0} ,\rgn_0, \cdot}{e_b'}{\tau} & H42\\
-    \end{array}
-    \end{smathpar}
-%   From $H35$, $H26$, and $H42$:
-%   \begin{smathpar}
-%   \begin{array}{cr}
-%     \hastyp{(dom(\rhomap'),\rhoenv \cup \{\rgn_i\},\cdot,true),\rgn_i,
-%       \cdot}{[\rgn_i/\rgn_0]e_b'}{[\rgn_i/\rgn_0]\tau} & H44\\
-%   \end{array}
-%   \end{smathpar}
-%   From $H8$ and $H26$, we know that $\rgn_0 \notin \frv(\tau)$. Hence:
-%   \begin{smathpar}
-%   \begin{array}{cr}
-%     \hastyp{(dom(\rhomap'),\rhoenv \cup \{\rgn_i\},\cdot,true),\rgn_i,
-%       \cdot}{[\rgn_i/\rgn_0]e_b'}{\tau} & H46\\
-%   \end{array}
-%   \end{smathpar}
-    By strengthening the type context:
-    \begin{smathpar}
-    \begin{array}{cr}
-      \hastyp{\emptyASigpDelcup{\rgn_0} ,\rgn_0,
-        \cdot[y \mapsto T@\rgn_0]}{e_b'}{\tau} & H48\\
-    \end{array}
-    \end{smathpar}
-    Since $dom(\rhomap) \subseteq dom(\rhomap')$ (from $H31$), we get the
-    following by strengthening the context in $H7-11$:
-    \begin{smathpar}
-    \begin{array}{cr}
-      \hastyp{\emptyASigpp,\rgn, \cdot}{v_a}
-        {\RgnZ\inang{T}\inang{\toprgn}} & H50\\
-      \tywf{\emptyASigpp}{\tau} & H51\\
-    \end{array}
-    \end{smathpar}
-    From $H48$, $H50$, $H51$, we have the required goal:
-    \begin{smathpar}
-    \begin{array}{cr}
-      \hastyp{\emptyASigp,\rgn,\cdot}{\open{v_a}{\rgn_0}{y}{e_b'}}{\tau}
-    \end{array}
-    \end{smathpar}
+    $H7-H9$ and $H29$ proves $\hastyp{\emptyASigpp,\cdot}{\open{v_a}{\rgn_0}{y}{ e_b'}}{\tau}$. 
+    It can be easily shown that $dom(\Sigma) \subseteq dom(\Sigma')$.
+    Hence, $H3$ (and the fact that $e_a = v_a$) implies $\frv(v_a)
+    \subseteq dom(\Sigma')$. This lets us prove that $\frv(e')
+    \subseteq dom( \Sigma')$.
     
     \item SCase ($e_a$ is a value $v_a$, and $e_b$ is a value $v_b$): In this
     case, $\redstoo{(\open{v_a}{\rgn_0}{y}{v_b},\rhomap)} {(v_b,\rhomap)}$. 
     From $H11$:
     \begin{smathpar}
     \begin{array}{cr}
-      \hastyp{\emptyADelcup{\rgn_0} ,\rgn_0, [y \mapsto T@\rgn_0]}{v_b}{\tau} & H53\\
+      \hastyp{\emptyADelcup{\rgn_0} , [y \mapsto T@\rgn_0]}{v_b}{\tau} & H53\\
     \end{array}
     \end{smathpar}
     Since $\valuee(v_b)$, it has not free variables. Consequently:
     \begin{smathpar}
     \begin{array}{cr}
-      \hastyp{\emptyADelcup{\rgn_0} ,\rgn_0,
+      \hastyp{\emptyADelcup{\rgn_0} ,
         \cdot}{v_b}{\tau} & H55\\
     \end{array}
     \end{smathpar}
 %   Since $dom(\rhomap) \subseteq dom(\rhomap')$:
 %   \begin{smathpar}
 %   \begin{array}{cr}
-%     \hastyp{(dom(\rhomap'),\rhoenv \cup \{\rgn_0\},\cdot,true),\rgn_0,
+%     \hastyp{(dom(\rhomap'),\rhoenv \cup \{\rgn_0\},\cdot,true),
 %       \cdot}{v_b}{\tau} & H57\\
 %   \end{array}
 %   \end{smathpar}
-    From $H2$, $H8$, $H9$, $H55$ and Lemma~\ref{thm:fb-tywf}, we prove the
+    Since $\tau$ is well-formed under $\emptyA$ ($H8$), Applying
+    Lemma~\ref{thm:fb-tywf} using $H8$ gives:
     required goal:
     \begin{smathpar}
     \begin{array}{cr}
-      \hastyp{\emptyA,\rgn, \cdot}{v_b}{\tau} & \\
+      \hastyp{\emptyA, \cdot}{v_b}{\tau} & \\
     \end{array}
     \end{smathpar}
+    From the hypothesis, we have $\frv(e) = \frv(v_a) \cup \frv(v_b)
+    \subseteq dom(\Sigma)$. Hence, $\frv(e') = \frv(v_b) \subseteq
+    dom(\Sigma)$.
   % End of cases for open   
   \end{itemize}
 
@@ -289,35 +287,30 @@ Cases from induction
   Hypotheses:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn \in \rhoenv & H2\\
-    \hastyp{\emptyA,\rgn, \cdot}{\C{new}\; \RgnZT{\toprgn}(e_0)}{\tau} & H4\\
+    \tywf{\Delta}{\phicx} & H1\\
+    \frv(e_0)\subseteq dom(\rhomap) & H2\\
+    \hastyp{\emptyA, \cdot}{\C{new}\; \RgnZT{\toprgn}(e_0)}{\tau} & H4\\
     \redstoo{(e,\rhomap)}{(e',\rhomap')} & H6\\
   \end{array}
   \end{smathpar}
-  Inverting $H4$, we know that $e_0 = \lambdaexp{\rgn}{\rhoalloc}{}{e_1}$, and:
+  Inverting $H4$, we know that $e_0 = \lambdaexp{\rgn}{\rho}{}{e_1}$, and:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\vacantA{\rhoalloc},\rhoalloc,\cdot}{e_1} {T@\rhoalloc}& H7\\
-%   \hastyp{\emptyA,\rgn, \cdot}{v_0}{\inang{\rhoalloc}\unitZ
-%       \xrightarrow{\rgn} T@\rhoalloc} & H7\\
+    \hastyp{\vacantA{\rho},\cdot}{e_1} {T@\rho}& H7\\
+%   \hastyp{\emptyA, \cdot}{v_0}{\inang{\rho}\unitZ
+%       \xrightarrow{\rgn} T@\rho} & H7\\
     \fgjtywf{\cdot}{T} & H8\\
 %   \rgn_0 \notin \rhoenv & H9\\
-%   \hastyp{(dom(\rhomap),\rhoenv \cup \{\rgn_0\},\cdot,true),\rgn_0,[y \mapsto
+%   \hastyp{(dom(\rhomap),\rhoenv \cup \{\rgn_0\},\cdot,true),[y \mapsto
 %   T@\rgn_0]}{e_b}{\tau} & H11\\
   \end{array}
   \end{smathpar}
-  From $H7$ and Lemma~\ref{thm:fb-renaming}:
-  \begin{smathpar}
-  \begin{array}{cr}
-    \hastyp{\vacantA{\rgn_i},\rgn_i,\cdot}{[\rgn_i/\rhoalloc]e_1} {T@\rgn_i}& H10\\
-  \end{array}
-  \end{smathpar}
-% Inverting $H7$, we know that $v_0 = \lambdaexp{\rgn}{\rhoalloc}{}{e_1}$, and
+% Inverting $H7$, we know that $v_0 = \lambdaexp{\rgn}{\rho}{}{e_1}$, and
 % we get the following hypotheses:
 % \begin{smathpar}
 % \begin{array}{cr}
-%   \rhoalloc \notin \rhoenv & H13\\
-%   \hastyp{\emptyADelcup{\rhoalloc},\rhoalloc,\cdot}{e}{T@\rhoalloc} & H15\\
+%   \rho \notin \rhoenv & H13\\
+%   \hastyp{\emptyADelcup{\rho},\rho,\cdot}{e}{T@\rho} & H15\\
 % \end{array}
 % \end{smathpar}
   Inverting $H6$:
@@ -325,45 +318,59 @@ Cases from induction
   \begin{array}{cr}
     \rgn_i \notin dom(\rhomap) \cup \rhoenv & H17\\
     \rhomap' = \rhomap[\rgn_i \mapsto \CLOSED] & H19\\
-    \redstoo{(\C{new}\; \RgnZT{\toprgn}(\lambdaexp{\rgn}{\rhoalloc}{}{e_1}))}
-      {(\C{new}\; \RgnZT{\rgn_i}([\rgn_i/\rhoalloc]e_1),\rhomap')} & H21\\
+    \redstoo{(\C{new}\; \RgnZT{\toprgn}(\lambdaexp{\rgn}{\rho}{}{e_1}))}
+      {(\C{new}\; \RgnZT{\rgn_i}([\rgn_i/\rho]e_1),\rhomap')} & H21\\
   \end{array}
   \end{smathpar}
-  Since strengthening the context preserves typing, strengthening the context for type judgment in
-  $H10$ gives us the following:
+  Renaming the region var in $H7$:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyASigpDelcup{\rgn_i},\rgn_i,\cdot}{[\rgn_i/\rhoalloc]e}
+    \hastyp{\vacantA{\rgn_i},\rgn_i,\cdot}{[\rgn_i/\rho]e_1} {T@\rgn_i}& H10\\
+  \end{array}
+  \end{smathpar}
+  Since $\rgn_i \notin \Delta$ (from $H17$), it is safe to strengthen
+  the context of the type judgment in $H10$ to the following:
+  \begin{smathpar}
+  \begin{array}{cr}
+    \hastyp{\emptyASigpDelcup{\rgn_i},\rgn_i,\cdot}{[\rgn_i/\rho]e}
         {T@\rgn_i} & H24\\
   \end{array}
   \end{smathpar}
 % From $H13$, $H17$, $H15$ and Lemma~\ref{thm:fb-renaming}, we get:
 % \begin{smathpar}
 % \begin{array}{cr}
-%   \hastyp{\emptyADelcup{\rgn_i},\rgn_i,\cdot}{[\rgn_i/\rhoalloc]e}
+%   \hastyp{\emptyADelcup{\rgn_i},\rgn_i,\cdot}{[\rgn_i/\rho]e}
 %       {T@\rgn_i} & H23\\
 % \end{array}
 % \end{smathpar}
 % Since $dom(\rhomap) \subseteq dom(\rhomap')$, $H23$ is equivalent to:
 % \begin{smathpar}
 % \begin{array}{cr}
-%   \hastyp{\emptyASigpDelcup{\rgn_i},\rgn_i,\cdot}{[\rgn_i/\rhoalloc]e}
+%   \hastyp{\emptyASigpDelcup{\rgn_i},\rgn_i,\cdot}{[\rgn_i/\rho]e}
 %       {T@\rgn_i} & H24\\
 % \end{array}
 % \end{smathpar}
-  $H19$ implies $\rgn_i \in dom(\rhomap')$. This, and $H17$, $H8$, and $H24$ entail the required goal:
+  $H19$ implies $\rgn_i \in dom(\rhomap')$. This, and $H17$, $H8$, and
+  $H24$ entail type preservation:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyASigp,\rgn, \cdot}{\C{new}\; \RgnZT{\rgn_i}
-        ([\rgn_i/\rhoalloc]e_1)}{\RgnZT{\toprgn}} & \\
+    \hastyp{\emptyASigp, \cdot}{\C{new}\; \RgnZT{\rgn_i}
+        ([\rgn_i/\rho]e_1)}{\RgnZT{\toprgn}} & \\
   \end{array}
   \end{smathpar}
+  $\frv(e') = \{\rgn_i\} \cup \frv([\rgn_i/\rho]e_1)$. We need to
+  prove that $\frv(e') \subseteq dom(\Sigma') = \{\rgn_i\} \cup
+  dom(\Sigma)$.  From initial hypotheses ($H2$), we know that $\frv(e)
+  = \frv(e_0) = \frv(e_1) \subseteq dom(\Sigma)$. Since $\rgn_i \in
+  dom(\Sigma')$, we have that $\frv([\rgn_i/\rho]e_1) \subseteq
+  dom(\Sigma')$.  
 
   \item Case ($e = \C{new} \RgnZT{\rgn_i}(e_0)$, where $\rgn_i \neq \toprgn$):Hypotheses:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn \in \rhoenv & H2\\
-    \hastyp{\emptyA,\rgn, \cdot}{\C{new}\; \RgnZT{\rgn_i}(e_0)}{\tau} & H4\\
+    \tywf{\Delta}{\phicx} & H1\\
+    \{\rgn_i\} \cup \frv(e_0)\subseteq dom(\rhomap) & H2\\
+    \hastyp{\emptyA, \cdot}{\C{new}\; \RgnZT{\rgn_i}(e_0)}{\tau} & H4\\
     \redstoo{(\C{new} \RgnZT{\rgn_i}(e_0),\rhomap)}{(e',\rhomap')} & H6\\
   \end{array}
   \end{smathpar}
