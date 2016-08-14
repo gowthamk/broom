@@ -1,15 +1,20 @@
 \begin{theorem}
 \emph{(\textbf{Type Safety})}
 \label{thm:fb-type-safety}
-$\forall e, \tau, \rhoenv, \rhomap, \rgn$, if $\rgn \in \rhoenv$ and
-$\hastyp{\emptyA,\rgn, \cdot}{e}{\tau}$, then either $e$ is a value,
-or one of the following holds:\\
+$\forall e, \tau, \rhoenv, \rhomap$, if $\tywf{\Delta}{\phicx}$ and 
+$\frv(e) \subseteq dom(\Sigma)$ and
+$\hastyp{\emptyA,\cdot}{e}{\tau}$, then one of the following holds:\\
   \begin{smathpar}
   \begin{array}{rl}
-    (i) & \exists (e',\rhomap').\;\mathit{such\; that}\; 
-      \redstoo{(e,\rhomap)}{(e',\rhomap')}
-      \;\mathit{and}\; \hastyp{\emptyASigp,\rgn, \cdot}{e}{\tau}\\
-    (ii) & \redstoo{(e,\rhomap)}{\invalidexn}\\
+    (i) & \exists (e',\rhomap').~\redstoo{(e,\rhomap)}{(e',\rhomap')}
+        \conj \frv(e') \subseteq dom(\Sigma')\\
+    (ii) & \valuee(e)\\
+    (iii) & \redstoo{(e,\rhomap)}{\invalidexn}\\
+%   (i) & e is a value
+%   (i) & \exists (e',\rhomap').\;\mathit{such\; that}\; 
+%     \redstoo{(e,\rhomap)}{(e',\rhomap')}
+%     \;\mathit{and}\; \hastyp{\emptyASigp,\rgn, \cdot}{e}{\tau}\\
+%   (ii) & \redstoo{(e,\rhomap)}{\invalidexn}\\
   \end{array}
   \end{smathpar}
 \end{theorem}

@@ -1,82 +1,79 @@
 \begin{lemma}
 \emph{(\textbf{Weakening})}
 \label{thm:fb-tywf}
-$\forall v, \tau, \rhoenv, \rhoenv_0, \rhoset, \phicx, \rgn, \rgn_0$, such that $\valuee(v)$, $\rgn
-\in \rhoenv$, $\rgn_0 \notin \rhoenv$, and $\rhoenv_0 \subseteq \rhoenv$, if
-$\hastyp{\emptyADelcupPhicapp{\rgn_0}{\rhoenv_0 \outlives \rgn_0},\rgn_0,\cdot}{v}{\tau}$ and
-$\tywf{\emptyA}{\tau}$, then $\hastyp{\emptyA,\rgn,\cdot}{v}{\tau}$.
+$\forall v, \tau, \rhoenv, \rhoenv_0, \rhoset, \phicx, \phicx_0 $, if
+$\hastyp{(\Delta \cup \Delta_0, \cdot, \phicx \conj \phicx_0)}{v}{\tau}$ and
+$\tywf{\emptyA}{\tau}$, then $\hastyp{\emptyA,\cdot}{v}{\tau}$.
 \end{lemma}
 \begin{proof}
 Intros. Hypotheses:
 \begin{smathpar}
 \begin{array}{cr}
-  \rgn \in \rhoenv & H1\\
-  \rgn_0 \notin \rhoenv & H2\\
-  \rhoenv_0 \subseteq \rhoenv & H4\\
-  \hastyp{\emptyADelcupPhicapp{\rgn_0}{\rhoenv_0 \outlives \rgn_0},\rgn_0, \cdot}{v}{\tau} & H6\\
+  \hastyp{(\Delta \cup \Delta_0, \cdot, \phicx \conj \phicx_0)}{v}{\tau} & H6\\
   \tywf{\emptyA}{\tau} & H8\\
 \end{array}
 \end{smathpar}
 Proof by induction on $H6$. Cases:
 \begin{itemize}
-  \item Case ($v = \C{new}\; \fbN_0(\vbar)$ and $\tau = \fbN_0$): Inversion on $H6$:
+  \item Case ($v = \C{new}\; \fbN_0(\vbar)$ and $\tau = \fbN_0$):
+  Hypotheses:
   \begin{smathpar}
   \begin{array}{cr}
     \fields(\fbN_0) = \bar{f}:\bar{\tau} & H10\\
     \tywf{\emptyA}{\fbN_0} & H11\\
-    \hastyp{\emptyADelcupPhicapp{\rgn_0}{\rhoenv_0 \outlives \rgn_0},\rgn_0,\cdot}{\vbar}{\taubar} & H12\\
+    \hastyp{(\Delta \cup \Delta_0, \cdot, \phicx \conj \phicx_0)}{v}{\tau} & H6\\
   \end{array}
   \end{smathpar}
   Inductive hypothesis on $\vbar$:
   \begin{smathpar}
   \begin{array}{cr}
-    \tywf{\emptyA}{\taubar}\; \Rightarrow\; \hastyp{\emptyA,\rgn,\cdot}{\vbar}{\taubar} & IH1\\
+    \tywf{\emptyA}{\taubar}\; \Rightarrow\; \hastyp{\emptyA,\cdot}{\vbar}{\taubar} & IH1\\
   \end{array}
   \end{smathpar}
-  Inversion on $H8$ tells us that $\fbN_0$ is of the form $\BZT{\rgn\rbar}$, where,
+  Inversion on $H8$ tells us that $\fbN_0$ is of the form $\BZT{\rbar}$, where,
   $\headerOf{B}\{\bar{\tau^h} \; \bar{h},...\}$ is a well-formed class definition. Furthermore, we get:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn,\rbar \in \rhoenv & H13\\
+    \rbar \in \rhoenv & H13\\
     \fgjtywf{\cdot}{\bar{T}} & H14\\
-    \isvalid{\phicx}[\rgn/\rhoalloc][\rbar/\rhobar]\phi & H16\\
+    \isvalid{\phicx}[\rbar/\rhobar]\phi & H16\\
   \end{array}
   \end{smathpar}
   Let $\fields(\fbN) = \bar{g}:\bar{\tau^g}$. Inverting the well-formedness of class $B$, we get
   the following:
   \begin{smathpar}
   \begin{array}{cr}
-    \tywf{(\emptyset,\{\rhoalloc,\rhobar\},[\bar{a} \mapsto
+    \tywf{(\{\rhobar\},[\bar{a} \mapsto
     \bar{\fgjN}],\phi)}{\bar{\tau^h}\bar{\tau^g}} & H18\\
   \end{array}
   \end{smathpar}
   Since $\fgjtywf{\cdot}{\BZ}$, $H18$ gives:
   \begin{smathpar}
   \begin{array}{cr}
-    \tywf{(\emptyset,\{\rhoalloc,\rhobar\},\cdot,
+    \tywf{(\{\rhobar\},\cdot,
     \phi)}{[\tbar/\bar{a}](\bar{\tau^h}\bar{\tau^g})} & H20\\
   \end{array}
   \end{smathpar}
-  And, since $\rgn \neq \rhoalloc$ and $\{\rbar\} \cap \{\rhobar\} = \emptyset$:
+  Renaming region vars in $H20$:
   \begin{smathpar}
   \begin{array}{cr}
-    \tywf{(\emptyset,\{\rgn,\rbar\},\cdot, [\rbar/\rhobar][\rgn/\rhoalloc]\phi)}
-      {[\rbar/\rhobar][\rgn/\rhoalloc][\tbar/\bar{a}](\bar{\tau^h}\bar{\tau^g})} & H22\\
+    \tywf{(\{\rbar\},\cdot, [\rbar/\rhobar]\phi)}
+      {[\rbar/\rhobar][\tbar/\bar{a}](\bar{\tau^h}\bar{\tau^g})} & H22\\
   \end{array}
   \end{smathpar}
   From the definition of $\fields$, we have:
   \begin{smathpar}
   \begin{array}{cr}
-    \fields(\BZT{\rgn\rbar}) = \bar{h}:[\rbar/\rhobar][\rgn/\rhoalloc][\tbar/\bar{a}]\bar{\tau^h},\,
-                      \bar{g}:[\rbar/\rhobar][\rgn/\rhoalloc][\tbar/\bar{a}]\bar{\tau^g} & H24\\
+    \fields(\BZT{\rbar}) = \bar{h}:[\rbar/\rhobar][\tbar/\bar{a}]\bar{\tau^h},\,
+                      \bar{g}:[\rbar/\rhobar][\tbar/\bar{a}]\bar{\tau^g} & H24\\
   \end{array}
   \end{smathpar}
   From $H10$ and  $H24$, we know that $\taubar =
-  [\rbar/\rhobar][\rgn/\rhoalloc][\tbar/\bar{a}](\bar{\tau^h}\bar{\tau^g)}$. Substituting this in
-  H22:
+  [\rbar/\rhobar][\tbar/\bar{a}](\bar{\tau^h}\bar{\tau^g)}$.
+  Substituting this in H22:
   \begin{smathpar}
   \begin{array}{cr}
-    \tywf{(\emptyset,\{\rgn,\rbar\},\cdot, [\rbar/\rhobar][\rgn/\rhoalloc]\phi)} {\taubar} & H26\\
+    \tywf{(\{\rbar\},\cdot, [\rbar/\rhobar]\phi)} {\taubar} & H26\\
   \end{array}
   \end{smathpar}
   Using $H13$ and $H16$, from $H26$, we derive:
@@ -88,29 +85,28 @@ Proof by induction on $H6$. Cases:
   From $H28$ and $IH1$, we get:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyA,\rgn,\cdot}{\vbar}{\taubar} & H30\\
+    \hastyp{\emptyA,\cdot}{\vbar}{\taubar} & H30\\
   \end{array}
   \end{smathpar}
   From $H10$, $H11$, and $H30$, we prove the required goal:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyA,\rgn,\cdot}{\C{new}\; \fbN_0(\vbar)}{\fbN_0} & \\
+    \hastyp{\emptyA,\cdot}{\C{new}\; \fbN_0(\vbar)}{\fbN_0} & \\
   \end{array}
   \end{smathpar}
 
   \item Case ($v = \C{new}\; \RgnZT{\rgn_i}(v_0)$ and $\tau = \RgnZT{\toprgn}$): Inversion on $H6$:
   \begin{smathpar}
   \begin{array}{cr}
-    \rgn_i \in dom(\rhomap) & H10\\
-    \rgn_i \notin \rhoenv \cup \{\rgn_0,\toprgn\} & H12\\
-    \tywf{\emptyADelcupPhicapp{\rgn_i,\rgn_0}{\rhoenv_0 \outlives \rgn_0}}{T@\rgn_i} & H14\\
-    \hastyp{\emptyADelcupPhicapp{\rgn_i,\rgn_0}{\rhoenv_0 \outlives \rgn_0},\rgn,\cdot}{v_0}{T@\rgn_i} & H16\\
+    \rgn_i \notin \rhoenv \cup \{\toprgn\} & H12\\
+    \tywf{(\Delta \cup \Delta_0, \cdot, \phicx \wedge \phicx_0)}{T@\rgn_i} & H14\\
+    \hastyp{(\{\rgn_i\}, \cdot, true),\cdot}{v_0}{T@\rgn_i} & H16\\
   \end{array}
   \end{smathpar}
   Inductive hypothesis on $v_0$:
   \begin{smathpar}
   \begin{array}{cr}
-    \tywf{\emptyADelcup{\rgn_i}}{T@\rgn_i}\; \Rightarrow\; \hastyp{\emptyADelcup{\rgn_i},\rgn,\cdot}{v_0}{T@\rgn_i} & IH1\\
+    \tywf{\emptyADelcup{\rgn_i}}{T@\rgn_i}\; \Rightarrow\; \hastyp{\emptyADelcup{\rgn_i},\cdot}{v_0}{T@\rgn_i} & IH1\\
   \end{array}
   \end{smathpar}
   Inverting $H14$, we get:
@@ -131,14 +127,14 @@ Proof by induction on $H6$. Cases:
   $H22$ and $IH1$ gives:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyADelcup{\rgn_i},\rgn,\cdot}{v_0}{T@\rgn_i} & H24\\
+    \hastyp{\emptyADelcup{\rgn_i},\cdot}{v_0}{T@\rgn_i} & H24\\
   \end{array}
   \end{smathpar}
   $H12$ implies $\rgn_i \notin \rhoenv \cup \{\toprgn\}$. Using this, and $H10$, $H22$ and $H24$, we
   conclude:
   \begin{smathpar}
   \begin{array}{cr}
-    \hastyp{\emptyA,\rgn,\cdot}{\RgnZT{\rgn_i}}{\RgnZT{\toprgn}} & \\
+    \hastyp{\emptyA,\cdot}{\RgnZT{\rgn_i}}{\RgnZT{\toprgn}} & \\
   \end{array}
   \end{smathpar}
 

@@ -1,25 +1,31 @@
 \begin{theorem}
 \emph{(\textbf{Transfer Safety})}
 \label{thm:fb-transfer-safety-stmt}
-$\forall$ $v$, $\rhoenv$, $\rhoenv'$, $\rhomap$, $\rhomap'$, $\phicx$,
-$\phicx'$, $\rgn$, $\rgn'$, such that $\rgn \in \rhoenv$, $\rgn' \in \rhoenv'$, and $\rgn_i \notin
-dom(\rhomap') \cup \{\toprgn\}$, if $\hastyp{\emptyA,\rgn, \cdot}{\C{new}\;
-\RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$, then $\hastyp{(\rhomap'[\rgn_i \mapsto
-\CLOSED],\rhoenv',\cdot,\phicx')} {\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$
+$\forall$ $v$, $\rhoenv$, $\rhoenv'$, $\phicx$, $\phicx'$, if
+$\hastyp{\emptyA, \cdot}{\C{new}\;
+\RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$ and $\rgn_i \notin \Delta'$, and
+$\tywf{\Delta}{\phicx}$, then $\hastyp{(\rhoenv',\cdot,\phicx')}
+{\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$
 \end{theorem}
 \begin{proof}
-Intros. Hypothesis:
-\begin{smathpar}
-\begin{array}{cr}
-  \rgn_i \notin dom(\rhomap') \cup \rhoenv' \cup \{\toprgn\} & H6\\
-  \hastyp{\emptyA,\rgn, \cdot}{\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}} & H8\\
-\end{array}
-\end{smathpar}
-By inversion on H8, we observe that $v$ is well-typed under an empty environment containing nothing
-but $\rgn_i$. Hence, $\frv(v) \in \{\rgn_i\}$. Since $v$ is a value, it means that $v$ preserves its
-type under any context that contains a binding for $\rgn_i$ in $\rhomap$. Since $\rgn_i \notin dom(\rhomap')
-\cup \rhoenv'$, it means that $v$ preserves its type under a context with $\rhomap[\rgn_i \mapsto
-\CLOSED]$. Applying the type rule for $\C{new}\; \RgnZT{\rgn_i}(v)$ expression, where $\rgn_i \neq
-\toprgn$, we get the proof.
+% Intros. Hypothesis:
+% \begin{smathpar}
+% \begin{array}{cr}
+%   \rgn_i \notin dom(\rhomap') \cup \rhoenv' \cup \{\toprgn\} & H6\\
+%   \hastyp{\emptyA, \cdot}{\C{new}\; \RgnZT{\rgn_i}(v),\cdot}{\RgnZT{\toprgn}} & H8\\
+% \end{array}
+% \end{smathpar}
+% By inversion on H8, we observe that $v$ is well-typed under an empty
+% environment containing nothing but $\rgn_i$. Hence, $\frv(v) \in
+% \{\rgn_i\}$. Since $v$ is a value, it means that $v$ preserves its
+% type under any context that contains a binding for $\rgn_i$ in
+% $\rhomap$. Since $\rgn_i \notin dom(\rhomap') \cup \rhoenv'$, it
+% means that $v$ preserves its type under a context with
+% $\rhomap[\rgn_i \mapsto \CLOSED]$. Applying the type rule for
+% $\C{new}\; \RgnZT{\rgn_i}(v)$ expression, where $\rgn_i \neq
+% \toprgn$, we get the proof.
+Proof trivial because $\RgnZT{\rgn_i}(v)$ is typed under an empty
+environment containing only $\rgn_i$. Hence, strengthening the context
+is legal. 
 \qed
 \end{proof}

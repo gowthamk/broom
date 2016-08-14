@@ -1,7 +1,7 @@
 \begin{theorem}
 \emph{(\textbf{Preservation})}
 \label{thm:fb-preservation}
-$\forall e, \tau, \rhoenv, \rhomap, \phicx, \rgn$, such that $\frv(e)
+$\forall e, \tau, \rhoenv, \rhomap, \phicx$, such that $\frv(e)
 \subseteq dom(\rhoenv)$ and $\tywf{\rhoenv}{\phicx}$ and
 $\hastyp{\emptyA, \cdot}{e}{\tau}$, if
 $\redstoo{(e,\rhomap)}{(e',\rhomap')}$, then:
@@ -268,8 +268,7 @@ Cases from induction
 %   \end{array}
 %   \end{smathpar}
     Since $\tau$ is well-formed under $\emptyA$ ($H8$), Applying
-    Lemma~\ref{thm:fb-tywf} using $H8$ gives:
-    required goal:
+    Lemma~\ref{thm:fb-tywf} using $H8$ gives: required goal:
     \begin{smathpar}
     \begin{array}{cr}
       \hastyp{\emptyA, \cdot}{v_b}{\tau} & \\
@@ -383,11 +382,11 @@ Cases from induction
   \neq \toprgn$) to prove the preservation.
 
   \item Case ($e$ is a lambda expression): $e$ is a value, hence cannot take a
-  step. Preservation trivially holds.
+  step.
 
   \item Case ($e$ is a method/function call, or a \C{let} expression): Proof
-  follows directly from the inductive hypothesis, substitution lemma
-  (\ref{thm:fb-substitution}) and renaming lemma (\ref{thm:fb-renaming}).
+  follows directly from the inductive hypothesis, and substitution lemma
+  (\ref{thm:fb-substitution}).
 
 %End of cases for proof
 \end{itemize}
