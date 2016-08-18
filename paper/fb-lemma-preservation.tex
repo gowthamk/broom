@@ -2,13 +2,13 @@
 \emph{(\textbf{Preservation})}
 \label{thm:fb-preservation}
 $\forall e, \tau, \rhoenv, \rhomap, \phicx$, such that $\frv(e)
-\subseteq dom(\rhoenv)$ and $\tywf{\rhoenv}{\phicx}$ and
+\subseteq dom(\rhomap)$ and $\tywf{\rhoenv}{\phicx}$ and
 $\hastyp{\emptyA, \cdot}{e}{\tau}$, if
 $\redstoo{(e,\rhomap)}{(e',\rhomap')}$, then:
   \begin{smathpar}
   \begin{array}{rl}
     (i) & \hastyp{\emptyASigp, \cdot}{e'}{\tau}\\
-    (ii) & \frv(e') \subseteq dom(\rhoenv') \\
+    (ii) & \frv(e') \subseteq dom(\rhomap') \\
   \end{array}
   \end{smathpar}
 \end{theorem}
