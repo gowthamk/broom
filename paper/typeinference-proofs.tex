@@ -1,3 +1,11 @@
+Invariants and other points:
+\begin{itemize}
+  \item Every predicate variable has a single domain-constraint.
+  \item Progress: Every region-variable will be unified with some constant.
+  \item Notation: should we use a different notation to distinguish a validity constraint
+    from actual entailment?
+\end{itemize}
+
 \begin{lemma}
 The antecedent of any generated validity constraint is of the form
 $\varphi \conj \phictxt$ where $\varphi$ is a predicate variable and
@@ -19,6 +27,14 @@ a conjunct in $\phictxt$.
   as conjuncts to $\phicx$.
 \end{proof}
 
+\begin{lemma}
+  Consider any constraint satisfying the above invariant with a rhs of the
+  form $\pi_i \outlives \pi_j$, with both $\pi_i$ and $\pi_j$ region constants.
+  (a) If $\{ \pi_i, \pi_j \} \subseteq \predDeltaMap(\varphi)$,
+  then $\isvalid{\varphi}{\pi_i \outlives \pi_j}$ in any solution to the constraints.
+  (b) If $\{ \pi_i, \pi_j \} \not \subseteq \predDeltaMap(\varphi)$,
+  then $\isvalid{\phicx}{\pi_i \outlives \pi_j}$ in any solution to the constraints.
+\end{lemma}
 
 \begin{theorem}
 Let $p$, $q$, $r$ and $C$ denote the values of the corresponding
