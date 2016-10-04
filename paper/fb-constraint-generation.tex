@@ -1,5 +1,5 @@
 %% ************ MACROS *************
-\newcommand{\hdOf}[2]{\C{class}\; #1\angAlpha\inang{\rhoalloc\rhobar \,|\, #2} \extends \fbN}
+\newcommand{\hdOf}[2]{\C{class}\; #1\angAlpha\inang{\rhobar \,|\, #2} \extends \fbN}
 
 % mathpartir's inferrule: seems to have problems with linebreaks
 \newcommand{\genconstraint}[2]{\inferrule*{#1}{#2}}
@@ -42,7 +42,7 @@
 
 %% ************ END MACROS *************
 
-\begin{figure*}[t]
+\begin{figure*}[t!]
 
 %%%%%%%%%%% Header Box %%%%%%%%%%%
 \fbox{  \( \exprok{\stdcontext}{e}{\tau}{C} \)}
@@ -79,7 +79,8 @@
   {
     \typeok {\A} {\fbN} {C_1} \spc
     \exprok {\stdcontext} {\bar{e}} {\bar{\tau'}} {C_2} \spc
-    C_3 = \{ \isvalid{\A.\phicx}{\allocRgn(\fbN)=\ralloc} \} \spc
+    C_3 = \{ \isvalid{\A.\phicx}{\allocRgn(\fbN)=\ralloc} \}
+    \\
     \fields(\fbN) = \bar{f} : \taubar \spc
     \subtypeok {\A} {\bar{\tau'}} {\bar{\tau}} {C_4}
   }
@@ -101,7 +102,8 @@
   \lgcrule{NEW-REGION}
   {
     \typeok {\A.\aenv} {T} {C_1} \spc
-    \rgn \in \A.\rhoenv \spc
+    \rgn \in \A.\rhoenv
+    \\
     \exprok{(\{\rho\},\A.\aenv,true),{\cdot}}{e}{T@\rho}{C_2}
   }
   {
@@ -119,7 +121,8 @@
 %   \substFn = [\rbar/\rhobar] \\
 	\typeok {\A} {\inang{\rhobar \,|\,\phi}\bar{\tau^1}\rightarrow{\tau^2}} {C_2}
     \spc
-    \exprok {\stdcontext} {\bar{e}} {[\rbar/\rhobar](\bar{\tau^1})} {C_3} \spc
+    \exprok {\stdcontext} {\bar{e}} {[\rbar/\rhobar](\bar{\tau^1})} {C_3}
+    \\
 %   \subtyp{\A}{\bar{\tau'}}{\substFn(\bar{\tau^1})} \spc
     \isvalid{\A.\phicx}{[\rbar/\rhobar](\phi)}
   }
@@ -133,24 +136,32 @@
 \lgcrule{LET-REGION}{
 \A= (\rhoenv,\aenv,\phicx)  \spc
 \rgn \notin \rhoenv \spc
-\A' = (\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn))  \spc
+\A' = (\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn))
+\\
 \exprok{\A',\rgn,\env} {e_a} {\tau} {C_1} \spc
 \typeok {\A} {\tau} {C_2}
 }{
 \exprok{\stdcontext} {\letregion{\rgn}{e_a}} {\tau} {(C_1 \cup C_2)}
 }
 
+\caption{Constraint generation}
+\label{fig:constraint-gen}
+\end{figure*}
+
+\begin{figure*}[t!]
+
 %%%%%%%%%%% LAMBDA %%%%%%%%%%%
 
 \lgcrule{LAMBDA}
   {
     \rgn \in \A.\rhoenv \spc
-    \rhobar \notin \A.\rhoenv \\
+    \rhobar \notin \A.\rhoenv
+    \spc
 %   \rhoenv' = \rhoenv \cup \{\rhoalloc,\rhobar\}\spc
     \A' = (\A.\rhoenv \cup \{\rhobar\}, \A.\aenv, 
           \A.\phicx \conj \phi)\spc
     \tywf{\A'.\rhoenv}{\phi}
-    \spc
+    \\
     \typeok {\A'} {\bar{\tau^1}} {C} \spc
     \typeok {\A'} {\tau^2} {C} \spc
     \exprok {\A',\env[\xbar \mapsto \bar{\tau^1}]} {e} {\tau^2} {C}
@@ -166,37 +177,39 @@
 \lgcrule{OPEN}{
 \exprok {\stdcontext} {e_a} {\RgnZ\inang{T}\inang{\rho}} {C_1} \spc
 \A = (\rhoenv,\aenv,\phicx) \spc
-\rgn \notin \rhoenv \spc
+\rgn \notin \rhoenv
+\\
 (\A',\env') = ((\rhoenv \cup \{\rgn\},\aenv,\phicx),\env[y\mapsto T@\rgn] \spc
 \exprok {\A',\rgn,\env'} {e_b} {\tau} {C_2}
 }{
 \exprok {\stdcontext} {\open{e_a}{\rgn}{y}{e_b}} {\tau} {(C_1 \cup C_2)}
 }
 
+
 %%%%%%%%%%% FUNCTION INVOCATION %%%%%%%%%%%
 \lgcrule{FUN-APPLY}
 {
-\exprok {\stdcontext} {e_a} {\inang{\rho_0 \rhobar\,|\,\phi}\taubar \xrightarrow{\rgn} \tau} {C_1} \spc
+\exprok {\stdcontext} {e_a} {\inang{\rhobar\,|\,\phi}\taubar \xrightarrow{\rgn} \tau} {C_1} \spc
 \exprok {\stdcontext} {\bar{e}} {\bar{\tau'}} {C_2} \spc
-\substFn = [\bar{\rho'}/\rhobar][\rho_0'/\rho_0]
+\substFn = [\bar{\rho'}/\rhobar]
 \\
-C_3 = \{\rho_0' \bar{\rho'} \in \A.\rhoenv\} \spc
+C_3 = \{\bar{\rho'} \in \A.\rhoenv\} \spc
 C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
 \subtypeok {\A} {\bar{\tau'}} {\substFn(\bar{\tau})} {C_5}
 }{
-\exprok {\stdcontext} {e_a\inang{\rho_0'\bar{\rho'}}(\bar{e})} {\tau} {\cup_{i=1}^5 C_i}
+\exprok {\stdcontext} {e_a\inang{\bar{\rho'}}(\bar{e})} {\tau} {\cup_{i=1}^5 C_i}
 }
 
 %%%%%%%%%%% METHOD %%%%%%%%%%%
 \lgcrule{METHOD}{
 CT(B) = \hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\} \\
-\A = (\rhoenv,\aenv,\phicx) = (\{\rhoalloc,\rhobar,\rhoalloc_m,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN}, \varphi_m) \spc\spc
+\A = (\rhoenv,\aenv,\phicx) = (\{\rhobar,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN}, \varphi_m) \spc\spc
 C_1 = \{ \tywf{\rhoenv}{\varphi_m} \} \\
-\env = \cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhoalloc\rhobar}][\xbar \mapsto \taubar] \spc\spc
-\exprok {\A,\rhoalloc_m,\env}{e} {\tau'} {C_2} \spc\spc
+\env = \cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhobar}][\xbar \mapsto \taubar] \spc\spc
+\exprok {\stdcontext}{e} {\tau'} {C_2} \spc\spc
 \subtypeok {\A} {\tau'} {\tau} {C_3}
 }{
-\typeok{} {(B, \tau \; m\inang{\rhoalloc_m\rhobarm \,|\, \varphi_m} (\taubar \;  \xbar)\{\C{return} e;\})} {(C_1 \cup C_2 \cup C_3)}
+\typeok{} {(B, \tau \; m\inang{\rhobarm \,|\, \varphi_m} (\taubar \;  \xbar)\{\C{return} e;\})} {(C_1 \cup C_2 \cup C_3)}
 }
 
 %%%%%%%%%%% CLASS %%%%%%%%%%%
@@ -215,7 +228,8 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
 \label{fig:constraint-gen}
 \end{figure*}
 
-\begin{figure*}[t]
+\begin{figure*}[t!]
+
 %%%%%%%%%%% Header Box %%%%%%%%%%%
 \fbox{  \( \typeok{\A}{\tau}{C} \)}
 \\

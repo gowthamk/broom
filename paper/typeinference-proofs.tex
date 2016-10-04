@@ -1,9 +1,21 @@
-Invariants and other points:
+Invariants, other points, and to-dos:
 \begin{itemize}
+  \item use of a set to represent conjunctions
+  \item equality is shorthand for two inequalities
+  \item unify notation for substitution
+  \item substitution required in correctness theorem as well
+  \item use of alpha-renaming, and its use to discharge not-in contraints;
+also, incorporate this into first stage rather than second (in Fig. 7).
+  \item Modify CSP definition to be same as preceding; we can define the $\Delta$s 
+    as auxiliary notation
+  \item Note that we can also clarify that the well-formedness constraints are
+    syntactic sugar from basic set constraints
   \item Every predicate variable has a single domain-constraint.
-  \item Progress: Every region-variable will be unified with some constant.
+  \item Prove: Progress: Every region-variable will be unified with some constant.
   \item Notation: should we use a different notation to distinguish a validity constraint
     from actual entailment?
+  \item Proof by relating proof-trees with constraint-generation trees; each can
+    be constructed from the other; inductive lemma is as earlier
 \end{itemize}
 
 \begin{lemma}
