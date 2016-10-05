@@ -1,3 +1,5 @@
+\newcommand{\soln}{\eta}
+
 \section{Type Inference}
 \label{sec:type-inference}
 
@@ -25,25 +27,6 @@ The algorithm consists of the following steps:
    \emph{predicate variable} ($\varphi$) to denote an undetermined set of constraints
    over the region parameters of that class/method.
 
-%%    as follows:
-%% \begin{enumerate}
-%% \item For every class determine a set of \emph{region parameters} ($\rho$)
-%%        it should be parametrized over.
-%% \item For every field of the class, determine its region parametrized type by
-%%        generating as many fresh \emph{actual region parameters} as required by its class (type),
-%%        which in turn become formal region parameters of the containing class.
-%% \item  For every method and function type, determine its corresponding region
-%%    type template by introducing fresh region parameters as required by
-%%    the type of each parameter and return value (in addition to the allocation region
-%%    parameter).
-%%  \item Elaborate every \C{new} expression, method call or function application by
-%%    introducing \emph{fresh region variables} (as required by the region type
-%%    template of the called method or function).
-%% \item Introduce for each class and method, a \emph{predicate variable} ($\varphi$) to denote
-%%    an undetermined set of constraints over the region parameters of that
-%%    class/method.
-%% \end{enumerate}
-
  \item \emph{Constraint Generation}.
    In the second step, we analyze the program to generate a set of constraints
    (over the region identifiers and the predicate variables)
@@ -51,28 +34,27 @@ The algorithm consists of the following steps:
 
  \item \emph{Constraint Solving}.
    We solve the generated set of constraints using our fixpoint constraint
-   solving algorithm \csolvestar, which reduces the constraint solving problem to
+   solving algorithm, which reduces the constraint solving problem to
    an abduction problem. If the original program in $\absof{\FB}$ contains unsafe
    references, for example, a reference from a transferable region to a
    stack region, then the constraints generated during the elaboration
-   are not satisfiable. In such a case, \csolvestar{} fails to solve
+   are not satisfiable. In such a case, the solver fails to solve
    the constraints.
-% in a Herbrand constraint system, and then relies on \csolve,
-% our abduction solver for that domain. 
 
- \item If the solver succeeds, it returns substitution functions $\substFn_\rho$ and
-  $\substFn_\varphi$ for free region and predicate variables, respectively, introduced in
-  step 1. We apply these substitutions to the elaborated program to produce the final program.
+ \item If the solver succeeds, it returns a solution $\soln$ consisting of a
+   pair of substitution functions $\substFn_\rho$ and $\substFn_\varphi$ for
+   free region and predicate variables, respectively, introduced in step 1.
+   We apply these substitutions to the elaborated program to produce the final program.
 \end{enumerate}
 
 \begin{figure}
 \begin{codeml}
 Infer ($p$) =
   let $q$ = IntroduceRegionParameters($p$) in
-  let $(r,C)$ = GenerateConstraints($q$) in
+  let $C$ = GenerateConstraints($q$) in
   match (SolveConstraints($C$) with
   | None $\longrightarrow$ None
-  | Some ($s$) $\longrightarrow$ Some (ApplySolution $(s,r)$)
+  | Some ($\soln$) $\longrightarrow$ Some ($q[\soln]$)
 \end{codeml}
 
 \caption{The type inference algorithm}
@@ -80,7 +62,8 @@ Infer ($p$) =
 \end{figure}
 
 We later on establish the soundness of the type inference algorithm, and also establish
-partial completeness results.
+that the constraint-generation and constraint-solving steps (the second and third steps
+above) are complete.
 
 \subsection{Region Parameterization for Classes}
 \label{sec:fb-templatization}
@@ -122,11 +105,9 @@ a class does not specify an explicit base class, it has an implicit base class
 This transformation is illustrated below, using a non-generic \C{Pair} class:
 
 \begin{tabular}{ccc}
-\begin{minipage}{0.28\linewidth}
+\begin{minipage}{0.35\linewidth}
 \begin{codejava}
-class Pair
-  $\extends$ $\ObjZ$
-{
+class Pair $\extends$ $\ObjZ$ {
   $\ObjZ$ fst;
   $\ObjZ$ snd;
 }
@@ -135,11 +116,9 @@ class Pair
 &
 $\Rightarrow$
 &
-\begin{minipage}{0.5\linewidth}
+\begin{minipage}{0.6\linewidth}
 \begin{codejava}
-class Pair $\langle \rho_0, \rho_1, \rho_2 \; | \; \varphi \rangle$
-  $\extends$ $\ObjZ \langle \rho_0 \rangle$
-{
+class Pair $\langle \rho_0, \rho_1, \rho_2 \; | \; \varphi \rangle$ $\extends$ $\ObjZ \langle \rho_0 \rangle$ {
   $\ObjZ \langle \rho_1 \rangle$ fst;
   $\ObjZ \langle \rho_2 \rangle$ snd;
 }
@@ -152,6 +131,7 @@ The region parameters for a recursive class is computed in
 a similar fashion, with the following difference: any recursive
 field is ignored while instantiating region parameters for the fields of
 the class, and the region parameters of the recursive class are computed
+
 as before. We then do parameter instantiation for all recursive fields,
 such that their region annotations (the actual region parameters) are
 exactly the same as the (formal) region parameters of the class.
@@ -160,11 +140,9 @@ The resulting class represents a linked list with spine in the region
 $\rho_0$ and data objects in the region $\rho_1$.
 
 \begin{tabular}{ccc}
-\begin{minipage}{0.28\linewidth}
+\begin{minipage}{0.35\linewidth}
 \begin{codejava}
-class List
-  $\extends$ $\ObjZ$
-{
+class List $\extends$ $\ObjZ$ {
   $\ObjZ$ data;
   List next;
 }
@@ -173,11 +151,9 @@ class List
 &
 $\Rightarrow$
 &
-\begin{minipage}{0.5\linewidth}
+\begin{minipage}{0.65\linewidth}
 \begin{codejava}
-class List $\langle \rho_0, \rho_1 \; | \; \varphi \rangle$
-  $\extends$ $\ObjZ \langle \rho_0 \rangle$
-{
+class List $\langle \rho_0, \rho_1 \; | \; \varphi \rangle$ $\extends$ $\ObjZ \langle \rho_0 \rangle$ {
   $\ObjZ \langle \rho_1 \rangle$ data;
   $\C{List} \langle \rho_0, \rho_1 \rangle$ next;
 }
@@ -193,6 +169,8 @@ then instantiating them).
 % Type parameters of classes are handled as follows.
 % Consider a type-parametric class \C{C $\langle$ T $\extends$ B $\rangle$}.
 The type parameter \C{T} of a class \C{C} is instantiated as $\C{T}@\rho$ using a single region parameter $\rho$. 
+(This can be extended to use the bound specified for \C{T}, if any. We do not
+discuss this due to space restrictions.)
 % number of region parameters
 % that its bound \C{B} has. If no bound is specified for \C{T}, the bound is taken
 % to be \C{Object}, and \C{T} is instantiated with one region parameter.
@@ -251,18 +229,24 @@ alternatively generalized as formal region parameters of $f$, but we choose to
 generalize them as formal region parameters of $g$.
 We will discuss this aspect again later.
 
-\subsection{The Constraint Satisfaction Problem (CSP)}
+\subsection{Constraint Generation}
 \label{sec:fb-constraintsem}
 
 The constraint generation algorithm mimics the static type checker, but accumulates
 constraints that must hold for the type checking to succeed.
 
 \paragraph{Syntax of Constraints.}
-The constraints are expressed in terms of region identifiers ($\pi$ and $\rho$)
-and predicate variables ($\varphi$).
+The constraints are expressed using
+a set $\regionConstants$ of region constants,
+a set $\regionVars$ of region variables,
+and
+a set $\predVars$ of predicate variables.
+% 
+% ($\pi$ and $\rho$) and predicate variables ($\varphi$).
+% $(\regionConstants, \regionVars, \predVars, \regionDeltaMap, \predDeltaMap, \constraintSet)$,
 
-\emph{Region identifiers} are of two kinds: \emph{region constants} and \emph{region variables}.
-A \emph{region variable} is introduced to represent an unknown actual region parameter
+% \emph{Region identifiers} are of two kinds: \emph{region constants} and \emph{region variables}.
+Recall that a \emph{region variable} is introduced to represent an unknown actual region parameter
 of a method invocation or object allocation, which will be bound to a region constant by the end of the
 type inference.
 A region constant may be 
@@ -275,9 +259,13 @@ Every predicate variable $\varphi$ denotes an unknown \emph{region-constraint},
 where the set of region-constraints $\phi$ is defined by:
 \begin{smathpar}
 \begin{array}{lcl}
-\phi & \coloneqq & true \ALT \rho \outlives \rho \ALT \rho = \rho \ALT \phi \conj \phi \\
+\phi & \coloneqq & true \ALT \rho \outlives \rho \ALT \phi \conj \phi \\
 \end{array}
 \end{smathpar}
+We will use $\rho_1 = \rho_2$ as shorthand for $\rho_1 \outlives \rho_2 \conj \rho_2 \outlives \rho_1$.
+We will also use a set $S$ of primitive constraints of the form $\rho_1 \outlives \rho_2$
+as shorthand for $\conj_{\phi \in S} \phi$.
+
 We will use the term \emph{validity constraint} to denote an entailment constraint
 of the form $\isvalid{\varphi}{\rho_1 \outlives \rho_2}$.
 
@@ -339,6 +327,12 @@ $\varphi_i$ are as above).
 
 \end{itemize}
 
+\paragraph{Constraint Solution.}
+The solution $\soln$ to a set of constraints $C$ is a pair $(\regionSubstFn,\predSubstFn)$,
+where $\regionSubstFn$ is a map from $\regionVars$ to $\regionConstants$
+and $\predSubstFn$ is a map from $\predVars$ to a region-constraint formula such that
+every sequent in $C$ is valid after the substitutions $\predSubstFn$ and $ \regionSubstFn$.
+
 \input{fb-constraint-generation}
 
 \paragraph{Constraint Generation.}
@@ -348,11 +342,10 @@ for the type checker to succeed.
 
 Fig.~\ref{fig:constraint-gen} illustrates this for selected language constructs.
 These rules use the same context as the corresponding typing judgment in
-Fig.~\ref{fig:fb-staticsem} with symbols $\A$,$\ralloc$, and $\env$
-retaining their meaning.
+Fig.~\ref{fig:fb-staticsem} with symbols $\A$ and $\env$ retaining their meaning.
 The algorithm proceeds top-down, analyzes an expression $e$ in a context
-$\exptycx{\ralloc}{\env}$, and returns a type $\tau$ and a set of constraints $C$
-(expressed in the rules as $\exprok {\exptycx{\ralloc}{\env}} {e} {\tau} {C}$ ),
+$\stdcontext$, and returns a type $\tau$ and a set of constraints $C$
+(expressed in the rules as $\exprok {\stdcontext} {e} {\tau} {C}$ ),
 indicating that the expression will have a type $\tau$ provided the constraints $C$ hold.
 
 The rules for generating constraints from a method and
@@ -448,6 +441,25 @@ it includes every conjunct $\pi_f \outlives \pi_s$ for every $\pi_f \in \predDel
 This property allows us to show that $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$
 iff $\isvalid{\varphi}{\pi_i \outlives \pi_j}$ or $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$,
 simplifying the constraint solver.
+
+\begin{theorem}
+  \label{thm:constraint-generation-sc}
+Let $C$ be the set of constraints generated from a program $q$.
+Let $\soln$ be any substitution for the region and predicate variables in $q$.
+$\soln$ is a solution to $C$ iff $q[\soln]$ is well-typed.
+\end{theorem}
+\begin{proof}
+  We inductively establish a correspondence between derivation trees under
+  the static semantics and the constraint-generation trees.
+
+% We do not present a formal proof of the theorem.
+The proof essentially requires establishing the following lemma inductively: if
+$\exprok {\stdcontext}{e}{\tau}{C}$
+and $\soln$ satisfies $C$, then
+$\hastyp {\stdcontext}{e[\soln]}{\tau}$,
+where $e[\soln]$ indicates $e$ with the substitutions
+in the solution $\soln$, as well as analogous lemmas for type well-formedness.
+\end{proof}
 
 \subsection{Solving the CSP}
 
@@ -553,7 +565,18 @@ In effect, this requires the type inference to process any collection of
 mutually recursive methods together.
 However, methods that are not mutually recursive can be processed separately.
 
-\paragraph{Soundness and Completeness.}
+\paragraph{Soundness and Completeness of the Constraint Solver.}
+
+\begin{theorem}
+  \label{thm:constraint-solver-sc}
+Let $C$ be the set of constraints generated from some $p \in \absof{\FB}$.
+If the constraint solver returns Some($\soln$), then $\soln$ is a valid solution
+for $C$.
+Conversely, if $C$ has some valid solution, then the constraint solver will return
+a value of the form Some($\soln$).
+\end{theorem}
+
+\subsection{Discussion}
 
 We now state the soundness theorem:
 
@@ -564,18 +587,6 @@ For any $p \in \absof{\FB}$, if Infer($p$) returns Some($t$), then
 (2) $t$ is well-typed.
 \end{theorem}
 
-We do not present a formal proof of the theorem. The proof essentially requires
-establishing the following lemma inductively: if
-$
- \exprok {\exptycx{\ralloc}{\env}}{e}{\tau}{C}
-$
-and $(\regionSubstFn,\predSubstFn)$ satisfies $C$, then
-$
- \hastyp {\exptycx{\ralloc}{\env}}{e[\regionSubstFn,\predSubstFn]}{\tau}
-$,
-where $e[\regionSubstFn,\predSubstFn]$ indicates $e$ with the substitutions
-in the solution $(\regionSubstFn,\predSubstFn)$,
-as well as analogous lemmas for type well-formedness.
 
 However, in this context, completeness is more interesting than soundness.
 (Note that an unsound inference algorithm can be made sound by simply type-checking
