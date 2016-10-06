@@ -328,10 +328,44 @@ $\varphi_i$ are as above).
 \end{itemize}
 
 \paragraph{Constraint Solution.}
-The solution $\soln$ to a set of constraints $C$ is a pair $(\regionSubstFn,\predSubstFn)$,
+We define an \emph{assignment} $\soln$ to be a pair of functions $(\regionSubstFn,\predSubstFn)$,
 where $\regionSubstFn$ is a map from $\regionVars$ to $\regionConstants$
-and $\predSubstFn$ is a map from $\predVars$ to a region-constraint formula such that
+and $\predSubstFn$ is a map from $\predVars$ to a region-constraint formula.
+Such an assignment is said to be a solution to a set of constraints $C$ if
 every sequent in $C$ is valid after the substitutions $\predSubstFn$ and $ \regionSubstFn$.
+
+%\begin{definition}
+%\emph{(\textbf{Constraint Satisfaction Problem (CSP)})}
+%A constraint satisfaction problem is a tuple
+%$(\regionConstants, \regionVars, \predVars, \regionDeltaMap, \predDeltaMap, \constraintSet)$,
+%where $\regionConstants$ is a set of region constants,
+%$\regionVars$ is a set of region variables,
+%$\predVars$ is a set of predicate variables,
+%$\regionDeltaMap : \regionVars \rightarrow 2^{\regionConstants}$ is a function that
+%specifies a unification domain for each region variable,
+%$\predDeltaMap : \predVars \rightarrow 2^{\regionConstants}$ is a function that
+%specifies the domain for each predicate variable,
+%and $\constraintSet$ is a set of validity constraints in one of the following forms:
+%\begin{center}
+%\(
+%    \isvalid{\phictxt \conj \varphi}{\phicstr}\qquad
+%    \isvalid{\phictxt \conj \varphi}{F(\varphi)}
+%\)
+%\end{center}
+%The solution to the constraint satisfaction problem is a pair $(\regionSubstFn,\predSubstFn)$,
+%where $\regionSubstFn$ is a map from $\regionVars$ to $\regionConstants$
+%and $\predSubstFn$ is a map from $\predVars$ to a region-constraint formula such that
+%\begin{itemize}
+%  \item $\regionSubstFn(\rho) \in \regionDeltaMap(\rho)$, for every $\rho \in \regionVars$,
+%
+%  \item $\predSubstFn$ is well-formed under $\predDeltaMap$
+%    (i.e., $\tywf{\predDeltaMap(\varphi)}{\predSubstFn(\varphi)}$, for every $\varphi \in \predVars$).
+%
+%  \item Every sequent in $C$ is valid after substitutions $\predSubstFn$ and $
+%    \regionSubstFn$.
+%  %% $C\lbrack (\regionSubstFn,\predSubstFn) \rbrack$ is valid.
+%\end{itemize}
+%\end{definition}
 
 \input{fb-constraint-generation}
 
@@ -357,6 +391,8 @@ variables ($\varphi$ and $\varphi_m$) to capture constraints over
 variables in $\rhoenv$ denoting the fact that such constraints are yet
 to be inferred.
 
+\TODO{Change the static semantics to be consistent with this, and
+make this a comment there.}
 One notable aspect here is the following. Consider a method with predicate
 variable $\varphi_m$ in a class with predicate variable $\varphi_c$. 
 We use $\varphi_m$ as the constraint formula in the initial context used for
@@ -372,49 +408,24 @@ $\isvalid{\varphi_m \conj \varphi_c \conj \phi_{cx}}{\phi_{cs}}$ (i.e., constrai
 with more than one predicate variable on the left hand side, which introduce complications).
 %  ensures that the generated constraints produces a restricted form of constraints that is easier to solve.
 
-\paragraph{Constraint Solution}
-Solving the set ($C$) of constraints entails finding an
-assignment for each predicate variable $(\varphi$) and each region
-variable ($\rho$) that occurs free in $C$, that satisfies all
-the validity constraints as well as the well-formedness constraints on
-$\varphi$ and $\rhobar$.
-% To simplify presentation, we think of $C$ as being parameterized on
-% $\varphi$ and $\rhobar$, and write it as $C\lbrack \varphi,\rhobar
-% \rbrack$. We now formalize the constraint satisfaction problem, and
-% its solution.
+\begin{theorem}
+  \label{thm:constraint-generation-sc}
+Let $C$ be the set of constraints generated from a program $q$.
+Let $\soln$ be any substitution for the region and predicate variables in $q$.
+$\soln$ is a solution to $C$ iff $q[\soln]$ is well-typed.
+\end{theorem}
+\begin{proof}
+  We inductively establish a correspondence between derivation trees under
+  the static semantics and the constraint-generation trees.
 
-\begin{definition}
-\emph{(\textbf{Constraint Satisfaction Problem (CSP)})}
-A constraint satisfaction problem is a tuple
-$(\regionConstants, \regionVars, \predVars, \regionDeltaMap, \predDeltaMap, \constraintSet)$,
-where $\regionConstants$ is a set of region constants,
-$\regionVars$ is a set of region variables,
-$\predVars$ is a set of predicate variables,
-$\regionDeltaMap : \regionVars \rightarrow 2^{\regionConstants}$ is a function that
-specifies a unification domain for each region variable,
-$\predDeltaMap : \predVars \rightarrow 2^{\regionConstants}$ is a function that
-specifies the domain for each predicate variable,
-and $\constraintSet$ is a set of validity constraints in one of the following forms:
-\begin{center}
-\(
-    \isvalid{\phictxt \conj \varphi}{\phicstr}\qquad
-    \isvalid{\phictxt \conj \varphi}{F(\varphi)}
-\)
-\end{center}
-The solution to the constraint satisfaction problem is a pair $(\regionSubstFn,\predSubstFn)$,
-where $\regionSubstFn$ is a map from $\regionVars$ to $\regionConstants$
-and $\predSubstFn$ is a map from $\predVars$ to a region-constraint formula such that
-\begin{itemize}
-  \item $\regionSubstFn(\rho) \in \regionDeltaMap(\rho)$, for every $\rho \in \regionVars$,
-
-  \item $\predSubstFn$ is well-formed under $\predDeltaMap$
-    (i.e., $\tywf{\predDeltaMap(\varphi)}{\predSubstFn(\varphi)}$, for every $\varphi \in \predVars$).
-
-  \item Every sequent in $C$ is valid after substitutions $\predSubstFn$ and $
-    \regionSubstFn$.
-  %% $C\lbrack (\regionSubstFn,\predSubstFn) \rbrack$ is valid.
-\end{itemize}
-\end{definition}
+% We do not present a formal proof of the theorem.
+The proof essentially requires establishing the following lemma inductively: if
+$\exprok {\stdcontext}{e}{\tau}{C}$
+and $\soln$ satisfies $C$, then
+$\hastyp {\stdcontext}{e[\soln]}{\tau}$,
+where $e[\soln]$ indicates $e$ with the substitutions
+in the solution $\soln$, as well as analogous lemmas for type well-formedness.
+\end{proof}
 
 \paragraph{Properties of generated constraints}
 In the sequel, we will restrict our attention to a special class of CSPs that satisfy
@@ -442,24 +453,7 @@ This property allows us to show that $\isvalid{\varphi \conj \phictxt}{\pi_i \ou
 iff $\isvalid{\varphi}{\pi_i \outlives \pi_j}$ or $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$,
 simplifying the constraint solver.
 
-\begin{theorem}
-  \label{thm:constraint-generation-sc}
-Let $C$ be the set of constraints generated from a program $q$.
-Let $\soln$ be any substitution for the region and predicate variables in $q$.
-$\soln$ is a solution to $C$ iff $q[\soln]$ is well-typed.
-\end{theorem}
-\begin{proof}
-  We inductively establish a correspondence between derivation trees under
-  the static semantics and the constraint-generation trees.
 
-% We do not present a formal proof of the theorem.
-The proof essentially requires establishing the following lemma inductively: if
-$\exprok {\stdcontext}{e}{\tau}{C}$
-and $\soln$ satisfies $C$, then
-$\hastyp {\stdcontext}{e[\soln]}{\tau}$,
-where $e[\soln]$ indicates $e$ with the substitutions
-in the solution $\soln$, as well as analogous lemmas for type well-formedness.
-\end{proof}
 
 \subsection{Solving the CSP}
 
