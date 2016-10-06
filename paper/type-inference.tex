@@ -504,43 +504,74 @@ as below. Otherwise, the constraint solver fails, as no valid solution exists.
 \begin{itemize}
 \item For any predicate variable $\varphi$, $\predSubstFn(\varphi)$ is defined
 to be $\conj \{ \pi_1 \outlives \pi_2 \;|\; \pi_1, \pi_2 \in \regionConstants, \isvalid{\varphi}{\pi_1 \outlives \pi_2} \in \saturate{C} \}$.
-\item For any region variable $\rho$,  we are guaranteed that there exists a unique
- $\pi \in \regionConstants$  such that $\saturate{C}$ contains some constraint
-with a consequent $\rho = \pi$. We define $\regionSubstFn(\rho)$ to be $\pi$.
+\item For any region variable $\rho$,  the set
+ $\{ \pi \in \regionConstants \:|\; \isvalid{\ell}{\rho = \pi} \in \saturate{C} \}$ 
+is guarantted to contain a single element $\pi$.
+We define $\regionSubstFn(\rho)$ to be $\pi$.
+%\item For any region variable $\rho$,  we are guaranteed that there exists a unique
+% $\pi \in \regionConstants$  such that $\saturate{C}$ contains some constraint
+%with a consequent $\rho = \pi$. We define $\regionSubstFn(\rho)$ to be $\pi$.
 \end{itemize}
 \end{enumerate}
 
-Solving the constraints is an iterative process, consisting of the following
-steps, and this process fails at any point if it determines that no solution
-exists for the set of constraints:
+We compute $\saturate{C}$ by iteratively applying the following rules until a fixed
+point is reached:
 
 \begin{enumerate}
 
-\item
-    A constraint of the form $\isvalid{\varphi}{\rho_i = \rho_j}$ unifies
-$\rho_i$ and $\rho_j$ if at least one of them is a region variable.
-If $\rho_i$ and $\rho_j$ are distinct region constants, then the constraint
-solver fails.
+\item (Initialization) $\isvalid{\ell}{r} \in C \Rightarrow \isvalid{\ell}{r} \in \saturate{C}$
 
-\item
-When a region variable $\rho$ is unified with a region constant $\pi$,
-if $\pi \in \regionDeltaMap(\rho)$, we update $\regionSubstFn(\rho)$ to be $\pi$,
-and replace every occurrence of $\rho$ by $\pi$ in the set of constraints.
-If $\pi \not\in \regionDeltaMap(\rho)$, the constraint solver fails.
+\item (Transitivity)
+$\isvalid{\ell}{\rho_1 \outlives \rho_2} \in \saturate{C}$,
+$\isvalid{\ell}{\rho_2 \outlives \rho_3} \in \saturate{C}$,
+$\Rightarrow$
+$\isvalid{\ell}{\rho_1 \outlives \rho_3} \in \saturate{C}$
 
-\item
+\item (Substitution)
+$\isvalid{\ell}{F(\varphi)} \in \saturate{C}$,
+$\isvalid{\varphi}{\phi} \in \saturate{C}$
+$\Rightarrow$ $\isvalid{\ell}{F(\phi)} \in \saturate{C}$
+
+\item (Abduction Decomposition)
 \label{item:context}
-Consider any constraint of the form $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$,
-where $\pi_i$ and $\pi_j$ are both region constants.
-If $\{ \pi_i, \pi_j \} \subseteq \predDeltaMap(\varphi)$, then we simply add
-$\pi_i \outlives \pi_j$ as an additional conjunct to $\predSubstFn(\varphi)$.
-Otherwise, we check if $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$.
-If this entailment does not hold, the constraint solver fails, since no valid solution is possible.
-
+\begin{enumerate}
 \item
-  When any outlives constraint $\phi$ is added to $\predSubstFn(\varphi)$,
-  then for every existing validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\varphi)}$,
-  we produce a new validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\phi)}$. 
+$\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j} \in \saturate{C}$,
+$\{ \pi_i, \pi_j \} \subseteq \predDeltaMap(\varphi)$
+$\Rightarrow$
+$\isvalid{\varphi}{\pi_i \outlives \pi_j} \in \saturate{C} $
+
+\item 
+$\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j} \in \saturate{C}$,
+$\{ \pi_i, \pi_j \} \subseteq \regionConstants \setminus \predDeltaMap(\varphi)$
+$\Rightarrow$
+$\isvalid{\phictxt}{\pi_i \outlives \pi_j} \in \saturate{C} $
+\end{enumerate}
+
+%\item
+%\label{item:context}
+%Consider any constraint of the form $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$,
+%where $\pi_i$ and $\pi_j$ are both region constants.
+%If $\{ \pi_i, \pi_j \} \subseteq \predDeltaMap(\varphi)$, then we simply add
+%$\pi_i \outlives \pi_j$ as an additional conjunct to $\predSubstFn(\varphi)$.
+%Otherwise, we check if $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$.
+%If this entailment does not hold, the constraint solver fails, since no valid solution is possible.
+%
+%\item
+%    A constraint of the form $\isvalid{\varphi}{\rho_i = \rho_j}$ unifies
+%$\rho_i$ and $\rho_j$ if at least one of them is a region variable.
+%If $\rho_i$ and $\rho_j$ are distinct region constants, then the constraint
+%solver fails.
+%
+%\item
+%When a region variable $\rho$ is unified with a region constant $\pi$,
+%if $\pi \in \regionDeltaMap(\rho)$, we update $\regionSubstFn(\rho)$ to be $\pi$,
+%and replace every occurrence of $\rho$ by $\pi$ in the set of constraints.
+%If $\pi \not\in \regionDeltaMap(\rho)$, the constraint solver fails.
+%\item
+%  When any outlives constraint $\phi$ is added to $\predSubstFn(\varphi)$,
+%  then for every existing validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\varphi)}$,
+%  we produce a new validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\phi)}$. 
 \end{enumerate}
 
 Point~\ref{item:context} makes use of the special structure of the generated
