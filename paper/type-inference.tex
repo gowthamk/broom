@@ -574,13 +574,20 @@ Every abduction constraint in $C$ is decomposable.
 
 
 \begin{lemma}
-  Consider any constraint satisfying the above invariant with a rhs of the
-  form $\pi_i \outlives \pi_j$, with both $\pi_i$ and $\pi_j$ region constants.
-  (a) If $\{ \pi_i, \pi_j \} \subseteq \predDeltaMap(\varphi)$,
-  then $\isvalid{\varphi}{\pi_i \outlives \pi_j}$ in any solution to the constraints.
+  Consider any decomposable constraint  $\isvalid{\varphi \conj \phi}{\pi_i \outlives \pi_j}$
+where both $\pi_i$ and $\pi_j$ are region constants.
+(a) If $\{ \pi_i, \pi_j \} \subseteq \predDeltaMap(\varphi)$,
+then $\soln$ satisfies $C \cup \{ \isvalid{\varphi \conj \phi}{\pi_i \outlives \pi_j} \}$
+iff
+$\soln$ satisfies $C \cup \{ \isvalid{\varphi}{\pi_i \outlives \pi_j} \}$
   (b) If $\{ \pi_i, \pi_j \} \not \subseteq \predDeltaMap(\varphi)$,
-  then $\isvalid{\phicx}{\pi_i \outlives \pi_j}$ in any solution to the constraints.
+$\soln$ satisfies $C \cup \{ \isvalid{\varphi \conj \phi}{\pi_i \outlives \pi_j} \}$
+iff
+$\soln$ satisfies $C \cup \{ \isvalid{\phi}{\pi_i \outlives \pi_j} \}$
 \end{lemma}
+
+Note that the above lemma shows how the conjunction in the antecedent of
+any decomposable constraint can be eliminated.
 
 \paragraph{Algorithmic Aspects.}
 The iterative process described above is a standard fixed point computation.
