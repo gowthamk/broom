@@ -60,21 +60,22 @@
 %
 
 %
-\begin{minipage}{3.25in}
+\begin{minipage}{3.6in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
     \fgjtywf{\A.\aenv}{T} \spc
-    \fgjN = \RgnZ\inang{T}\\
     \rgn \in \A.\rhoenv \spc
     \hastyp{(\{\rho\},\A.\aenv,true),{\cdot}}{e}
       {T@\rho}
   }
   {
     \hastyp{\exptycx{\env}}{\C{new}\;
-    \fgjN\inang{\toprgn}(\lambdaexp{\rgn}{\rho}{}{e})} {\fgjN\inang{\toprgn}}
+    \RgnZ\inang{T}\inang{\toprgn}(\lambdaexp{\rgn}{\rho}{}{e})} 
+      {\RgnZ\inang{T}\inang{\toprgn}}
   }
 \end{array}
 \end{smathpar}
@@ -227,7 +228,7 @@
 %   \subtyp{\A}{\taubar}{\bar{\tau^1}}
   }
   {
-    \hastyp{\A,\ralloc,\env}{e\inang{\rbar}(\bar{e})}
+    \hastyp{\A,\env}{e\inang{\rbar}(\bar{e})}
            {\subst{\rbar}{\rhobar}\tau^2}
   }
 \end{array}
