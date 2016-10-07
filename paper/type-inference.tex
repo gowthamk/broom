@@ -19,8 +19,8 @@ expressions, similar to the language introduced in
 
 \paragraph{Overview.}
 
-Fig.~\ref{fig:type-inference-algo} presents the high-level outline of the type
-inference algorithm.
+% Fig.~\ref{fig:type-inference-algo}
+We now present a high-level outline of the type inference algorithm.
 The algorithm consists of the following steps:
 \begin{enumerate}
  \item \emph{Region Parameterization}.
@@ -45,24 +45,24 @@ The algorithm consists of the following steps:
    the constraints.
 
  \item If the solver succeeds, it returns a solution $\soln$ consisting of a
-   pair of substitution functions $\substFn_\rho$ and $\substFn_\varphi$ for
+   pair of substitution functions $\regionSubstFn$ and $\predSubstFn$ for
    free region and predicate variables, respectively, introduced in step 1.
    We apply these substitutions to the elaborated program to produce the final program.
 \end{enumerate}
 
-\begin{figure}
-\begin{codeml}
-Infer ($p$) =
-  let $q$ = IntroduceRegionParameters($p$) in
-  let $C$ = GenerateConstraints($q$) in
-  match (SolveConstraints($C$) with
-  | None $\longrightarrow$ None
-  | Some ($\soln$) $\longrightarrow$ Some ($q[\soln]$)
-\end{codeml}
-
-\caption{The type inference algorithm}
-\label{fig:type-inference-algo}
-\end{figure}
+% \begin{figure}
+% \begin{codeml}
+% Infer ($p$) =
+%   let $q$ = IntroduceRegionParameters($p$) in
+%   let $C$ = GenerateConstraints($q$) in
+%   match (SolveConstraints($C$) with
+%   | None $\longrightarrow$ None
+%   | Some ($\soln$) $\longrightarrow$ Some ($q[\soln]$)
+% \end{codeml}
+% 
+% \caption{The type inference algorithm}
+% \label{fig:type-inference-algo}
+% \end{figure}
 
 We later on establish the soundness of the type inference algorithm, and also establish
 that the constraint-generation and constraint-solving steps (the second and third steps
@@ -134,7 +134,6 @@ The region parameters for a recursive class is computed in
 a similar fashion, with the following difference: any recursive
 field is ignored while instantiating region parameters for the fields of
 the class, and the region parameters of the recursive class are computed
-
 as before. We then do parameter instantiation for all recursive fields,
 such that their region annotations (the actual region parameters) are
 exactly the same as the (formal) region parameters of the class.
@@ -414,7 +413,7 @@ with more than one predicate variable on the left hand side, which introduce com
 %  ensures that the generated constraints produces a restricted form of constraints that is easier to solve.
 
 \begin{theorem}
-  \label{thm:constraint-generation-sc}
+\label{thm:constraint-generation-sc}
 Let $C$ be the set of constraints generated from a program $q$.
 Let $\soln$ be any substitution for the region and predicate variables in $q$.
 $\soln$ is a solution to $C$ iff $q[\soln]$ is well-typed.
@@ -644,7 +643,7 @@ This follows because $\FB$ does not admit uninitialized variables.
 % , and the type system uniquely determines the region parameters of every value
 
 \begin{theorem}
-  \label{thm:constraint-solver-sc}
+\label{thm:constraint-solver-sc}
 Let $C$ be the set of constraints generated from some $p \in \absof{\FB}$.
 If the constraint solver returns Some($\soln$), then $\soln$ is a valid solution
 for $C$.
@@ -686,24 +685,28 @@ We now state the soundness theorem:
 
 \begin{theorem}
 \emph{(\textbf{Soundness})}
-For any $p \in \absof{\FB}$, if Infer($p$) returns Some($t$), then
+For any $p \in \absof{\FB}$, if type inference succeeds, it returns a $t$ such that
+% Infer($p$) returns Some($t$), then
 (1) $\absof{t} = p$, and
 (2) $t$ is well-typed.
 \end{theorem}
 
+% \item $\absof{q[\sigma]}$ = $p$ for any substitution $\sigma$.
 
 However, in this context, completeness is more interesting than soundness.
 (Note that an unsound inference algorithm can be made sound by simply type-checking
 the resulting program.)
-We believe that the converse of the above lemma can also be established:
-any substitution for the region variables and the predicate variables that makes the
-expression well-typed will also satisfy the generated constraints.
-Thus, if there is any possible instantiation (of the region variables and predicate variables) of
-the elaborated program produced by the first phase that type checks, then the generated
-constraints are satisfiable, and the second phase will identify it.
-
-However, the entire type inference algorithm is not complete, because of some heuristic
-choices made during the first phase (elaboration phase), as explained below.
+Theorems~\ref{thm:constraint-generation-sc} and~\ref{thm:constraint-solver-sc}
+show that the second and third steps of the type-inference algorithm are complete.
+%% We believe that the converse of the above lemma can also be established:
+%% any substitution for the region variables and the predicate variables that makes the
+%% expression well-typed will also satisfy the generated constraints.
+%% Thus, if there is any possible instantiation (of the region variables and predicate variables) of
+%% the elaborated program produced by the first phase that type checks, then the generated
+%% constraints are satisfiable, and the second phase will identify it.
+%% 
+The only sources of incompleteness in the type inference algorithm are some heuristic
+choices made in the first step (the elaboration phase), as explained below.
 
 \begin{enumerate}
 \item Our technique for determining the set of region parameters for a recursive class
@@ -904,6 +907,20 @@ This can help the type-inference overcome these sources of incompleteness.
 % Second and third are generated by the the assignment expressions, and
 % the last constraint is generated from the recursive call.
 
-\subsection{Proofs}
+\subsection{Miscellaneous points and to-dos}
 
-\input{typeinference-proofs}
+% \input{typeinference-proofs}
+
+\begin{itemize}
+  \item for function-calls: need basic typing from core language to introduce region parameters
+  \item discuss computation of least-solution to constraints?
+  \item use of a set to represent conjunctions
+  \item equality is shorthand for two inequalities
+  \item use of alpha-renaming, and its use to discharge not-in contraints;
+also, incorporate this into first stage rather than second (in Fig. 7).
+  \item Note that we can also clarify that the well-formedness constraints are
+    syntactic sugar from basic set constraints
+  \item Prove: Progress: Every region-variable will be unified with some constant.
+  \item Notation: should we use a different notation to distinguish a validity constraint
+    from actual entailment?
+\end{itemize}

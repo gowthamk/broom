@@ -2,37 +2,47 @@
 \newcommand{\hdOf}[2]{\C{class}\; #1\angAlpha\inang{\rhobar \,|\, #2} \extends \fbN}
 
 % mathpartir's inferrule: seems to have problems with linebreaks
-\newcommand{\genconstraint}[2]{\inferrule*{#1}{#2}}
-\newcommand{\gcarrow}{\leadsto}
-\newcommand{\gctransforms}{\models}
+%% \newcommand{\genconstraint}[2]{\inferrule*{#1}{#2}}
+%% \newcommand{\gcarrow}{\leadsto}
+%% \newcommand{\gctransforms}{\models}
 
-\newcommand{\gcrule}[2]{%
+%% \newcommand{\gcrule}[2]{%
+%% \begin{smathpar}\begin{array}{c}%
+%% \renewcommand*{\arraystretch}{1.2}%
+%% \RULE {#1} {#2}%
+%% \end{array}\end{smathpar}%
+%% }
+
+\newcommand{\SRULE}[2]{\frac{\begin{array}{c}\renewcommand*{\arraystretch}{1.5} #1\end{array}}
+                           {\begin{array}{c}\renewcommand*{\arraystretch}{1.5} #2\end{array}}}
+\newcommand{\beginrules}{%
 \begin{smathpar}\begin{array}{c}%
-\renewcommand*{\arraystretch}{1.2}%
-\RULE {#1} {#2}%
-\end{array}\end{smathpar}%
+\renewcommand*{\arraystretch}{1.5}%
 }
+\newcommand{\myendrules}{\end{array}\end{smathpar}}
 
 \newcommand{\lgcrule}[3]{%
-\begin{smathpar}\begin{array}{c}%
-\renewcommand*{\arraystretch}{1.2}%
-[\rulelabel{#1}] \spc \RULE {#2} {#3}%
-\end{array}\end{smathpar}%
+% \begin{smathpar}\begin{array}{c}%
+% \renewcommand*{\arraystretch}{1.2}%
+[\rulelabel{#1}] \spc \SRULE {#2} {#3}%
+\\[0.5cm]%
+% \end{array}\end{smathpar}%
 }
 
 \newcommand{\lgcfact}[2]{%
-\begin{smathpar}\begin{array}{c}%
-\renewcommand*{\arraystretch}{1.2}%
+% \begin{smathpar}\begin{array}{c}%
+% \renewcommand*{\arraystretch}{1.0}%
 [\rulelabel{#1}] \spc {#2} %
-\end{array}\end{smathpar}%
+\\[0.5cm]%
+% \end{array}\end{smathpar}%
 }
 
-\newcommand{\minigcrule}[3]{%
-\begin{minipage}{#1}\begin{smathpar}\begin{array}{c}%
-\renewcommand*{\arraystretch}{1.2}%
-\RULE {#2} {#3}%
-\end{array}\end{smathpar}\end{minipage}%
-}
+%% \newcommand{\minigcrule}[3]{%
+%% \begin{minipage}{#1}\begin{smathpar}\begin{array}{c}%
+%% \renewcommand*{\arraystretch}{1.2}%
+%% \RULE {#2} {#3}%
+%% \end{array}\end{smathpar}\end{minipage}%
+%% }
 
 \newcommand{\subtypesym}{<:}
 \newcommand{\typeok}[3]{{#1\,\vdash\,#2 \; \texttt{ok} \, \lhd #3}}
@@ -48,6 +58,7 @@
 \fbox{  \( \exprok{\stdcontext}{e}{\tau}{C} \)}
 \\
 
+\beginrules
 
 %%%%%%%%%%% () and x %%%%%%%%%%%
 \lgcfact{UNIT}{\exprok{\stdcontext}{\unitval}{\unitZ}{\{\}}}
@@ -144,11 +155,15 @@
 \exprok{\stdcontext} {\letregion{\rgn}{e_a}} {\tau} {(C_1 \cup C_2)}
 }
 
+\myendrules
+
 \caption{Constraint generation}
 \label{fig:constraint-gen}
 \end{figure*}
 
 \begin{figure*}[t!]
+
+\beginrules
 
 %%%%%%%%%%% LAMBDA %%%%%%%%%%%
 
@@ -224,11 +239,15 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
 \typeok {} {\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}} {\bigcup_{i=1}^5 C_i}
 }
 
+\myendrules
+
 \caption{Constraint generation}
 \label{fig:constraint-gen}
 \end{figure*}
 
 \begin{figure*}[t!]
+
+\beginrules
 
 %%%%%%%%%%% Header Box %%%%%%%%%%%
 \fbox{  \( \typeok{\A}{\tau}{C} \)}
@@ -312,6 +331,8 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
       {\inang{\rhobar \,|\, \phi_1}\bar{\tau^{11}} \xrightarrow{\rgn} \tau^{12}}
       {C_1 \cup C_2 \cup C_3}
   }
+
+\myendrules
 
 \caption{Type well-formedness constraint generation}
 \label{fig:constraint-gen-2}
