@@ -1,8 +1,9 @@
 \newcommand{\soln}{\eta}
 \newcommand{\saturate}[1]{{#1}^*}
-\newcommand{\groundc}[1]{\saturate{#1}_g}
+\newcommand{\myground}[1]{\saturate{#1}_g}
 \newcommand{\consOf}[1]{\textsc{GenConstraint}(#1)}
 \newcommand{\satC}{\saturate{C}}
+\newcommand{\groundC}{\myground{C}}
 
 \section{Type Inference}
 \label{sec:type-inference}
@@ -520,10 +521,10 @@ Our algorithm for solving a set of constraints $C$ consists of the following ste
 \begin{enumerate}
 \item We use an iterative fixed point (saturation) algorithm to compute
 $\saturate{C}$, the set of all constraints logically implied by $C$.
-\item Let $\groundc{C}$ denote the subset of all ground constraints
+\item Let $\myground{C}$ denote the subset of all ground constraints
 (\ie, constraints without any region variable or predicate variable)
-in $\saturate{C}$. We check if $\groundc{C}$ is valid in the theory of
-partial-order. If $\groundc{C}$ is valid, the solution $\soln$ is determined
+in $\saturate{C}$. We check if $\myground{C}$ is valid in the theory of
+partial-order. If $\myground{C}$ is valid, the solution $\soln$ is determined
 as below. Otherwise, the constraint solver fails, as no valid solution exists.
 \begin{itemize}
 \item For any predicate variable $\varphi$, $\predSubstFn(\varphi)$ is defined
@@ -654,23 +655,23 @@ and compute the solution using any Datalog engine.
 
 \paragraph{Soundness and Completeness of the Constraint Solver.}
 
-Correctness follows by establishing:
+% Correctness follows by establishing:
 \begin{theorem}
-(a) Any assignment $\soln$ satisfies $C$ iff $\soln$ satisfies $\satC$.
-(b) $\satC$ is satisfiable iff $\groundc{C}$ is valid.
-(c) For any region variable $\rho$, $\satC$ contains some constraint of the
-form $\isvalid{\ell}{\rho = \pi}$.
+  \label{thm:closure}
+Let $C = \consOf{q}$.
+Any assignment $\soln$ satisfies $C$ iff $\soln$ satisfies $\satC$.
+%% (b) $\satC$ is satisfiable iff $\myground{C}$ is valid.
+%% (c) For any region variable $\rho$, $\satC$ contains some constraint of the
+%% form $\isvalid{\ell}{\rho = \pi}$.
 \end{theorem}
 
-The last item in the above theorem follows because every region variable is guaranteed to be unified with some
-region constant by the generated constraints\footnote{
-There is one special case where this does not hold: a recursive function
-that calls itself in a non-terminating fashion. Such a function never
-returns a value, and so the return-value can be typed as anything.
-We assume that the return value of such a function is typed to be \C{unit},
-which will not introduce any region variables at the call-site of such a function.}
-This follows because $\FB$ does not admit uninitialized variables.
-% , and the type system uniquely determines the region parameters of every value
+\begin{proof}
+  For the forward implication, we use induction to show that every constraint
+  added to $\satC$ preserves satisfiability (with respect to an assignment $\soln$).
+  The Transitivity and Substitution steps are straightforward. The Abduction Decomposition
+  step is justified by Lemmas~\ref{lemma:gc-is-decomposable} and~\ref{lemma:decomposition}.
+  The reverse implication is trivial.
+\end{proof}
 
 \begin{theorem}
 \label{thm:constraint-solver-sc}
@@ -680,6 +681,49 @@ that satisfies $C$.
 (Completeness)
 Conversely, if $C$ is satisfiable, then the constraint solver will succeed.
 \end{theorem}
+
+\begin{proof}
+
+Theorem~\ref{thm:closure} shows that $\satC$ and $C$ are equivalent.
+
+\TODO{The following is an informal sketch, requiring some formalization.}
+
+The next step is to show that $\groundC$ and $\satC$ are (almost) equivalent.
+Consider $\satC \setminus \groundC$. This includes the well-formedness constraints.
+It is easy to show that we take care of these.
+
+The more difficult case are validity constraints, involving either region variables
+($\rho$) or predicate variables ($\varphi$) or both.
+
+The constraint-generation rules guarantee that every region variable will
+be unified with some region constant\footnote{
+There is one special case where this does not hold: a recursive function
+that calls itself in a non-terminating fashion. Such a function never
+returns a value, and so the return-value can be typed as anything.
+We assume that the return value of such a function is typed to be \C{unit},
+which will not introduce any region variables at the call-site of such a function.}
+This follows because $\FB$ does not admit uninitialized variables.
+% , and the type system uniquely determines the region parameters of every value
+
+We use this property to show that it is okay to ignore validity constraints
+in $\satC$ containing region variables. For every
+region variable $\rho$ unified with a constant $\pi$, and for every validity
+constraint containing $\rho$, we will have a corresponding validity constraint
+containing $\pi$ instead.
+Note: We likely need to add another rule to the saturation rules for computing
+$\satC$, namely $\isvalid{\ell}{r} \in \satC \Rightarrow \isvalid{\ell \conj \phi}{r} \in \satC$.
+We need this to propagate constraints from an outer scope into an inner scope.
+
+As for validity constraints containing a predicate variable $\varphi$ on the consequent,
+we argue that the use of the Substitution rule in computing $\satC$ makes it okay
+to ignore these constraints.
+
+As for validity constraints containing a predicate variable $\varphi$ on the antecedent,
+we use Lemma~\ref{lemma:decomposition} to argue that Abduction Decomposition lets
+us convert these into simpler constraints that do not have $\varphi$ on the
+antecedent or into a constraint that is directly incorporated into definition
+of $\predSubstFn$.
+\end{proof}
 
 \paragraph{Modularity Aspects.}
 The type inference algorithm, as presented, traverses the entire program to
