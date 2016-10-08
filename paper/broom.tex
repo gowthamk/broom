@@ -192,7 +192,7 @@
 \newcommand{\letexp}[3]{\C{let}\;#1\,=\,#2\;\C{in}\;#3}
 \newcommand{\letregion}[2]{\C{letregion}\;#1\;\C{in}\;#2}
 \newcommand{\open}[4]{\C{open}\;#1\;\C{as}\;#3@#2\;\C{in}\;#4}
-\newcommand{\openalloc}[3]{\C{openalloc}\;#1\;\C{withroot}\;#2\;\C{in}\;#3}
+\newcommand{\opened}[2]{\C{open}\;#1\;\C{in}\;#2}
 \newcommand{\unpackexp}[4]{\C{let}\;(#1,\,#2)\,=\,\C{unpack}\;#3\;\C{in}\;#4}
 \newcommand{\invalidexn}{\bot}
 \newcommand{\toprgn}{\rgn_{\top}}
@@ -221,7 +221,12 @@
 \newcommand{\elabClassTable}{{\sf elabClassTable}}
 \newcommand{\CLOSED}{\mathtt{C}}
 \newcommand{\OPEN}{\mathtt{O}}
-\newcommand{\XFERRED}{\mathtt{X}}
+\newcommand{\XFERRED}{{\color{blue}\times}}
+\newcommand{\LIVE}{{\color{ForestGreen}\blacksquare}}
+\newcommand{\SLIVE}{{\color{ForestGreen}\widehat{\blacksquare}}}
+\newcommand{\TLIVE}{{\color{ForestGreen}\overrightarrow{\blacksquare}}}
+\newcommand{\FREE}{{\color{blue}\square}}
+\newcommand{\USED}{{\color{blue}\overrightarrow{\blacksquare}}}
 \newcommand{\transfer}{{\sf transfer}}
 \newcommand{\CSP}{(C\lbrack \varphi,\rhobar \rbrack,\rhoenv_{\varphi}, \bar{\rhoenv})}
 \newcommand{\csp}{(c\lbrack \varphi,\rhobar \rbrack,\rhoenv_{\varphi},\bar{\rhoenv})}
@@ -248,8 +253,12 @@
 \newcommand{\RgnZT}[1]{\RgnZ\inang{T}\inang{#1}}
 \newcommand{\BZ}[0]{B\inang{\tbar}}
 \newcommand{\BZT}[1]{B\inang{\tbar}\inang{#1}}
-\newcommand{\redstoo}[2]{\redsto{\rhoenv}{#1}{#2}}
+\newcommand{\redstoo}[2]{#1 \longrightarrow #2}
 \newcommand{\redstocup}[3]{\redsto{\rhoenv \cup \{#1\}}{#2}{#3}}
+\newcommand{\loc}{\mathtt{l}}
+\newcommand{\locbar}{\overline{\loc}}
+\newcommand{\isLive}{{\sf isLive}}
+\newcommand{\mem}{\sigma}
 
 %Rules
 %-----
