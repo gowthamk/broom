@@ -176,7 +176,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 
 \lopsemrule{4in}{
     v_a = \C{new} \; \RgnZ\inang{T}\inang{\loc}(v) \spc
-    \mem(\loc) = \USED \spc
+    \mem(\loc) = \USED ~\texttt{or}~ \mem(\loc) = \TLIVE \spc
 %   \fresh(\rgn_1)\\
 %   \rgn_0 \notin \rhoenv \\
     \mem' = \mem[\loc \mapsto \TLIVE]
