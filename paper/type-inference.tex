@@ -682,7 +682,7 @@ We need this to propagate constraints from an outer scope into an inner scope.
 \begin{lemma}
 Let $C = \consOf{q}$.
 Suppose a region variable $\rho$ is bound to two different region constants $\pi_1$
-and $\pi_2$ in $\satC$.
+and $\pi_2$ in a context $\varphi \conj \phi$. % in $\satC$.
 Let $\soln$ satisfy $\satC$.
 For any context $\varphi \conj \phi$ that contains $\rho$, we must have
 $\{ \pi_1, \pi_2 \} \subseteq \predDeltaMap(\varphi)$ and
@@ -786,8 +786,22 @@ If $\satC$ is satisfiable, then the constraint solver will return some assignmen
 
 \begin{proof}
 If $\satC$ is satisfiable, then $\groundC$ is trivially satisfiable.
-We just need to show that the definition $\regionSubstFn(\rho)$ for any
-region variable $\rho$ will succeed.
+If $\groundC$ is satisfiable, the solver will fail to return an assignment only if the set $S_\rho$ = 
+$\{ \pi \in \regionDeltaMap(\rho) \; | \; \isvalid{\ell}{\rho = \pi} \in \satC \}$ is empty for some region variable $\rho$.
+Consider any such $\rho$.
+Let $\soln$ be a satisfying assignment for $\satC$.
+Let $\pi' = \predSubstFn(\rho)$. Then, we must have $\pi' in \regionDeltaMap(\rho)$.
+From Lemma~\ref{lemma:completely-bound}, $\rho$ must be bound to some $\pi$ in some context $\ell$.
+Thus, $\isvalid{\ell}{\rho = \pi} \in \satC$.
+Since $\soln$ satisfies this constraint, we have $\isvalid{\ell[\soln]}{\pi' = \pi}$.
+If $\pi$ and $\pi'$ are the same region identifier, we have a contradiction, since
+$\pi \in S_\rho$ and $S_\rho$ cannot be empty.
+If $\pi$ and $\pi'$ are distinct region identifiers, then it follows that the precondition of case (a) must hold
+in Lemma~\ref{lemma:decomposition}, and we must have $\{ \pi, \pi' \} \subseteq \predDeltaMap(\varphi)$.
+We can show, by induction over the constraint-generation rules, that if $\regionDeltaMap(\rho)$ includes
+some element of $\predDeltaMap(\varphi)$, then it includes all elements of $\predDeltaMap(\varphi)$.
+It follows that $\pi \in \regionDeltaMap(\rho)$. Hence, the set $S_\rho$ is non-empty (as it contains $\pi$.
+The result follows.
 \end{proof}
 
 \begin{theorem}
