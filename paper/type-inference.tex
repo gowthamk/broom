@@ -18,6 +18,8 @@ algorithm is an elaboration function from programs in $\absof{\FB}$
 (i.e., \FB without region types, but with \C{letregion} and \C{open}
 expressions, similar to the language introduced in
 \S~\ref{sec:overview}) to programs in \FB.
+For simplicity, we assume that each \C{letregion} and \C{open} construct
+in the input program introduces a distinct region identifier $\pi$.
 
 \paragraph{Overview.}
 
@@ -577,38 +579,9 @@ $\Rightarrow$
 $\isvalid{\phictxt}{\pi_i \outlives \pi_j} \in \saturate{C} $
 \end{enumerate}
 
-%\item
-%\label{item:context}
-%Consider any constraint of the form $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$,
-%where $\pi_i$ and $\pi_j$ are both region constants.
-%If $\{ \pi_i, \pi_j \} \subseteq \predDeltaMap(\varphi)$, then we simply add
-%$\pi_i \outlives \pi_j$ as an additional conjunct to $\predSubstFn(\varphi)$.
-%Otherwise, we check if $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$.
-%If this entailment does not hold, the constraint solver fails, since no valid solution is possible.
-%
-%\item
-%    A constraint of the form $\isvalid{\varphi}{\rho_i = \rho_j}$ unifies
-%$\rho_i$ and $\rho_j$ if at least one of them is a region variable.
-%If $\rho_i$ and $\rho_j$ are distinct region constants, then the constraint
-%solver fails.
-%
-%\item
-%When a region variable $\rho$ is unified with a region constant $\pi$,
-%if $\pi \in \regionDeltaMap(\rho)$, we update $\regionSubstFn(\rho)$ to be $\pi$,
-%and replace every occurrence of $\rho$ by $\pi$ in the set of constraints.
-%If $\pi \not\in \regionDeltaMap(\rho)$, the constraint solver fails.
-%\item
-%  When any outlives constraint $\phi$ is added to $\predSubstFn(\varphi)$,
-%  then for every existing validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\varphi)}$,
-%  we produce a new validity constraint $\isvalid{\varphi' \conj \phictxt}{F(\phi)}$. 
 \end{enumerate}
 
 Point~\ref{item:context} makes use of Lemmas~\ref{lemma:gc-is-decomposable} and~\ref{lemma:decomposition}.
-% the special structure of the generated
-% constraints: namely that $\phictxt$  is a conjunction of outlives-constraints of the
-% form $\pi \outlives \pi_s$ where $\pi_s$ is a static region identifier and $\pi$ is a
-% region constant. As a result, we can show that $\isvalid{\varphi \conj \phictxt}{\pi_i \outlives \pi_j}$
-% iff $\isvalid{\varphi}{\pi_i \outlives \pi_j}$ or $\isvalid{\phictxt}{\pi_i \outlives \pi_j}$.
 
 \paragraph{Step 2.}
 Checking the validity of a ground constraint is straightforward.
@@ -673,6 +646,150 @@ Any assignment $\soln$ satisfies $C$ iff $\soln$ satisfies $\satC$.
   The reverse implication is trivial.
 \end{proof}
 
+Consider a set of constraints $D$. We say that a region variable $\rho$
+\emph{occurs} in a \emph{context} $\ell$ (in $D$) if $D$ contains some
+constraint $\isvalid{\ell}{r}$ where $\rho$ occurs in $r$.
+We say that a region variable $\rho$ is \emph{bound} to a region constant
+$\pi$ in a context $\ell$ if
+$\{ \isvalid{\ell}{\rho \outlives \pi}, \isvalid{\ell}{\pi \outlives \rho} \} \subseteq D$.
+We say that a region variable $\rho$ is \emph{bound} to a region constant $\pi$ (in $D$) if
+$\rho$ is bound to $\pi$ in every context $\ell$ in which it occurs.
+
+\begin{lemma}
+  \label{lemma:completely-bound}
+Let $C = \consOf{q}$.
+Every region variable occurring in $\satC$ is bound to some region constant in $\satC$.
+\end{lemma}
+
+\begin{proof}
+The constraint-generation rules guarantee that every region variable will
+be unified with some region constant\footnote{
+There is one special case where this does not hold: a recursive function
+that calls itself in a non-terminating fashion. Such a function never
+returns a value, and so the return-value can be typed as anything.
+We assume that the return value of such a function is typed to be \C{unit},
+which will not introduce any region variables at the call-site of such a function.}
+This follows because $\FB$ does not admit uninitialized variables.
+% , and the type system uniquely determines the region parameters of every value
+
+Note: We likely need to add another rule to the saturation rules for computing
+$\satC$, namely $\isvalid{\ell}{r} \in \satC \Rightarrow \isvalid{\ell \conj \phi}{r} \in \satC$.
+We need this to propagate constraints from an outer scope into an inner scope.
+
+\TODO{Need to establish that there are no independent variables with same name.}
+\end{proof}
+
+\begin{lemma}
+Let $C = \consOf{q}$.
+Suppose a region variable $\rho$ is bound to two different region constants $\pi_1$
+and $\pi_2$ in $\satC$.
+Let $\soln$ satisfy $\satC$.
+For any context $\varphi \conj \phi$ that contains $\rho$, we must have
+$\{ \pi_1, \pi_2 \} \subseteq \predDeltaMap(\varphi)$ and
+$\isvalid{\predSubstFn(\varphi)}{\pi_1 = \pi_2}$.
+\end{lemma}
+
+\begin{proof}
+  Assume that a region variable $\rho$ is bound to two different
+  region constants $\pi_1$ and $\pi_2$ in a context $\varphi \conj \phi$.
+  By transitivity, $\satC$ is guaranteed to have the constraints
+  $\isvalid{\varphi \conj \phi}{\pi_1 \outlives \pi_2}$
+  and $\isvalid{\varphi \conj \phi}{\pi_2 \outlives \pi_1}$.
+  By abduction decomposition, one of the following conditions must hold:
+  (a) $\{ \pi_1, \pi_2 \} \subseteq \predDeltaMap(\varphi)$ and
+  both $\isvalid{\varphi}{\pi_1 \outlives \pi_2}$ and
+  $\isvalid{\varphi}{\pi_2 \outlives \pi_1}$ are in $\satC$, or
+  (b) $\{ \pi_1, \pi_2 \} \not\subseteq \predDeltaMap(\varphi)$ and
+  both $\isvalid{\phi}{\pi_1 \outlives \pi_2}$ and
+  $\isvalid{\phi}{\pi_2 \outlives \pi_1}$ are in $\satC$.
+  In case (b), $\satC$ will not be satisfiable, so we can ignore this case.
+  In case (a), $\varphi$ must be bound to a conjunction that includes both
+  $\pi_1 \outlives \pi_2$ and $\pi_2 \outlives \pi_1$ in any satisfying assignment
+  for $\satC$.
+\end{proof}
+
+\begin{lemma}
+Let $C = \consOf{q}$.
+Let $\satC_1$ denote the subset of $\satC$ obtained by removing all constraints
+that contain a region variable.
+$\satC$ is satisfiable iff $\satC_1$ is satisfiable.
+\end{lemma}
+
+\begin{proof}
+  The forward implication is trivial.
+  The reverse implication follows from Lemma~\label{lemma:completely-bound}, as shown below.
+
+
+\end{proof}
+
+\begin{theorem}
+\label{thm:constraint-solver-soundness}
+Let $C = \consOf{q}$.
+If the constraint solver returns an assignment $\soln$,
+then $\soln$ satisfies $\satC$.
+\end{theorem}
+
+\begin{proof}
+Assume that the constraint solver returns an assignment $\soln$.
+
+By construction, $\groundC$ (the set of all variable-free constraints in $\satC$)
+is satisfiable. Hence, $\soln$ trivially satisfies all constraints in $\groundC$.
+
+The definition of $\soln$ ensures that it satisfies the well-formedness constraints
+for any region variable $\rho$.
+
+Consider any constraint of the form $\isvalid{\varphi}{\pi_i \outlives \pi_j}$ in $\satC$,
+where $\pi_i$ and $\pi_j$ are region constants. The definition of $\predSubstFn(\varphi)$
+ensures that $\soln$ satisfies this constraint.
+Furthermore, $\soln$ must also satisfy the well-formedness constraint
+$\tywf{predDeltaMap(\varphi)}{\varphi}$.
+(Otherwise, it follows from abduction decomposition that $\isvalid{}{\pi_i \outlives \pi_j}$ must
+be in $\satC$, which means $\groundC$ must be invalid.)
+
+Consider any constraint of the form $\isvalid{\varphi \conj \phi}{\pi_i \outlives \pi_j}$ in $\satC$,
+It follows from abduction decomposition that either
+$\isvalid{\varphi}{\pi_i \outlives \pi_j}$
+or
+$\isvalid{\phi}{\pi_i \outlives \pi_j}$ must be in $\satC$, which we know is satisfied by $\soln$.
+Hence, $\soln$ must satisfy
+$\isvalid{\varphi \conj \phi}{\pi_i \outlives \pi_j}$ as well.
+
+This shows that $\soln$ satisfies all outlives-constraints in $\satC$ that have no variables in the consequent.
+
+Consider any constraint of the form $\isvalid{\ell}{F_j(\varphi_j)}$.
+Substituting the value $\predSubstFn(\varphi_j)$ reduces this constraint to one of
+the form $\isvalid{\ell}{\conj_i \pi_i \outlives \pi_i'}$ where the substitution rule
+guarantees $\isvalid{\ell}{\pi_i \outlives \pi_i'}$ is already in $\satC$ and, hence,
+satisfied by $\soln$.
+Hence, $\soln$ satisfies $\isvalid{\ell}{F_j(\varphi_j)}$ as well.
+
+Consider any constraint of the form $\isvalid{\ell}{r}$ where $r$ contains a single occurrence
+of a region variable, say $\rho$.
+It follows from Lemma~\label{lemma:completely-bound} that $\rho$ is bound to some region
+constant $\pi$.
+Let $r'$ denote $r$ with $\rho$ replaced by $\pi$.
+It follows from the transitivity rule that $\satC$ must contain the constraint $\isvalid{\ell}{r'}$
+and that $\soln$ satisfies this constraint.
+Further, it follows that $\soln$ satisfies $\isvalid{\ell}{\pi = \pi'}$ where $\pi' = \regionSubstFn(\rho)$.
+Hence, $\soln$ satisfies this constraint as well.
+\TODO{Flesh this out.}
+
+The same idea works for constraints with occurrences of two region variables in the consequent.
+
+\end{proof}
+
+\begin{theorem}
+\label{thm:constraint-solver-completeness}
+Let $C = \consOf{q}$.
+If $\satC$ is satisfiable, then the constraint solver will return some assignment.
+\end{theorem}
+
+\begin{proof}
+If $\satC$ is satisfiable, then $\groundC$ is trivially satisfiable.
+We just need to show that the definition $\regionSubstFn(\rho)$ for any
+region variable $\rho$ will succeed.
+\end{proof}
+
 \begin{theorem}
 \label{thm:constraint-solver-sc}
 Let $C = \consOf{q}$.
@@ -684,45 +801,32 @@ Conversely, if $C$ is satisfiable, then the constraint solver will succeed.
 
 \begin{proof}
 
-Theorem~\ref{thm:closure} shows that $\satC$ and $C$ are equivalent.
+Follows from Theorems~\ref{thm:constraint-solver-soundness} and~\ref{thm:constraint-solver-completeness}.
 
-\TODO{The following is an informal sketch, requiring some formalization.}
-
-The next step is to show that $\groundC$ and $\satC$ are (almost) equivalent.
-Consider $\satC \setminus \groundC$. This includes the well-formedness constraints.
-It is easy to show that we take care of these.
-
-The more difficult case are validity constraints, involving either region variables
-($\rho$) or predicate variables ($\varphi$) or both.
-
-The constraint-generation rules guarantee that every region variable will
-be unified with some region constant\footnote{
-There is one special case where this does not hold: a recursive function
-that calls itself in a non-terminating fashion. Such a function never
-returns a value, and so the return-value can be typed as anything.
-We assume that the return value of such a function is typed to be \C{unit},
-which will not introduce any region variables at the call-site of such a function.}
-This follows because $\FB$ does not admit uninitialized variables.
-% , and the type system uniquely determines the region parameters of every value
-
-We use this property to show that it is okay to ignore validity constraints
-in $\satC$ containing region variables. For every
-region variable $\rho$ unified with a constant $\pi$, and for every validity
-constraint containing $\rho$, we will have a corresponding validity constraint
-containing $\pi$ instead.
-Note: We likely need to add another rule to the saturation rules for computing
-$\satC$, namely $\isvalid{\ell}{r} \in \satC \Rightarrow \isvalid{\ell \conj \phi}{r} \in \satC$.
-We need this to propagate constraints from an outer scope into an inner scope.
-
-As for validity constraints containing a predicate variable $\varphi$ on the consequent,
-we argue that the use of the Substitution rule in computing $\satC$ makes it okay
-to ignore these constraints.
-
-As for validity constraints containing a predicate variable $\varphi$ on the antecedent,
-we use Lemma~\ref{lemma:decomposition} to argue that Abduction Decomposition lets
-us convert these into simpler constraints that do not have $\varphi$ on the
-antecedent or into a constraint that is directly incorporated into definition
-of $\predSubstFn$.
+% Theorem~\ref{thm:closure} shows that $\satC$ and $C$ are equivalent.
+% 
+% The next step is to show that $\groundC$ and $\satC$ are (almost) equivalent.
+% Consider $\satC \setminus \groundC$. This includes the well-formedness constraints.
+% It is easy to show that we take care of these.
+% 
+% The more difficult case are validity constraints, involving either region variables
+% ($\rho$) or predicate variables ($\varphi$) or both.
+% 
+% We use this property to show that it is okay to ignore validity constraints
+% in $\satC$ containing region variables. For every
+% region variable $\rho$ unified with a constant $\pi$, and for every validity
+% constraint containing $\rho$, we will have a corresponding validity constraint
+% containing $\pi$ instead.
+% 
+% As for validity constraints containing a predicate variable $\varphi$ on the consequent,
+% we argue that the use of the Substitution rule in computing $\satC$ makes it okay
+% to ignore these constraints.
+% 
+% As for validity constraints containing a predicate variable $\varphi$ on the antecedent,
+% we use Lemma~\ref{lemma:decomposition} to argue that Abduction Decomposition lets
+% us convert these into simpler constraints that do not have $\varphi$ on the
+% antecedent or into a constraint that is directly incorporated into definition
+% of $\predSubstFn$.
 \end{proof}
 
 \paragraph{Modularity Aspects.}
@@ -996,7 +1100,6 @@ This can help the type-inference overcome these sources of incompleteness.
   \item use of a set to represent conjunctions
   \item equality is shorthand for two inequalities
   \item use of alpha-renaming, and its use to discharge not-in contraints;
-also, incorporate this into first stage rather than second (in Fig. 7).
   \item Note that we can also clarify that the well-formedness constraints are
     syntactic sugar from basic set constraints
   \item Prove: Progress: Every region-variable will be unified with some constant.
