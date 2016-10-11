@@ -4,6 +4,8 @@
 \newcommand{\consOf}[1]{\textsc{GenConstraint}(#1)}
 \newcommand{\satC}{\saturate{C}}
 \newcommand{\groundC}{\myground{C}}
+\newcommand{\rhoC}{C_\rho}
+\newcommand{\solveCon}[1]{\textsc{Solve}(#1)}
 
 \section{Type Inference}
 \label{sec:type-inference}
@@ -519,29 +521,10 @@ Note that the above lemma shows how the conjunction in the antecedent of
 any decomposable constraint can be eliminated.
 
 \paragraph{Constraint Solver.}
-Our algorithm for solving a set of constraints $C$ consists of the following steps:
-\begin{enumerate}
-\item We use an iterative fixed point (saturation) algorithm to compute
-$\saturate{C}$, the set of all constraints logically implied by $C$.
-\item Let $\myground{C}$ denote the subset of all ground constraints
-(\ie, constraints without any region variable or predicate variable)
-in $\saturate{C}$. We check if $\myground{C}$ is valid in the theory of
-partial-order. If $\myground{C}$ is valid, the solution $\soln$ is determined
-as below. Otherwise, the constraint solver fails, as no valid solution exists.
-\begin{itemize}
-\item For any predicate variable $\varphi$, $\predSubstFn(\varphi)$ is defined
-to be $\conj \{ \pi_1 \outlives \pi_2 \;|\; \pi_1, \pi_2 \in \regionConstants, \isvalid{\varphi}{\pi_1 \outlives \pi_2} \in \saturate{C} \}$.
-\item For any region variable $\rho$, we define $\regionSubstFn(\rho)$ to be any element of the
-set $\{ \pi \in \regionDeltaMap(\rho) \:|\; \isvalid{\ell}{\rho = \pi} \in \saturate{C} \}$ 
-if this set is non-empty.
-Otherwise, the solver fails.
-%\item For any region variable $\rho$,  we are guaranteed that there exists a unique
-% $\pi \in \regionConstants$  such that $\saturate{C}$ contains some constraint
-%with a consequent $\rho = \pi$. We define $\regionSubstFn(\rho)$ to be $\pi$.
-\end{itemize}
-\end{enumerate}
-
-\paragraph{Step 1.}
+The first step in our algorithm for solving a set of constraints $C$ uses an
+iterative fixed point algorithm to compute a $\satC \supseteq C$ of
+constraints by adding  a set of constraints that are logically implied by $C$.
+% \paragraph{Step 1.}
 We compute $\saturate{C}$ by iteratively applying the following rules until a fixed
 point is reached:
 
@@ -581,9 +564,127 @@ $\isvalid{\phictxt}{\pi_i \outlives \pi_j} \in \saturate{C} $
 
 \end{enumerate}
 
-Point~\ref{item:context} makes use of Lemmas~\ref{lemma:gc-is-decomposable} and~\ref{lemma:decomposition}.
+% Point~\ref{item:context} makes use of Lemmas~\ref{lemma:gc-is-decomposable} and~\ref{lemma:decomposition}.
 
-\paragraph{Step 2.}
+\begin{theorem}
+  \label{thm:closure}
+Let $C = \consOf{q}$.
+An assignment $\soln$ satisfies $C$ iff $\soln$ satisfies $\satC$.
+\end{theorem}
+
+\begin{proof}
+  For the forward implication, we use induction to show that every constraint
+  added to $\satC$ preserves satisfiability (with respect to an assignment $\soln$).
+  The Transitivity and Substitution steps are straightforward. The Abduction Decomposition
+  step is justified by Lemmas~\ref{lemma:gc-is-decomposable} and~\ref{lemma:decomposition}.
+  The reverse implication is trivial.
+\end{proof}
+
+One key point of the first step is that it has the effect of unifying region variables with the
+region constants that they should be bound to in the solution, as explained below.
+
+Consider a set of constraints $D$. We say that a region variable $\rho$
+\emph{occurs} in a \emph{context} $\ell$ (in $D$) if $D$ contains some
+constraint $\isvalid{\ell}{r}$ where $\rho$ occurs in $r$.
+We say that a region variable $\rho$ is \emph{bound} to a region constant
+$\pi$ in a context $\ell$ if
+$\{ \isvalid{\ell}{\rho \outlives \pi}, \isvalid{\ell}{\pi \outlives \rho} \} \subseteq D$.
+We say that a region variable $\rho$ is \emph{bound} to a region constant $\pi$ (in $D$) if
+$\rho$ is bound to $\pi$ in every context $\ell$ in which it occurs.
+
+\begin{lemma}
+  \label{lemma:completely-bound}
+Let $C = \consOf{q}$.
+Every region variable occurring in $\satC$ is bound to some region constant in $\satC$.
+\end{lemma}
+
+\begin{proof}
+The constraint-generation rules guarantee that every region variable will
+be unified with some region constant\footnote{
+There is one special case where this does not hold: a recursive function
+that calls itself in a non-terminating fashion. Such a function never
+returns a value, and so the return-value can be typed as anything.
+We assume that the return value of such a function is typed to be \C{unit},
+which will not introduce any region variables at the call-site of such a function.}
+This follows because $\FB$ does not admit uninitialized variables.
+% , and the type system uniquely determines the region parameters of every value
+
+Note: We likely need to add another rule to the saturation rules for computing
+$\satC$, namely $\isvalid{\ell}{r} \in \satC \Rightarrow \isvalid{\ell \conj \phi}{r} \in \satC$.
+We need this to propagate constraints from an outer scope into an inner scope.
+\end{proof}
+
+The set $\satC$ makes it easy to identify a solution $\soln$ (if one exists), as below.
+\begin{itemize}
+\item For any predicate variable $\varphi$, $\predSubstFn(\varphi)$ is defined
+to be $\conj \{ \pi_1 \outlives \pi_2 \;|\; \pi_1, \pi_2 \in \regionConstants, \isvalid{\varphi}{\pi_1 \outlives \pi_2} \in \saturate{C} \}$.
+\item For any region variable $\rho$, we define $\regionSubstFn(\rho)$ to be any element of the
+set $\{ \pi \in \regionConstants \:|\; \isvalid{\ell}{\rho = \pi} \in \saturate{C} \}$.
+\end{itemize}
+
+% \paragraph{Step 2.}
+
+% \begin{enumerate}
+% \item We use an iterative fixed point (saturation) algorithm to compute
+% $\saturate{C}$, the set of all constraints logically implied by $C$.
+% \item
+
+The set $\satC$ also makes it easy to check if $C$ is satisfiable.
+Let $\myground{C}$ denote the subset of all ground constraints
+(\ie, constraints without any region variable or predicate variable)
+in $\saturate{C}$. Let $\rhoC$ denote the subset of all wellformedness
+constraints for region variables in $\satC$.
+Define $\solveCon(C)$ as below.
+% It is possible to show that $\soln$ satisfies $\satC4
+% iff  $\myground{C}$ is valid in the theory of partial-order. 
+
+% \end{enumerate}
+
+\[
+\solveCon{C} = 
+\begin{cases}
+\textsc{Some} (\soln) & \textrm{if $\groundC$ is valid and $\soln$ satisfies $\rhoC$} \\
+\textsc{None} & \textrm{otherwise}
+\end{cases}
+\]
+
+\begin{theorem}
+\label{thm:constraint-solver-sc}
+Let $C = \consOf{q}$.
+(Soundness) If $\solveCon{C} = \textsc{Some}(\soln)$, then $\soln$ satisfies $C$.
+(Completeness) If $\solveCon{C} = \textsc{None}$, then $C$ is unsatisfiable.
+\end{theorem}
+
+\begin{proof}
+
+Follows from Theorems~\ref{thm:constraint-solver-soundness} and~\ref{thm:constraint-solver-completeness}.
+
+% Theorem~\ref{thm:closure} shows that $\satC$ and $C$ are equivalent.
+% 
+% The next step is to show that $\groundC$ and $\satC$ are (almost) equivalent.
+% Consider $\satC \setminus \groundC$. This includes the well-formedness constraints.
+% It is easy to show that we take care of these.
+% 
+% The more difficult case are validity constraints, involving either region variables
+% ($\rho$) or predicate variables ($\varphi$) or both.
+% 
+% We use this property to show that it is okay to ignore validity constraints
+% in $\satC$ containing region variables. For every
+% region variable $\rho$ unified with a constant $\pi$, and for every validity
+% constraint containing $\rho$, we will have a corresponding validity constraint
+% containing $\pi$ instead.
+% 
+% As for validity constraints containing a predicate variable $\varphi$ on the consequent,
+% we argue that the use of the Substitution rule in computing $\satC$ makes it okay
+% to ignore these constraints.
+% 
+% As for validity constraints containing a predicate variable $\varphi$ on the antecedent,
+% we use Lemma~\ref{lemma:decomposition} to argue that Abduction Decomposition lets
+% us convert these into simpler constraints that do not have $\varphi$ on the
+% antecedent or into a constraint that is directly incorporated into definition
+% of $\predSubstFn$.
+\end{proof}
+
 Checking the validity of a ground constraint is straightforward.
 A ground constraint is of the form $\isvalid{\conj_{i \in I} \ell_i}{r}$, where each
 $\ell_i$ and $r$ is an outlives-constraint.
@@ -629,55 +730,7 @@ and compute the solution using any Datalog engine.
 \paragraph{Soundness and Completeness of the Constraint Solver.}
 
 % Correctness follows by establishing:
-\begin{theorem}
-  \label{thm:closure}
-Let $C = \consOf{q}$.
-Any assignment $\soln$ satisfies $C$ iff $\soln$ satisfies $\satC$.
-%% (b) $\satC$ is satisfiable iff $\myground{C}$ is valid.
-%% (c) For any region variable $\rho$, $\satC$ contains some constraint of the
-%% form $\isvalid{\ell}{\rho = \pi}$.
-\end{theorem}
 
-\begin{proof}
-  For the forward implication, we use induction to show that every constraint
-  added to $\satC$ preserves satisfiability (with respect to an assignment $\soln$).
-  The Transitivity and Substitution steps are straightforward. The Abduction Decomposition
-  step is justified by Lemmas~\ref{lemma:gc-is-decomposable} and~\ref{lemma:decomposition}.
-  The reverse implication is trivial.
-\end{proof}
-
-Consider a set of constraints $D$. We say that a region variable $\rho$
-\emph{occurs} in a \emph{context} $\ell$ (in $D$) if $D$ contains some
-constraint $\isvalid{\ell}{r}$ where $\rho$ occurs in $r$.
-We say that a region variable $\rho$ is \emph{bound} to a region constant
-$\pi$ in a context $\ell$ if
-$\{ \isvalid{\ell}{\rho \outlives \pi}, \isvalid{\ell}{\pi \outlives \rho} \} \subseteq D$.
-We say that a region variable $\rho$ is \emph{bound} to a region constant $\pi$ (in $D$) if
-$\rho$ is bound to $\pi$ in every context $\ell$ in which it occurs.
-
-\begin{lemma}
-  \label{lemma:completely-bound}
-Let $C = \consOf{q}$.
-Every region variable occurring in $\satC$ is bound to some region constant in $\satC$.
-\end{lemma}
-
-\begin{proof}
-The constraint-generation rules guarantee that every region variable will
-be unified with some region constant\footnote{
-There is one special case where this does not hold: a recursive function
-that calls itself in a non-terminating fashion. Such a function never
-returns a value, and so the return-value can be typed as anything.
-We assume that the return value of such a function is typed to be \C{unit},
-which will not introduce any region variables at the call-site of such a function.}
-This follows because $\FB$ does not admit uninitialized variables.
-% , and the type system uniquely determines the region parameters of every value
-
-Note: We likely need to add another rule to the saturation rules for computing
-$\satC$, namely $\isvalid{\ell}{r} \in \satC \Rightarrow \isvalid{\ell \conj \phi}{r} \in \satC$.
-We need this to propagate constraints from an outer scope into an inner scope.
-
-\TODO{Need to establish that there are no independent variables with same name.}
-\end{proof}
 
 \begin{lemma}
 Let $C = \consOf{q}$.
@@ -804,44 +857,7 @@ It follows that $\pi \in \regionDeltaMap(\rho)$. Hence, the set $S_\rho$ is non-
 The result follows.
 \end{proof}
 
-\begin{theorem}
-\label{thm:constraint-solver-sc}
-Let $C = \consOf{q}$.
-(Soundness) If the constraint solver succeeds, it will return an assignment $\soln$ 
-that satisfies $C$.
-(Completeness)
-Conversely, if $C$ is satisfiable, then the constraint solver will succeed.
-\end{theorem}
 
-\begin{proof}
-
-Follows from Theorems~\ref{thm:constraint-solver-soundness} and~\ref{thm:constraint-solver-completeness}.
-
-% Theorem~\ref{thm:closure} shows that $\satC$ and $C$ are equivalent.
-% 
-% The next step is to show that $\groundC$ and $\satC$ are (almost) equivalent.
-% Consider $\satC \setminus \groundC$. This includes the well-formedness constraints.
-% It is easy to show that we take care of these.
-% 
-% The more difficult case are validity constraints, involving either region variables
-% ($\rho$) or predicate variables ($\varphi$) or both.
-% 
-% We use this property to show that it is okay to ignore validity constraints
-% in $\satC$ containing region variables. For every
-% region variable $\rho$ unified with a constant $\pi$, and for every validity
-% constraint containing $\rho$, we will have a corresponding validity constraint
-% containing $\pi$ instead.
-% 
-% As for validity constraints containing a predicate variable $\varphi$ on the consequent,
-% we argue that the use of the Substitution rule in computing $\satC$ makes it okay
-% to ignore these constraints.
-% 
-% As for validity constraints containing a predicate variable $\varphi$ on the antecedent,
-% we use Lemma~\ref{lemma:decomposition} to argue that Abduction Decomposition lets
-% us convert these into simpler constraints that do not have $\varphi$ on the
-% antecedent or into a constraint that is directly incorporated into definition
-% of $\predSubstFn$.
-\end{proof}
 
 \paragraph{Modularity Aspects.}
 The type inference algorithm, as presented, traverses the entire program to
@@ -1114,6 +1130,7 @@ This can help the type-inference overcome these sources of incompleteness.
   \item use of a set to represent conjunctions
   \item equality is shorthand for two inequalities
   \item use of alpha-renaming, and its use to discharge not-in contraints;
+\item also remind reader that variable names are unique
   \item Note that we can also clarify that the well-formedness constraints are
     syntactic sugar from basic set constraints
   \item Prove: Progress: Every region-variable will be unified with some constant.
