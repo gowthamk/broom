@@ -13,36 +13,27 @@
 %% \end{array}\end{smathpar}%
 %% }
 
-\newcommand{\SRULE}[2]{\frac{\begin{array}{c}\renewcommand*{\arraystretch}{1.5} #1\end{array}}
-                           {\begin{array}{c}\renewcommand*{\arraystretch}{1.5} #2\end{array}}}
+% \newcommand{\SRULE}[2]{\frac{\begin{array}{c}\renewcommand*{\arraystretch}{1.5} #1\end{array}}
+%                            {\begin{array}{c}\renewcommand*{\arraystretch}{1.5} #2\end{array}}}
+\newcommand{\SRULE}[2]{\frac{\begin{array}{c} #1 \end{array}}{\begin{array}{c} #2 \end{array}}}
+
 \newcommand{\beginrules}{%
-\begin{smathpar}\begin{array}{c}%
-\renewcommand*{\arraystretch}{1.5}%
+\renewcommand*{\arraystretch}{1.2}%
+\begin{smathpar}\begin{array}{lc}%
 }
 \newcommand{\myendrules}{\end{array}\end{smathpar}}
 
 \newcommand{\lgcrule}[3]{%
-% \begin{smathpar}\begin{array}{c}%
-% \renewcommand*{\arraystretch}{1.2}%
-[\rulelabel{#1}] \spc \SRULE {#2} {#3}%
-\\[0.5cm]%
-% \end{array}\end{smathpar}%
+[\rulelabel{#1}] & \SRULE {#2} {#3}%
+\\[0.2cm]%
 }
 
 \newcommand{\lgcfact}[2]{%
-% \begin{smathpar}\begin{array}{c}%
-% \renewcommand*{\arraystretch}{1.0}%
-[\rulelabel{#1}] \spc {#2} %
-\\[0.5cm]%
-% \end{array}\end{smathpar}%
+[\rulelabel{#1}] & {#2} %
+\\[0.2cm]%
 }
 
-%% \newcommand{\minigcrule}[3]{%
-%% \begin{minipage}{#1}\begin{smathpar}\begin{array}{c}%
-%% \renewcommand*{\arraystretch}{1.2}%
-%% \RULE {#2} {#3}%
-%% \end{array}\end{smathpar}\end{minipage}%
-%% }
+\newcommand{\nl}{\\}
 
 \newcommand{\subtypesym}{<:}
 \newcommand{\typeok}[3]{{#1\,\vdash\,#2 \; \texttt{ok} \, \lhd #3}}
@@ -89,21 +80,21 @@
   \lgcrule{NEW}
   {
     \typeok {\A} {\fbN} {C_1} \spc
-    \exprok {\stdcontext} {\bar{e}} {\bar{\tau'}} {C_2} \spc
-    C_3 = \{ \isvalid{\A.\phicx}{\allocRgn(\fbN)=\ralloc} \}
-    \\
+    \exprok {\stdcontext} {\bar{e}} {\bar{\tau'}} {C_2}
+    %% \spc C_3 = \{ \isvalid{\A.\phicx}{\allocRgn(\fbN)=\ralloc} \}
+    \nl
     \fields(\fbN) = \bar{f} : \taubar \spc
-    \subtypeok {\A} {\bar{\tau'}} {\bar{\tau}} {C_4}
+    \subtypeok {\A} {\bar{\tau'}} {\bar{\tau}} {C_3}
   }
   {
-    \exprok {\stdcontext}   {\C{new} \fbN(\bar{e})} {\fbN} {\cup_{i=1}^4 C_i}
+    \exprok {\stdcontext}   {\C{new} \fbN(\bar{e})} {\fbN} {\cup_{i=1}^3 C_i}
   }
 
 %%%%%%%%%%% LET %%%%%%%%%%%
   \lgcrule{LET}
   {
     \exprok{\stdcontext}{e_1}{\tau_1}{C_1} \spc
-    \exprok{\exptycx{\ralloc}{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}{C_2} \\
+    \exprok{\A,{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}{C_2} \\
   }
   {
     \exprok{\stdcontext}{\letexp{x}{e_1}{e_2}}{\tau_2}{C_1 \cup C_2}
@@ -114,45 +105,44 @@
   {
     \typeok {\A.\aenv} {T} {C_1} \spc
     \rgn \in \A.\rhoenv
-    \\
+    \nl
     \exprok{(\{\rho\},\A.\aenv,true),{\cdot}}{e}{T@\rho}{C_2}
   }
   {
-    \exprok{\stdcontext}{\C{new}\;
-    \RgnZ\inang{T}\inang{\toprgn}(\lambdaexp{\rgn}{\rho}{}{e})}{\fgjN\inang{\toprgn}}{C_1 \cup C_2}
+    \exprok {\stdcontext} {\C{new}\; \RgnZ\inang{T} \inang{\toprgn} (\lambdaexp{\rgn}{\rho}{}{e})}
+        {\RgnZ\inang{T} \inang{\toprgn}} {C_1 \cup C_2}
   }
 
 %%%%%%%%%%% METHOD-INV %%%%%%%%%%%
   \lgcrule{METHOD-INV}
   {
-    \exprok {\stdcontext} {e_0} {\tau} {C_1} \spc
-    \rbar \in \A.\rhoenv \\
-    \mtype(m,\bound_{\A.\aenv}(\tau)) = \inang{\rhobar \,|\, 
-        \phi}\bar{\tau^1}\rightarrow{\tau^2} \\
+    \exprok {\stdcontext} {e_0} {\tau} {C_1} \spc C_4 = \{ \rbar \in \A.\rhoenv \}
+    \nl
+    \mtype(m,\bound_{\A.\aenv}(\tau)) = \inang{\rhobar \,|\, \phi}\bar{\tau^1}\rightarrow{\tau^2}
+    \nl
 %   \substFn = [\rbar/\rhobar] \\
-	\typeok {\A} {\inang{\rhobar \,|\,\phi}\bar{\tau^1}\rightarrow{\tau^2}} {C_2}
-    \spc
-    \exprok {\stdcontext} {\bar{e}} {[\rbar/\rhobar](\bar{\tau^1})} {C_3}
-    \\
+    \typeok {\A} {\inang{\rhobar \,|\,\phi}\bar{\tau^1}\rightarrow{\tau^2}} {C_2}
+       \spc
+       \exprok {\stdcontext} {\bar{e}} {[\rbar/\rhobar](\bar{\tau^1})} {C_3}
+    \nl
 %   \subtyp{\A}{\bar{\tau'}}{\substFn(\bar{\tau^1})} \spc
-    \isvalid{\A.\phicx}{[\rbar/\rhobar](\phi)}
+    C_5 = \{ \isvalid{\A.\phicx}{[\rbar/\rhobar](\phi)} \}
   }
   {
     \exprok {\stdcontext} {e_0.m\inang{\rbar}(\bar{e})} 
-       {[\rbar/\rhobar](\tau^2)} {C_1 \cup C_2 \cup C_3}
+       {[\rbar/\rhobar](\tau^2)} {C_1 \cup C_2 \cup C_3 \cup C_4 \cup C_5}
   }
 
 %%%%%%%%%%% LET-REGION %%%%%%%%%%%
 
 \lgcrule{LET-REGION}{
-\A= (\rhoenv,\aenv,\phicx)  \spc
-\rgn \notin \rhoenv \spc
-\A' = (\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn))
-\\
-\exprok{\A',\rgn,\env} {e_a} {\tau} {C_1} \spc
-\typeok {\A} {\tau} {C_2}
+   \A = (\rhoenv,\aenv,\phicx)  \spc \rgn \notin \rhoenv \spc
+      \A' = (\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn))
+   \nl
+   \exprok{\A',\env} {e_a} {\tau} {C_1} \spc
+      \typeok {\A} {\tau} {C_2}
 }{
-\exprok{\stdcontext} {\letregion{\rgn}{e_a}} {\tau} {(C_1 \cup C_2)}
+   \exprok{\stdcontext} {\letregion{\rgn}{e_a}} {\tau} {(C_1 \cup C_2)}
 }
 
 \myendrules
@@ -190,14 +180,14 @@
 
 %%%%%%%%%%% OPEN-REGION %%%%%%%%%%%
 \lgcrule{OPEN}{
-\exprok {\stdcontext} {e_a} {\RgnZ\inang{T}\inang{\rho}} {C_1} \spc
-\A = (\rhoenv,\aenv,\phicx) \spc
-\rgn \notin \rhoenv
-\\
-(\A',\env') = ((\rhoenv \cup \{\rgn\},\aenv,\phicx),\env[y\mapsto T@\rgn] \spc
-\exprok {\A',\rgn,\env'} {e_b} {\tau} {C_2}
+   \exprok {\stdcontext} {e_a} {\RgnZ\inang{T}\inang{\rho}} {C_1} \spc
+   \A = (\rhoenv,\aenv,\phicx) \spc
+   \rgn \notin \rhoenv
+   \\
+   % (\A',\env') = ((\rhoenv \cup \{\rgn\},\aenv,\phicx),\env[y\mapsto T@\rgn] \spc
+   \exprok {(\rhoenv \cup \{\rgn\},\aenv,\phicx),\env[y\mapsto T@\rgn]} {e_b} {\tau} {C_2}
 }{
-\exprok {\stdcontext} {\open{e_a}{\rgn}{y}{e_b}} {\tau} {(C_1 \cup C_2)}
+   \exprok {\stdcontext} {\open{e_a}{\rgn}{y}{e_b}} {\tau} {(C_1 \cup C_2)}
 }
 
 

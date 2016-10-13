@@ -1,0 +1,26 @@
+* Include op semantics back, after reformatting/splitting?
+* constraint gen rules: tywf: for arrow type: rho-bar not-in constraint!
+
+
+
+\begin{itemize}
+  \item explain: non-determinism in defining region-variable binding is immaterial.
+  \item explain lemma 2's use case (a) and (b)
+  \item notation: decomposable is dependent on C
+  \item cleanup: syntax of constraints (region-constraint, validity constraint, etc.)
+    and later usage (abduction constraint)
+  \item adjust spacing in RULEs
+  \item for function-calls: need basic typing from core language to introduce region parameters
+  \item discuss computation of least-solution to constraints?
+  \item use of a set to represent conjunctions
+  \item equality is shorthand for two inequalities
+  \item use of alpha-renaming, and its use to discharge not-in contraints;
+\item also remind reader that variable names are unique
+  \item Note that we can also clarify that the well-formedness constraints are
+    syntactic sugar from basic set constraints
+  \item Prove: Progress: Every region-variable will be unified with some constant.
+  \item Notation: should we use a different notation to distinguish a validity constraint
+    from actual entailment?
+  \item update abstract/intro to stress aspects of constraint solver
+  \item Change static semantics to use method precondition, without class precondition
+\end{itemize}

@@ -1,19 +1,28 @@
-Recent work in high-performance systems written in managed languages
-(such as Java or C\#) has shown that garbage-collection can be a
-significant performance bottleneck.  A class of these systems, focused
-on big-data, create numerous large data structures with well-defined
-lifetimes.  In this paper, we present a language and a memory
+% Recent work in high-performance systems written in managed languages
+% (such as Java or C\#) has shown that garbage-collection can be a
+% significant performance bottleneck.
+% A class of these systems, focused on big-data, create numerous large
+% data structures with well-defined lifetimes.
+%
+There is increasing interest in alternative memory management techniques
+that strike a balance between the convenience of garbage collection and
+the better performance that manual memory management enables, without
+compromising safety.
+%
+In this paper, we present a language and a memory
 management scheme based on user-managed memory regions (called
 \emph{transferable regions}) that allow programmers to exploit the
-knowledge of data structures' lifetimes to achieve significant
-performance improvements.
+knowledge of data structures' lifetimes to improve performance.
 
 Manual memory management is susceptible to the usual perils of
 dangling pointers. A key contribution of this paper is a
 refinement-based region type system that ensures the memory safety of
-C\# programs in the presence of transferable regions. We complement
-our type system with a type inference algorithm.
-This eliminates the need for programmers to
-write region annotations on types, while facilitating the reuse of
-existing C\# libraries with no modifications. Experiments demonstrate
-the practical utility of our approach.
+C\# programs in the presence of transferable regions.
+We complement our type system with a type inference algorithm.
+This eliminates the need for programmers to write region annotations on types.
+We establish the soundness of the type inference algorithm and
+show that the key steps of constraint-generation and constraint-solving
+in the type inference algorithm are complete.
+
+% while facilitating the reuse of existing C\# libraries with no modifications.
+% Experiments demonstrate the practical utility of our approach.
