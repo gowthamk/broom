@@ -1,3 +1,4 @@
+* proof of lemma 4 (abduction decomposition)
 * Include op semantics back, after reformatting/splitting?
 * constraint gen rules: tywf: for arrow type: rho-bar not-in constraint!
 

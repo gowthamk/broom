@@ -3,7 +3,7 @@
 \begin{theorem}
 \label{thm:constraint-generation-sc}
 Let $C = \consOf{q}$.
-Any assignment $\soln$ (for the region and predicate variables in $q$)
+An assignment $\soln$ (for the region and predicate variables in $q$)
 satisfies $C$ iff $q[\soln]$ is well-typed.
 \end{theorem}
 \begin{proof}
@@ -86,8 +86,8 @@ This follows because $\FB$ does not admit uninitialized variables.
 % , and the type system uniquely determines the region parameters of every value
 \end{proof}
 
-\paragraph{Soundness and Completeness of the Constraint Solver.}
 \begin{lemma}
+  \label{lemma:two-bindings}
 Let $C = \consOf{q}$.
 Suppose a region variable $\rho$ is bound to two different region constants $\pi_1$
 and $\pi_2$ in a context $\varphi \conj \phi$. % in $\satC$.
@@ -116,43 +116,42 @@ $\isvalid{\predSubstFn(\varphi)}{\pi_1 = \pi_2}$.
   for $\satC$.
 \end{proof}
 
-\begin{lemma}
-Let $C = \consOf{q}$.
-Let $\satC_1$ denote the subset of $\satC$ obtained by removing all constraints
-that contain a region variable.
-$\satC$ is satisfiable iff $\satC_1$ is satisfiable.
-\end{lemma}
-
-\begin{proof}
-  The forward implication is trivial.
-  The reverse implication follows from Lemma~\label{lemma:completely-bound}, as shown below.
-
-
-\end{proof}
+% \begin{lemma}
+% Let $C = \consOf{q}$.
+% Let $\satC_1$ denote the subset of $\satC$ obtained by removing all constraints
+% that contain a region variable.
+% $\satC$ is satisfiable iff $\satC_1$ is satisfiable.
+% \end{lemma}
+% 
+% \begin{proof}
+%   The forward implication is trivial.
+%   The reverse implication follows from Lemma~\label{lemma:completely-bound}, as shown below.
+% \end{proof}
 
 \begin{theorem}
 \label{thm:constraint-solver-soundness}
 Let $C = \consOf{q}$.
-If the constraint solver returns an assignment $\soln$,
+If $\solveCon{C} = \textsc{Some}(\soln)$,
 then $\soln$ satisfies $\satC$.
 \end{theorem}
 
 \begin{proof}
-Assume that the constraint solver returns an assignment $\soln$.
+Assume $\solveCon{C} = \textsc{Some}(\soln)$.
 
-By construction, $\groundC$ (the set of all variable-free constraints in $\satC$)
+By definition (of $\solveCon{C}$), $\groundC$ (the set of all variable-free constraints in $\satC$)
 is satisfiable. Hence, $\soln$ trivially satisfies all constraints in $\groundC$.
-
-The definition of $\soln$ ensures that it satisfies the well-formedness constraints
+%
+The definition also ensures that $\soln$ satisfies the well-formedness constraints
 for any region variable $\rho$.
 
 Consider any constraint of the form $\isvalid{\varphi}{\pi_i \outlives \pi_j}$ in $\satC$,
-where $\pi_i$ and $\pi_j$ are region constants. The definition of $\predSubstFn(\varphi)$
+where $\pi_i$ and $\pi_j$ are distinct region constants. The definition of $\predSubstFn(\varphi)$
 ensures that $\soln$ satisfies this constraint.
 Furthermore, $\soln$ must also satisfy the well-formedness constraint
-$\tywf{predDeltaMap(\varphi)}{\varphi}$.
-(Otherwise, it follows from abduction decomposition that $\isvalid{}{\pi_i \outlives \pi_j}$ must
-be in $\satC$, which means $\groundC$ must be invalid.)
+$\tywf{\predDeltaMap(\varphi)}{\varphi}$.
+(Otherwise, the application of Abduction Decomposition to this constraint will add
+$\isvalid{}{\pi_i \outlives \pi_j}$ to $\satC$. This constraint is invalid, which
+contradicts the fact that $\groundC$ is valid.)
 
 Consider any constraint of the form $\isvalid{\varphi \conj \phi}{\pi_i \outlives \pi_j}$ in $\satC$,
 It follows from abduction decomposition that either
@@ -173,14 +172,15 @@ Hence, $\soln$ satisfies $\isvalid{\ell}{F_j(\varphi_j)}$ as well.
 
 Consider any constraint of the form $\isvalid{\ell}{r}$ where $r$ contains a single occurrence
 of a region variable, say $\rho$.
-It follows from Lemma~\label{lemma:completely-bound} that $\rho$ is bound to some region
+It follows from Lemma~\ref{lemma:completely-bound} that $\rho$ is bound to some region
 constant $\pi$.
 Let $r'$ denote $r$ with $\rho$ replaced by $\pi$.
-It follows from the transitivity rule that $\satC$ must contain the constraint $\isvalid{\ell}{r'}$
-and that $\soln$ satisfies this constraint.
-Further, it follows that $\soln$ satisfies $\isvalid{\ell}{\pi = \pi'}$ where $\pi' = \regionSubstFn(\rho)$.
-Hence, $\soln$ satisfies this constraint as well.
-\TODO{Flesh this out.}
+It follows from the transitivity rule that $\satC$ must contain the constraint $\isvalid{\ell}{r'}$.
+Since this constraint has no variables on the consequent, we have already shown that $\soln$
+must satisfy this constraint ($\isvalid{\ell}{r'}$).
+Let $\pi' = \regionSubstFn(\rho)$.
+We can show (as in the proof of Lemma~\ref{lemma:two-bindings}) that $\soln$ satisfies $\isvalid{\ell}{\pi = \pi'}$.
+Hence, $\soln$ satisfies $\isvalid{\ell}{r}$ as well.
 
 The same idea works for constraints with occurrences of two region variables in the consequent.
 
@@ -198,7 +198,7 @@ If $\groundC$ is satisfiable, the solver will fail to return an assignment only 
 $\{ \pi \in \regionDeltaMap(\rho) \; | \; \isvalid{\ell}{\rho = \pi} \in \satC \}$ is empty for some region variable $\rho$.
 Consider any such $\rho$.
 Let $\soln$ be a satisfying assignment for $\satC$.
-Let $\pi' = \predSubstFn(\rho)$. Then, we must have $\pi' in \regionDeltaMap(\rho)$.
+Let $\pi' = \predSubstFn(\rho)$. Then, we must have $\pi' \in \regionDeltaMap(\rho)$.
 From Lemma~\ref{lemma:completely-bound}, $\rho$ must be bound to some $\pi$ in some context $\ell$.
 Thus, $\isvalid{\ell}{\rho = \pi} \in \satC$.
 Since $\soln$ satisfies this constraint, we have $\isvalid{\ell[\soln]}{\pi' = \pi}$.
@@ -214,8 +214,8 @@ The result follows.
 
 \begin{theorem}
 \label{thm:constraint-solver-sc}
-Let $C = \consOf{q}$.
-(Soundness) If $\solveCon{C} = \textsc{Some}(\soln)$, then $\soln$ satisfies $C$.
+Let $C = \consOf{q}$.\\
+(Soundness) If $\solveCon{C} = \textsc{Some}(\soln)$, then $\soln$ satisfies $C$.\\
 (Completeness) If $\solveCon{C} = \textsc{None}$, then $C$ is unsatisfiable.
 \end{theorem}
 
