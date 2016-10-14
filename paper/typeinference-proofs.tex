@@ -88,13 +88,15 @@ This follows because $\FB$ does not admit uninitialized variables.
 
 \begin{lemma}
   \label{lemma:two-bindings}
-Let $C = \consOf{q}$.
+Let $C = \consOf{q}$. Assume that $\groundC$ is valid.
 Suppose a region variable $\rho$ is bound to two different region constants $\pi_1$
 and $\pi_2$ in a context $\varphi \conj \phi$. % in $\satC$.
-Let $\soln$ satisfy $\satC$.
-For any context $\varphi \conj \phi$ that contains $\rho$, we must have
-$\{ \pi_1, \pi_2 \} \subseteq \predDeltaMap(\varphi)$ and
-$\isvalid{\predSubstFn(\varphi)}{\pi_1 = \pi_2}$.
+% Let $\soln$ satisfy $\satC$.
+% For any context $\varphi \conj \phi$ that contains $\rho$, we must have
+Then, 
+(a) $\{ \pi_1, \pi_2 \} \subseteq \predDeltaMap(\varphi)$,
+(b) $\isvalid{\thesolnP(\varphi)}{\pi_1 = \pi_2}$.
+(c) For any $\soln$ that satisfies $\satC$, we must have $\isvalid{\solnP(\varphi)}{\pi_1 = \pi_2}$.
 \end{lemma}
 
 \begin{proof}
@@ -179,7 +181,7 @@ It follows from the transitivity rule that $\satC$ must contain the constraint $
 Since this constraint has no variables on the consequent, we have already shown that $\soln$
 must satisfy this constraint ($\isvalid{\ell}{r'}$).
 Let $\pi' = \regionSubstFn(\rho)$.
-We can show (as in the proof of Lemma~\ref{lemma:two-bindings}) that $\soln$ satisfies $\isvalid{\ell}{\pi = \pi'}$.
+We can show (using Lemma~\ref{lemma:two-bindings}) that $\soln$ satisfies $\isvalid{\ell}{\pi = \pi'}$.
 Hence, $\soln$ satisfies $\isvalid{\ell}{r}$ as well.
 
 The same idea works for constraints with occurrences of two region variables in the consequent.
@@ -189,7 +191,8 @@ The same idea works for constraints with occurrences of two region variables in 
 \begin{theorem}
 \label{thm:constraint-solver-completeness}
 Let $C = \consOf{q}$.
-If $\satC$ is satisfiable, then the constraint solver will return some assignment.
+If $\solveCon{C} = \textsc{None}$, then $C$ is unsatisfiable.
+% If $\satC$ is satisfiable, then the constraint solver will return some assignment.
 \end{theorem}
 
 \begin{proof}

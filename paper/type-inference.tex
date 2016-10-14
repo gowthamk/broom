@@ -1,4 +1,10 @@
 \newcommand{\soln}{\eta}
+\newcommand{\solnR}{\soln_R}
+\newcommand{\solnP}{\soln_P}
+\newcommand{\thesoln}{\hat{\eta}}
+\newcommand{\thesolnR}{\thesoln_R}
+\newcommand{\thesolnP}{\thesoln_P}
+
 \newcommand{\saturate}[1]{{#1}^*}
 \newcommand{\myground}[1]{\saturate{#1}_g}
 \newcommand{\consOf}[1]{\textsc{GenConstraint}(#1)}
@@ -577,11 +583,11 @@ Let $C = \consOf{q}$.
 Every region variable occurring in $\satC$ is bound to some region constant in $\satC$.
 \end{lemma}
 
-The set $\satC$ makes it easy to identify a solution $\soln$ (if one exists), as below.
+The set $\satC$ makes it easy to identify a solution $\thesoln$ (if one exists), as below.
 \begin{itemize}
-\item For any predicate variable $\varphi$, $\predSubstFn(\varphi)$ is defined
+\item For any predicate variable $\varphi$, $\thesolnP(\varphi)$ is defined
 to be $\conj \{ \pi_1 \outlives \pi_2 \;|\; \pi_1, \pi_2 \in \regionConstants, \isvalid{\varphi}{\pi_1 \outlives \pi_2} \in \saturate{C} \}$.
-\item For any region variable $\rho$, we define $\regionSubstFn(\rho)$ to be any element of the
+\item For any region variable $\rho$, we define $\thesolnR(\rho)$ to be any element of the
 set $\{ \pi \in \regionConstants \:|\; \isvalid{\ell}{\rho = \pi} \in \saturate{C} \}$.
 \end{itemize}
 
@@ -606,7 +612,7 @@ Define $\solveCon{C}$ as below.
 \[
 \solveCon{C} = 
 \begin{cases}
-\textsc{Some} (\soln) & \textrm{if $\groundC$ is valid and $\soln$ satisfies $\rhoC$} \\
+\textsc{Some} (\thesoln) & \textrm{if $\groundC$ is valid and $\thesoln$ satisfies $\rhoC$} \\
 \textsc{None} & \textrm{otherwise}
 \end{cases}
 \]
