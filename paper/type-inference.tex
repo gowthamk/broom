@@ -259,6 +259,8 @@ a set $\predVars$ of predicate variables.
 % ($\pi$ and $\rho$) and predicate variables ($\varphi$).
 % $(\regionConstants, \regionVars, \predVars, \regionDeltaMap, \predDeltaMap, \constraintSet)$,
 
+\input{constraint-syntax}
+
 % \emph{Region identifiers} are of two kinds: \emph{region constants} and \emph{region variables}.
 Recall that a \emph{region variable} is introduced to represent an unknown actual region parameter
 of a method invocation or object allocation, which will be bound to a region constant by the end of the
@@ -269,29 +271,28 @@ A region constant may be
 (c) an  \emph{open transferable region identifier} introduced by an \C{open} construct.
 
 Every predicate variable $\varphi$ denotes an unknown \emph{region-constraint},
-%% over a set of fixed formal region parameters,
-where the set of region-constraints $\phi$ is defined by:
-\begin{smathpar}
-\begin{array}{lcl}
-\phi & \coloneqq & true \ALT \rho \outlives \rho \ALT \phi \conj \phi \\
-\end{array}
-\end{smathpar}
-We will use $\rho_1 = \rho_2$ as shorthand for $\rho_1 \outlives \rho_2 \conj \rho_2 \outlives \rho_1$.
-We will also use a set $S$ of primitive constraints of the form $\rho_1 \outlives \rho_2$
-as shorthand for $\conj_{\phi \in S} \phi$.
-
+over a set of fixed formal region parameters.
+%% where the set of region-constraints $\phi$ is defined by:
+%% \begin{smathpar}
+%% \begin{array}{lcl}
+%% \phi & \coloneqq & true \ALT \rho \outlives \rho \ALT \phi \conj \phi \\
+%% \end{array}
+%% \end{smathpar}
+%% We will use $\rho_1 = \rho_2$ as shorthand for $\rho_1 \outlives \rho_2 \conj \rho_2 \outlives \rho_1$.
+%% We will also use a set $S$ of primitive constraints of the form $\rho_1 \outlives \rho_2$
+%% as shorthand for $\conj_{\phi \in S} \phi$.
+%% 
 We will use the term \emph{validity constraint} to denote an entailment constraint
 of the form $\isvalid{\varphi}{\rho_1 \outlives \rho_2}$.
 
 Our constraints also make uses of \emph{pending substitutions} $F$:
-% \footnote{we borrowed this terminology from~\cite{ltpldi08}}
 A pending substitution serves to bind formal region parameters in $\varphi$ to the actual region parameters
 used in a particular context:
-\begin{smathpar}
-\begin{array}{lcl}
-F & \coloneqq & \cdot \ALT [\rho/\rho]F \\
-\end{array}
-\end{smathpar}
+%% \begin{smathpar}
+%% \begin{array}{lcl}
+%% F & \coloneqq & \cdot \ALT [\rho/\rho]F \\
+%% \end{array}
+%% \end{smathpar}
 E.g., in the validity constraint $\isvalid{\rgn_1 \outlives
 \rgn_2}{[\rgn_1/\rho_1][\rgn_2/\rho_2]\varphi}$, the pending substitution
 is $[\rgn_1/\rho_1][\rgn_2/\rho_2]$. Any concrete formula (call it
