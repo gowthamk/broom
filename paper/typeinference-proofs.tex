@@ -192,27 +192,55 @@ The same idea works for constraints with occurrences of two region variables in 
 \label{thm:constraint-solver-completeness}
 Let $C = \consOf{q}$.
 If $\solveCon{C} = \textsc{None}$, then $C$ is unsatisfiable.
-% If $\satC$ is satisfiable, then the constraint solver will return some assignment.
 \end{theorem}
 
 \begin{proof}
-If $\satC$ is satisfiable, then $\groundC$ is trivially satisfiable.
-If $\groundC$ is satisfiable, the solver will fail to return an assignment only if the set $S_\rho$ = 
-$\{ \pi \in \regionDeltaMap(\rho) \; | \; \isvalid{\ell}{\rho = \pi} \in \satC \}$ is empty for some region variable $\rho$.
-Consider any such $\rho$.
-Let $\soln$ be a satisfying assignment for $\satC$.
-Let $\pi' = \predSubstFn(\rho)$. Then, we must have $\pi' \in \regionDeltaMap(\rho)$.
-From Lemma~\ref{lemma:completely-bound}, $\rho$ must be bound to some $\pi$ in some context $\ell$.
-Thus, $\isvalid{\ell}{\rho = \pi} \in \satC$.
-Since $\soln$ satisfies this constraint, we have $\isvalid{\ell[\soln]}{\pi' = \pi}$.
-If $\pi$ and $\pi'$ are the same region identifier, we have a contradiction, since
-$\pi \in S_\rho$ and $S_\rho$ cannot be empty.
-If $\pi$ and $\pi'$ are distinct region identifiers, then it follows that the precondition of case (a) must hold
-in Lemma~\ref{lemma:decomposition}, and we must have $\{ \pi, \pi' \} \subseteq \predDeltaMap(\varphi)$.
-We can show, by induction over the constraint-generation rules, that if $\regionDeltaMap(\rho)$ includes
-some element of $\predDeltaMap(\varphi)$, then it includes all elements of $\predDeltaMap(\varphi)$.
-It follows that $\pi \in \regionDeltaMap(\rho)$. Hence, the set $S_\rho$ is non-empty (as it contains $\pi$.
-The result follows.
+We prove the theorem by contradiction.
+Assume that $\satC$ is satisfiable.
+We will show that the precondition for the first case in the definition of $\textsc{Solve}$
+holds and, hence, $\solveCon{C}$ cannot be $\textsc{None}$.
+
+Since $\satC$ is satisfiable, $\groundC$ is trivially valid.
+We just need to show that $\thesolnR$ satisfies $\rhoC$.
+Recall that $\rhoC$ is the subset of $C$ of well-formedness constraints
+on region variables.
+So, we just need to show for any constraint $\rho \in \rhoenv$ in $C$ that
+$\thesolnR(\rho) \in \rhoenv$.
+Since we have assumed that $\satC$ is satisfiable, there exists some $\soln$ that satisfies $\satC$
+and, in particular, the constraint $\rho \in \rhoenv$.
+Let $\pi$ denote $\soln(\rho)$. Thus, we have $\pi \in \rhoenv$.
+
+Let $\hat{\pi}$ denote $\thesolnR(\rho)$. If $\pi$ and $\hat{\pi}$ are the same region
+constant, then $\hat{\pi}\ \in \rhoenv$ and the proof is complete.
+%
+Otherwise, it follows from the definition of $\thesoln$, that we have some constraint
+$\isvalid{\varphi \conj \phi}{\rho = \hat{\pi}}$ in $\satC$.
+Since $\soln$ satisfies this constraint, we have
+$\isvalid{\solnP(\varphi) \conj \phi}{\pi = \hat{\pi}}$.
+We can show that $\{ \pi, \hat{\pi} \} \subseteq \predDeltaMap(\varphi)$
+(as in the proof of Lemma~\ref{lemma:two-bindings}).
+We can show, by induction over the constraint-generation rules, that if $\Delta$
+includes some element of $\predDeltaMap(\varphi)$, then it includes all elements of $\predDeltaMap(\varphi)$.
+Hence, it follows that $\hat{\pi} \in \Delta$.
+% for some predicate variable $\varphi$.
+
+
+% If $\groundC$ is satisfiable, the solver will fail to return an assignment only if the set $S_\rho$ = 
+% $\{ \pi \in \regionDeltaMap(\rho) \; | \; \isvalid{\ell}{\rho = \pi} \in \satC \}$ is empty for some region variable $\rho$.
+% Consider any such $\rho$.
+% Let $\soln$ be a satisfying assignment for $\satC$.
+% Let $\pi' = \predSubstFn(\rho)$. Then, we must have $\pi' \in \regionDeltaMap(\rho)$.
+% From Lemma~\ref{lemma:completely-bound}, $\rho$ must be bound to some $\pi$ in some context $\ell$.
+% Thus, $\isvalid{\ell}{\rho = \pi} \in \satC$.
+% Since $\soln$ satisfies this constraint, we have $\isvalid{\ell[\soln]}{\pi' = \pi}$.
+% If $\pi$ and $\pi'$ are the same region identifier, we have a contradiction, since
+% $\pi \in S_\rho$ and $S_\rho$ cannot be empty.
+% If $\pi$ and $\pi'$ are distinct region identifiers, then it follows that the precondition of case (a) must hold
+% in Lemma~\ref{lemma:decomposition}, and we must have $\{ \pi, \pi' \} \subseteq \predDeltaMap(\varphi)$.
+% We can show, by induction over the constraint-generation rules, that if $\regionDeltaMap(\rho)$ includes
+% some element of $\predDeltaMap(\varphi)$, then it includes all elements of $\predDeltaMap(\varphi)$.
+% It follows that $\pi \in \regionDeltaMap(\rho)$. Hence, the set $S_\rho$ is non-empty (as it contains $\pi$.
+% The result follows.
 \end{proof}
 
 \begin{theorem}
@@ -226,29 +254,5 @@ Let $C = \consOf{q}$.\\
 
 Follows from Theorems~\ref{thm:constraint-solver-soundness} and~\ref{thm:constraint-solver-completeness}.
 
-% Theorem~\ref{thm:closure} shows that $\satC$ and $C$ are equivalent.
-% 
-% The next step is to show that $\groundC$ and $\satC$ are (almost) equivalent.
-% Consider $\satC \setminus \groundC$. This includes the well-formedness constraints.
-% It is easy to show that we take care of these.
-% 
-% The more difficult case are validity constraints, involving either region variables
-% ($\rho$) or predicate variables ($\varphi$) or both.
-% 
-% We use this property to show that it is okay to ignore validity constraints
-% in $\satC$ containing region variables. For every
-% region variable $\rho$ unified with a constant $\pi$, and for every validity
-% constraint containing $\rho$, we will have a corresponding validity constraint
-% containing $\pi$ instead.
-% 
-% As for validity constraints containing a predicate variable $\varphi$ on the consequent,
-% we argue that the use of the Substitution rule in computing $\satC$ makes it okay
-% to ignore these constraints.
-% 
-% As for validity constraints containing a predicate variable $\varphi$ on the antecedent,
-% we use Lemma~\ref{lemma:decomposition} to argue that Abduction Decomposition lets
-% us convert these into simpler constraints that do not have $\varphi$ on the
-% antecedent or into a constraint that is directly incorporated into definition
-% of $\predSubstFn$.
 \end{proof}
 

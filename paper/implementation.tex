@@ -32,16 +32,13 @@ Sec.~\ref{sec:type-inference}.
 \begin{figure}
 \begin{codejava}
 class LinkedList<T><R5,R4 | R4$\outlives$R5> {
-  ListNode<T><R5,R4> head;
-  ..
+  ListNode<T><R5,R4> head; ...
   List<T><R17,R4> rev<R17,R4 | R4$\outlives$R17>(unit u) {
-    List<T><R17,R4> xs = 
-        new List<T><R17,R4>(this.head.val);
+    List<T><R17,R4> xs = new List<T><R17,R4>(this.head.val);
     ListNode<T><R5,R4> cur = this.head.next;
     while (!cur == Null) {
       xs.add<R17>(cur.val)
-      cur = cur.next;
-    }
+      cur = cur.next; }
     return xs;
   }
 \end{codejava}
