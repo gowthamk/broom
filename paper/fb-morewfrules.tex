@@ -9,11 +9,12 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \rhoenv = \{\rhobar,\bar{\rho_m}\} \spc
+    \mem = \cdot[\rhobar\mapsto\overline{\LIVE}]
+           [\bar{\rho_m}\mapsto\overline{\LIVE}] \spc
     \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
     \phicx = \phi \conj \phi_m \spc
     \A = (\subtypcx)\spc
-    \tywf{\rhoenv}{\phi_m} \\
+    \tywf{\mem}{\phi_m} \\
     \tywf{\A}{\bar{\tau^1},\tau^2} \spc
 %   \tywf{\A}{\tau^2} \spc
     \headerOf{B}\{...\}\spc
@@ -46,11 +47,12 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \rhoenv = \{\rho,\rhobar\} \spc
+    \mem = \cdot[\rho\mapsto\LIVE][\rhobar\mapsto\overline{\LIVE}]\spc
+%   \rhoenv = \{\rho,\rhobar\} \spc
     \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
     \phicx = \phi \spc
     \A = (\subtypcx)\spc
-    \tywf{\rhoenv}{\phi} \spc
+    \tywf{\mem}{\phi} \spc
     \fgjtywf{\aenv}{\bar{\fgjN}} \\
     \tywf{\A}{\fbN,\bar{\tau^f}} \spc
     \shape(\fbN) \neq \RgnZ\inang{T}\spc

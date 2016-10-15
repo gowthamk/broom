@@ -1,0 +1,30 @@
+\renewcommand{\rgn}{r}
+\renewcommand{\rbar}{\overline{r}}
+
+\begin{figure*}[!h]
+%
+\textbf{Subtyping}  \; \fbox
+  {\(\subtyp{\A}{\tau_1}{\tau_2}\)}\\
+\input{fb-subtyprules-full}
+%
+\bigskip
+
+\textbf{Type, and Type Constraint Well-formedness}  \; \fbox
+  {\(\tywf{\A}{\tau}, \spc 
+     \tywf{\mem}{\phi}\)}\\
+\input{fb-tywfrules-full}
+%
+\bigskip
+
+\textbf{Expression Typing}  \; \fbox
+  {\(\hastyp{\exptycx{\env}}{e}{\tau}\)}\\
+\input{fb-exptyprules-full}
+%
+\bigskip
+
+\caption{\fbname: Static Semantics}
+\label{fig:fb-staticsem}
+\end{figure*}
+
+\renewcommand{\rgn}{\pi}
+\renewcommand{\rbar}{\overline{\pi}}

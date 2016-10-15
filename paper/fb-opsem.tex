@@ -83,20 +83,20 @@
             {\invalidexn}
 	  }{EXCEPTION}
 
-\lopsemrule{3.2in}{
-    \not\exists \loc.~\mem(\loc) = \FREE
-}{
-    \redstoo{(\letregion{\rgn}{e},\mem)}{\invalidexn}
-  }{EXCEPTION}
+% \lopsemrule{3.2in}{
+%     \not\exists \loc.~\mem(\loc) = \FREE
+% }{
+%     \redstoo{(\letregion{\rgn}{e},\mem)}{\invalidexn}
+%   }{EXCEPTION}
 
 
-\lopsemrule{3.3in}{
-    \not\exists \loc.~\mem(\loc) = \FREE
-}{
-    \redstoo{(\C{new} \; \RgnZ\inang{T}\inang{\toprgn}
-                (\lambdaexp{\loc'}{\rho}{}{e}),\mem)}
-            {\invalidexn}
-	      }{EXCEPTION}
+% \lopsemrule{3.3in}{
+%     \not\exists \loc.~\mem(\loc) = \FREE
+% }{
+%     \redstoo{(\C{new} \; \RgnZ\inang{T}\inang{\toprgn}
+%                 (\lambdaexp{\loc'}{\rho}{}{e}),\mem)}
+%             {\invalidexn}
+%         }{EXCEPTION}
 % \lopsemrule{2.5in}{
 %     \mem(\rgn_r) \neq \XFERRED \spc
 % %   \fresh(\rgn_1) \spc
@@ -119,7 +119,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
       v.m\inang{\locbar}(...,\bullet,...) \ALT \C{new}\; \fbN(...,\bullet,...) \ALT
       \C{new} \; \RgnZ\inang{T}\inang{\loc}(\bullet) \ALT \bullet\inang{\locbar}(\ebar) \\
   &  & \ALT v\inang{\locbar}(...,\bullet,...) \ALT
-       \letregion{\loc}{\bullet} \ALT \open{\bullet}{\rgn}{y}{e} \ALT
+       \letd{\loc}{\bullet} \ALT \open{\bullet}{\rgn}{y}{e} \ALT
        \opened{\loc}{\status}{\bullet}
 \end{array}
 \end{smathpar}
@@ -132,18 +132,19 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 
 \lopsemrule{3.2in}{
 %   \fresh(\rgn')\spc
-    \mem(\loc) = \FREE \spc
+%   \mem(\loc) = \FREE \spc
+    \loc \not\in dom(\mem) \spc
     \mem' = \mem[\loc \mapsto \SLIVE]
 %   \redstoo{(e,\mem)}{(e',\mem')}
 }{
-    \redstoo{(\letregion{\rgn}{e},\mem)}{(\letregion{\loc}{[\loc/\rgn]e},\mem')}
+    \redstoo{(\letregion{\rgn}{e},\mem)}{(\letd{\loc}{[\loc/\rgn]e},\mem')}
   }{LET-REGION-BEGIN}
 
 \lopsemrule{3in}{
 %   \rgn \notin \rhoenv
     \mem' = \mem[\loc \mapsto \FREE]
 }{
-    \redstoo{(\letregion{\loc}{v},\mem)}{(v,\mem)}
+    \redstoo{(\letd{\loc}{v},\mem)}{(v,\mem)}
   }{LET-REGION-END}
 
 \lopsemrule{3.3in}{
@@ -154,13 +155,25 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 %   \rgn \notin dom(\mem) \cup \rhoenv \spc
 %   \mem' = \mem[\rgn_r \mapsto \CLOSED]
     \mem(\loc) = \LIVE \spc
-    \mem(\loc') = \FREE \spc
+%   \mem(\loc') = \FREE \spc
+    \loc' \not\in dom(\mem) \spc
     \mem' = \mem[\loc' \mapsto \USED]
 }{
     \redstoo{(\C{new} \; \RgnZ\inang{T}\inang{\toprgn}
-                (\lambdaexp{\rgn}{\rho}{}{e}),\mem)}
+                (\lambdaexp{\loc}{\rho}{}{e}),\mem)}
             {(\C{new} \; \RgnZ\inang{T}\inang{\loc'}
                 ([\loc'/\rho]e),\mem')}
+	      }{NEW-REGION}
+
+\lopsemrule{3.3in}{
+    \loc \in dom(\mem) \spc
+    \mem' = \mem[\loc \mapsto \LIVE] \spc
+    \redstoo{(e,\mem') }{(e',\mem')}
+}{
+    \redstoo{(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
+                (e),\mem)}
+            {(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
+                (e'),\mem)}
 	      }{NEW-REGION}
 
 % \lopsemrule{2.8in}{
@@ -229,12 +242,12 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
             {\invalidexn}
 	  }{TRANSFER-OPENED}
 
-\lopsemrule{2.5in}{
-    \not\exists \loc.~\mem(\loc) = \SLIVE \spc
-    \mem(\loc') = \XFERRED
-}{
-    \redstoo{(e,\mem)}{(e,\mem[\loc'\mapsto\FREE])}
-	  }{GARBAGE-COLLECT}
+% \lopsemrule{2.5in}{
+%     \not\exists \loc.~\mem(\loc) = \SLIVE \spc
+%     \mem(\loc') = \XFERRED
+% }{
+%     \redstoo{(e,\mem)}{(e,\mem[\loc'\mapsto\FREE])}
+%     }{GARBAGE-COLLECT}
 
 
 \caption{\fbname: Operational Semantics (Part 2)}

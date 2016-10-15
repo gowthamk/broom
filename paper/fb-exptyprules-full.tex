@@ -1,0 +1,309 @@
+%
+\begin{minipage}{1.2in}
+\begin{smathpar}
+\begin{array}{l}
+\renewcommand*{\arraystretch}{1.2}
+\hastyp{\exptycx{\env}}{\unitval}{\unitZ}\\
+\hastyp{\exptycx{\env}}{x}{\env(\tau)}
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.8in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}}{e}{\tau'}\\
+    \bar{f}:\taubar \,=\, \fields(\bound_{\A.\aenv}(\tau'))
+  }
+  {
+    \hastyp{\exptycx{\env}}{e.f_i}{\tau_i}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.8in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}}{\bar{e}}{\taubar} \\
+    \tywf{\A}{\fbN} \spc
+    \fields(\fbN) = \bar{f} : \taubar \\
+  }
+  {
+    \hastyp{\exptycx{\env}}{\C{new}\; \fbN(\bar{e})}{\fbN}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}}{e_1}{\tau_1}\\
+    \hastyp{\exptycx{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}\\
+  }
+  {
+    \hastyp{\exptycx{\env}}{\letexp{x}{e_1}{e_2}}{\tau_2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{3.6in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\mem,\aenv,\phicx)\spc
+    \fgjtywf{\aenv}{T} \\
+%   \rgn \in \A.\rhoenv \spc
+    \mem(\rgn) = \LIVE \spc
+    \hastyp{(\cdot[\rho\mapsto\LIVE],\aenv,true),{\cdot}}{e}
+      {T@\rho}
+  }
+  {
+    \hastyp{\exptycx{\env}}{\C{new}\;
+    \RgnZ\inang{T}\inang{\toprgn}(\lambdaexp{\rgn}{\rho}{}{e})} 
+      {\RgnZ\inang{T}\inang{\toprgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+%   To preserve type safety, we need to compensate for 
+%   commenting out the below line. One way to do this is
+%   by requiring frv(e) \subseteq dom(\Sigma), where frv(e)
+%   is defined as region identifiers tagging Region objects
+%   in e.
+%   \rgn \in \A.\rhoset\spc
+    \A = (\mem,\aenv,\phicx)\spc
+    \A' = (\cdot[\loc\mapsto\LIVE], \aenv, true) \\
+    \mem(\loc) = \USED \spc
+    \tywf{\A'}{T@\loc} \spc
+%   \fgjN = \RgnZ\inang{T}\spc
+    \hastyp{\A', {\env}}{e}{T@\loc}
+  }
+  {
+    \hastyp{\exptycx{\env}}{\C{new}\;
+    \RgnZT{\toploc\loc}(e)} {\RgnZT{\toprgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{3.7in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\mem,\aenv,\phicx) \spc
+    \hastyp{\exptycx{\env}}{e_0}{\tau} \\
+%   \rbar \in \A.\rhoenv \\
+    \mem(\rbar) = \overline{\LIVE} \spc
+    \mtype(m,\bound_{\aenv}(\tau)) = \inang{\rhobar \,|\, 
+        \phi}\bar{\tau^1}\rightarrow{\tau^2} \\
+    \tywf{\A}{\inang{\rhobar \,|\,
+    \phi}\bar{\tau^1}\rightarrow{\tau^2}}\spc
+    \hastyp{\exptycx{\env}}{\bar{e}}{[\rbar/\rhobar](\bar{\tau^1})} \spc
+    \isvalid{\phicx}{[\rbar/\rhobar](\phi)}
+  }
+  {
+    \hastyp{\exptycx{\env}}{e_0.m\inang{\rbar}(\bar{e})} 
+           {[\rbar/\rhobar](\tau^2)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx) \spc
+    \rgn \notin dom(\mem) \\
+    \Delta = \{\rgn \,|\, \mem(\rgn) = \LIVE\} \spc
+    \phi = \Delta \outlives \rgn \\
+    \A' = (\mem[\rgn\mapsto\LIVE], \aenv, \phicx \conj \phi)\spc
+    \hastyp{\A',\env}{e}{\tau} \spc
+    \tywf{\A}{\tau}
+  }
+  {
+    \hastyp{\exptycx{\env}}{\letregion{\rgn}{e}}{\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{3.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx) \spc
+%   \rgn \in \A.\rhoenv \spc
+    \mem(\rgn) = \LIVE \spc
+    \rhobar \notin dom(\mem)\\
+%   \rhobar \notin \A.\rhoenv \\
+    \A' = (\mem[\rhobar\mapsto\overline{\LIVE}], \aenv, 
+          \phicx \conj \phi)\spc
+    \tywf{\A'.\mem}{\phi}\\
+    \tywf{\A'}{\bar{\tau^1}}\spc
+    \tywf{\A'}{\tau^2}\spc
+    \hastyp{\A',\env[\xbar \mapsto \bar{\tau^1}]}{e}{\tau^2}
+  }
+  {
+    \hastyp{\exptycx{\env}}
+           {\lambdaexp{\rgn}{\rhobar \,|\, \phi}
+                      {\xbar:\bar{\tau^1}}{e}}
+           {\inang{\rhobar \,|\, \phi}
+            \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}}{e_a}
+            {\RgnZ\inang{T}\inang{\toprgn}}\spc
+    \A = (\subtypcx) \\
+%   \rgn \notin \rhoenv \spc
+    \rgn \notin dom(\mem) \spc
+    \A' = (\mem[\rgn\mapsto\LIVE],\aenv,\phicx) \\
+    \env' =  \env[y\mapsto T@\rgn]\spc
+    \hastyp{\A',\env'}{e_b}{\tau} \spc
+    \tywf{\A}{\tau}
+  }
+  {
+    \hastyp{\exptycx{\env}}{\open{e_a}{\rgn}{y}{e_b}}
+            {\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{3.55in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx) \spc
+    \mem(\rbar) = \overline{\LIVE} \\
+    \hastyp{\exptycx{\env}}{e}
+        {\inang{\rhobar \,|\, \phi}
+            \bar{\tau^1} \xrightarrow{\rgn} \tau^2}\spc
+%   \substFn = \subst{\rbar}{\rhobar} \spc
+    \isvalid{\phicx}{\subst{\rbar}{\rhobar}\phi} \spc
+    \hastyp{\exptycx{\env}}{\bar{e}}
+        {\subst{\rbar}{\rhobar}\bar{\tau^1}}\spc
+%   \subtyp{\A}{\taubar}{\bar{\tau^1}}
+  }
+  {
+    \hastyp{\A,\env}{e\inang{\rbar}(\bar{e})}
+           {\subst{\rbar}{\rhobar}\tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx)\\
+    \mem(\loc) = \LIVE \spc
+    \hastyp{\exptycx{\env}}{e}{\tau}
+  }
+  {
+    \hastyp{\exptycx{\env}}{\letd{\loc}{e}}{\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
+\begin{minipage}{1.6in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx)\\
+    \mem(\loc) = \LIVE \spc
+    \hastyp{\exptycx{\env}}{e}{\tau}
+  }
+  {
+    \hastyp{\exptycx{\env}}{\opened{\loc}{s}{e}}{\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{1.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}}{e}{\RgnZ\inang{T}\inang{\toprgn}}
+  }
+  {
+    \hastyp{\exptycx{\env}}{e.\transfer\inang()}{\unitZ}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}}{e}{\tau} \spc
+    \subtyp{\A}{\tau}{\tau'}
+  }
+  {
+    \hastyp{\exptycx{\env}}{e}{\tau'}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%

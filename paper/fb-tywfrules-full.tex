@@ -1,0 +1,130 @@
+%
+\begin{minipage}{1.25in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    \\
+    \mem(\rgn) = \LIVE
+  }
+  {
+    \tywf{(\mem,\aenv,\phicx)}{\ObjZ\inang{\rgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+% 
+\begin{minipage}{2.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \mem(\rgn) = \LIVE \spc
+    \rhobar \notin dom(\mem) \\
+    \mem' = \mem[\rhobar \mapsto \overline{\LIVE}] \spc
+    \A' = (\mem', \aenv, \phicx \conj \phi) \\
+    \tywf{\mem'}{\phi}\spc 
+    \tywf{\A'}{\bar{\tau^1}} \spc
+    \tywf{\A'}{\tau^2}
+  }
+  {
+    \tywf{(\mem,\aenv,\phicx)}{\inang{\rhobar \,|\, \phi}
+              \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  { 
+    \\
+    \\
+    \fgjtywf{\A.\aenv}{T}
+  }
+  {
+    \tywf{\A}{\RgnZ\inang{T}\inang{\toprgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    \\
+%   \rgn_0,\rgn_1 \in dom(\mem)
+    \mem(\rgn_0) = \LIVE \spc
+    \mem(\rgn_1) = \LIVE
+  }
+  {
+    \tywf{\mem}{\rgn_0 \outlives \rgn_1}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{3.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    CT(B) = \headerOf{B}\{...\}\\
+%   \rbar \in \rhoenv \spc
+    \mem(\rbar) = \overline{\LIVE} \spc
+    \fgjtywf{\aenv}{B\inang{\tbar}}\spc
+%   \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}] \spc
+    \isvalid{\phicx}{[\rbar/\rhobar](\phi)}
+  }
+  {
+    \tywf{(\mem,\aenv,\phicx)}{B\inang{\rbar}\inang{\tbar}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.65in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \fgjtywf{\aenv}{T}\spc
+%   \rgn \in \A.\rhoenv\\
+    \mem(\rgn) = \LIVE\\
+    \fgjsubtyp{\aenv}{T}{\ObjZ}\spc
+  }
+  {
+    \tywf{(\mem,\aenv,\phicx)}{T@\rgn}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{0.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \tywf{\mem}{\phi_0} \\ \tywf{\mem}{\phi_1}
+  }
+  {
+    \tywf{\mem}{\phi_0 \wedge \phi_1}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}

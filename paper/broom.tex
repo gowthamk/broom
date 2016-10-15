@@ -176,7 +176,7 @@
 \newcommand{\phictxt}{\phi_{cx}}
 \newcommand{\phicstr}{\phi_{cs}}
 \newcommand{\phisol}{\phi_{sol}}
-\newcommand{\subtypcx}{\rhoenv,\aenv,\phicx}
+\newcommand{\subtypcx}{\mem,\aenv,\phicx}
 \newcommand{\A}{{\mathcal{A}}}
 \newcommand{\exptycx}[1]{\A,#1}
 \newcommand{\void}{\C{void}}
@@ -193,9 +193,10 @@
 \newcommand{\letregion}[2]{\C{letregion}\;#1\;\C{in}\;#2}
 \newcommand{\open}[4]{\C{open}\;#1\;\C{as}\;#3@#2\;\C{in}\;#4}
 \newcommand{\opened}[3]{\C{opened}\;#1(#2)\;\C{in}\;#3}
+\newcommand{\letd}[2]{\C{letd}\;#1\;\C{in}\;#2}
 \newcommand{\unpackexp}[4]{\C{let}\;(#1,\,#2)\,=\,\C{unpack}\;#3\;\C{in}\;#4}
 \newcommand{\invalidexn}{\bot}
-\newcommand{\toprgn}{\rgn_{\top}}
+\newcommand{\toprgn}{\pi_{\top}}
 \newcommand{\csolvestar}{{\sc CSolve*}\xspace}
 \newcommand{\elabExpr}{{\sf elabExpr}}
 \newcommand{\fields}{{\sf fields}}
@@ -258,8 +259,9 @@
 \newcommand{\loc}{\mathtt{l}}
 \newcommand{\locbar}{\overline{\loc}}
 \newcommand{\isLive}{{\sf isLive}}
-\newcommand{\mem}{\sigma}
+\newcommand{\mem}{\Sigma}
 \newcommand{\status}{s}
+\newcommand{\toploc}{\loc_{\top}}
 
 %Rules
 %-----
