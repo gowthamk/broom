@@ -120,7 +120,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
       \C{new} \; \RgnZ\inang{T}\inang{\loc}(\bullet) \ALT \bullet\inang{\locbar}(\ebar) \\
   &  & \ALT v\inang{\locbar}(...,\bullet,...) \ALT
        \letregion{\loc}{\bullet} \ALT \open{\bullet}{\rgn}{y}{e} \ALT
-       \opened{\loc}{\bullet}
+       \opened{\loc}{\status}{\bullet}
 \end{array}
 \end{smathpar}
 
@@ -183,16 +183,16 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 %   \mem'' = \mem'[\rgn_r \mapsto \mem(\rgn_r)]
 }{
     \redstoo{(\open{v_a}{\rgn}{x}{e_b},\mem)} 
-            {(\opened{\loc}{[v/x][\loc/\rgn]e_b},\mem')}
+            {(\opened{\loc}{\mem(\loc)}{[v/x][\loc/\rgn]e_b},\mem')}
 	  }{OPEN}
 
 \lopsemrule{2.7in}{
 %   v_a = \C{new} \; \RgnZ\inang{T}\inang{\}(v_r) \spc
 %   \mem(\rgn_r) \neq \XFERRED \spc
 %   \rgn_0 \notin \rhoenv \spc
-    \mem' = \mem[\loc \mapsto \USED]
+    \mem' = \mem[\loc \mapsto \status]
 }{
-    \redstoo{(\opened{\loc}{v},\mem)} {(v,\mem')}
+    \redstoo{(\opened{\loc}{\status}{v},\mem)} {(v,\mem')}
   }{OPEN-END}
 
 
