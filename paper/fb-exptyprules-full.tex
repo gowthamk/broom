@@ -66,17 +66,18 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \A = (\mem,\aenv,\phicx)\spc
-    \fgjtywf{\aenv}{T} \\
+%   \A = (\mem,\aenv,\phicx)\spc
+%   \fgjtywf{\aenv}{T} \\
 %   \rgn \in \A.\rhoenv \spc
-    \mem(\rgn) = \LIVE \spc
-    \hastyp{(\cdot[\rho\mapsto\LIVE],\aenv,true),{\cdot}}{e}
-      {T@\rho}
+%   \mem(\rgn) = \LIVE \spc
+%   \hastyp{(\mem[\rho\mapsto\LIVE],\aenv,\phicx),{\env}}{e}
+%     {T@\rho}
+    \\
+    \hastyp{\exptycx{\env}}{e} {\inang{\rho} \unitZ \xrightarrow{\rgn} T@\rho}
   }
   {
     \hastyp{\exptycx{\env}}{\C{new}\;
-    \RgnZ\inang{T}\inang{\toprgn}(\lambdaexp{\rgn}{\rho}{}{e})} 
-      {\RgnZ\inang{T}\inang{\toprgn}}
+    \RgnZ\inang{T}\inang{\toprgn}(e)} {\RgnZ\inang{T}\inang{\toprgn}}
   }
 \end{array}
 \end{smathpar}
@@ -88,14 +89,8 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-%   To preserve type safety, we need to compensate for 
-%   commenting out the below line. One way to do this is
-%   by requiring frv(e) \subseteq dom(\Sigma), where frv(e)
-%   is defined as region identifiers tagging Region objects
-%   in e.
-%   \rgn \in \A.\rhoset\spc
     \A = (\mem,\aenv,\phicx)\spc
-    \A' = (\cdot[\loc\mapsto\LIVE], \aenv, true) \\
+    \A' = (\mem[\loc\mapsto\LIVE], \aenv,\phicx) \\
     \mem(\loc) = \USED \spc
     \tywf{\A'}{T@\loc} \spc
 %   \fgjN = \RgnZ\inang{T}\spc

@@ -77,9 +77,10 @@
 \lopsemrule{2in}{
 %   \fgjN = \RgnZ\inang{T} \spc
 %   \rgn \in dom(\mem) \spc
+    \mem(\loc) = \USED \spc
     \redstoo{(e,\mem[\loc \mapsto \LIVE])}{\invalidexn}
 }{
-    \redstoo{(\C{new} \; \RgnZT{\loc} (e),\mem)}
+    \redstoo{(\C{new} \; \RgnZT{\toploc\loc} (e),\mem)}
             {\invalidexn}
 	  }{EXCEPTION}
 
@@ -117,10 +118,13 @@
 \begin{array}{lcl}
 E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \ALT
       v.m\inang{\locbar}(...,\bullet,...) \ALT \C{new}\; \fbN(...,\bullet,...) \ALT
-      \C{new} \; \RgnZ\inang{T}\inang{\loc}(\bullet) \ALT \bullet\inang{\locbar}(\ebar) \\
+      \C{new} \; \RgnZ\inang{T}\inang{\toprgn}(\bullet) \ALT 
+      \bullet\inang{\locbar}(\ebar) \\
   &  & \ALT v\inang{\locbar}(...,\bullet,...) \ALT
        \letd{\loc}{\bullet} \ALT \open{\bullet}{\rgn}{y}{e} \ALT
-       \opened{\loc}{\status}{\bullet}
+       \opened{\loc}{\status}{\bullet} 
+%     The following should be forbidden. See NEW-REGION rule 2.
+%      \ALT \C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}(\bullet)
 \end{array}
 \end{smathpar}
 
@@ -154,26 +158,25 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 %   \rgn_r \notin \Delta \cup dom(\Sigma) \spc
 %   \rgn \notin dom(\mem) \cup \rhoenv \spc
 %   \mem' = \mem[\rgn_r \mapsto \CLOSED]
-    \mem(\loc) = \LIVE \spc
+%   \mem(\loc) = \LIVE \spc
 %   \mem(\loc') = \FREE \spc
-    \loc' \not\in dom(\mem) \spc
-    \mem' = \mem[\loc' \mapsto \USED]
+    \loc \not\in dom(\mem) \spc
+    \mem' = \mem[\loc \mapsto \USED]
 }{
     \redstoo{(\C{new} \; \RgnZ\inang{T}\inang{\toprgn}
-                (\lambdaexp{\loc}{\rho}{}{e}),\mem)}
-            {(\C{new} \; \RgnZ\inang{T}\inang{\loc'}
-                ([\loc'/\rho]e),\mem')}
+                (v),\mem)}
+            {(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
+                (v\inang{\loc}()),\mem')}
 	      }{NEW-REGION}
 
 \lopsemrule{3.3in}{
-    \loc \in dom(\mem) \spc
-    \mem' = \mem[\loc \mapsto \LIVE] \spc
-    \redstoo{(e,\mem') }{(e',\mem')}
+    \mem(\loc) = \USED \spc
+    \redstoo{(e,\mem[\loc \mapsto \LIVE]) }{(e',\mem')}
 }{
     \redstoo{(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
                 (e),\mem)}
             {(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
-                (e'),\mem)}
+                (e'),\mem'[\loc\mapsto\USED])}
 	      }{NEW-REGION}
 
 % \lopsemrule{2.8in}{
@@ -188,7 +191,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 %         }{NEW-REGION}
 
 \lopsemrule{4in}{
-    v_a = \C{new} \; \RgnZ\inang{T}\inang{\loc}(v) \spc
+    v_a = \C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}(v) \spc
     \mem(\loc) = \USED ~\texttt{or}~ \mem(\loc) = \TLIVE \spc
 %   \fresh(\rgn_1)\\
 %   \rgn_0 \notin \rhoenv \\
@@ -210,7 +213,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 
 
 \lopsemrule{3in}{
-    v_a = \C{new} \; \RgnZ\inang{T}\inang{\loc}(v) \spc
+    v_a = \C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}(v) \spc
     \mem(\loc) = \XFERRED
 %   \rgn_0 \notin \rhoenv \\
 %   \redstocup{\rgn_0}{([[\rgn_0/\rgn]v_r/x]e_b,
@@ -228,7 +231,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
     \mem(\loc) = \USED \spc
     \mem' = \mem[\loc \mapsto \XFERRED]
 }{
-    \redstoo{((\C{new}\;\RgnZ\inang{T}\inang{\loc}(v)).\transfer(),\mem)}
+    \redstoo{((\C{new}\;\RgnZ\inang{T}\inang{\toploc\loc}(v)).\transfer(),\mem)}
             {(\unitval,\mem')}
 	  }{TRANSFER}
 
@@ -238,7 +241,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 %   \redstoo{(, \mem)}{(e',\mem')}
     \mem(\loc) = \TLIVE \spc
 }{
-    \redstoo{((\C{new}\;\RgnZ\inang{T}\inang{\loc}(v)).\transfer(),\mem)}
+    \redstoo{((\C{new}\;\RgnZ\inang{T}\inang{\toploc\loc}(v)).\transfer(),\mem)}
             {\invalidexn}
 	  }{TRANSFER-OPENED}
 
