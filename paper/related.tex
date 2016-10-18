@@ -130,8 +130,8 @@ system (FGJ). The safety guarantees have been formalized and proved.
 %rigor and simplicity of Broom makes it easy to understand the the
 %underlying ideas, and apply them in various problem settings.
 Similar contrast can be made of region type inference in both the languages.
-Cyclone’s type inference was only ever described as being similar to
-Tofte and Talpin’s, and it’s effectiveness in presence of tracked
+Cyclone's type inference was only ever described as being similar to
+Tofte and Talpin's, and its effectiveness in presence of tracked
 pointers is not clear.
 In contrast, a detailed type inference algorithm is one of our core contributions.
 %In contrast, the complete Ocaml (pseudo) code
@@ -139,22 +139,22 @@ In contrast, a detailed type inference algorithm is one of our core contribution
 %ideas underlying type inference have been described elaborately in the
 %paper
 
+Our region type system can also be thought of as a specialized
+ownership type system~\cite{OwnershipSurvey}, where each region is the
+owner of all objects allocated in the region.
+%
 An ownership type system for safe region-based memory management in
 real-time Java has been proposed by~\cite{MIT03}.  
 % Like us, they too assume a source language with programmer-managed
 % memory regions, and focus on proving safety of programs written in
 % that language.  
-Their source language admits various kinds of regions with
-lexically-scoped lifetimes (i.e., stack regions) in order to support
-shared-memory concurrency. In contrast, we admit regions with
-dynamically determined lifetimes in order to support message-passing
-concurrency. We borrow outlives relation from their formal
+Their language permits only lexically-scoped (stack) regions
+(in the context of shared-memory concurrency). In contrast, we permit
+regions with dynamically determined lifetimes (in the context of message-passing concurrency).
+We borrow outlives relation from their formal
 development, and our type system bears some similarities to theirs.
 However, our language also admits parametric polymorphism (generics)
 and higher-order functions.
-%, whose interaction is non-trivial in context of a region type system. 
-% On the other hand, our type system eschews the notions of region kinds
-% and ownership, leading to a more succinct formalization. 
 Moreover, we establish type safety and transfer safety results that
 formalize the guarantees provided by our system. While~\cite{MIT03}'s
 language is explicitly typed, our language comes equipped with full
@@ -163,6 +163,10 @@ type inference.
 % type inference, region types for methods and classes need to be
 % written explicitly. In contrast, our region type inference that
 % eliminates any such need.
+% Our type inference algorithm is also novel compared to existing type
+% inference approaches for ownership types, which are based on, e.g.,
+% context-insensitive pointer analysis or boolean satisfiability.
+% E.g., papers 55 and 79.
 
 ~\cite{HMN01} proposes a flow-sensitive region-based memory management
 for first-order programs that proposes to overcome some of the

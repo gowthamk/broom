@@ -3,37 +3,35 @@
 
 \section{Introduction} \label{sec:introduction}
 
-In this paper, we present a \emph{safe} and \emph{efficient} region-based approach
+This paper presents a \emph{safe} and \emph{efficient} region-based approach
 to \emph{data transferable} between a set of concurrent actors, motivated by the following concerns.
 
 Consider the example (of  a producer creating a data structure and transferring it to a consumer)
-in Fig.~\ref{fig:motivating-eg}. This represents a \C{SELECT} query operator for streaming data. 
-The operator receives a stream of input messages, each
-associated with a time (window) $t$, processed by method
-\texttt{onReceive}.  Each input message contains a list of inputs,
-each of which is processed by applying a user-defined function to
-create a corresponding output.  The operator may receive multiple
-messages with the same timestamp (and messages with different
-timestamps may be delivered out of order). A timing-message (an
-invocation of method \texttt{OnNotify}) indicates that no more input
-messages with a timestamp $t$ will be subsequently delivered.  At this
-point, the operator completes the processing for time window $t$ and
-sends a corresponding output message to its successor.
+in Fig.~\ref{fig:motivating-eg}.
+This represents a \C{SELECT} query operator that receives a stream of input messages,
+each associated with a time window $t$, processed by method \texttt{onReceive}.
+Each input message contains a list of inputs, each processed by applying a user-defined function to
+create a corresponding output.  Multiple messages with the same timestamp
+are permitted and messages with different timestamps may arrive out of order.
+An invocation of method
+\texttt{OnNotify} indicates that no more input messages with a timestamp
+$t$ will be subsequently delivered.  At this point, the operator completes
+the processing for time window $t$ and sends a corresponding output message
+to its successor.
 
 \input{motivating-eg}
 
-
 \paragraph{Performance.}
-When the transferred data structures are large, as is the case with many streaming big-data
-analysis systems, garbage collection overhead becomes
-significant~\cite{Broom:HotOS}.  Furthermore, in a distributed
+When the transferred data structures are large, as is the case with many
+streaming big-data analysis systems, garbage collection overhead becomes
+significant~\cite{Broom:HotOS}.  Further, in a distributed
 dataflow system, the GC pause at one node can have a cascading adverse
 effect on the performance of other nodes~\cite{Broom:HotOS,harris15}:
 a GC pause at an upstream actor can block downstream actors that are waiting for
-messages.  However, often much of the GC overhead results from the
+messages.  However, much of the GC overhead results from the
 collector performing avoidable or unproductive work.  For the example
 in Fig.~\ref{fig:motivating-eg}, GC might repeatedly traverse the
-\C{map} data structure, although its objects cannot be collected until a
+\C{map}, although its objects cannot be collected until a
 suitable timing message arrives.
 There has been increasing interest in off-heap memory management for better performance
 in the context of several  systems and languages (e.g.,
@@ -67,20 +65,23 @@ invalid after transfer.}
 Several of these systems are designed to allow the producer and consumer to
 execute in the same address space or in different address spaces
 (as determined by the compiler and runtime).
-We wish to ensure memory safety in the presence of such transferred data by ensuring
-that there are no invalid references. A transfer operation, with no
+We wish to ensure memory safety in the presence of such transferred data.
+% by ensuring that there are no invalid references.
+A transfer operation, with no
 additional checks, may cause memory safety violations, both at the
 producer of the data structure, and its (possibly remote) consumer. At
 the producer, any existing references into the transferred data structure become
 invalid post transfer. If the data structure contains references to
 objects outside (the transferred data), then such references become
 invalid in the context of the consumer. Both scenarios are depicted in
-Fig.~\ref{fig:transfer-violations}. Safety violations of this kind are
-particularly unwelcome in the context of languages like C\# and Java
-that are otherwise memory-safe. While references from within the
-transferable data to outside can be disallowed in the interest of safety,
+Fig.~\ref{fig:transfer-violations}.
+% Safety violations of this kind are
+% particularly unwelcome in the context of languages like C\# and Java
+% that are otherwise memory-safe.
+While references from within the transferable data to outside can be disallowed
+in the interest of safety,
 references into transferable data needs to be allowed before the data
-is transferred. Allowing such references is crucial to performance,
+is transferred. Allowing such references is crucial, % to performance,
 as any non-trivial program creates temporary references to the internal
 objects of a data-structure.
 
@@ -393,51 +394,50 @@ parameters (using an interprocedural fixed point computation).
 % it would be for the first set of invariants.
 % >>>>>>> af17b22a358a6165ae10628a5247cd4fa66adc07
 
-\subsection*{Contributions}
-
+\paragraph{Contributions.}
 The paper makes the following contributions:
 
 \begin{itemize} 
-  \item We present \name, a \csharp-like typed
+  \item We present \broom, a \csharp-like typed
   object-oriented language that eschews garbage collection in favour of
-  programmer-managed memory regions . \name extends its core language,
+  programmer-managed memory regions. \broom{} extends its core language,
   which includes \emph{lambdas} (higher-order functions) and
   \emph{generics} (parametric polymorphism), with constructs to create,
-  manage and destroy static and transferable memory regions. Transferable regions
-  are first-class values in \name.
+  manage and free static and transferable memory regions. Transferable regions
+  are first-class values in \broom.
   % Experiments demonstrate that   \naiad~\cite{naiad} dataflow
   % program using programmer-managed memory regions outperform their
   % GC counterparts by a margin of upto 59\%. 
 
-  \item \name is equipped with a region type system that statically
+\item \broom{} is equipped with a region type system that statically
   guarantees safety of all memory accesses in a well-typed program,
   provided that certain typestate invariants on regions hold.  The
   later invariants are enforced via simple runtime checks.
-% The correctness of region usage is checked efficiently at run-time.
-% The overhead of checking these conditions is less than \GK{x\%} in
-% our experiments with \naiad workloads.
 
-  \item We define an operational semantics for \name, and a type
+  \item We define an operational semantics for \broom, and a type
   safety result that clearly defines and proves safety guarantees
   described above.
 
-  \item We describe a region type inference algorithm for \name that
-  (a). completely eliminates the need to annotate \name programs with
+  \item We describe a region type inference algorithm for \broom that
+  (a). completely eliminates the need to annotate \broom programs with
   region types, and (b). enables seamless interoperability between
-  region-aware \name programs and legacy standard library code that is
+  region-aware \broom programs and legacy standard library code that is
   region-oblivious. The cornerstone of our inference algorithm is a
   novel constraint solver that performs abduction in a partial-order
   constraint domain to infer weakest solutions to recursive
   constraints.
 
-  \item We describe an implementation of \name frontend in OCaml,
+\item We establish partial completeness results for the type inference
+  algorithm, as well as soundness.
+
+  \item We describe an implementation of \broom frontend in OCaml,
   along with case studies where the region type system was able to
   identify unsafe memory accesses statically.
   
 \end{itemize}
 
   %The rest of the paper is organized as follows. The next section
-  %presents an informal overview of \name, and motivates the need for a
+  %presents an informal overview of \broom, and motivates the need for a
   %region type system.  \S~\ref{sec:type-system} formalizes the type
   %system and its safety guarantees. The type inference algorithm is
   %described in \S~\ref{sec:type-inference}. \S~\ref{sec:csolve} focuses
@@ -447,30 +447,3 @@ The paper makes the following contributions:
   %\S~\ref{sec:evaluation} presents experimental evaluation and case
   %studies.  \S~\ref{sec:related} discusses the related work, and
   %\S~\ref{sec:conclusion} concludes.
-
-% , and it is undesirable to allocate them in a transferable
-% region; such regions are meant for the data being transferred.
-
-%As with allocation and deallocation, transferring a memory region is fast, and therefore,
-%transferring a data structure contained in a region is more efficient
-%that traversing its objects in heap, and transferring them
-%independently.
-%In the \C{SelectVertex} example from
-%Fig.~\ref{fig:motivating-eg}, the proposed region to contain the
-%output for each time window $t$ must be transferable due to the
-%\C{transfer} operation on Line 16. As it is the case with
-%\C{SelectVertex}, the transferred data is no longer accessed by the
-%producer, so the transfer operation in our system deallocates the
-%region once the transfer is complete.
-%
-%Since transferable regions are first class objects in our setting,
-%controlling references to and from such regions while ensuring their
-%safety without significantly diluting the performance advantage of
-%regions over GC is a challenging exercise.
-%
-%An important observation, in the context of processes of the kind
-%described above, is that the data-structures exchanged between them
-%can be partitioned into sets of fate-sharing objects with common
-%lifetimes, which makes them good candidates for a region-based memory
-%management discipline.
-

@@ -1,6 +1,15 @@
 \section{Implementation and Evaluation}
 \label{sec:implementation}
 
+As mentioned earlier, our work is a continuation of the work reported in~\cite{Broom:HotOS},
+which provides users with a C\#-based implementation of \broom (the language described in
+Section~\ref{sec:overview}). This system has no type system and provides users with no safety
+guarantees, but does shed light on the performance gains as well as the viability of the
+approach (in terms of expressiveness). In particular, it reports speedups up to 34\% for
+typical big-data analytics jobs.
+We now describe our implementation and experience with the type system and type inference
+algorithm presented in the current paper.
+
 We have implemented the prototype of \name compiler frontend,
 including its region type system and type inference, in 3k+ lines of
 OCaml. Our implementation is called \namec. The input to \namec is a
