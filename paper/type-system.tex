@@ -37,9 +37,7 @@ class Pair<a $\extends$ Object, b $\extends$ Object>
           <$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a \conj \rho_2 \outlives \rho^a$> $\extends$ Object<$\rho^a$> {
   a@$\rho_1$ fst; 
   b@$\rho_2$ snd;
-  a@$\rho_1$ getFst() { 
-    return this.fst; 
-  }
+  a@$\rho_1$ getFst() { return this.fst; }
 }
 \end{codejava}
 % \vspace*{-0.15in}
@@ -83,8 +81,7 @@ letregion $\rgn_0$ in
   let snd = new Object<$\rgn_0$>() in
   letregion $\rgn_1$ in
     let fst = new Object<$\rgn_1$>() in
-    let p = new Pair<Object,Object><$\rgn_1$,$\rgn_1$,$\rgn_0$>
-                  (fst,snd);
+    let p = new Pair<Object,Object><$\rgn_1$,$\rgn_1$,$\rgn_0$> (fst,snd);
 \end{codejava}
 %\vspace*{-0.1in}
 In the above code, the instantiation of $\rhoalloc$ and $\rho_1$ with
