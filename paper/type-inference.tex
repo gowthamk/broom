@@ -668,66 +668,35 @@ and can be encoded using a set of Datalog rules, allowing us to compute the clos
 using any Datalog engine.
 % Further details omitted.
 
-\paragraph{Modularity Aspects.}
-The type inference algorithm, as presented, traverses the entire program to
-generate the set of constraints, which are solved en masse, using an iterative
-fixed point computation. However, the type inference can be realized in a
-modular and compositional fashion, subject only to the restrictions imposed
-by recursion.
-
-In the elaboration phase, we can process a class \C{C} only after any class
-\C{B} that \C{C} depends on has been processed: class \C{C} depends on
-class \C{B} if \C{B} is either \C{C}'s base class or the type of any field
-of \C{C} depends on \C{B}. In effect, this means that any collection of
-mutually recursive classes must be processed together. Non-recursive
-dependences can be handled in a compositional fashion: if class \C{C}
-depends on \C{B} non-recursively, then the elaboration can be done for
-\C{B} first, and then \C{C} can be processed.
-
-The same idea applies to the constraint-solving phase as well.
-Given a set of constraints, we say that a predicate variable $\varphi_1$
-\emph{directly-depends} on another predicate variable $\varphi_2$ if the set of
-constraints includes a constraint $\isvalid{\varphi_1 \conj \phictxt}{F(\varphi_2)}$.
-We say that $\varphi_1$ \emph{depends} on $\varphi_2$ if $\varphi_1$ transitively
-depends on $\varphi_2$.
-The constraint solver needs to process any collection of mutually dependent
-predicate variables together.
-In effect, this requires the type inference to process any collection of
-mutually recursive methods together.
-However, methods that are not mutually recursive can be processed separately.
-
 \subsection{Soundness and Completeness: Discussion}
 
-We now state the soundness theorem, which follows from
 Theorems~\ref{thm:constraint-generation-sc} and~\ref{thm:constraint-solver-sc}
-as well as the following observation about the elaboration phase.
+show that the second and third steps of the type-inference algorithm are both
+sound and complete.
+It is easy to verify the soundness of the first step (the elaboration phase):
 For any program $p \in \absof{\FB}$, the elaboration phase produces a $q$
 such that for any assignment $\soln$, we have $\absof{q[\soln]} = p$.
+%
+The soundness of the type inference algorithm follows.
+The only sources of incompleteness in the type inference algorithm are some heuristic
+choices made in the first step, as explained below.
 
-\begin{theorem}
-\emph{(\textbf{Soundness})}
-For any $p \in \absof{\FB}$, if type inference succeeds, it returns a $t$ such that
-% Infer($p$) returns Some($t$), then
-(1) $\absof{t} = p$, and
-(2) $t$ is well-typed.
-\end{theorem}
+%% \begin{theorem}
+%% \emph{(\textbf{Soundness})}
+%% For any $p \in \absof{\FB}$, if type inference succeeds, it returns a $t$ such that
+%% % Infer($p$) returns Some($t$), then
+%% (1) $\absof{t} = p$, and
+%% (2) $t$ is well-typed.
+%% \end{theorem}
 
 % \item $\absof{q[\sigma]}$ = $p$ for any substitution $\sigma$.
 
-However, in this context, completeness is more interesting than soundness.
-(Note that an unsound inference algorithm can be made sound by simply type-checking
-the resulting program.)
-Theorems~\ref{thm:constraint-generation-sc} and~\ref{thm:constraint-solver-sc}
-show that the second and third steps of the type-inference algorithm are complete.
-%% We believe that the converse of the above lemma can also be established:
-%% any substitution for the region variables and the predicate variables that makes the
-%% expression well-typed will also satisfy the generated constraints.
-%% Thus, if there is any possible instantiation (of the region variables and predicate variables) of
-%% the elaborated program produced by the first phase that type checks, then the generated
-%% constraints are satisfiable, and the second phase will identify it.
-%% 
-The only sources of incompleteness in the type inference algorithm are some heuristic
-choices made in the first step (the elaboration phase), as explained below.
+%% However, in this context, completeness is more interesting than soundness.
+%% (Note that an unsound inference algorithm can be made sound by simply type-checking
+%% the resulting program.)
+%% Theorems~\ref{thm:constraint-generation-sc} and~\ref{thm:constraint-solver-sc}
+%% show that the second and third steps of the type-inference algorithm are complete.
+
 
 \begin{enumerate}
 \item We determine the set of region parameters for a recursive class
