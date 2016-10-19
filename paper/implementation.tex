@@ -1,6 +1,12 @@
 \section{Implementation and Evaluation}
 \label{sec:implementation}
 
+% We now briefly describe our experience of
+% working with these benchmarks. Note that the performance benefits of
+% using transferable regions in dataflow systems have been established
+% in~\cite{Broom:HotOS}. Our current evaluation only focuses on safety
+% aspects.
+
 As mentioned earlier, our work is a continuation of the work reported in~\cite{Broom:HotOS},
 which provides users with a C\#-based implementation of \broom (the language described in
 Section~\ref{sec:overview}). This system has no type system and provides users with no safety
@@ -10,10 +16,11 @@ typical big-data analytics jobs.
 We now describe our implementation and experience with the type system and type inference
 algorithm presented in the current paper.
 
-We have implemented the prototype of \name compiler frontend,
+We have implemented \namec, a prototype of \name compiler frontend,
 including its region type system and type inference, in 3k+ lines of
-OCaml. Our implementation is called \namec. The input to \namec is a
-program in $\absof{\FB^+}$, an extended version of $\absof{\FB}$ that
+OCaml.
+% Our implementation is called \namec.
+The input to \namec is a program in $\absof{\FB^+}$, an extended version of $\absof{\FB}$ that
 includes assignments, conditionals, loops, more primitive datatypes
 (\eg, integers), and a null value. 
 % If needed, a specification file containing region type annotations
@@ -22,21 +29,24 @@ Our implementation of region type inference and constraint solving
 closely follows the description given in
 Sec.~\ref{sec:type-inference}.
 
-% To solve the
-% constraints that arise during type inference, we built a solver called
-% \csolve that implements constraint solving approach based on fixpoint
-% computation and graph augmentation described in \S~\ref{sec:csolve}. 
-% Since graph augmentation is NP-hard, \csolve uses an approximation
-% algorithm that repeatedly adds an edge and recomputes paths in graph
-% $G_1$ until it is as connected as graph $G_2$. Though this approach
-% may not necessarily return the weakest solution to the abduction
-% problem (\S~\ref{sec:csolve}), it seems to do so in practice, since
-% constraints are not often complex. 
-% If the input $\absof{\FB^+}$ program does not create any unsafe
-% references, \namec annotates it with region types, which act as a
-% witness to program's memory safety. If potential safety violations are
-% encountered, then the type inference fails during the constraint
-% solving phase. 
+
+We performed two kinds of experiments to evaluate our region type system and type
+inference.
+First, we implemented some 
+microbenchmarks ($\le$100 LOC) consisting of standard classes such
+as pairs, lists, list iterators, etc., in $\absof{\FB^+}$, and used
+our inference engine to infer their region types.
+These classes are region-oblivious. Hence, as long as they are well-typed
+as per the core type system, \namec must be able to automatically construct its
+region-type-annotated definition without fail. \namec was
+able to infer the expected region types for all these classes under 10ms.
+Fig~\ref{fig:rev} shows the region-type-annotated
+definition computed for the list reverse method. Observe that \namec
+was able to infer that the list and its data (of type \C{T}) can be
+allocated in different regions, as long as the later outlives the
+former. This allows, for instance, a \C{preOrder} method to traverse a
+tree in a transferable region, and return a list of its nodes, where
+the list itself is allocated in the stack region. 
 
 \begin{figure}
 \begin{codejava}
@@ -57,29 +67,12 @@ class LinkedList<T><R5,R4 | R4$\outlives$R5> {
 \vspace*{-0.15in}
 \end{figure}
 
-To evaluate the practical utility of our region type system and type
-inference, we 
-% implemented some of the C\# libraries in $\absof{\FB^+}$, and 
-performed two kinds of experiments. First, we implemented some of the
-microbenchmarks ($\le$100 LOC), which are the standard libraries such
-as pairs, lists, list iterators, etc., in $\absof{\FB^+}$, and used
-our inference engine to infer their principal region types. Since a
-library class is region-oblivious, if it is well-typed as per the core
-type system, then \namec must be able to automatically construct its
-region-type-annotated definition without fail. As expected, \namec was
-able to infer principal region types for all the library classes,
-under 10ms. Fig~\ref{fig:rev} shows the region-type-annotated
-definition computed for the list reverse method. Observe that \namec
-was able to infer that the list and its data (of type \C{T}) can be
-allocated in different regions, as long as the later outlives the
-former. This allows, for instance, a \C{preOrder} method to traverse a
-tree in a transferable region, and return a list of its nodes, where
-the list itself is allocated in the stack region. 
-
 Next, we translated some of the Naiad streaming query operator
 benchmarks (Naiad vertices) used in~\cite{Broom:HotOS} to
-$\absof{\FB^+}$, and used \namec to verify their safety. During the
-process, we found multiple instances of potential memory safety
+$\absof{\FB^+}$, and used \namec to verify their safety.
+The number of LOC performing operations on \C{Region} objects relative
+to the total LOC is 8\% or under in the Naiad benchmarks. 
+During the process, we found multiple instances of potential memory safety
 violations in the $\absof{FB^+}$ translation of benchmarks, which we
 verified to be present in the original C\# implementation as well. The
 cause of all safety violations is the creation of a reference from the
@@ -102,26 +95,15 @@ subsequently able to certify the safety of all references.
 
 Our experience with Naiad benchmarks shows the utility of our
 type inference/checking tool,
-%suggests that, although our
-%approach cannot statically enforce memory safety, it is nonetheless
-%useful, 
 particularly because it comes at no additional cost to the developer.
-If the developer is satisfied with
-the confidence gained by static verification, she may even choose to
-turn the runtime safety checks off. Since we did not implement code
-generation in \namec, we could not measure the runtime overhead of
-checks needed to enforce safety. However, the number of LOC performing
-operations on \C{Region} objects relative to the total LOC never
-exceeds 8\% in Naiad benchmarks. 
+%% If the developer is satisfied with
+%% the confidence gained by static verification, she may even choose to
+%% turn the runtime safety checks off. Since we did not implement code
+%% generation in \namec, we could not measure the runtime overhead of
+%% checks needed to enforce safety.
+
 % \C{SelectVertex}, for example, contains one each of
 % \C{open} and \C{transfer} operations on one region in its 45LOC,
 % whereas, \C{JoinVertex} contains 5 \C{open}s, 2 \C{transfer}s, and 1
 % \C{free} operation.
 
-% We now briefly describe our experience of
-% working with these benchmarks. Note that the performance benefits of
-% using transferable regions in dataflow systems have been established
-% in~\cite{Broom:HotOS}. Our current evaluation only focuses on safety
-% aspects.
-
-% \paragraph{Memory safety violation} 
