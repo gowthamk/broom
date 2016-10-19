@@ -698,8 +698,9 @@ choices made in the first step, as explained below.
 %% show that the second and third steps of the type-inference algorithm are complete.
 
 
-\begin{enumerate}
-\item We determine the set of region parameters for a recursive class
+% \begin{enumerate}
+% \item
+  (1) We determine the set of region parameters for a recursive class
 using the heuristic that a recursive occurrence of the class has
 the same parameters, in the same order, as the class itself.
 This heuristic fails, for example, if the program uses a recursive list type whose
@@ -730,7 +731,8 @@ class List $\langle \rho_0, \rho_1, \rho_2 \; | \; \varphi \rangle$ $\extends$ $
 \end{minipage}
 \end{tabular}
 
-\item Our technique for region parameterization also uses a heuristic in the case of
+% \item
+  (2) Our technique for region parameterization also uses a heuristic in the case of
 higher order programs. The following examples illustrates that principal types may
 not exist for higher order functions.
 \begin{codejava}
@@ -770,7 +772,7 @@ and useful candidate.
 
 % The treatment of class fields with a function type also uses the same (incomplete) heuristic.
 
-\end{enumerate}
+% \end{enumerate}
 
 If users provide partial region annotations, especially in situations (such as above) where elaboration
 makes a heuristic choice, the elaboration procedure can use the user-provided choices instead.
