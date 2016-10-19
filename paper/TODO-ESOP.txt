@@ -1,3 +1,8 @@
+* Discuss Miscellaneous points (POPL review)
+- subtyping: treatment of downcasts
+- limitation in treatment of generic parameters
+-- 
+======
 * Change static semantics to use method precondition, without class precondition
 * update abstract/intro to stress aspects of constraint solver
 ======
@@ -21,3 +26,57 @@
   \item explain: non-determinism in defining region-variable binding is immaterial.
   \item explain lemma 2's use case (a) and (b)
   \item notation: decomposable is dependent on C
+
+====
+Proofs:
+
+? prrof for use of phi_m instead of conjunction phi_m and phi_c
+
+? handling phi for higher-order: double-check: may be start with an example.
+
+Missing Rules:
+* add missing constraint-generation rules 
+--- [TRANSFER] ???
+* add rules for "tau ok"
+
+* cleanup
+--- use of pi vs. rho (consistnt with static sem)
+--- use of tau vs tau^1, tau^2 (ditto)
+--- check/understand (pi not in Delta) preconditions
+
+* Static Semantics cleanup:
+-- make two "new Region" rules similar (inline "K")
+-- clarify/understand why two rules (for dynamic semantics?)
+-- other "new" should clarify it is not for a region
+-- drop pi^a from [FUN-APPLY]
+-- missing subtyping rules
+-- add labels to rules (helps correlate across figures as well)
+
+Misc Points :
+
+* potential overload union/conjunction operator for context
+
+* perhaps clarify the two languages, with and without type annotations,
+clearer upfront; also, highlight the potential for splitting into an
+unsafe usable language and a verification tool.
+
+* when are the rho_a >= other-rho constraints for a class generated in
+our process?
+
+* potential for generalizing treatment of generic type params with a
+non-Object bound
+
+===============
+* Clarify relation to HotOS paper
+-- in Evaluation section!
+-- also, introduction and related work
+
+* Add discussion of ownership types
+-- mention in introduction
+-- related work
+
+* Miscellaneous points
+- subtyping: treatment of downcasts
+- limitation in treatment of generic parameters
+-- 
+

@@ -57,7 +57,7 @@ The algorithm consists of the following steps:
    the constraints.
 
  \item If the solver succeeds, it returns a solution $\soln$ consisting of a
-   pair of substitution functions $\regionSubstFn$ and $\predSubstFn$ for
+   pair of substitution functions $\solnR$ and $\solnP$ for
    free region and predicate variables, respectively, introduced in step 1.
    We apply these substitutions to the elaborated program to produce the final program.
 \end{enumerate}
@@ -343,11 +343,11 @@ $\varphi_i$ are as above).
 \end{itemize}
 
 \paragraph{Constraint Solution.}
-We define an \emph{assignment} $\soln$ to be a pair of functions $(\regionSubstFn,\predSubstFn)$,
-where $\regionSubstFn$ is a map from $\regionVars$ to $\regionConstants$
-and $\predSubstFn$ is a map from $\predVars$ to a region-constraint formula.
+We define an \emph{assignment} $\soln$ to be a pair of functions $(\solnR,\solnP)$,
+where $\solnR$ is a map from $\regionVars$ to $\regionConstants$
+and $\solnP$ is a map from $\predVars$ to a region-constraint formula.
 Such an assignment is said to \emph{satisfy} a set of constraints $C$ if
-every sequent in $C$ is valid after the substitutions $\predSubstFn$ and $ \regionSubstFn$.
+every sequent in $C$ is valid after the substitutions $\solnP$ and $ \solnR$.
 We say that $C$ is \emph{satisfiable} if it has a satisfying assignment.
 
 %\begin{definition}
@@ -368,18 +368,18 @@ We say that $C$ is \emph{satisfiable} if it has a satisfying assignment.
 %    \isvalid{\phictxt \conj \varphi}{F(\varphi)}
 %\)
 %\end{center}
-%The solution to the constraint satisfaction problem is a pair $(\regionSubstFn,\predSubstFn)$,
-%where $\regionSubstFn$ is a map from $\regionVars$ to $\regionConstants$
-%and $\predSubstFn$ is a map from $\predVars$ to a region-constraint formula such that
+%The solution to the constraint satisfaction problem is a pair $(\solnR,\solnP)$,
+%where $\solnR$ is a map from $\regionVars$ to $\regionConstants$
+%and $\solnP$ is a map from $\predVars$ to a region-constraint formula such that
 %\begin{itemize}
-%  \item $\regionSubstFn(\rho) \in \regionDeltaMap(\rho)$, for every $\rho \in \regionVars$,
+%  \item $\solnR(\rho) \in \regionDeltaMap(\rho)$, for every $\rho \in \regionVars$,
 %
-%  \item $\predSubstFn$ is well-formed under $\predDeltaMap$
-%    (i.e., $\tywf{\predDeltaMap(\varphi)}{\predSubstFn(\varphi)}$, for every $\varphi \in \predVars$).
+%  \item $\solnP$ is well-formed under $\predDeltaMap$
+%    (i.e., $\tywf{\predDeltaMap(\varphi)}{\solnP(\varphi)}$, for every $\varphi \in \predVars$).
 %
-%  \item Every sequent in $C$ is valid after substitutions $\predSubstFn$ and $
-%    \regionSubstFn$.
-%  %% $C\lbrack (\regionSubstFn,\predSubstFn) \rbrack$ is valid.
+%  \item Every sequent in $C$ is valid after substitutions $\solnP$ and $
+%    \solnR$.
+%  %% $C\lbrack (\solnR,\solnP) \rbrack$ is valid.
 %\end{itemize}
 %\end{definition}
 
