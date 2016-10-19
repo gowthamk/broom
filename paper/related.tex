@@ -23,10 +23,11 @@
 % Talpin & Jouvelot, Polymorphic Type, Region and Effect Inference, JFP'92.
 % Tofte & Birkedal, A Region Inference Algorithm, TOPLAS'98.
 
-Tofte and Talpin in~\cite{tofte93,tofte94,tofte97} introduce the
-concept of a region type system to statically enforce the safety of
-their region-based memory management scheme in ML. Following their
-seminal work, static type systems for safe region-based memory
+% Tofte and Talpin in~\cite{tofte93,tofte94,tofte97} introduce the
+% concept of a region type system to statically enforce the safety of
+% their region-based memory management scheme in ML.
+Following Tofte and Talpin's seminal work in~\cite{tofte93,tofte94,tofte97},
+static type systems for safe region-based memory
 management have been extensively studied in the context of various
 languages and problem settings~\cite{cyclone02,cyclone04,yates99,MIT03,DPJ09,HMN01,WW01,rust,gpu14}.
 Our work differs from the
@@ -42,9 +43,10 @@ existing proposals in one or more of the following respects.
 \item We support both lexically scoped (stack) regions and dynamic transferable
 regions (both programmer-managed).
 
-\item We adopt a two-pronged approach to memory safety that relies on a
-combination of a simple static type discipline and lightweight runtime
-checks. In particular, our approach circumvents the need for restrictive
+\item We exploit a combination of a simple static type discipline and lightweight
+  runtime checks to ensure memory safety.
+  % adopt a two-pronged approach to memory safety that relies on a
+In particular, our approach circumvents the need for restrictive
 static mechanisms (e.g., linear types and unique pointers) or
 expensive runtime mechanisms (e.g., garbage collection and reference
 counting) in order to guarantee safety.
@@ -62,20 +64,17 @@ impact on aspects such type inference.
 
 Tofte and Talpin's approach~\cite{tofte97} uses compiler-managed lexically
 scoped (stack) regions (as a replacement for GC).
-% Similar to their region inference algorithm, our region type inference
-% algorithm can deal with region-polymorphic recursion by computing
-% fixed points for recursive constraints. 
-Our type inference is analogous to their region inference in some respects,
-while differing in others. While their inference algorithm only generates equality constraints, which
-can be solved via unification, our type inference algorithm also
-generates partial order outlives constraints, which are required to
-capture relationships between lifetimes of transferable regions
-and stack regions. Consequently, our constraint solving algorithm is
+Our type inference is analogous to their's in some respects,
+while differing in others.
+Their inference algorithm only generates equality constraints, solvable via unification.
+Our type inference algorithm generates partial order outlives constraints.
+% which are required to capture relationships between lifetimes of transferable regions and stack regions.
+Consequently, our constraint solving algorithm is
 more sophisticated, and is capable of inferring unknown outlives
 constraints over region arguments of polymorphic recursive functions.
 
 Walker and Watkins~\cite{WW01} extend lambda calculus with first-class regions
-with dynamic lifetimes, and imposes linear typing to control accesses to regions.
+with dynamic lifetimes, and impose linear typing to control accesses to regions.
 Our open/close lexical block for transferable regions traces its origins to the \C{let!}
 expression in~\cite{WW01} and~\cite{wadler90}, which safely relaxes
 linear typing restrictions, allowing variables to be temporarily
@@ -92,10 +91,10 @@ Cyclone~\cite{cyclone02} equips C with programmer-managed stack
 regions, and a typing discipline that statically guarantees the safety
 of all pointer dereferences. Later
 proposals~\cite{cyclone04,cycloneSCP} extends Cyclone with dynamic
-regions. \name differs from Cyclone fundamentally because of its
-non-intrusiveness design principle, which requires its safety
-mechanisms to not intrude on the the programming practices of C\#.
-\name programmers, for example, shouldn’t be forced to abandon
+regions. \name differs from Cyclone in its non-intrusiveness design principle,
+which requires its safety
+mechanisms to not intrude on the programming practices of C\#.
+\name programmers, for example, shouldn't be forced to abandon
 iterators in favor of for-loops, annotate region types, or rewrite
 C\#'s standard libraries to use in \name. Cyclone requires C
 programmers to use new language constructs and abandon some standard
@@ -151,14 +150,14 @@ real-time Java has been proposed by~\cite{MIT03}.
 Their language permits only lexically-scoped (stack) regions
 (in the context of shared-memory concurrency). In contrast, we permit
 regions with dynamically determined lifetimes (in the context of message-passing concurrency).
-We borrow outlives relation from their formal
-development, and our type system bears some similarities to theirs.
-However, our language also admits parametric polymorphism (generics)
-and higher-order functions.
-Moreover, we establish type safety and transfer safety results that
+% We borrow outlives relation from their formal
+% development, and our type system bears some similarities to theirs.
+Our language also admits generics and higher-order functions.
+We also establish type safety and transfer safety results that
 formalize the guarantees provided by our system. While~\cite{MIT03}'s
 language is explicitly typed, our language comes equipped with full
 type inference.
+
 % Although there is some support for local
 % type inference, region types for methods and classes need to be
 % written explicitly. In contrast, our region type inference that
@@ -168,22 +167,16 @@ type inference.
 % context-insensitive pointer analysis or boolean satisfiability.
 % E.g., papers 55 and 79.
 
-~\cite{HMN01} proposes a flow-sensitive region-based memory management
-for first-order programs that proposes to overcome some of the
-drawbacks of~\cite{tofte97} by generalizing~\cite{tofte97}'s approach
-to regions with dynamic lifetimes. However, dynamic regions are still
-not first-class values of the language, and reference counting is
-nonetheless needed to ensure memory safety.
-
-
-
-The idea of using region-based memory management to facilitate the
-safe transfer of rich data structures between computational nodes has
-been previously explored by~\cite{gpu14} in the context of Scheme
-language. However, their setting only includes lexically-scoped
+~\cite{HMN01} proposes a flow-sensitive approach for first-order programs
+% to overcome some of the drawbacks of~\cite{tofte97}
+to generalize~\cite{tofte97}'s approach to dynamic regions.
+However, dynamic regions are still not first-class values of the language,
+and reference counting is needed to ensure memory safety.
+%
+\cite{gpu14} uses regions to safely transfer data between the CPU and GPU
+in the context of Scheme. However, their setting only includes lexically-scoped
 regions for which Tofte and Talpin-style analysis~\cite{tofte97}
-suffices. In contrast, our language provides first-class support for
-transferable regions with dynamic lifetimes. We require this
-generality in order to support streaming query operators, such as the
-one shown in Fig.~\ref{fig:motivating-eg}. 
-
+suffices. In contrast, we provide first-class support for
+transferable regions with dynamic lifetimes.
+% We require this generality in order to support streaming query operators, such as the
+% one shown in Fig.~\ref{fig:motivating-eg}. 
