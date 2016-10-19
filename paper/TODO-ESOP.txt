@@ -1,18 +1,19 @@
 * Discuss Miscellaneous points (POPL review)
 - subtyping: treatment of downcasts
 - limitation in treatment of generic parameters
--- 
+--  mention HotOS paper in intro [related work?]
+* cleanup: syntax of constraints (region-constraint, validity constraint, etc.) and later usage (abduction constraint)
 ======
 * Change static semantics to use method precondition, without class precondition
 * update abstract/intro to stress aspects of constraint solver
 ======
+* Prove: Progress: Every region-variable will be unified with some constant.
 * proof of lemma 4 (abduction decomposition)
 * Include op semantics back, after reformatting/splitting?
 * constraint gen rules: tywf: for arrow type: rho-bar not-in constraint!
 
 ? Notation: should we use a different notation to distinguish a validity constraint from actual entailment?
 ======
-  cleanup: syntax of constraints (region-constraint, validity constraint, etc.) and later usage (abduction constraint)
   \item adjust spacing in RULEs
   \item for function-calls: need basic typing from core language to introduce region parameters
   \item discuss computation of least-solution to constraints?
@@ -21,9 +22,6 @@
 \item also remind reader that variable names are unique
   \item Note that we can also clarify that the well-formedness constraints are
     syntactic sugar from basic set constraints
-  \item Prove: Progress: Every region-variable will be unified with some constant.
-======
-  \item explain: non-determinism in defining region-variable binding is immaterial.
   \item explain lemma 2's use case (a) and (b)
   \item notation: decomposable is dependent on C
 
@@ -54,8 +52,6 @@ Missing Rules:
 
 Misc Points :
 
-* potential overload union/conjunction operator for context
-
 * perhaps clarify the two languages, with and without type annotations,
 clearer upfront; also, highlight the potential for splitting into an
 unsafe usable language and a verification tool.
@@ -67,16 +63,6 @@ our process?
 non-Object bound
 
 ===============
-* Clarify relation to HotOS paper
--- in Evaluation section!
--- also, introduction and related work
+* related work: expand discussion of ownership types?
 
-* Add discussion of ownership types
--- mention in introduction
--- related work
-
-* Miscellaneous points
-- subtyping: treatment of downcasts
-- limitation in treatment of generic parameters
--- 
-
+* notation-cleanup: potential overload union/conjunction operator for context
