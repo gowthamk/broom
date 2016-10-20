@@ -235,15 +235,21 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.5in}
+\begin{minipage}{3in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \A = (\subtypcx)\\
-    \loc \in \rhoenv \spc
-    \hastyp{\exptycx{\env}}{e}{\tau}
+%   \A = (\subtypcx)\\
+%   \loc \in \rhoenv \spc
+%   \hastyp{\exptycx{\env}}{e}{\tau}
+    \A = (\subtypcx) \spc
+    \loc \notin \rhoenv \spc
+    \phi = \Delta \outlives \loc \\
+    \A' = (\rhoenv\cup\{\loc\}, \aenv, \phicx \conj \phi)\spc
+    \hastyp{\A',\env}{e}{\tau} \spc
+    \tywf{\A}{\tau}
   }
   {
     \hastyp{\exptycx{\env}}{\letd{\loc}{e}}{\tau}
@@ -252,16 +258,23 @@
 \end{smathpar}
 \end{minipage}
 %
+
 %
-\begin{minipage}{1.6in}
+\begin{minipage}{3in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \A = (\subtypcx)\\
-    \loc \in \rhoenv \spc
-    \hastyp{\exptycx{\env}}{e}{\tau}
+%   \A = (\subtypcx)\\
+%   \loc \in \rhoenv \spc
+%   \hastyp{\exptycx{\env}}{e}{\tau}
+    \A = (\subtypcx) \spc
+    \loc \notin \rhoenv \\
+%   \loc \notin dom(\mem) \spc
+    \A' = (\rhoenv\cup\{\loc\},\aenv,\phicx) \spc
+    \hastyp{\A',\env}{e}{\tau} \spc
+    \tywf{\A}{\tau}
   }
   {
     \hastyp{\exptycx{\env}}{\opened{\loc}{s}{e}}{\tau}
@@ -270,7 +283,6 @@
 \end{smathpar}
 \end{minipage}
 %
-
 %
 \begin{minipage}{1.75in}
 \begin{smathpar}
@@ -278,6 +290,7 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
     \hastyp{\exptycx{\env}}{e}{\RgnZ\inang{T}\inang{\toprgn}}
   }
   {
@@ -293,6 +306,7 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
     \hastyp{\exptycx{\env}}{e}{\tau} \spc
     \subtyp{\A}{\tau}{\tau'}
   }
