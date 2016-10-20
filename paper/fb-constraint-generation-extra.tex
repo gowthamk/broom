@@ -1,67 +1,81 @@
+\newcommand{\localokin}[2]{#1 \; \texttt{ok} \; \texttt{in} \; #2}
+
 \begin{figure*}[t!]
 
 \beginrules
 
-%%%%%%%%%%% LAMBDA %%%%%%%%%%%
+%%%%%%%%%%% () and x %%%%%%%%%%%
+\lgcfact{UNIT}{\exprok{\stdcontext}{\unitval}{\unitZ}{\{\}}}
 
-\lgcrule{LAMBDA}
+\lgcfact{VAR}{\exprok{\stdcontext}{x}{\env(\tau)}{\{\}}}
+
+% \begin{minipage}{1.2in}
+% \begin{smathpar}
+% \begin{array}{l}
+% \renewcommand*{\arraystretch}{1.2}
+% \exprok{\stdcontext}{\unitval}{\unitZ}{\{\}} \\
+% \exprok{\stdcontext}{x}{\env(\tau)}{\{\}}
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+
+%%%%%%%%%%% FIELD-ACCESS: e.f %%%%%%%%%%%
+\lgcrule{FIELD-ACCESS}
   {
-    \rgn \in \A.\rhoenv \spc
-    \rhobar \notin \A.\rhoenv
-    \spc
-%   \rhoenv' = \rhoenv \cup \{\rhoalloc,\rhobar\}\spc
-    \A' = (\A.\rhoenv \cup \{\rhobar\}, \A.\aenv, 
-          \A.\phicx \conj \phi)\spc
-    \tywf{\A'.\rhoenv}{\phi}
-    \\
-    \typeok {\A'} {\bar{\tau^1}} {C} \spc
-    \typeok {\A'} {\tau^2} {C} \spc
-    \exprok {\A',\env[\xbar \mapsto \bar{\tau^1}]} {e} {\tau^2} {C}
+    \exprok{\stdcontext}{e}{\tau'}{C} \spc
+    \bar{f}:\taubar \,=\, \fields(\bound_{\A.\aenv}(\tau'))
   }
   {
-    \exprok {\stdcontext}
-           {\lambdaexp{\rgn}{\rhobar \,|\, \phi} {\xbar:\bar{\tau^1}}{e}}
-           {\inang{\rhobar \,|\, \phi} \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
-	   {C}
+    \exprok{\stdcontext}{e.f_i}{\tau_i}{C}
   }
 
-%%%%%%%%%%% OPEN-REGION %%%%%%%%%%%
-\lgcrule{OPEN}{
-   \exprok {\stdcontext} {e_a} {\RgnZ\inang{T}\inang{\rho}} {C_1} \spc
-   \A = (\rhoenv,\aenv,\phicx) \spc
-   \rgn \notin \rhoenv
-   \\
-   % (\A',\env') = ((\rhoenv \cup \{\rgn\},\aenv,\phicx),\env[y\mapsto T@\rgn] \spc
-   \exprok {(\rhoenv \cup \{\rgn\},\aenv,\phicx),\env[y\mapsto T@\rgn]} {e_b} {\tau} {C_2}
-}{
-   \exprok {\stdcontext} {\open{e_a}{\rgn}{y}{e_b}} {\tau} {(C_1 \cup C_2)}
-}
+%%%%%%%%%%% LET %%%%%%%%%%%
+  \lgcrule{LET}
+  {
+    \exprok{\stdcontext}{e_1}{\tau_1}{C_1} \spc
+    \exprok{\A,{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}{C_2} \\
+  }
+  {
+    \exprok{\stdcontext}{\letexp{x}{e_1}{e_2}}{\tau_2}{C_1 \cup C_2}
+  }
 
-
-%%%%%%%%%%% FUNCTION INVOCATION %%%%%%%%%%%
-\lgcrule{FUN-APPLY}
-{
-\exprok {\stdcontext} {e_a} {\inang{\rhobar\,|\,\phi}\taubar \xrightarrow{\rgn} \tau} {C_1} \spc
-\exprok {\stdcontext} {\bar{e}} {\bar{\tau'}} {C_2} \spc
-\substFn = [\bar{\rho'}/\rhobar]
-\\
-C_3 = \{\bar{\rho'} \in \A.\rhoenv\} \spc
-C_4 = \{\isvalid{\A.\phicx}{\substFn(\phi)}\} \spc
-\subtypeok {\A} {\bar{\tau'}} {\substFn(\bar{\tau})} {C_5}
-}{
-\exprok {\stdcontext} {e_a\inang{\bar{\rho'}}(\bar{e})} {\tau} {\cup_{i=1}^5 C_i}
-}
+%%%%%%%%%%% METHOD-INV %%%%%%%%%%%
+  \lgcrule{METHOD-INV}
+  {
+    \exprok {\stdcontext} {e_0} {\tau} {C_1} \spc C_4 = \{ \rbar \in \A.\rhoenv \}
+    \nl
+    \mtype(m,\bound_{\A.\aenv}(\tau)) = \inang{\rhobar \,|\, \phi}\bar{\tau^1}\rightarrow{\tau^2}
+    \nl
+%   \substFn = [\rbar/\rhobar] \\
+    \typeok {\A} {\inang{\rhobar \,|\,\phi}\bar{\tau^1}\rightarrow{\tau^2}} {C_2}
+       \spc
+       \exprok {\stdcontext} {\bar{e}} {[\rbar/\rhobar](\bar{\tau^1})} {C_3}
+    \nl
+%   \subtyp{\A}{\bar{\tau'}}{\substFn(\bar{\tau^1})} \spc
+    C_5 = \{ \isvalid{\A.\phicx}{[\rbar/\rhobar](\phi)} \}
+  }
+  {
+    \exprok {\stdcontext} {e_0.m\inang{\rbar}(\bar{e})} 
+       {[\rbar/\rhobar](\tau^2)} {C_1 \cup C_2 \cup C_3 \cup C_4 \cup C_5}
+  }
 
 %%%%%%%%%%% METHOD %%%%%%%%%%%
 \lgcrule{METHOD}{
-CT(B) = \hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\} \\
+CT(B) = \hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}
+\nl
 \A = (\rhoenv,\aenv,\phicx) = (\{\rhobar,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN}, \varphi_m) \spc\spc
-C_1 = \{ \tywf{\rhoenv}{\varphi_m} \} \\
-\env = \cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhobar}][\xbar \mapsto \taubar] \spc\spc
-\exprok {\stdcontext}{e} {\tau'} {C_2} \spc\spc
-\subtypeok {\A} {\tau'} {\tau} {C_3}
+C_1 = \{ \tywf{\rhoenv}{\varphi_m} \}
+\nl
+\env = \cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhobar}][\xbar \mapsto \bar{\tau^1}]
+\spc
+\mtype(m,\fbN) = \inang{\rhobarm \,|\, \phi_m}\bar{\tau^1} \rightarrow \tau^2
+\nl
+\exprok {\stdcontext}{e} {\tau^2} {C_2}
+\spc \typeok {\A} {\tau^1} {C_3}
+\spc \typeok {\A} {\tau^2} {C_4}
+% \subtypeok {\A} {\tau'} {\tau} {C_3}
 }{
-\typeok{} {(B, \tau \; m\inang{\rhobarm \,|\, \varphi_m} (\taubar \;  \xbar)\{\C{return} e;\})} {(C_1 \cup C_2 \cup C_3)}
+\okinok {\tau^2 \; m\inang{\rhobarm \,|\, \varphi_m} (\bar{\tau^1} \;  \xbar)\{\C{return} e;\}} {B} {(C_1 \cup C_2 \cup C_3 \cup C_4)}
 }
 
 %%%%%%%%%%% CLASS %%%%%%%%%%%
@@ -71,14 +85,21 @@ C_1 = \{ \tywf{\rhoenv}{\varphi} \} \spc\spc
 \typeok {\A} {\fbN} {C_2} \spc\spc
 \typeok {\A} {\bar{\tau^f}} {C_3} \\
 C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allocRgn(\fbN) = \rhoalloc}\} \\
-\typeok {} {\bar{d}} {C_5}
+\okinok {\bar{d}} {B} {C_5}
 }{
 \typeok {} {\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}} {\bigcup_{i=1}^5 C_i}
 }
 
+
+\lgcrule{SUBTYPING}{
+    \exprok {\exptycx{\env}} {e} {\tau} {C_1} \spc  \subtypeok {\A} {\tau} {\tau'} {C_2}
+}{
+    \exprok {\exptycx{\env}} {e} {\tau'} {C_1 \cup C_2}
+}
+
 \myendrules
 
-\caption{Constraint generation}
+\caption{Constraint generation: extra rules}
 \label{fig:constraint-gen-1}
 \end{figure*}
 
@@ -93,7 +114,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
 %%%%%%%%%%% TYPE WELL-FORMEDNESS %%%%%%%%%%%
 
 %%%%%%%%%%% OBJECT TYPE %%%%%%%%%%%
-\lgcrule{TWF}
+\lgcrule{OBJECT-TYPE}
   {
     C = \{ \rgn \in \A.\rhoenv \}
   }
@@ -102,24 +123,24 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
   }
 
 %%%%%%%%%%% CLASS TYPE %%%%%%%%%%%
-  \lgcrule{TWF}
+  \lgcrule{CLASS-TYPE}
   {
     CT(B) = \headerOf{B}\{...\}
     \spc
     \fgjtywf{\aenv}{B\inang{\tbar}}
     \\
-    C = \{ \rbar \in \rhoenv, \isvalid{\phicx}{[\rbar/\rhobar, \tbar/\bar{\tyvar}](\phi)} \}
+    C = \{ \rbar \in \rhoenv, \isvalid{\phicx}{[\rbar/\rhobar](\phi)} \}
   }
   {
     \typeok {(\rhoenv,\aenv,\phicx)} {B\inang{\rbar}\inang{\tbar}} {C}
   }
 
 %%%%%%%%%%% GENERIC TYPE PARAMETER %%%%%%%%%%%
-  \lgcrule{TWF}
+  \lgcrule{TYPE-PARAM}
   {
     \fgjtywf{\A.\aenv}{T} \spc
     \fgjsubtyp{\A.\aenv}{T}{\ObjZ} \spc
-    \\
+    \spc
     C = \{ \rgn \in \A.\rhoenv \}
   }
   {
@@ -127,7 +148,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
   }
 
 %%%%%%%%%%% FUNCTION TYPE %%%%%%%%%%%
-  \lgcrule{TWF}
+  \lgcrule{FN-TYPE}
   {
     C_1 = \{ \rgn \in \rhoenv \}
     \\
@@ -145,7 +166,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
   }
 
 %%%%%%%%%%% REGION TYPE %%%%%%%%%%%
-  \lgcrule{TWF}
+  \lgcrule{REGION-TYPE}
   { 
     \fgjtywf{\A.\aenv}{T}
   }
@@ -159,7 +180,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
     C_1 = \{ \isvalid{\A.\phicx}{\phi_1 \Rightarrow \phi_2} \}
     \\
     \subtypeok {\A} {\bar{\tau^{11}}} {\bar{\tau^{21}}} {C_2}
-    \\
+    \spc
     \subtypeok {\A} {\tau^{22}} {\tau^{12}} {C_3}
   }
   {
@@ -171,6 +192,6 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
 
 \myendrules
 
-\caption{Type well-formedness constraint generation}
+\caption{Type well-formedness constraint generation rules}
 \label{fig:constraint-gen-2}
 \end{figure*}

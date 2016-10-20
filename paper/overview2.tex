@@ -27,11 +27,13 @@ context}. The statement \C{new T()} allocates the newly created object
 in the current allocation context.
 %
 This is important as it enables \name applications to use existing
-region-oblivious C\# libraries. In particular, given a  C\# library
-function \C{f} (that makes no use of \name's region constructs), the
-statement ``\C{letregion R \{ f(); \}}'' invokes \C{f}, but has the
-effect that all objects allocated by this invocation are allocated in
-the new region \C{R}.
+region-oblivious C\# libraries, as explained soon.
+
+%In particular, given a  C\# library
+%function \C{f} (that makes no use of \name's region constructs), the
+%statement ``\C{letregion R \{ f(); \}}'' invokes \C{f}, but has the
+%effect that all objects allocated by this invocation are allocated in
+%the new region \C{R}.
 
 \paragraph{Transferable Regions} 
 % \name's \emph{transferable regions} are an encapsulation of a
@@ -107,6 +109,11 @@ freed when it is in closed state. The acceptable state transition
 discipline over the lifetime of a transferable region is described
 in Fig.~\ref{fig:region-fsm}. Enforcement of this discipline is done
 at runtime.
+
+Opening a region also makes it the current allocation context.
+Thus, given a  C\# library function \C{f} (that makes no use of \name's region constructs),
+opening a region \C{R} and invoking \C{f} has the effect that all objects created by this
+invocation are allocated in the region \C{R}.
 
 \paragraph{Motivating Example}
 % We now illustrate how the features of \name can be used to 
