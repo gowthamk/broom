@@ -70,7 +70,7 @@
 %   \fgjtywf{\aenv}{T} \\
 %   \rgn \in \A.\rhoenv \spc
 %   \mem(\rgn) = \LIVE \spc
-%   \hastyp{(\mem[\rho\mapsto\LIVE],\aenv,\phicx),{\env}}{e}
+%   \hastyp{(\rhoenv\cup\{\rho\},\aenv,\phicx),{\env}}{e}
 %     {T@\rho}
     \\
     \hastyp{\exptycx{\env}}{e} {\inang{\rho} \unitZ \xrightarrow{\rgn} T@\rho}
@@ -89,9 +89,9 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \A = (\mem,\aenv,\phicx)\spc
-    \A' = (\mem[\loc\mapsto\LIVE], \aenv,\phicx) \\
-    \mem(\loc) = \USED \spc
+    \A = (\subtypcx)\spc
+    \A' = (\rhoenv\cup\{\loc\}, \aenv,\phicx) \\
+%   \mem(\loc) = \USED \spc
     \tywf{\A'}{T@\loc} \spc
 %   \fgjN = \RgnZ\inang{T}\spc
     \hastyp{\A', {\env}}{e}{T@\loc}
@@ -112,10 +112,10 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \A = (\mem,\aenv,\phicx) \spc
+    \A = (\subtypcx) \spc
     \hastyp{\exptycx{\env}}{e_0}{\tau} \\
 %   \rbar \in \A.\rhoenv \\
-    \mem(\rbar) = \overline{\LIVE} \spc
+    \{\rbar\} \subseteq \rhoenv \spc
     \mtype(m,\bound_{\aenv}(\tau)) = \inang{\rhobar \,|\, 
         \phi}\bar{\tau^1}\rightarrow{\tau^2} \\
     \tywf{\A}{\inang{\rhobar \,|\,
@@ -137,11 +137,12 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
     \A = (\subtypcx) \spc
-    \rgn \notin dom(\mem) \\
-    \Delta = \{\rgn \,|\, \mem(\rgn) = \LIVE\} \spc
+    \rgn \notin \rhoenv \spc
+%   \Delta = \{\rgn \,|\, \rgn \in \rhoenv\} \spc
     \phi = \Delta \outlives \rgn \\
-    \A' = (\mem[\rgn\mapsto\LIVE], \aenv, \phicx \conj \phi)\spc
+    \A' = (\rhoenv\cup\{\rgn\}, \aenv, \phicx \conj \phi)\spc
     \hastyp{\A',\env}{e}{\tau} \spc
     \tywf{\A}{\tau}
   }
@@ -162,12 +163,12 @@
   {
     \A = (\subtypcx) \spc
 %   \rgn \in \A.\rhoenv \spc
-    \mem(\rgn) = \LIVE \spc
-    \rhobar \notin dom(\mem)\\
-%   \rhobar \notin \A.\rhoenv \\
-    \A' = (\mem[\rhobar\mapsto\overline{\LIVE}], \aenv, 
+    \rgn \in \rhoenv \spc
+%   \rhobar \notin dom(\mem)\\
+    \rhobar \notin \rhoenv \\
+    \A' = (\rhoenv \cup \{\rhobar\}, \aenv, 
           \phicx \conj \phi)\spc
-    \tywf{\A'.\mem}{\phi}\\
+    \tywf{\rhoenv \cup \{\rhobar\}}{\phi}\\
     \tywf{\A'}{\bar{\tau^1}}\spc
     \tywf{\A'}{\tau^2}\spc
     \hastyp{\A',\env[\xbar \mapsto \bar{\tau^1}]}{e}{\tau^2}
@@ -190,11 +191,11 @@
 \RULE
   {
     \hastyp{\exptycx{\env}}{e_a}
-            {\RgnZ\inang{T}\inang{\toprgn}}\spc
-    \A = (\subtypcx) \\
-%   \rgn \notin \rhoenv \spc
-    \rgn \notin dom(\mem) \spc
-    \A' = (\mem[\rgn\mapsto\LIVE],\aenv,\phicx) \\
+            {\RgnZ\inang{T}\inang{\toprgn}}\\
+    \A = (\subtypcx) \spc
+    \rgn \notin \rhoenv \spc
+%   \rgn \notin dom(\mem) \spc
+    \A' = (\rhoenv\cup\{\rgn\},\aenv,\phicx) \\
     \env' =  \env[y\mapsto T@\rgn]\spc
     \hastyp{\A',\env'}{e_b}{\tau} \spc
     \tywf{\A}{\tau}
@@ -216,7 +217,7 @@
 \RULE
   {
     \A = (\subtypcx) \spc
-    \mem(\rbar) = \overline{\LIVE} \\
+    \{\rbar\} \subseteq \rhoenv \\
     \hastyp{\exptycx{\env}}{e}
         {\inang{\rhobar \,|\, \phi}
             \bar{\tau^1} \xrightarrow{\rgn} \tau^2}\spc
@@ -241,7 +242,7 @@
 \RULE
   {
     \A = (\subtypcx)\\
-    \mem(\loc) = \LIVE \spc
+    \loc \in \rhoenv \spc
     \hastyp{\exptycx{\env}}{e}{\tau}
   }
   {
@@ -259,7 +260,7 @@
 \RULE
   {
     \A = (\subtypcx)\\
-    \mem(\loc) = \LIVE \spc
+    \loc \in \rhoenv \spc
     \hastyp{\exptycx{\env}}{e}{\tau}
   }
   {

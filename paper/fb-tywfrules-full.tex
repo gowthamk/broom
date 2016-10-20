@@ -7,10 +7,10 @@
   {
     \\
     \\
-    \mem(\rgn) = \LIVE
+    \rgn \in \rhoenv
   }
   {
-    \tywf{(\mem,\aenv,\phicx)}{\ObjZ\inang{\rgn}}
+    \tywf{(\rhoenv,\aenv,\phicx)}{\ObjZ\inang{\rgn}}
   }
 \end{array}
 \end{smathpar}
@@ -22,16 +22,18 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \mem(\rgn) = \LIVE \spc
-    \rhobar \notin dom(\mem) \\
-    \mem' = \mem[\rhobar \mapsto \overline{\LIVE}] \spc
-    \A' = (\mem', \aenv, \phicx \conj \phi) \\
-    \tywf{\mem'}{\phi}\spc 
+    \rgn \in \rhoenv \spc
+    \rhobar \not\in \rhoenv\\
+%   \rhobar \notin dom(\mem) \\
+%   \mem' = \mem[\rhobar \mapsto \overline{\LIVE}] \spc
+    \rhoenv' = \rhoenv \cup \{\rhobar\} \spc
+    \A' = (\rhoenv', \aenv, \phicx \conj \phi) \\
+    \tywf{\rhoenv'}{\phi}\spc 
     \tywf{\A'}{\bar{\tau^1}} \spc
     \tywf{\A'}{\tau^2}
   }
   {
-    \tywf{(\mem,\aenv,\phicx)}{\inang{\rhobar \,|\, \phi}
+    \tywf{(\rhoenv,\aenv,\phicx)}{\inang{\rhobar \,|\, \phi}
               \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
   }
 \end{array}
@@ -63,12 +65,12 @@
   {
     \\
     \\
-%   \rgn_0,\rgn_1 \in dom(\mem)
-    \mem(\rgn_0) = \LIVE \spc
-    \mem(\rgn_1) = \LIVE
+    \rgn_0,\rgn_1 \in \rhoenv
+%   \mem(\rgn_0) = \LIVE \spc
+%   \mem(\rgn_1) = \LIVE
   }
   {
-    \tywf{\mem}{\rgn_0 \outlives \rgn_1}
+    \tywf{\rhoenv}{\rgn_0 \outlives \rgn_1}
   }
 \end{array}
 \end{smathpar}
@@ -83,14 +85,14 @@
 \RULE
   {
     CT(B) = \headerOf{B}\{...\}\\
-%   \rbar \in \rhoenv \spc
-    \mem(\rbar) = \overline{\LIVE} \spc
+    \rbar \in \rhoenv \spc
+%   \mem(\rbar) = \overline{\LIVE} \spc
     \fgjtywf{\aenv}{B\inang{\tbar}}\spc
 %   \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}] \spc
     \isvalid{\phicx}{[\rbar/\rhobar](\phi)}
   }
   {
-    \tywf{(\mem,\aenv,\phicx)}{B\inang{\rbar}\inang{\tbar}}
+    \tywf{(\rhoenv,\aenv,\phicx)}{B\inang{\rbar}\inang{\tbar}}
   }
 \end{array}
 \end{smathpar}
@@ -104,11 +106,11 @@
   {
     \fgjtywf{\aenv}{T}\spc
 %   \rgn \in \A.\rhoenv\\
-    \mem(\rgn) = \LIVE\\
+    \rgn \in \rhoenv\\
     \fgjsubtyp{\aenv}{T}{\ObjZ}\spc
   }
   {
-    \tywf{(\mem,\aenv,\phicx)}{T@\rgn}
+    \tywf{(\rhoenv,\aenv,\phicx)}{T@\rgn}
   }
 \end{array}
 \end{smathpar}
@@ -120,10 +122,10 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \tywf{\mem}{\phi_0} \\ \tywf{\mem}{\phi_1}
+    \tywf{\rhoenv}{\phi_0} \\ \tywf{\rhoenv}{\phi_1}
   }
   {
-    \tywf{\mem}{\phi_0 \wedge \phi_1}
+    \tywf{\rhoenv}{\phi_0 \wedge \phi_1}
   }
 \end{array}
 \end{smathpar}
