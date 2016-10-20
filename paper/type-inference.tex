@@ -226,9 +226,12 @@ fresh region variables representing the (yet unknown) actual region
 parameters for this particular invocation.
 %
 We similarly perform instantiation for every constructor invocation
-of the form \C{new T($\ldots$)}, by instantiating the type \C{T} as
-before, turning it into \C{new T$\langle \rho_0, \cdots, \rho_n \rangle$($\ldots$)},
-where $\rho_0, \cdots, \rho_n$ are fresh region variables.
+of the form \C{new@$\pi_0$ T($\ldots$)}, by instantiating the type \C{T} as
+before, turning it into \C{new T$\langle \pi_0, \rho_1, \cdots, \rho_n \rangle$($\ldots$)},
+where $\rho_1, \cdots, \rho_n$ are fresh region variables. Note that the programmer
+typically specifies the region $\pi_0$ where the object is to be allocated. If the programmer
+does not specify this, it is allocated in the allocation-context region by default. Region
+variables are introduced only for the other region parameters.
 
 Function types (of fields and parameters) are instantiated just like methods above, except that
 an additional fresh region identifier is introduced to represent the region where the closure is
