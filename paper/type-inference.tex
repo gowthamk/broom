@@ -579,18 +579,19 @@ $\{ \isvalid{\ell}{\rho \outlives \pi}, \isvalid{\ell}{\pi \outlives \rho} \} \s
 We say that a region variable $\rho$ is \emph{bound} to a region constant $\pi$ (in $D$) if
 $\rho$ is bound to $\pi$ in every context $\ell$ in which it occurs.
 
-\begin{lemma}
-  \label{lemma:completely-bound}
-Let $C = \consOf{q}$.
-Every region variable occurring in $\satC$ is bound to some region constant in $\satC$.
-\end{lemma}
+%\begin{lemma}
+%  \label{lemma:completely-bound}
+%Let $C = \consOf{q}$.
+%Every region variable occurring in $\satC$ is bound to some region constant in $\satC$.
+%\end{lemma}
 
 The set $\satC$ makes it easy to identify a solution $\thesoln$ (if one exists), as below.
 \begin{itemize}
 \item For any predicate variable $\varphi$, $\thesolnP(\varphi)$ is defined
 to be $\conj \{ \pi_1 \outlives \pi_2 \;|\; \pi_1, \pi_2 \in \regionConstants, \isvalid{\varphi}{\pi_1 \outlives \pi_2} \in \saturate{C} \}$.
 \item For any region variable $\rho$, we define $\thesolnR(\rho)$ to be any element of the
-set $\{ \pi \in \regionConstants \:|\; \isvalid{\ell}{\rho = \pi} \in \saturate{C} \}$.
+set $\{ \pi \in \regionConstants \:|\; \isvalid{\ell}{\rho = \pi} \in \saturate{C} \}$,
+if this set is non-empty. If this set is empty for any $\rho$, $\thesoln$ is undefined.
 \end{itemize}
 
 % \paragraph{Step 2.}
@@ -614,7 +615,7 @@ Define $\solveCon{C}$ as below.
 \[
 \solveCon{C} = 
 \begin{cases}
-\textsc{Some} (\thesoln) & \textrm{if $\groundC$ is valid and $\thesoln$ satisfies $\rhoC$} \\
+\textsc{Some} (\thesoln) & \textrm{if $\groundC$ is valid and $\thesoln$ is defined and satisfies $\rhoC$} \\
 \textsc{None} & \textrm{otherwise}
 \end{cases}
 \]
