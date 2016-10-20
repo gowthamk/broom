@@ -9,22 +9,23 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \mem = \cdot[\rhobar\mapsto\overline{\LIVE}]
-           [\bar{\rho_m}\mapsto\overline{\LIVE}] \spc
-    \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
-    \phicx = \phi \conj \phi_m \spc
-    \A = (\subtypcx)\spc
-    \tywf{\mem}{\phi_m} \\
+%   \rhoenv = \{\rhobar,\bar{\rho_m}\} \spc
+%   \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
+%   \phicx = \phi \conj \phi_m \spc
+    \A = (\{\rhobar,\bar{\rho_m}\}, [\bar{\tyvar} \mapsto \bar{\fgjN}], \phi_m)\spc
+    \tywf{\rhoenv}{\phi_m} \\
     \tywf{\A}{\bar{\tau^1},\tau^2} \spc
 %   \tywf{\A}{\tau^2} \spc
-    \headerOf{B}\{...\}\spc
+    \headerOf{B}\{...\}\\
     \env = \cdot[\xbar\mapsto\bar{\tau^1}][\thisZ\mapsto
-            B\inang{\bar{\tyvar}}\inang{\rhobar}] \\
-    \A \vdash \override(m,\fbN,\inang{\rhobarm \,|\, \phi_m}\bar{\tau^1} 
-             \rightarrow \tau^2) \spc
+            B\inang{\bar{\tyvar}}\inang{\rhobar}] \spc
+%   \A \vdash \override(m,\fbN,\inang{\rhobarm \,|\, \phi_m}\bar{\tau^1} 
+%            \rightarrow \tau^2) \spc
+    \mtype(m,\fbN) = \inang{\rhobarm \,|\, \phi_m}\bar{\tau^1} 
+             \rightarrow \tau^2 \spc
 %   \stmtsem{\rhoallocm}{s}{\stmtsemcx}{\stmtsemcxp}\spc
     \hastyp{\exptycx{\env}}{e}{\tau} \spc
-    \subtyp{\A}{\tau}{\tau^2}
+%   \subtyp{\A}{\tau}{\tau^2}
   }
   {
     \okin 
@@ -47,18 +48,18 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \mem = \cdot[\rho\mapsto\LIVE][\rhobar\mapsto\overline{\LIVE}]\spc
-%   \rhoenv = \{\rho,\rhobar\} \spc
+    \rhoenv = \{\rho,\rhobar\} \spc
     \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
     \phicx = \phi \spc
-    \A = (\subtypcx)\spc
-    \tywf{\mem}{\phi} \spc
-    \fgjtywf{\aenv}{\bar{\fgjN}} \\
+    \A = (\subtypcx)\\
+%   \A = (\{\rho,\rhobar\},[\bar{\tyvar} \mapsto \bar{\fgjN}],\phi)\spc
+    \tywf{\rhoenv}{\phi} \spc
+    \fgjtywf{\aenv}{\bar{\fgjN}} \spc
     \tywf{\A}{\fbN,\bar{\tau^f}} \spc
-    \shape(\fbN) \neq \RgnZ\inang{T}\spc
+%   \shape(\fbN) \neq \RgnZ\inang{T}\spc
 %   \tywf{\A}{\bar{\tau^f}} \spc
     \isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rho} \spc
-    \ctype(\fbN) = \bar{\tau^{\fbN}} \spc
+%   \ctype(\fbN) = \bar{\tau^{\fbN}} \spc
 %    k = B(\bar{\tau^{\fbN}}\;\xbar,\bar{\tau^f}\;\bar{y})
 %        \{\superZ(\xbar);\,\thisZ.\bar{f} = \bar{y};\} \spc
     \okin{\bar{d}}{B}
