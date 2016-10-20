@@ -1,0 +1,201 @@
+%
+\begin{minipage}{2.55in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    CT(B) = \headerOf{B}\{...\}\\
+    \rbar \in \rhoenv \spc
+%   \mem(\rbar) = \overline{\LIVE} \spc
+    \fgjtywf{\aenv}{B\inang{\tbar}}\spc
+%   \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}] \spc
+    \isvalid{\phicx}{[\rbar/\rhobar](\phi)}
+  }
+  {
+    \tywf{(\rhoenv,\aenv,\phicx)}{B\inang{\rbar}\inang{\tbar}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.25in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \fgjtywf{\aenv}{T}\spc
+%   \rgn \in \A.\rhoenv\\
+    \rgn \in \rhoenv\\
+    \fgjsubtyp{\aenv}{T}{\ObjZ}\spc
+  }
+  {
+    \tywf{(\rhoenv,\aenv,\phicx)}{T@\rgn}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{0.9in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  { 
+    \\
+    \A = (\subtypcx) \spc
+    \fgjtywf{\aenv}{T}
+  }
+  {
+    \tywf{\A}{\RgnZ\inang{T}\inang{\toprgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{2.6in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}}{\bar{e}}{\taubar} \spc
+    \tywf{\A}{\fbN} \spc
+    \fields(\fbN) = \bar{f} : \taubar \\
+  }
+  {
+    \hastyp{\exptycx{\env}}{\C{new}\; \fbN(\bar{e})}{\fbN}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+%   We don't need the following condition because of the
+%   guarantee provided by the lambda type rule.
+%   \A = (\subtypcx) \spc
+%   \rgn \in \rhoenv \\
+    \hastyp{\exptycx{\env}}{e} {\inang{\rho} \unitZ \xrightarrow{\rgn} T@\rho} \spc
+  }
+  {
+    \hastyp{\exptycx{\env}}{\C{new}\;
+    \RgnZ\inang{T}\inang{\toprgn}(e)} {\RgnZ\inang{T}\inang{\toprgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{2.99in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    \A = (\subtypcx) \spc
+    \rgn \notin \rhoenv \spc
+%   \Delta = \{\rgn \,|\, \rgn \in \rhoenv\} \spc
+    \phi = \Delta \outlives \rgn \\
+    \A' = (\rhoenv\cup\{\rgn\}, \aenv, \phicx \conj \phi)\spc
+    \hastyp{\A',\env}{e}{\tau} \spc
+    \tywf{\A}{\tau}
+  }
+  {
+    \hastyp{\exptycx{\env}}{\letregion{\rgn}{e}}{\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
+\begin{minipage}{2.25in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx) \spc
+    \{\rbar\} \subseteq \rhoenv \\
+    \hastyp{\exptycx{\env}}{e}
+        {\inang{\rhobar \,|\, \phi}
+            \bar{\tau^1} \xrightarrow{\rgn} \tau^2}\\
+%   \substFn = \subst{\rbar}{\rhobar} \spc
+    \isvalid{\phicx}{\subst{\rbar}{\rhobar}\phi} \spc
+    \hastyp{\exptycx{\env}}{\bar{e}}
+        {\subst{\rbar}{\rhobar}\bar{\tau^1}}\spc
+%   \subtyp{\A}{\taubar}{\bar{\tau^1}}
+  }
+  {
+    \hastyp{\A,\env}{e\inang{\rbar}(\bar{e})}
+           {\subst{\rbar}{\rhobar}\tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{2.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}}{e_a}
+            {\RgnZ\inang{T}\inang{\toprgn}}\\
+    \A = (\subtypcx) \spc
+    \rgn \notin \rhoenv \spc
+%   \rgn \notin dom(\mem) \spc
+    \A' = (\rhoenv\cup\{\rgn\},\aenv,\phicx) \\
+    \env' =  \env[y\mapsto T@\rgn]\spc
+    \hastyp{\A',\env'}{e_b}{\tau} \spc
+    \tywf{\A}{\tau}
+  }
+  {
+    \hastyp{\exptycx{\env}}{\open{e_a}{\rgn}{y}{e_b}}
+            {\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
+\begin{minipage}{2.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx) \spc
+%   \rgn \in \A.\rhoenv \spc
+    \rgn \in \rhoenv \spc
+%   \rhobar \notin dom(\mem)\\
+    \rhobar \notin \rhoenv \\
+    \A' = (\rhoenv \cup \{\rhobar\}, \aenv, 
+          \phicx \conj \phi)\spc
+    \tywf{\rhoenv \cup \{\rhobar\}}{\phi}\\
+    \tywf{\A'}{\bar{\tau^1}}\spc
+    \tywf{\A'}{\tau^2}\spc
+    \hastyp{\A',\env[\xbar \mapsto \bar{\tau^1}]}{e}{\tau^2}
+  }
+  {
+    \hastyp{\exptycx{\env}}
+           {\lambdaexp{\rgn}{\rhobar \,|\, \phi}
+                      {\xbar:\bar{\tau^1}}{e}}
+           {\inang{\rhobar \,|\, \phi}
+            \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
