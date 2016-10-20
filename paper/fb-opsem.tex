@@ -11,187 +11,104 @@
 \end{array}\end{smathpar}\end{minipage}%
 }
 %
-\newcommand{\anobjty}[0]{B\inang{\tbar}\inang{\ralloc\rbar}}
+\newcommand{\anobjty}[0]{B\inang{\tbar}\inang{\ralloc\locbar}}
 \newcommand{\anobj}[0]{\C{new} \; \anobjty(\bar{v})}
 %
 
 \begin{figure*}[t!]
 
 %
-\fbox {\(\redstoo{(e,\rhomap)}{(e',\rhomap')}\)}\\
+\fbox {\(\redstoo{\Delta}{(e,\mem)}{(e',\mem')}\)}\\
 
 \lopsemrule{1.5in}{
-    \redstoo{(e,\rhomap)}{(e',\rhomap')}
+    \redstoo{\Delta}{(e,\mem)}{(e',\mem')}
 }{
-    \redstoo{(E\lbrack e \rbrack, \rhomap)}
-            {(E\lbrack e' \rbrack, \rhomap')}
+    \redstoo{\Delta}{(E\lbrack e \rbrack, \mem)}
+            {(E\lbrack e' \rbrack, \mem')}
 	  }{EVAL-ORDER}
 
 \lopsemrule{1.2in}{
-    \redstoo{(e,\rhomap)}{\invalidexn}
+    \redstoo{\Delta}{(e,\mem)}{\invalidexn}
   }{
-    \redstoo{(E\lbrack e \rbrack, \rhomap)}
+    \redstoo{\Delta}{(E\lbrack e \rbrack, \mem)}
             {\invalidexn}
 	  }{EXCEPTION}
 %
 
 \lopsemrule{2.7in}{
-    \allocRgn(\fbN) \in \rhoenv \spc
-    \fields(\fbN) = \bar{f}:\taubar
+%   \allocRgn(A\inang{\rgn\locbar}\inang{\tbar}) & = & \rgn
+%   \allocRgn(\fbN) \in \rhoenv \spc
+    \mem(\loc) = \LIVE \spc
+    \fields(A\inang{\tbar}\inang{\loc\locbar}) = \bar{f}:\taubar
 }{
-    \redstoo{((\C{new} \; \fbN(\vbar)).f_i,\rhomap)}{(v_i,\rhomap)}
+    \redstoo{\Delta}{((\C{new} \; A\inang{\tbar}\inang{\loc\locbar}(\vbar)).f_i,\mem)}{(v_i,\mem)}
 }{FIELD-ACCESS}
 
 \lopsemrule{3.85in}{
-    \allocRgn(\fbN),\ralloc \in \rhoenv \spc
-    \mbody(m\inang{\ralloc \rbar},\fbN) = \bar{x}.e 
-%   \redstoo{(, \rhomap)}{(e',\rhomap')}
+%   \allocRgn(\fbN) \in \rhoenv \spc
+    \mem(\loc) = \LIVE \spc
+    \mbody(m,A\inang{\tbar}\inang{\loc\locbar}) = \rhobar.\bar{x}.e 
+%   \redstoo{\Delta}{(, \mem)}{(e',\mem')}
 }{
-    \redstoo{((\C{new}\;\fbN(\bar{v})).m\inang{\ralloc \rbar}
-                      (\bar{v'}),\rhomap)}
-            {([\bar{v'}/\xbar][\C{new} \; \fbN(\bar{v})/\thisZ]\,e,\rhomap)}
+    \redstoo{\Delta}{((\C{new}\;A\inang{\tbar}\inang{\loc\locbar}(\bar{v})).m\inang{\overline{\loc'}}
+                      (\bar{v'}),\mem)}
+            {([\overline{\loc'}/\rhobar][\bar{v'}/\xbar]
+                [\C{new} \; A\inang{\tbar}\inang{\loc\locbar}(\bar{v})/\thisZ]\,e,\mem)}
 	  }{METHOD-INV}
 
 \lopsemrule{2.85in}{
-    v_a = \lambdaexp{\rgn_a}{\rhoalloc\rhobar}
+    v_a = \lambdaexp{\loc}{\rhobar}
                         {\taubar \; \xbar}{e} \spc
-    \rgn_a,\ralloc \in \rhoenv \spc 
+    \mem(\loc) = \LIVE  \spc 
 }{
-    \redstoo{(v_a\inang{\ralloc\rbar}(\bar{v}) ,\rhomap)}
-            {([\bar{v}/\xbar][\rbar/\rhobar][\ralloc/\rhoalloc]\,e,\rhomap)}
+    \redstoo{\Delta}{(v_a\inang{\locbar}(\bar{v}) ,\mem)}
+            {([\bar{v}/\xbar][\locbar/\rhobar]\,e,\mem)}
 	  }{FUN-APPLY}
 
 %
-\lopsemrule{2in}{
-%   \rgn \notin \rhoenv \spc
-    \fresh(\rgn') \spc
-    \redsto{\rhoenv \cup \{\rgn'\}}{([\rgn'/\rgn]e,\rhomap)}{\invalidexn}
-}{
-    \redstoo{(\letregion{\rgn}{e},\rhomap)}{\invalidexn}
-  }{EXCEPTION}
+% \lopsemrule{2in}{
+% %   \rgn \notin \rhoenv \spc
+% %   \fresh(\rgn') \spc
+%     \redstoo{\Delta}{(e,\mem)}{\invalidexn}
+% }{
+%     \redstoo{\Delta}{(\letregion{\rgn}{e},\mem)}{\invalidexn}
+%   }{EXCEPTION}
 
 \lopsemrule{2in}{
-    \fgjN = \RgnZ\inang{T} \spc
-    \rgn \in dom(\rhomap) \spc
-    \redsto{\{\rgn\}}{(e,\rhomap)}{\invalidexn}
+%   \fgjN = \RgnZ\inang{T} \spc
+%   \rgn \in dom(\mem) \spc
+    \mem(\loc) = \USED \spc
+    \redstocup{\loc}{(e,\mem[\loc \mapsto \LIVE])}{\invalidexn}
 }{
-    \redstoo{(\C{new} \; \fgjN\inang{\rgn}
-                (e),\rhomap)}
+    \redstoo{\Delta}{(\C{new} \; \RgnZT{\toploc\loc} (e),\mem)}
             {\invalidexn}
 	  }{EXCEPTION}
 
-\lopsemrule{2.5in}{
-    v_a = \C{new} \; \RgnZ\inang{T}\inang{\rgn}(v_r) \spc
-    \rhomap(\rgn) \neq \XFERRED \spc
-    \fresh(\rgn_1) \spc
-%  \rgn_0 \notin \rhoenv \\
-    \redsto{\{\rgn_1\}}{([\rgn_1/\{\rgn,\rgn_0\}][v_r/x]e_b,
-      \rhomap[\rgn \mapsto \OPEN])}{\invalidexn}
-}{
-    \redstoo{(\open{v_a}{\rgn_0}{x}{e_b},\rhomap)} 
-            {\invalidexn}
-	  }{EXCEPTION}
-
-%\caption{\fbname: Operational Semantics (Part 1)}
-%\label{fig:fb-opsem-1}
-%\end{figure*}
-%
-%\begin{figure*}[t!]
-
-\lopsemrule{3.2in}{
-    \fresh(\rgn')\spc
-%   \rgn \notin \rhoenv \spc
-    \redsto{\rhoenv \cup \{\rgn'\}}{([\rgn'/\rgn]e,\rhomap)}{(e',\rhomap')}
-}{
-    \redstoo{(\letregion{\rgn}{e},\rhomap)}{(\letregion{\rgn'}{e'},\rhomap')}
-  }{LET-REGION}
-
-\lopsemrule{3in}{
-%   \rgn \notin \rhoenv
-}{
-    \redstoo{(\letregion{\rgn}{v},\rhomap)}{(v,\rhomap)}
-  }{LET-REGION-END}
-
-\lopsemrule{3.3in}{
-    \fgjN = \RgnZ\inang{T} \spc
-    \ralloc \in \rhoenv \spc
-    \fresh(\rgn)\spc
-%   \rgn \notin dom(\rhomap) \cup \rhoenv \spc
-    \rhomap' = \rhomap[\rho \mapsto \CLOSED]
-}{
-    \redstoo{(\C{new} \; \fgjN\inang{\toprgn}
-                (\lambdaexp{\ralloc}{\rhoalloc}{}{e}),\rhomap)}
-            {(\C{new} \; \fgjN\inang{\rgn}
-                ([\rgn/\rhoalloc]e),\rhomap')}
-	      }{NEW-REGION}
-
-\lopsemrule{2.8in}{
-    \redsto{\{\rgn\}}{(e,\rhomap)}{(e',\rhomap')} \spc
-    \fgjN = \RgnZ\inang{T} \spc
-    \rgn \in dom(\rhomap)
-}{
-    \redstoo{(\C{new} \; \fgjN\inang{\rgn}
-                (e),\rhomap)}
-            {(\C{new} \; \fgjN\inang{\rgn}
-                (e'),\rhomap')}
-	      }{NEW-REGION}
-
-\lopsemrule{2.7in}{
-    v_a = \C{new} \; \RgnZ\inang{T}\inang{\rgn}(v_r) \spc
-    \rhomap(\rgn) \neq \XFERRED \spc
-%   \rgn_0 \notin \rhoenv \spc
-}{
-    \redstoo{(\open{v_a}{\rgn_0}{x}{v_b},\rhomap)} {(v_b,\rhomap)}
-  }{OPEN-END}
+% \lopsemrule{3.2in}{
+%     \not\exists \loc.~\mem(\loc) = \FREE
+% }{
+%     \redstoo{\Delta}{(\letregion{\rgn}{e},\mem)}{\invalidexn}
+%   }{EXCEPTION}
 
 
-\lopsemrule{4in}{
-    v_a = \C{new} \; \RgnZ\inang{T}\inang{\rgn}(v_r) \spc
-    \rhomap(\rgn) \neq \XFERRED \spc
-    \fresh(\rgn_1)\\
-%   \rgn_0 \notin \rhoenv \\
-    \redsto{\{\rgn_1\}}{([\rgn_1/\{\rgn,\rgn_0\}][v_r/x]e_b,
-      \rhomap[\rgn \mapsto \OPEN])}{(e_b',\rhomap')} \spc
-    \rhomap'' = \rhomap'[\rgn \mapsto \rhomap(\rgn)]
-}{
-    \redstoo{(\open{v_a}{\rgn_0}{x}{e_b},\rhomap)} 
-            {(\open{v_a}{\rgn_1}{x}{e_b'},\rhomap'')}
-	  }{OPEN}
-
-\lopsemrule{3in}{
-    v_a = \C{new} \; \RgnZ\inang{T}\inang{\rgn}(v_r) \spc
-    \rhomap(\rgn) = \XFERRED
-%   \rgn_0 \notin \rhoenv \\
-%   \redstocup{\rgn_0}{([[\rgn_0/\rgn]v_r/x]e_b,
-%     \rhomap[\rgn \mapsto \OPEN])}{(e_b',\rhomap')}
-}{
-    \redstoo{(\open{v_a}{\rgn_0}{x}{e_b},\rhomap)} 
-            {\invalidexn}
-	  }{OPEN-TRANSFERRED}
-
-
-\lopsemrule{3.25in}{
-%   \ralloc \in \rhoenv \spc
-    \fbN = \RgnZ\inang{T}\inang{\rgn}\spc
-%   \redstoo{(, \rhomap)}{(e',\rhomap')}
-    \rhomap(\rgn) \neq \OPEN \spc
-    \rhomap' = \rhomap[\rgn \mapsto \XFERRED]
-}{
-    \redstoo{((\C{new}\;\fbN(v)).\transfer\inang{\ralloc}
-                      (),\rhomap)}
-            {(\unitval,\rhomap')}
-	  }{TRANSFER}
-
-\lopsemrule{2.5in}{
-    \fbN = \RgnZ\inang{T}\inang{\rgn}\spc
-%   \ralloc \in \rhoenv \spc
-%   \redstoo{(, \rhomap)}{(e',\rhomap')}
-    \rhomap(\rgn) = \OPEN \spc
-}{
-    \redstoo{((\C{new}\;\fbN(v)).\transfer\inang{\ralloc}
-                      (),\rhomap)}
-            {\invalidexn}
-	  }{TRANSFER-OPENED}
+% \lopsemrule{3.3in}{
+%     \not\exists \loc.~\mem(\loc) = \FREE
+% }{
+%     \redstoo{\Delta}{(\C{new} \; \RgnZ\inang{T}\inang{\toprgn}
+%                 (\lambdaexp{\loc'}{\rho}{}{e}),\mem)}
+%             {\invalidexn}
+%         }{EXCEPTION}
+% \lopsemrule{2.5in}{
+%     \mem(\rgn_r) \neq \XFERRED \spc
+% %   \fresh(\rgn_1) \spc
+% %  \rgn_0 \notin \rhoenv \\
+%     \redsto{\Delta \cup \{\rgn\}}{([[\rgn/\rgn_r]v_r/x]e_b,
+%       \mem[\rgn_r \mapsto \OPEN])}{\invalidexn}
+% }{
+%     \redstoo{\Delta}{(\open{(\C{new} \; \RgnZ\inang{T}\inang{\rgn_r}(v_r))}
+%                    {\rgn}{x}{e_b},\mem)} 
+%             {\invalidexn}
+%     }{EXCEPTION}
 
 %
 \bigskip
@@ -199,14 +116,157 @@
 \textbf{Evaluation Context} \fbox {\(E\)}\\
 \begin{smathpar}
 \begin{array}{lcl}
-E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\ralloc\rbar}(\ebar) \ALT
-      v.m\inang{\ralloc\rbar}(...,\bullet,...) \ALT \C{new}\; \fbN(...,\bullet,...) \ALT
-      \C{new} \; \RgnZ\inang{T}\inang{\toprgn}(\bullet) \ALT \bullet\inang{\ralloc\rbar}(\ebar) \\
-  &  & \ALT v\inang{\ralloc\rbar}(...,\bullet,...) \ALT \open{\bullet}{\rgn}{y}{e}
+E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \ALT
+      v.m\inang{\locbar}(...,\bullet,...) \ALT \C{new}\; \fbN(...,\bullet,...) \ALT
+      \C{new} \; \RgnZ\inang{T}\inang{\toprgn}(\bullet) \ALT 
+      \bullet\inang{\locbar}(\ebar) \\
+  &  & \ALT v\inang{\locbar}(...,\bullet,...) \ALT
+       \letexp{x}{\bullet}{e} \ALT \open{\bullet}{\rgn}{y}{e} 
+%      \ALT \opened{\loc}{\status}{\bullet} \ALT \letd{\loc}{\bullet}
+%     The following should be forbidden. See NEW-REGION rule 2.
+%      \ALT \C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}(\bullet)
 \end{array}
 \end{smathpar}
 
+\caption{\fbname: Operational Semantics (Part 1)}
+\label{fig:fb-opsem-1}
+\end{figure*}
 
-\caption{\fbname: Operational Semantics}
-\label{fig:fb-opsem}
+\begin{figure*}[t!]
+
+\lopsemrule{3.2in}{
+%   \fresh(\rgn')\spc
+%   \mem(\loc) = \FREE \spc
+    \loc \not\in dom(\mem) \spc
+    \mem' = \mem[\loc \mapsto \SLIVE]
+%   \redstoo{\Delta}{(e,\mem)}{(e',\mem')}
+}{
+    \redstoo{\Delta}{(\letregion{\rgn}{e},\mem)}{(\letd{\loc}{[\loc/\rgn]e},\mem')}
+  }{LET-REGION-BEGIN}
+
+\lopsemrule{3in}{
+    \redstocup{\loc}{(e,\mem)}{(e',\mem')}
+}{
+    \redstoo{\Delta}{(\letd{\loc}{e},\mem)}{(\letd{\loc}{e'},\mem')}
+  }{LET-REGION}
+
+
+\lopsemrule{3in}{
+%   \rgn \notin \rhoenv
+    \mem' = \mem[\loc \mapsto \FREE]
+}{
+    \redstoo{\Delta}{(\letd{\loc}{v},\mem)}{(v,\mem)}
+  }{LET-REGION-END}
+
+\lopsemrule{3.3in}{
+%   \fgjN = \RgnZ\inang{T} \spc
+%   \rgn \in \rhoenv \spc
+%   We need Delta here to ensure Delta U {pi_r} in next rule is sound. 
+%   \rgn_r \notin \Delta \cup dom(\Sigma) \spc
+%   \rgn \notin dom(\mem) \cup \rhoenv \spc
+%   \mem' = \mem[\rgn_r \mapsto \CLOSED]
+%   \mem(\loc) = \LIVE \spc
+%   \mem(\loc') = \FREE \spc
+    \loc \not\in dom(\mem) \spc
+    \mem' = \mem[\loc \mapsto \USED]
+}{
+    \redstoo{\Delta}{(\C{new} \; \RgnZ\inang{T}\inang{\toprgn}
+                (v),\mem)}
+            {(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
+                (v\inang{\loc}()),\mem')}
+	      }{NEW-REGION}
+
+\lopsemrule{3.3in}{
+    \mem(\loc) = \USED \spc
+    \redstocup{\loc}{(e,\mem[\loc \mapsto \LIVE]) }{(e',\mem')}
+}{
+    \redstoo{\Delta}{(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
+                (e),\mem)}
+            {(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
+                (e'),\mem'[\loc\mapsto\USED])}
+	      }{NEW-REGION}
+
+% \lopsemrule{2.8in}{
+%     \redsto{\Delta \cup \{\rgn_r\}}{(e,\mem)}{(e',\mem')} \spc
+% %   \fgjN = \RgnZ\inang{T} \spc
+%     \rgn_r \in dom(\mem)
+% }{
+%     \redstoo{\Delta}{(\C{new} \; \RgnZ\inang{T}\inang{\rgn_r}
+%                 (e),\mem)}
+%             {(\C{new} \; \RgnZ\inang{T}\inang{\rgn_r}
+%                 (e'),\mem')}
+%         }{NEW-REGION}
+
+\lopsemrule{4in}{
+    v_a = \C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}(v) \spc
+    \mem(\loc) = \USED ~\texttt{or}~ \mem(\loc) = \TLIVE \spc
+%   \fresh(\rgn_1)\\
+%   \rgn_0 \notin \rhoenv \\
+    \mem' = \mem[\loc \mapsto \TLIVE]
+%   \mem'' = \mem'[\rgn_r \mapsto \mem(\rgn_r)]
+}{
+    \redstoo{\Delta}{(\open{v_a}{\rgn}{x}{e_b},\mem)} 
+            {(\opened{\loc}{\mem(\loc)}{[v/x][\loc/\rgn]e_b},\mem')}
+	  }{OPEN}
+
+\lopsemrule{2.7in}{
+    \redstocup{\loc}{(e,\mem)}{(e',\mem')}
+}{
+    \redstoo{\Delta}{(\opened{\loc}{\status}{e},\mem)}
+    {(\opened{\loc}{\status}{e'},\mem')}
+  }{OPENED}
+
+\lopsemrule{2.7in}{
+%   v_a = \C{new} \; \RgnZ\inang{T}\inang{\}(v_r) \spc
+%   \mem(\rgn_r) \neq \XFERRED \spc
+%   \rgn_0 \notin \rhoenv \spc
+    \mem' = \mem[\loc \mapsto \status]
+}{
+    \redstoo{\Delta}{(\opened{\loc}{\status}{v},\mem)} {(v,\mem')}
+  }{OPEN-END}
+
+
+\lopsemrule{3in}{
+    v_a = \C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}(v) \spc
+    \mem(\loc) \neq \USED ~\texttt{and}~ \mem(\loc) \neq \LIVE
+%   \rgn_0 \notin \rhoenv \\
+%   \redstocup{\rgn_0}{([[\rgn_0/\rgn]v_r/x]e_b,
+%     \mem[\rgn \mapsto \OPEN])}{(e_b',\mem')}
+}{
+    \redstoo{\Delta}{(\open{v_a}{\rgn}{x}{e_b},\mem)} 
+            {\invalidexn}
+	  }{OPEN-TRANSFERRED}
+
+
+\lopsemrule{3.25in}{
+%   \ralloc \in \rhoenv \spc
+%   \fbN = \RgnZ\inang{T}\inang{\rgn_r}\spc
+%   \redstoo{\Delta}{(, \mem)}{(e',\mem')}
+    \mem(\loc) = \USED \spc
+    \mem' = \mem[\loc \mapsto \XFERRED]
+}{
+    \redstoo{\Delta}{((\C{new}\;\RgnZ\inang{T}\inang{\toploc\loc}(v)).\transfer(),\mem)}
+            {(\unitval,\mem')}
+	  }{TRANSFER}
+
+\lopsemrule{2.5in}{
+%   \fbN = \RgnZ\inang{T}\inang{\rgn}\spc
+%   \ralloc \in \rhoenv \spc
+%   \redstoo{\Delta}{(, \mem)}{(e',\mem')}
+    \mem(\loc) = \TLIVE \spc
+}{
+    \redstoo{\Delta}{((\C{new}\;\RgnZ\inang{T}\inang{\toploc\loc}(v)).\transfer(),\mem)}
+            {\invalidexn}
+	  }{TRANSFER-OPENED}
+
+% \lopsemrule{2.5in}{
+%     \not\exists \loc.~\mem(\loc) = \SLIVE \spc
+%     \mem(\loc') = \XFERRED
+% }{
+%     \redstoo{\Delta}{(e,\mem)}{(e,\mem[\loc'\mapsto\FREE])}
+%     }{GARBAGE-COLLECT}
+
+
+\caption{\fbname: Operational Semantics (Part 2)}
+\label{fig:fb-opsem-2}
 \end{figure*}
