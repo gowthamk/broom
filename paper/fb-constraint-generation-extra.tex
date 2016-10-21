@@ -174,8 +174,32 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
     \typeok {\A} {\RgnZ\inang{T}\inang{\toprgn}} {\{\}}
   }
 
+%%%%%%%%%%% Header Box %%%%%%%%%%%
+\fbox{  \( \subtypeok{\A}{\tau_1}{\tau_2}{C} \)}
+\\[0.3cm]
+
+%%%%%%%%%%% SUBTYPING: REFLEXIVE %%%%%%%%%%%
+
+  \lgcfact{REFLEXIVE}{
+    \subtypeok{\A}{\tau}{\tau}{\{\}}
+  }
+
+%%%%%%%%%%% SUBTYPING: UNIFICATION %%%%%%%%%%%
+  \lgcfact{UNIFY}{
+    \subtypeok{\A}{\tau}{[\pi/\rho](\tau)}{ \{ \pi \outlives \rho, \rho \outlives \pi \} }
+  }
+
+%%%%%%%%%%% SUBTYPING: TRANSITIVITY %%%%%%%%%%%
+
+  \lgcrule{TRANSITIVE}{
+    \subtypeok{\A}{\tau_1}{\tau_2}{C_1} \spc
+    \subtypeok{\A}{\tau_2}{\tau_3}{C_2}
+  }{
+    \subtypeok{\A}{\tau_1}{\tau_3}{C_1 \cup C_2}
+  }
+
 %%%%%%%%%%% FUNCTION SUBTYPING %%%%%%%%%%%
-  \lgcrule{FUN-SUBTYPING}
+  \lgcrule{FN-SUBTYPING}
   {
     C_1 = \{ \isvalid{\A.\phicx}{\phi_1 \Rightarrow \phi_2} \}
     \\

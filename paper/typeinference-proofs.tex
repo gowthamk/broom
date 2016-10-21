@@ -113,7 +113,7 @@ every region variable occurring in $\satC$ is bound to some region constant in $
 \end{lemma}
 
 \begin{proof}
-Intuitively, the lemma says that every region variable will be unified with
+The lemma formalizes the intuition that every region variable will be ``unified'' with
 some region constant (by the generated constraints).
 %
 Region variables are introduced at call-sites and represent the formal region parameters for the call.
@@ -134,9 +134,12 @@ Note that the region \C{R} where a new object is allocated (by the \C{new} const
 by the user (as \C{new@R}). If the user does not specify this, it defaults to the allocation
 context region. Thus, this aspect is handled by the frontend, and does not require or use
 the constraint solver.
+
+Formally, we can prove via induction that if $\exprok{\stdcontext}{e}{\tau}{C}$ then
+every region variable in the result type $\tau$ will be bound to one of the ``live''
+region constants (\ie, region constants in $\A$).
 \qed
-% This property follows from the constraint-generation rules.
-% , and the type system uniquely determines the region parameters of every value
+
 \end{proof}
 
 \begin{lemma}
