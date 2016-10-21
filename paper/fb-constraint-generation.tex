@@ -10,9 +10,7 @@
 \endgroup%
 }
 
-% \newcommand{\SRULE}[2]{\frac{\renewcommand*{\arraystretch}{1.2}\begin{array}{c} #1 \end{array}}{\renewcommand*{\arraystretch}{1.2}\begin{array}{c} #2 \end{array}}}
 \newcommand{\SRULE}[2]{\frac{\rulepart{#1}}{\rulepart{#2}}}
-
 
 \newcommand{\beginrules}{%
 \renewcommand*{\arraystretch}{1.4}%
@@ -50,7 +48,7 @@
 \beginrules
 
 %%%%%%%%%%% NEW %%%%%%%%%%%
-  \lgcrule{NEW}
+  \lgcrule{New}
   {
     \exprok {\stdcontext} {\bar{e}} {\bar{\tau}} {C_1}
     \spc
@@ -65,7 +63,7 @@
   }
 
 %%%%%%%%%%% NEW-REGION %%%%%%%%%%%
-  \lgcrule{NEW-REGION}
+  \lgcrule{NewRegion}
   {
     % \typeok {\A.\aenv} {T} {C_1} \spc
     % C_1 = \{ \rgn \in \A.\rhoenv \}
@@ -81,7 +79,7 @@
 
 %%%%%%%%%%% LET-REGION %%%%%%%%%%%
 
-\lgcrule{LET-REGION}{
+\lgcrule{LetRegion}{
    \A = (\rhoenv,\aenv,\phicx)  \spc \rgn \notin \rhoenv \spc
       \A' = (\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn))
    \nl
@@ -92,7 +90,7 @@
 }
 
 %%%%%%%%%%% FUNCTION INVOCATION %%%%%%%%%%%
-\lgcrule{FUN-APPLY}
+\lgcrule{FnApply}
 {
 C_1 = \{\bar{\pi} \in \A.\rhoenv\} \spc
 \exprok {\stdcontext} {e} {\inang{\rhobar\,|\,\phi}\bar{\tau^1} \xrightarrow{\rgn} \tau^2} {C_2}
@@ -107,7 +105,7 @@ C_3 = \{\isvalid{\A.\phicx}{[\bar{\pi}/\rhobar]\phi}\} \spc
 }
 
 %%%%%%%%%%% OPEN-REGION %%%%%%%%%%%
-\lgcrule{OPEN}{
+\lgcrule{Open}{
    \exprok {\stdcontext} {e_a} {\RgnZ\inang{T}\inang{\toprgn}} {C_1} \spc
    \A = (\rhoenv,\aenv,\phicx) \spc
    \rgn \notin \rhoenv
@@ -122,7 +120,7 @@ C_3 = \{\isvalid{\A.\phicx}{[\bar{\pi}/\rhobar]\phi}\} \spc
 
 %%%%%%%%%%% LAMBDA %%%%%%%%%%%
 
-\lgcrule{LAMBDA}
+\lgcrule{Lambda}
   {
     \rgn \in \A.\rhoenv \spc
     \rhobar \notin \A.\rhoenv

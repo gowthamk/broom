@@ -5,9 +5,9 @@
 \beginrules
 
 %%%%%%%%%%% () and x %%%%%%%%%%%
-\lgcfact{UNIT}{\exprok{\stdcontext}{\unitval}{\unitZ}{\{\}}}
+\lgcfact{Unit}{\exprok{\stdcontext}{\unitval}{\unitZ}{\{\}}}
 
-\lgcfact{VAR}{\exprok{\stdcontext}{x}{\env(\tau)}{\{\}}}
+\lgcfact{Var}{\exprok{\stdcontext}{x}{\env(\tau)}{\{\}}}
 
 % \begin{minipage}{1.2in}
 % \begin{smathpar}
@@ -20,7 +20,7 @@
 % \end{minipage}
 
 %%%%%%%%%%% FIELD-ACCESS: e.f %%%%%%%%%%%
-\lgcrule{FIELD-ACCESS}
+\lgcrule{FieldAccess}
   {
     \exprok{\stdcontext}{e}{\tau'}{C} \spc
     \bar{f}:\taubar \,=\, \fields(\bound_{\A.\aenv}(\tau'))
@@ -30,7 +30,7 @@
   }
 
 %%%%%%%%%%% LET %%%%%%%%%%%
-  \lgcrule{LET}
+  \lgcrule{Let}
   {
     \exprok{\stdcontext}{e_1}{\tau_1}{C_1} \spc
     \exprok{\A,{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}{C_2} \\
@@ -40,7 +40,7 @@
   }
 
 %%%%%%%%%%% METHOD-INV %%%%%%%%%%%
-  \lgcrule{METHOD-INV}
+  \lgcrule{MethodInv}
   {
     \exprok {\stdcontext} {e_0} {\tau} {C_1} \spc C_4 = \{ \rbar \in \A.\rhoenv \}
     \nl
@@ -60,7 +60,7 @@
   }
 
 %%%%%%%%%%% METHOD %%%%%%%%%%%
-\lgcrule{METHOD}{
+\lgcrule{Method}{
 CT(B) = \hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}
 \nl
 \A = (\rhoenv,\aenv,\phicx) = (\{\rhobar,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN}, \varphi_m) \spc\spc
@@ -79,7 +79,7 @@ C_1 = \{ \tywf{\rhoenv}{\varphi_m} \}
 }
 
 %%%%%%%%%%% CLASS %%%%%%%%%%%
-\lgcrule{CLASS}{
+\lgcrule{Class}{
 \A = (\rhoenv, \aenv, \phicx) = (\{\rhoalloc,\rhobar\},\bar{\tyvar} \extends \bar{\fgjN},\varphi) \\
 C_1 = \{ \tywf{\rhoenv}{\varphi} \} \spc\spc
 \typeok {\A} {\fbN} {C_2} \spc\spc
@@ -91,7 +91,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
 }
 
 
-\lgcrule{SUBTYPING}{
+\lgcrule{SubTyping}{
     \exprok {\exptycx{\env}} {e} {\tau} {C_1} \spc  \subtypeok {\A} {\tau} {\tau'} {C_2}
 }{
     \exprok {\exptycx{\env}} {e} {\tau'} {C_1 \cup C_2}
@@ -114,7 +114,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
 %%%%%%%%%%% TYPE WELL-FORMEDNESS %%%%%%%%%%%
 
 %%%%%%%%%%% OBJECT TYPE %%%%%%%%%%%
-\lgcrule{OBJECT-TYPE}
+\lgcrule{ObjectType}
   {
     C = \{ \rgn \in \A.\rhoenv \}
   }
@@ -123,7 +123,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
   }
 
 %%%%%%%%%%% CLASS TYPE %%%%%%%%%%%
-  \lgcrule{CLASS-TYPE}
+  \lgcrule{ClassType}
   {
     CT(B) = \headerOf{B}\{...\}
     \spc
@@ -136,7 +136,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
   }
 
 %%%%%%%%%%% GENERIC TYPE PARAMETER %%%%%%%%%%%
-  \lgcrule{TYPE-PARAM}
+  \lgcrule{TypeParam}
   {
     \fgjtywf{\A.\aenv}{T} \spc
     \fgjsubtyp{\A.\aenv}{T}{\ObjZ} \spc
@@ -148,7 +148,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
   }
 
 %%%%%%%%%%% FUNCTION TYPE %%%%%%%%%%%
-  \lgcrule{FN-TYPE}
+  \lgcrule{FnType}
   {
     C_1 = \{ \rgn \in \rhoenv \}
     \\
@@ -166,7 +166,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
   }
 
 %%%%%%%%%%% REGION TYPE %%%%%%%%%%%
-  \lgcrule{REGION-TYPE}
+  \lgcrule{RegionType}
   { 
     \fgjtywf{\A.\aenv}{T}
   }
@@ -180,18 +180,18 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
 
 %%%%%%%%%%% SUBTYPING: REFLEXIVE %%%%%%%%%%%
 
-  \lgcfact{REFLEXIVE}{
+  \lgcfact{Reflexive}{
     \subtypeok{\A}{\tau}{\tau}{\{\}}
   }
 
 %%%%%%%%%%% SUBTYPING: UNIFICATION %%%%%%%%%%%
-  \lgcfact{UNIFY}{
+  \lgcfact{Unify}{
     \subtypeok{\A}{\tau}{[\pi/\rho](\tau)}{ \{ \pi \outlives \rho, \rho \outlives \pi \} }
   }
 
 %%%%%%%%%%% SUBTYPING: TRANSITIVITY %%%%%%%%%%%
 
-  \lgcrule{TRANSITIVE}{
+  \lgcrule{Transitive}{
     \subtypeok{\A}{\tau_1}{\tau_2}{C_1} \spc
     \subtypeok{\A}{\tau_2}{\tau_3}{C_2}
   }{
@@ -199,7 +199,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
   }
 
 %%%%%%%%%%% FUNCTION SUBTYPING %%%%%%%%%%%
-  \lgcrule{FN-SUBTYPING}
+  \lgcrule{FnSubtyping}
   {
     C_1 = \{ \isvalid{\A.\phicx}{\phi_1 \Rightarrow \phi_2} \}
     \\

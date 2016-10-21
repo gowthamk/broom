@@ -25,14 +25,14 @@
 }{
     \redstoo{\Delta}{(E\lbrack e \rbrack, \mem)}
             {(E\lbrack e' \rbrack, \mem')}
-	  }{EVAL-ORDER}
+	  }{EvalOrder}
 
 \lopsemrule{1.2in}{
     \redstoo{\Delta}{(e,\mem)}{\invalidexn}
   }{
     \redstoo{\Delta}{(E\lbrack e \rbrack, \mem)}
             {\invalidexn}
-	  }{EXCEPTION}
+	  }{Exception}
 %
 
 \lopsemrule{2.7in}{
@@ -42,7 +42,7 @@
     \fields(A\inang{\tbar}\inang{\loc\locbar}) = \bar{f}:\taubar
 }{
     \redstoo{\Delta}{((\C{new} \; A\inang{\tbar}\inang{\loc\locbar}(\vbar)).f_i,\mem)}{(v_i,\mem)}
-}{FIELD-ACCESS}
+}{FieldAccess}
 
 \lopsemrule{3.85in}{
 %   \allocRgn(\fbN) \in \rhoenv \spc
@@ -54,7 +54,7 @@
                       (\bar{v'}),\mem)}
             {([\overline{\loc'}/\rhobar][\bar{v'}/\xbar]
                 [\C{new} \; A\inang{\tbar}\inang{\loc\locbar}(\bar{v})/\thisZ]\,e,\mem)}
-	  }{METHOD-INV}
+	  }{MethodInv}
 
 \lopsemrule{2.85in}{
     v_a = \lambdaexp{\loc}{\rhobar}
@@ -63,7 +63,7 @@
 }{
     \redstoo{\Delta}{(v_a\inang{\locbar}(\bar{v}) ,\mem)}
             {([\bar{v}/\xbar][\locbar/\rhobar]\,e,\mem)}
-	  }{FUN-APPLY}
+	  }{FnApply}
 
 %
 % \lopsemrule{2in}{
@@ -82,7 +82,7 @@
 }{
     \redstoo{\Delta}{(\C{new} \; \RgnZT{\toploc\loc} (e),\mem)}
             {\invalidexn}
-	  }{EXCEPTION}
+	  }{Exception}
 
 % \lopsemrule{3.2in}{
 %     \not\exists \loc.~\mem(\loc) = \FREE
@@ -142,13 +142,13 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 %   \redstoo{\Delta}{(e,\mem)}{(e',\mem')}
 }{
     \redstoo{\Delta}{(\letregion{\rgn}{e},\mem)}{(\letd{\loc}{[\loc/\rgn]e},\mem')}
-  }{LET-REGION-BEGIN}
+  }{LetRegionBegin}
 
 \lopsemrule{3in}{
     \redstocup{\loc}{(e,\mem)}{(e',\mem')}
 }{
     \redstoo{\Delta}{(\letd{\loc}{e},\mem)}{(\letd{\loc}{e'},\mem')}
-  }{LET-REGION}
+  }{LetRegion}
 
 
 \lopsemrule{3in}{
@@ -156,7 +156,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
     \mem' = \mem[\loc \mapsto \FREE]
 }{
     \redstoo{\Delta}{(\letd{\loc}{v},\mem)}{(v,\mem)}
-  }{LET-REGION-END}
+  }{LetRegionEnd}
 
 \lopsemrule{3.3in}{
 %   \fgjN = \RgnZ\inang{T} \spc
@@ -174,7 +174,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
                 (v),\mem)}
             {(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
                 (v\inang{\loc}()),\mem')}
-	      }{NEW-REGION}
+	      }{NewRegion}
 
 \lopsemrule{3.3in}{
     \mem(\loc) = \USED \spc
@@ -184,7 +184,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
                 (e),\mem)}
             {(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
                 (e'),\mem'[\loc\mapsto\USED])}
-	      }{NEW-REGION}
+	      }{NewRegion}
 
 % \lopsemrule{2.8in}{
 %     \redsto{\Delta \cup \{\rgn_r\}}{(e,\mem)}{(e',\mem')} \spc
@@ -207,14 +207,14 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 }{
     \redstoo{\Delta}{(\open{v_a}{\rgn}{x}{e_b},\mem)} 
             {(\opened{\loc}{\mem(\loc)}{[v/x][\loc/\rgn]e_b},\mem')}
-	  }{OPEN}
+	  }{Open}
 
 \lopsemrule{2.7in}{
     \redstocup{\loc}{(e,\mem)}{(e',\mem')}
 }{
     \redstoo{\Delta}{(\opened{\loc}{\status}{e},\mem)}
     {(\opened{\loc}{\status}{e'},\mem')}
-  }{OPENED}
+  }{Opened}
 
 \lopsemrule{2.7in}{
 %   v_a = \C{new} \; \RgnZ\inang{T}\inang{\}(v_r) \spc
@@ -223,7 +223,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
     \mem' = \mem[\loc \mapsto \status]
 }{
     \redstoo{\Delta}{(\opened{\loc}{\status}{v},\mem)} {(v,\mem')}
-  }{OPEN-END}
+  }{OpenEnd}
 
 
 \lopsemrule{3in}{
@@ -235,7 +235,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 }{
     \redstoo{\Delta}{(\open{v_a}{\rgn}{x}{e_b},\mem)} 
             {\invalidexn}
-	  }{OPEN-TRANSFERRED}
+	  }{OpenTransferred}
 
 
 \lopsemrule{3.25in}{
@@ -247,7 +247,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 }{
     \redstoo{\Delta}{((\C{new}\;\RgnZ\inang{T}\inang{\toploc\loc}(v)).\transfer(),\mem)}
             {(\unitval,\mem')}
-	  }{TRANSFER}
+	  }{Transfer}
 
 \lopsemrule{2.5in}{
 %   \fbN = \RgnZ\inang{T}\inang{\rgn}\spc
@@ -257,7 +257,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 }{
     \redstoo{\Delta}{((\C{new}\;\RgnZ\inang{T}\inang{\toploc\loc}(v)).\transfer(),\mem)}
             {\invalidexn}
-	  }{TRANSFER-OPENED}
+	  }{TransferOpened}
 
 % \lopsemrule{2.5in}{
 %     \not\exists \loc.~\mem(\loc) = \SLIVE \spc
