@@ -2,13 +2,42 @@
 %
 %Fig.~\ref{fig:fb-opsem} contains a definition of the operational semantics for \fbname.
 %
-\section{Operational Semantics}
-\input{fb-opsem}
+\section{\fbname}
 
+\subsection{Full Syntax}
+\input{fb-syntax-full}
+
+The full syntax of \FB, including expressions that manifest only at
+runtime, is shown in Fig.~\ref{fig:fb-syntax-full}. Such expressions
+include:
+\begin{itemize}
+\item Memory locations ($\loc$) corresponding to the memory regions,
+\item A special expression $\RgnZT{\toploc\loc}(e)$ that evaluates to
+a region handler object (the syntax of this expression is captured by
+the $\C{new}\;\fbN(\overline{e})$ construct). $\toploc$ is the
+location of the special $\toprgn$ region where region handlers are
+stored. $\loc$ is the location of the corresponding transferable
+region.
+\item A $\letd{\loc}{e}$ expression that results when
+$\letregion{\pi}{e}$ takes a step (see Fig.~\ref{fig:fb-opsem-2}).
+$\loc$ is the location of the newly allocated region.
+\item An $\opened{\loc}{s}{e}$ expression that results when
+$\open{\RgnZT{\toploc\loc}(v)}{\pi}{x}{e}$ takes a step. $\loc$ is the
+location of the newly open transferable region.
+\end{itemize}
+
+\subsection{Full Static Semantics}
+
+\input{fb-staticsem-full}
+
+\subsection{Operational Semantics}
+
+\input{fb-opsem}
 Figs.~\ref{fig:fb-opsem-1} and~\ref{fig:fb-opsem-2} show the
 operational semantics of \fbname. \emph{TODO: 1. Some more text needs
 to be added, 2. To represent typestate, color coding itself is not
 enough; change in symbols needed.}.
+
 
 \input{fb-constraint-generation-extra}
 

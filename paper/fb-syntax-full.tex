@@ -17,10 +17,10 @@ cn & \in & \M{Class \; names} & \coloneqq & \ObjZ \ALT \RgnZ \ALT A \ALT B\\
      \fgjN & \in & \M{FGJ \; class \; types} & \coloneqq & cn\inang{\tbar}\\
 T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \ALT \unitZ
      \ALT \bar{T} \rightarrow T \\
-r  & \in & \M{Region\; annotations} & \coloneqq & \rho \ALT \pi \\
-% \status & \in & \mathtt{Region\; Typestate} & \coloneqq & \FREE \ALT
-%                   \USED \ALT \LIVE \ALT \XFERRED\\
-\fbN  & \in & \M{Annotated \; class \; types} & \coloneqq & 
+r  & \in & \M{Region\; annotations} & \coloneqq & \rho \ALT \pi \ALT \loc\\
+\status & \in & \mathtt{Region\; Typestate} & \coloneqq & \FREE \ALT
+                  \USED \ALT \LIVE \ALT \XFERRED\\
+\fbN  & \in & \M{\FB \; class \; types} & \coloneqq & 
      cn\inang{\tbar}\inang{\rbar} \\
 \tau &\in& \M{types} & \coloneqq & T@\rgn  
       \ALT \fbN \ALT \unitZ 
@@ -30,27 +30,26 @@ C  & \in & \M{Class \; definitions} & \coloneqq &
      \C{class} \; cn\inang{\bar{\tyvar} \extends \bar{\fgjN}} 
                     \inang{\rhobar \,|\, \phi}\extends \fbN 
                     \{\bar{\tau} \; \bar{f};\; \bar{d}\}\;\\
+%k  & \in & \M{Constructors} & \coloneqq & 
+%     cn(\bar{\tau} \; \bar{x})\{\C{super}(\bar{x}); \;
+%                                \C{this}.\bar{f}\,=\,\bar{x};\}\\
 d  & \in & \M{Methods} & \coloneqq & 
      \tau \; m\inang{\rhobar \,|\, \phi} (\taubar \; \xbar)
      \{\C{return}\;e;\}\\
 \phi,\phicx &\in& \M{Region\;constraints} & \coloneqq & true 
       \ALT \rgn \outlives \rgn \ALT \rgn = \rgn \ALT \phi \conj \phi\\
-e  & \in & \M{Expressions} & \coloneqq &
-     \unitval \ALT x \ALT e.f 
+e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f 
      \ALT e.m\inang{\rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar)
- \\  & & & & 
-     \ALT \lambdaexp{\rgn}{\rhobar \,|\, \phi}  {\xbar:\taubar} {e}
-     \ALT e\inang{\rbar}(\bar{e})
-     \ALT \letexp{x}{e}{e}
- \\  & & & & 
-     \ALT \letregion{\pi}{e} 
-      \ALT \open{e}{\pi}{y}{e}\\
-%  & & & & \ALT \letd{\loc}{e} \ALT \opened{\loc}{\status}{e}\\
+     \ALT \lambdaexp{\rgn}{\rhobar \,|\, \phi}
+                    {\xbar:\taubar} {e}\\
+   & & & & \ALT e\inang{\rbar}(\bar{e}) \ALT \letexp{x}{e}{e} \ALT
+   \letregion{\pi}{e} \\
+   & & & & \ALT \open{e}{\pi}{y}{e} \ALT \letd{\loc}{e} \ALT \opened{\loc}{\status}{e}\\
 \end{array}
 \end{smathpar}
 
-\caption{\fbname: Syntax}
-\label{fig:fb-syntax}
+\caption{\fbname: Full syntax}
+\label{fig:fb-syntax-full}
 \end{figure*}
 
 \renewcommand{\rgn}{\pi}
