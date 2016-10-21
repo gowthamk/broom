@@ -23,21 +23,59 @@ $\letregion{\pi}{e}$ takes a step (see Fig.~\ref{fig:fb-opsem-2}).
 $\loc$ is the location of the newly allocated region.
 \item An $\opened{\loc}{s}{e}$ expression that results when
 $\open{\RgnZT{\toploc\loc}(v)}{\pi}{x}{e}$ takes a step. $\loc$ is the
-location of the newly open transferable region.
+location of the newly open transferable region. The symbol $s$ denotes
+the typestate of the transferable region before it is
+opened\footnote{Operational semantics lets a transferable region to be
+opened while it is already open. This allows methods to safely open a
+transferable region argument regardless of the calling context.}. The
+typestate can assume the values of $\USED$ (allocated and closed),
+$\LIVE$ (allocated and live), and $\XFERRED$ (transferred or freed).
 \end{itemize}
 
 \subsection{Full Static Semantics}
 
+\input{fb-auxdef}
 \input{fb-staticsem-full}
+
+Figs.~\ref{fig:fb-staticsem-1} and~\ref{fig:fb-staticsem-2} show full
+static semantics of \FB. Fig.~\ref{fig:fb-staticsem-1} contains subtyping
+rules, and rules to check well-formedness of \FB types, type
+constraints, methods, and class definitions. Method well-formedness
+rule makes use of the expression typing judgment defined in
+Fig.~\ref{fig:fb-staticsem-2}. Auxiliary definitions used in
+Figs.~\ref{fig:fb-staticsem-1} and~\ref{fig:fb-staticsem-2} are
+defined in Fig.~\ref{fig:fb-auxdef}. As described in
+\S~\ref{sec:type-system}, all judgments are parameterized over the
+class table ($CT$). The premise $CT(B) = \headerOf{B}\{...\}$
+used in some of the rules means that the definition of class $B$ is
+present in $CT$ and that the definition is well-formed.
 
 \subsection{Operational Semantics}
 
 \input{fb-opsem}
 Figs.~\ref{fig:fb-opsem-1} and~\ref{fig:fb-opsem-2} show the
-operational semantics of \fbname. \emph{TODO: 1. Some more text needs
-to be added, 2. To represent typestate, color coding itself is not
-enough; change in symbols needed.}.
-
+operational semantics of \fbname. The semantics defines a five-place
+reduction relation:
+\begin{smathpar}
+  \redstoo{\Delta}{(e,\mem)}{(e',\mem')}
+\end{smathpar}
+Where $\Delta$ is the set of currently-live region locations, and
+$\mem$ is a map from memory locations ($\loc$) to type states ($s$).
+Evaluating a $\C{letregion}$ or a $\C{new}\;\C{Region}$ expression
+results in the addition of a new binding to $\mem$. For a new static
+region, the memory location ($\loc$) is mapped to $\LIVE$ (live), and
+for a new transferable region, it is mapped to $\USED$. The binding is
+updated when the transferable region is opened, closed, or
+transferred. Likewise, when a $\C{letregion}$ expression is evaluated
+to a value, the binding for the corresponding location is set to
+$\XFERRED$, effectively dellocating the region. Opening an already
+transferred region, or transferring a currently-open region results in
+an exception ($\bot$). The semantics gets stuck while evaluating a
+field access, a method call, or a lambda application, if the region
+containing the target object is not live. The type safety result
+establishes that this can never happen while evaluating a well-typed
+expression. The set ($\Delta$) of live region is the same set used by
+the expression typing judgment (Fig.~\ref{fig:fb-staticsem-2}). 
 
 \input{fb-constraint-generation-extra}
 

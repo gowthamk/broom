@@ -128,7 +128,7 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 \end{array}
 \end{smathpar}
 
-\caption{\fbname: Operational Semantics (Part 1)}
+\caption{\fbname: Operational semantics (part 1)}
 \label{fig:fb-opsem-1}
 \end{figure*}
 
@@ -153,7 +153,8 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 
 \lopsemrule{3in}{
 %   \rgn \notin \rhoenv
-    \mem' = \mem[\loc \mapsto \FREE]
+%   \mem' = \mem[\loc \mapsto \FREE]
+    \mem' = \mem[\loc \mapsto \XFERRED]
 }{
     \redstoo{\Delta}{(\letd{\loc}{v},\mem)}{(v,\mem)}
   }{LetRegionEnd}
@@ -267,6 +268,6 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 %     }{GARBAGE-COLLECT}
 
 
-\caption{\fbname: Operational Semantics (Part 2)}
+\caption{\fbname: Operational semantics (part 2)}
 \label{fig:fb-opsem-2}
 \end{figure*}
