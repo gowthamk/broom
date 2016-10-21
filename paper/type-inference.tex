@@ -397,6 +397,7 @@ each type checking judgment is modified to produce a set of constraints that mus
 for the type checker to succeed.
 
 Fig.~\ref{fig:constraint-gen-0} illustrates this for selected language constructs.
+(The appendix contains the remaining constraint generation rules.)
 These rules use the same context as the corresponding typing judgment in
 Fig.~\ref{fig:fb-staticsem}, except that this is generalized to permit the
 use of region variables and predicate variables.
@@ -405,6 +406,16 @@ The algorithm proceeds top-down, analyzes an expression $e$ in a context
 $\stdcontext$, and returns a type $\tau$ and a set of constraints $C$
 (expressed in the rules as $\exprok {\stdcontext} {e} {\tau} {C}$ ),
 indicating that the expression will have a type $\tau$ provided the constraints $C$ hold.
+
+Note that some of the conditions in the antecedents are checked at constraint-generation
+time, while some are encoded as constraints (to be resolved by the constraint-solver).
+E.g., we assume that the region constants introduced by
+\C{open}
+and
+\C{letregion}
+constructs are unique (and the elaboration phase ensures this by alpha-renaming
+them as needed). Thus, the precondition $\rho \not\in \Delta$ in rules \textsc{LetRegion}
+and \textsc{Open} merely validates this at constraint-generation time.
 
 The rules for generating constraints from a method and
 class definition first build a context ($\A$) containing a set ($ \rhoenv$) denoting

@@ -1,34 +1,26 @@
+* update abstract/intro to stress aspects of constraint solver
+* method well-formedness: reconcile
+* for function-calls: need basic typing from core language to introduce region parameters
+======
 * Discuss Miscellaneous points (POPL review)
 - subtyping: treatment of downcasts
 - limitation in treatment of generic parameters
---  mention HotOS paper in intro [related work?]
+* Check: Change static semantics to use method precondition, without class precondition
+======
 * cleanup: syntax of constraints (region-constraint, validity constraint, etc.) and later usage (abduction constraint)
-======
-* Change static semantics to use method precondition, without class precondition
-* update abstract/intro to stress aspects of constraint solver
-======
 * Prove: Progress: Every region-variable will be unified with some constant.
-* proof of lemma 4 (abduction decomposition)
-* Include op semantics back, after reformatting/splitting?
 * constraint gen rules: tywf: for arrow type: rho-bar not-in constraint!
-
 ? Notation: should we use a different notation to distinguish a validity constraint from actual entailment?
 ======
   \item adjust spacing in RULEs
-  \item for function-calls: need basic typing from core language to introduce region parameters
   \item discuss computation of least-solution to constraints?
   \item equality is shorthand for two inequalities
   \item use of alpha-renaming, and its use to discharge not-in contraints;
 \item also remind reader that variable names are unique
   \item Note that we can also clarify that the well-formedness constraints are
     syntactic sugar from basic set constraints
-  \item explain lemma 2's use case (a) and (b)
-  \item notation: decomposable is dependent on C
-
 ====
 Proofs:
-
-? prrof for use of phi_m instead of conjunction phi_m and phi_c
 
 ? handling phi for higher-order: double-check: may be start with an example.
 
@@ -47,7 +39,6 @@ Missing Rules:
 -- clarify/understand why two rules (for dynamic semantics?)
 -- other "new" should clarify it is not for a region
 -- drop pi^a from [FUN-APPLY]
--- missing subtyping rules
 -- add labels to rules (helps correlate across figures as well)
 
 Misc Points :

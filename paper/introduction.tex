@@ -218,8 +218,16 @@ expected outlives-constraints between the region parameters).
 We show that the second and third stages are sound as well as
 complete (while the first stage is sound).
 % (using an interprocedural fixed point computation).
-% While the first 
 
+\paragraph{Evaluation.}
+Our work was inspired by~\cite{Broom:HotOS}, which presents evidence that
+realistic programs can be written using transferable regions
+and that this can yield significant performance improvements.
+The system described in~\cite{Broom:HotOS}, however, provides no memory
+safety guarantees, which is the subject of our contribution.
+We report on an implementation of our type inference algorithm that
+was able to identify some unsafe memory accesses and was able to successfully
+verify programs correct (once the errors were fixed).
 
 % transferableally checking for the second category of
 % invariants is easy and does not pose a performance concern (unlike,
