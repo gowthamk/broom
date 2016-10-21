@@ -1,17 +1,22 @@
 \begin{figure*}[!t]
 
 \[
-{
-\renewcommand{\arraystretch}{1.2}
-\setlength{\arraycolsep}{7pt}
-\begin{array}{rcl} 
-
-\multicolumn{3}{c}{
    \pi \in R \; \mathtt{ (Region \; constants) } \;\;
    \nu \in V \; \mathtt{ (Region \; vars) } \;\;
    \varphi \in P \; \mathtt{ (Predicate \; vars) } \;\;
    \Delta \subseteq R
-} \\
+\]
+\[
+\renewcommand{\arraystretch}{1.2}
+\setlength{\arraycolsep}{7pt}
+\begin{array}{rcl} 
+
+%% \multicolumn{3}{c}{
+   %% \pi \in R \; \mathtt{ (Region \; constants) } \;\;
+   %% \nu \in V \; \mathtt{ (Region \; vars) } \;\;
+   %% \varphi \in P \; \mathtt{ (Predicate \; vars) } \;\;
+   %% \Delta \subseteq R
+%% } \\
 
 \rho \in \mathtt{Region \; Identifiers} & \coloneqq & \pi \ALT \nu \\
 
@@ -26,7 +31,6 @@ r \in \mathtt{Consequent} & \coloneqq & \phi \ALT F(\varphi) \\
 \mathtt{Constraint} & \coloneqq & \isvalid{\ell}{r} \ALT \nu \in \Delta \ALT \tywf{\Delta}{\varphi} \\
 
 \end{array}
-}
 \]
 
 \caption{Syntax of Constraints}

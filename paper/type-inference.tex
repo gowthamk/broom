@@ -18,7 +18,7 @@
 \section{Type Inference}
 \label{sec:type-inference}
 
-\name's region type system imposes a heavy annotation burden, and
+\name's region type system imposes an annotation burden, and
 manually annotating C\# standard libraries with region types
 can be tedious. We now present our region type inference algorithm
 that eliminates the need to write region type annotations.
@@ -41,7 +41,7 @@ The algorithm consists of the following steps:
    The first step elaborates the input program by introducing \emph{formal region parameters}
    (for each class and method), and \emph{region variables} (representing yet undetermined
    \emph{actual region parameters}). We also introduce for each class and method, a
-   \emph{predicate variable} ($\varphi$) to denote an undetermined set of constraints
+   \emph{predicate variable} ($\varphi$) to denote an undetermined set of outlives-constraints
    over the region parameters of that class/method.
 
  \item \emph{Constraint Generation}.
@@ -99,7 +99,7 @@ are fresh identifiers denoting actual region parameters.
 
 \emph{Predicate Variable Introduction}. For every class \C{C}, we introduce
 a fresh predicate variable $\varphi$, which represents the yet undetermined
-outlives constraints between the formal region parameters of class \C{C}.
+outlives-constraints between the formal region parameters of class \C{C}.
 
 We identify the region parameters of classes as follows.
 
@@ -122,7 +122,7 @@ a class does not specify an explicit base class, it has an implicit base class
 This transformation is illustrated below, using a non-generic \C{Pair} class:
 
 \begin{tabular}{ccc}
-\begin{minipage}{0.35\linewidth}
+\begin{minipage}{0.33\linewidth}
 \begin{codejava}
 class Pair $\extends$ $\ObjZ$ {
   $\ObjZ$ fst;
@@ -131,7 +131,7 @@ class Pair $\extends$ $\ObjZ$ {
 \end{codejava}
 \end{minipage}
 &
-$\Rightarrow$
+$\Rightarrow \; \;$
 &
 \begin{minipage}{0.6\linewidth}
 \begin{codejava}
@@ -156,7 +156,7 @@ The resulting class represents a linked list with spine in the region
 $\rho_0$ and data objects in the region $\rho_1$.
 
 \begin{tabular}{ccc}
-\begin{minipage}{0.35\linewidth}
+\begin{minipage}{0.33\linewidth}
 \begin{codejava}
 class List $\extends$ $\ObjZ$ {
   $\ObjZ$ data;
@@ -165,7 +165,7 @@ class List $\extends$ $\ObjZ$ {
 \end{codejava}
 \end{minipage}
 &
-$\Rightarrow$
+$\Rightarrow \; \;$
 &
 \begin{minipage}{0.65\linewidth}
 \begin{codejava}
@@ -235,11 +235,10 @@ typically specifies the region $\pi_0$ where the object is to be allocated. If t
 does not specify this, it is allocated in the allocation-context region by default. Region
 variables are introduced only for the other region parameters.
 
-Function types (of fields and parameters) are instantiated just like methods above, except that
-an additional fresh region identifier is introduced to represent the region where the closure is
-allocated.
+Function types (of fields and parameters) are instantiated just like methods above,
+(and the region where the closure is allocated is determined just as for other objects).
 For example, the function type $\C{List} \rightarrow \C{Object}$ is instantiated as
-$\inang{\rho_0, \rho_1, \rho_2, \rho_3, \rho_4 \,|\, \varphi } \C{List} \inang{\rho_1,\rho_2} \xrightarrow{\rho_4} \C{Object}\inang{\rho_3}$.
+$\inang{\rho_0, \rho_1, \rho_2, \rho_3 \,|\, \varphi } \C{List} \inang{\rho_1,\rho_2} \xrightarrow{\pi} \C{Object}\inang{\rho_3}$.
 Note that the newly introduced region identifiers are generalized as formal region parameters of the function type.
 This is a (heuristic) choice made in the case of higher order functions.
 Consider a higher order function \emph{f} with a function typed parameter $g$.
@@ -272,42 +271,32 @@ A region constant may be
 A predicate variable $\varphi$ is introduced to represent, \eg, the unknown precondition of a method.
 The constraint-solver will end up binding it to a \emph{region-constraint} $\phi$
 over a set of fixed formal region parameters.
-
-%% where the set of region-constraints $\phi$ is defined by:
-%% \begin{smathpar}
-%% \begin{array}{lcl}
-%% \phi & \coloneqq & true \ALT \rho \outlives \rho \ALT \phi \conj \phi \\
-%% \end{array}
-%% \end{smathpar}
+%
 %% We will use $\rho_1 = \rho_2$ as shorthand for $\rho_1 \outlives \rho_2 \conj \rho_2 \outlives \rho_1$.
 %% We will also use a set $S$ of primitive constraints of the form $\rho_1 \outlives \rho_2$
 %% as shorthand for $\conj_{\phi \in S} \phi$.
 %% 
 % We will use the term \emph{validity constraint} to denote an entailment constraint
 % of the form $\isvalid{\varphi}{\rho_1 \outlives \rho_2}$.
-
+%
 Our constraints also make uses of \emph{pending substitutions} $F$:
 A pending substitution serves to bind formal region parameters in $\varphi$ to the actual region parameters
 used in a particular context:
-%% \begin{smathpar}
-%% \begin{array}{lcl}
-%% F & \coloneqq & \cdot \ALT [\rho/\rho]F \\
-%% \end{array}
-%% \end{smathpar}
 E.g., in the validity constraint $\isvalid{\rgn_1 \outlives
 \rgn_2}{[\rgn_1/\rho_1][\rgn_2/\rho_2]\varphi}$, the pending substitution
-is $[\rgn_1/\rho_1][\rgn_2/\rho_2]$. Any concrete formula (call it
-$\phisol$) over variables $\rho_1$ and $\rho_2$ is a solution to
-$\varphi$ if and only if the formula obtained by substituting $\rgn_1$
-and $\rgn_2$ for $\rho_1$ and $\rho_2$ (resp.) in $\phisol$ is
-deducible from $\rgn_1 \outlives \rgn_2$.
+is $[\rgn_1/\rho_1][\rgn_2/\rho_2]$.
+% Any concrete formula (call it
+% $\phisol$) over variables $\rho_1$ and $\rho_2$ is a solution to
+% $\varphi$ if and only if the formula obtained by substituting $\rgn_1$
+% and $\rgn_2$ for $\rho_1$ and $\rho_2$ (resp.) in $\phisol$ is
+% deducible from $\rgn_1 \outlives \rgn_2$.
 
-The constraints generated are primarily of the form $\isvalid{\varphi_i \conj \phictxt} {\phicstr}$
+The constraints are primarily of the form $\isvalid{\varphi_i \conj \phictxt} {\phicstr}$
 or $\isvalid{\varphi_i \conj \phictxt} {F_j(\varphi_j)}$.  Here, $\varphi_i$ is a predicate variable
 (representing the precondition of a method to be determined), $\phicstr$ is a region-constraint
 that is \emph{required} to hold at a particular program point (within the method), and $\phictxt$ is
 a region-constraint that is \emph{known} to hold at that program point.
-Validity constraints of the form $\isvalid{\varphi_i \conj \phictxt} {F_j(\varphi_j)}$
+Constraints of the form $\isvalid{\varphi_i \conj \phictxt} {F_j(\varphi_j)}$
 are generated by an invocation of a method with precondition $\varphi_j$.
 
 We use \emph{well-formedness constraints} of the form $\rho \in \rhoenv$
@@ -356,39 +345,6 @@ Such an assignment is said to \emph{satisfy} a set of constraints $C$ if
 every sequent in $C$ is valid after the substitutions $\solnP$ and $ \solnR$.
 We say that $C$ is \emph{satisfiable} if it has a satisfying assignment.
 
-%\begin{definition}
-%\emph{(\textbf{Constraint Satisfaction Problem (CSP)})}
-%A constraint satisfaction problem is a tuple
-%$(\regionConstants, \regionVars, \predVars, \regionDeltaMap, \predDeltaMap, \constraintSet)$,
-%where $\regionConstants$ is a set of region constants,
-%$\regionVars$ is a set of region variables,
-%$\predVars$ is a set of predicate variables,
-%$\regionDeltaMap : \regionVars \rightarrow 2^{\regionConstants}$ is a function that
-%specifies a unification domain for each region variable,
-%$\predDeltaMap : \predVars \rightarrow 2^{\regionConstants}$ is a function that
-%specifies the domain for each predicate variable,
-%and $\constraintSet$ is a set of validity constraints in one of the following forms:
-%\begin{center}
-%\(
-%    \isvalid{\phictxt \conj \varphi}{\phicstr}\qquad
-%    \isvalid{\phictxt \conj \varphi}{F(\varphi)}
-%\)
-%\end{center}
-%The solution to the constraint satisfaction problem is a pair $(\solnR,\solnP)$,
-%where $\solnR$ is a map from $\regionVars$ to $\regionConstants$
-%and $\solnP$ is a map from $\predVars$ to a region-constraint formula such that
-%\begin{itemize}
-%  \item $\solnR(\rho) \in \regionDeltaMap(\rho)$, for every $\rho \in \regionVars$,
-%
-%  \item $\solnP$ is well-formed under $\predDeltaMap$
-%    (i.e., $\tywf{\predDeltaMap(\varphi)}{\solnP(\varphi)}$, for every $\varphi \in \predVars$).
-%
-%  \item Every sequent in $C$ is valid after substitutions $\solnP$ and $
-%    \solnR$.
-%  %% $C\lbrack (\solnR,\solnP) \rbrack$ is valid.
-%\end{itemize}
-%\end{definition}
-
 \input{fb-constraint-generation}
 
 \paragraph{Constraint Generation.}
@@ -402,6 +358,9 @@ These rules use the same context as the corresponding typing judgment in
 Fig.~\ref{fig:fb-staticsem}, except that this is generalized to permit the
 use of region variables and predicate variables.
 Symbols $\A$ and $\env$ retain their meaning, modulo this extension.
+Thus, the component $\phicx$ of $\A$ will now be a symbolic expression
+of the form $\varphi \conj \phi$, where $\varphi$ is the predicate variable
+representing the undetermined precondition of the method being analyzed.
 The algorithm proceeds top-down, analyzes an expression $e$ in a context
 $\stdcontext$, and returns a type $\tau$ and a set of constraints $C$
 (expressed in the rules as $\exprok {\stdcontext} {e} {\tau} {C}$ ),
@@ -423,8 +382,7 @@ regions that are currently live, a map ($\aenv$) mapping type
 variables to their bounds, and a constraint formula ($\phicx$)
 capturing constraints over live region variables. We use predicate
 variables ($\varphi$ and $\varphi_m$) to capture constraints over
-variables in $\rhoenv$ denoting the fact that such constraints are yet
-to be inferred.
+variables in $\rhoenv$ that are yet to be inferred.
 
 %\TODO{Change the static semantics to be consistent with this, and
 %make this a comment there.}
@@ -443,6 +401,8 @@ to be inferred.
 %with more than one predicate variable on the left hand side, which introduce complications).
 %%  ensures that the generated constraints produces a restricted form of constraints that is easier to solve.
 
+Let $\consOf{q}$ denote the set of constraints generated from an elaborated program $q$.
+The following theorem states that constraint-generation is sound and complete:
 \begin{theorem}
 \label{thm:constraint-generation-sc}
 Let $C = \consOf{q}$.
@@ -520,7 +480,8 @@ $\soln$ satisfies $\isvalid{\phi}{\pi_i \outlives \pi_j}$
 \end{lemma}
 
 The above lemma shows how we can reduce a non-trivial abduction constraint to
-either a trivial abduction constraint or a non-abduction constraint.
+either a trivial abduction constraint or a non-abduction constraint,
+provided that the consequent is an outlives-constraint without region variables.
 
 \paragraph{Constraint Solver.}
 The first step in our algorithm for solving a set of constraints $C$
@@ -603,20 +564,15 @@ $\rho$ is bound to $\pi$ in every context $\ell$ in which it occurs.
 %\end{lemma}
 
 The set $\satC$ makes it easy to identify a solution $\thesoln$ (if one exists), as below.
-\begin{itemize}
-\item For any predicate variable $\varphi$, $\thesolnP(\varphi)$ is defined
+% \begin{itemize}
+% \item
+For any predicate variable $\varphi$, $\thesolnP(\varphi)$ is defined
 to be $\conj \{ \pi_1 \outlives \pi_2 \;|\; \pi_1, \pi_2 \in \regionConstants, \isvalid{\varphi}{\pi_1 \outlives \pi_2} \in \saturate{C} \}$.
-\item For any region variable $\rho$, we define $\thesolnR(\rho)$ to be any element of the
+% \item
+For any region variable $\rho$, we define $\thesolnR(\rho)$ to be any element of the
 set $\{ \pi \in \regionConstants \:|\; \isvalid{\ell}{\rho = \pi} \in \saturate{C} \}$,
 if this set is non-empty. If this set is empty for any $\rho$, $\thesoln$ is undefined.
-\end{itemize}
-
-% \paragraph{Step 2.}
-
-% \begin{enumerate}
-% \item We use an iterative fixed point (saturation) algorithm to compute
-% $\saturate{C}$, the set of all constraints logically implied by $C$.
-% \item
+% \end{itemize}
 
 The set $\satC$ also makes it easy to check if $C$ is satisfiable.
 Let $\myground{C}$ denote the subset of all ground constraints
@@ -624,10 +580,6 @@ Let $\myground{C}$ denote the subset of all ground constraints
 in $\saturate{C}$. Let $\rhoC$ denote the subset of all wellformedness
 constraints for region variables in $\satC$.
 Define $\solveCon{C}$ as below.
-% It is possible to show that $\soln$ satisfies $\satC4
-% iff  $\myground{C}$ is valid in the theory of partial-order. 
-
-% \end{enumerate}
 
 \[
 \solveCon{C} = 
@@ -727,7 +679,7 @@ elements alternatively come from two different regions. Such a program would req
 the following elaboration, which is beyond the scope of our approach:
 
 \begin{tabular}{ccc}
-\begin{minipage}{0.35\linewidth}
+\begin{minipage}{0.32\linewidth}
 \begin{codejava}
 class List $\extends$ $\ObjZ$
 {
@@ -737,7 +689,7 @@ class List $\extends$ $\ObjZ$
 \end{codejava}
 \end{minipage}
 &
-$\Rightarrow$
+$\Rightarrow  \; \; \;$
 &
 \begin{minipage}{0.65\linewidth}
 \begin{codejava}

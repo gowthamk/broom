@@ -8,11 +8,11 @@
 % aspects.
 
 As mentioned earlier, our work is a continuation of the work reported in~\cite{Broom:HotOS},
-which provides users with a C\#-based implementation of \broom (the language described in
-Section~\ref{sec:overview}). This system has no type system and provides users with no safety
-guarantees, but does shed light on the performance gains as well as the viability of the
-approach (in terms of expressiveness). In particular, it reports speedups up to 34\% for
-typical big-data analytics jobs.
+which provides users with a C\#-based implementation of transferable regions (the features
+described in Section~\ref{sec:overview}). This system has no type system and provides users
+with no safety guarantees. \cite{Broom:HotOS} presents evidence that realistic programs can
+be implemented using transferable regions and that this can yield significant performance gains.
+In particular, it reports speedups up to 34\% for typical big-data analytics jobs.
 We now describe our implementation and experience with the type system and type inference
 algorithm presented in the current paper.
 

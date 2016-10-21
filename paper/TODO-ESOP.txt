@@ -1,7 +1,5 @@
 * update abstract/intro to stress aspects of constraint solver
 * method well-formedness: reconcile
-* for function-calls: need basic typing from core language to introduce region parameters
-======
 * Discuss Miscellaneous points (POPL review)
 - subtyping: treatment of downcasts
 - limitation in treatment of generic parameters
@@ -11,11 +9,11 @@
 * Prove: Progress: Every region-variable will be unified with some constant.
 * constraint gen rules: tywf: for arrow type: rho-bar not-in constraint!
 ? Notation: should we use a different notation to distinguish a validity constraint from actual entailment?
+* for function-calls: need basic typing from core language to introduce region parameters
 ======
   \item adjust spacing in RULEs
   \item discuss computation of least-solution to constraints?
   \item equality is shorthand for two inequalities
-  \item use of alpha-renaming, and its use to discharge not-in contraints;
 \item also remind reader that variable names are unique
   \item Note that we can also clarify that the well-formedness constraints are
     syntactic sugar from basic set constraints
@@ -47,13 +45,8 @@ Misc Points :
 clearer upfront; also, highlight the potential for splitting into an
 unsafe usable language and a verification tool.
 
-* when are the rho_a >= other-rho constraints for a class generated in
-our process?
-
-* potential for generalizing treatment of generic type params with a
-non-Object bound
+* when are the rho_a >= other-rho constraints for a class generated in our process?
 
 ===============
 * related work: expand discussion of ownership types?
-
 * notation-cleanup: potential overload union/conjunction operator for context
