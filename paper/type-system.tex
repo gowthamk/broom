@@ -523,7 +523,7 @@ in the appendix defines a small-step operational semantics for \fbname
 via a five-place reduction relation:
 % \vspace*{-0.15in}
 \begin{smathpar}
-  \redstoo{(e,\rhomap)}{(e',\rhomap')}
+  \redstoo{\rhoenv}{(e,\rhomap)}{(e',\rhomap')}
 \end{smathpar}
 The reduction judgment should be read as following: given a set
 ($\rhoenv$) of regions that are currently live, and a map ($\rhomap$)
