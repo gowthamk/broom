@@ -37,12 +37,12 @@ d  & \in & \M{Methods} & \coloneqq &
 \phi,\phicx &\in& \M{Region\;constraints} & \coloneqq & true 
       \ALT \rgn \outlives \rgn \ALT \rgn = \rgn \ALT \phi \conj \phi\\
 e  & \in & \M{Expressions} & \coloneqq & \unitval \ALT x \ALT e.f 
-     \ALT e.m\inang{\rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar)
-     \ALT \lambdaexp{\rgn}{\rhobar \,|\, \phi}
-                    {\xbar:\taubar} {e}\\
-   & & & & \ALT e\inang{\rbar}(\bar{e}) \ALT \letexp{x}{e}{e} \ALT
-   \letregion{\pi}{e} \\
-   & & & & \ALT \open{e}{\pi}{y}{e} \ALT \letd{\loc}{e} \ALT \opened{\loc}{\status}{e}\\
+     \ALT e.m\inang{\rbar}(\ebar) \ALT \C{new}\;\fbN(\ebar) \\
+   & & & & \ALT \lambdaexp{\rgn}{\rhobar \,|\, \phi}
+                    {\xbar:\taubar} {e} \ALT e\inang{\rbar}(\bar{e}) 
+                    \ALT \letexp{x}{e}{e} \\
+   & & & & \ALT \letregion{\pi}{e}  \ALT \open{e}{\pi}{y}{e}\\
+   & & & & \ALT \letd{\loc}{e} \ALT \opened{\loc}{\status}{e}\\
 \end{array}
 \end{smathpar}
 

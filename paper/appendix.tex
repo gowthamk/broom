@@ -11,25 +11,32 @@ The full syntax of \FB, including expressions that manifest only at
 runtime, is shown in Fig.~\ref{fig:fb-syntax-full}. Such expressions
 include:
 \begin{itemize}
+
 \item Memory locations ($\loc$) corresponding to the memory regions,
+
 \item A special expression $\RgnZT{\toploc\loc}(e)$ that evaluates to
 a region handler object (the syntax of this expression is captured by
 the $\C{new}\;\fbN(\overline{e})$ construct). $\toploc$ is the
 location of the special $\toprgn$ region where region handlers are
 stored. $\loc$ is the location of the corresponding transferable
 region.
+
 \item A $\letd{\loc}{e}$ expression that results when
-$\letregion{\pi}{e}$ takes a step (see Fig.~\ref{fig:fb-opsem-2}).
-$\loc$ is the location of the newly allocated region.
-\item An $\opened{\loc}{s}{e}$ expression that results when
-$\open{\RgnZT{\toploc\loc}(v)}{\pi}{x}{e}$ takes a step. $\loc$ is the
-location of the newly open transferable region. The symbol $s$ denotes
-the typestate of the transferable region before it is
-opened\footnote{Operational semantics lets a transferable region to be
-opened while it is already open. This allows methods to safely open a
-transferable region argument regardless of the calling context.}. The
-typestate can assume the values of $\USED$ (allocated and closed),
-$\LIVE$ (allocated and live), and $\XFERRED$ (transferred or freed).
+$\letregion{\pi}{e}$ expression takes a step (see
+Fig.~\ref{fig:fb-opsem-2}).  $\loc$ is the location of the newly
+allocated region.  
+
+\item An $\opened{\loc}{s}{e}$ expression that
+results when $\C{open}\;{\RgnZT{\toploc\loc}(v)} ...$ expression takes
+a step. $\loc$ is the location of the newly open transferable region.
+The symbol $s$ denotes the typestate of the
+transferable region before it is opened\footnote{Operational semantics
+lets a transferable region to be opened while it is already open. This
+allows methods to safely open a transferable region argument
+regardless of the calling context.}. The typestate can assume the
+values of $\USED$ (allocated and closed), $\LIVE$ (allocated and
+live), and $\XFERRED$ (transferred or freed).
+
 \end{itemize}
 
 \subsection{Full Static Semantics}
