@@ -4,6 +4,12 @@
 
 \beginrules
 
+%%%%%%%%%%% Header Box %%%%%%%%%%%
+\multicolumn{2}{l}{
+  \textbf{Expression Typing Constraint Generation} \; \fbox{  \( \exprok{\stdcontext}{e}{\tau}{C} \)}
+}
+\\[0.3cm]
+
 %%%%%%%%%%% () and x %%%%%%%%%%%
 \lgcfact{Unit}{\exprok{\stdcontext}{\unitval}{\unitZ}{\{\}}}
 
@@ -42,14 +48,14 @@
 %%%%%%%%%%% METHOD-INV %%%%%%%%%%%
   \lgcrule{MethodInv}
   {
-    \exprok {\stdcontext} {e_0} {\tau} {C_1} \spc C_4 = \{ \rbar \in \A.\rhoenv \}
+    \exprok {\stdcontext} {e_0} {\tau} {C_1} \spc C_2 = \{ \rbar \in \A.\rhoenv \}
     \nl
     \mtype(m,\bound_{\A.\aenv}(\tau)) = \inang{\rhobar \,|\, \phi}\bar{\tau^1}\rightarrow{\tau^2}
     \nl
 %   \substFn = [\rbar/\rhobar] \\
-    \typeok {\A} {\inang{\rhobar \,|\,\phi}\bar{\tau^1}\rightarrow{\tau^2}} {C_2}
+    \typeok {\A} {\inang{\rhobar \,|\,\phi}\bar{\tau^1}\rightarrow{\tau^2}} {C_3}
        \spc
-       \exprok {\stdcontext} {\bar{e}} {[\rbar/\rhobar](\bar{\tau^1})} {C_3}
+       \exprok {\stdcontext} {\bar{e}} {[\rbar/\rhobar](\bar{\tau^1})} {C_4}
     \nl
 %   \subtyp{\A}{\bar{\tau'}}{\substFn(\bar{\tau^1})} \spc
     C_5 = \{ \isvalid{\A.\phicx}{[\rbar/\rhobar](\phi)} \}
@@ -59,11 +65,24 @@
        {[\rbar/\rhobar](\tau^2)} {C_1 \cup C_2 \cup C_3 \cup C_4 \cup C_5}
   }
 
+%%%%%%%%%%% SUBTYPING %%%%%%%%%%%
+\lgcrule{SubTyping}{
+    \exprok {\exptycx{\env}} {e} {\tau} {C_1} \spc  \subtypeok {\A} {\tau} {\tau'} {C_2}
+}{
+    \exprok {\exptycx{\env}} {e} {\tau'} {C_1 \cup C_2}
+}
+
 %%%%%%%%%%% METHOD %%%%%%%%%%%
+\multicolumn{2}{l}{
+   \textbf{Method Well-formedness Constraint Generation}  \; \fbox{$\okinok{d}{B}{C}$}
+}
+\\[0.3cm]
+
 \lgcrule{Method}{
-CT(B) = \hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}
+CT(B) = \C{class}\; B \angAlpha \inang{\rhobar \,|\, \varphi} \extends \fbN
+   \{\bar{\tau^f}\,\xbar;\;\bar{d}\}
 \nl
-\A = (\rhoenv,\aenv,\phicx) = (\{\rhobar,\rhobarm\},\bar{\tyvar} \extends \bar{\fgjN}, \varphi_m) \spc\spc
+\A = (\rhoenv,\aenv,\phicx) = (\{\rhobar,\rhobarm\}, [\bar{\tyvar} \mapsto \bar{\fgjN}], \varphi_m) \spc\spc
 C_1 = \{ \tywf{\rhoenv}{\varphi_m} \}
 \nl
 \env = \cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhobar}][\xbar \mapsto \bar{\tau^1}]
@@ -71,7 +90,7 @@ C_1 = \{ \tywf{\rhoenv}{\varphi_m} \}
 \mtype(m,\fbN) = \inang{\rhobarm \,|\, \phi_m}\bar{\tau^1} \rightarrow \tau^2
 \nl
 \exprok {\stdcontext}{e} {\tau^2} {C_2}
-\spc \typeok {\A} {\tau^1} {C_3}
+\spc \typeok {\A} {\bar{\tau^1}} {C_3}
 \spc \typeok {\A} {\tau^2} {C_4}
 % \subtypeok {\A} {\tau'} {\tau} {C_3}
 }{
@@ -80,26 +99,24 @@ C_1 = \{ \tywf{\rhoenv}{\varphi_m} \}
 
 %%%%%%%%%%% CLASS %%%%%%%%%%%
 \lgcrule{Class}{
-\A = (\rhoenv, \aenv, \phicx) = (\{\rhoalloc,\rhobar\},\bar{\tyvar} \extends \bar{\fgjN},\varphi) \\
+  \A = (\rhoenv, \aenv, \phicx) = (\{\rho,\rhobar\}, [\bar{\tyvar} \mapsto \bar{\fgjN}],\varphi) \\
 C_1 = \{ \tywf{\rhoenv}{\varphi} \} \spc\spc
 \typeok {\A} {\fbN} {C_2} \spc\spc
 \typeok {\A} {\bar{\tau^f}} {C_3} \\
-C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allocRgn(\fbN) = \rhoalloc}\} \\
+C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rho \conj \allocRgn(\fbN) = \rho}\} \\
 \okinok {\bar{d}} {B} {C_5}
 }{
-\typeok {} {\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}} {\bigcup_{i=1}^5 C_i}
+% \typeok {} {\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}} {\bigcup_{i=1}^5 C_i}
+\typeok {}
+  {\C{class}\; B\angAlpha \inang{\rho \rhobar \,|\, \varphi} \extends \fbN
+      \{\bar{\tau^f}\,\xbar;\;\bar{d}\}}
+  {\bigcup_{i=1}^5 C_i}
 }
 
-
-\lgcrule{SubTyping}{
-    \exprok {\exptycx{\env}} {e} {\tau} {C_1} \spc  \subtypeok {\A} {\tau} {\tau'} {C_2}
-}{
-    \exprok {\exptycx{\env}} {e} {\tau'} {C_1 \cup C_2}
-}
 
 \myendrules
 
-\caption{Constraint generation: extra rules}
+\caption{Constraint generation rules: Part 2}
 \label{fig:constraint-gen-1}
 \end{figure*}
 
@@ -108,8 +125,11 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
 \beginrules
 
 %%%%%%%%%%% Header Box %%%%%%%%%%%
-\fbox{  \( \typeok{\A}{\tau}{C} \)}
-\\
+\multicolumn{2}{l}{
+  \textbf{Type Well-formedness Constraint Generation} \;
+  \fbox{  \( \typeok{\A}{\tau}{C} \)}
+}
+\\[0.3cm]
 
 %%%%%%%%%%% TYPE WELL-FORMEDNESS %%%%%%%%%%%
 
@@ -175,12 +195,15 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
   }
 
 %%%%%%%%%%% Header Box %%%%%%%%%%%
+\multicolumn{2}{l}{
+  \textbf{Subtyping Constraint Generation} \;
 \fbox{  \( \subtypeok{\A}{\tau_1}{\tau_2}{C} \)}
+}
 \\[0.3cm]
 
 %%%%%%%%%%% SUBTYPING: REFLEXIVE %%%%%%%%%%%
 
-  \lgcfact{Reflexive}{
+  \lgcfact{Reflexivity}{
     \subtypeok{\A}{\tau}{\tau}{\{\}}
   }
 
@@ -191,7 +214,7 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
 
 %%%%%%%%%%% SUBTYPING: TRANSITIVITY %%%%%%%%%%%
 
-  \lgcrule{Transitive}{
+  \lgcrule{Transitivity}{
     \subtypeok{\A}{\tau_1}{\tau_2}{C_1} \spc
     \subtypeok{\A}{\tau_2}{\tau_3}{C_2}
   }{
@@ -216,6 +239,6 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rhoalloc \conj \allo
 
 \myendrules
 
-\caption{Type well-formedness constraint generation rules}
+\caption{Constraint generation rules: Part 3}
 \label{fig:constraint-gen-2}
 \end{figure*}
