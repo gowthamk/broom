@@ -1,1 +1,29 @@
-/Users/gowtham/git/broom/fullversion/broom/paper/fb-staticsem-full.tex
+\begin{figure*}[!ht]
+%
+\textbf{Subtyping}  \; \fbox
+  {\(\subtyp{\A}{\tau_1}{\tau_2}\)}\\
+\input{fb-subtyprules-full}
+%
+\bigskip
+
+\textbf{Type, and Type Constraint Well-formedness}  \; \fbox
+  {\(\tywf{\A}{\tau}, \spc 
+     \tywf{\rhoenv}{\phi}\)}\\
+\input{fb-tywfrules-full}
+%
+\bigskip
+
+\input{fb-morewfrules}
+%
+
+\caption{\fbname: Subtyping and well-formedness rules}
+\label{fig:fb-staticsem-1}
+\end{figure*}
+
+\begin{figure*}[!ht]
+\textbf{Expression Typing}  \; \fbox
+  {\(\hastyp{\exptycx{\env}}{e}{\tau}\)}\\
+\input{fb-exptyprules-full}
+\caption{\fbname: Expression typing}
+\label{fig:fb-staticsem-2}
+\end{figure*}

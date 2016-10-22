@@ -1,1 +1,68 @@
-/Users/gowtham/git/broom/fullversion/broom/paper/fb-subtyprules-full.tex
+%
+\begin{minipage}{1.8in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+  \subtyp{\A}{\tau}{\tau} \\
+  \subtyp{(\mem,\aenv,\phicx)}{\tyvar @\rho}{\aenv(\tyvar) @\rho}\qquad
+% \subtyp{\A}{\RgnZ\inang{\rgn}}{\RgnZ\inang{\toprgn}}\qquad
+% \subtyp{\A}{\RgnZ\inang{\toprgn}}{\RgnZ\inang{\rgn}}
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.55in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    CT(B) = \headerOf{B}\{...\}
+  }
+  {
+    \subtyp{\A}{B\inang{\tbar}\inang{\rbar}}
+        {[\rbar/\rhobar, \tbar/\bar{\tyvar}](\fbN)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+\begin{minipage}{1.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \subtyp{\A}{\tau_1}{\tau_2}\\
+    \subtyp{\A}{\tau_2}{\tau_3}
+  }
+  {
+    \subtyp{\A}{\tau_1}{\tau_3}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \isvalid{\A.\phicx}{\phi_1 \Rightarrow \phi_2} \\
+    \subtyp{\A}{\bar{\tau^{11}}}{\bar{\tau^{21}}} \spc
+    \subtyp{\A}{\tau^{22}}{\tau^{12}}
+  }
+  {
+    \subtyp{\A}
+      {\inang{\rhobar \,|\, \phi_2}\bar{\tau^{21}}
+          \xrightarrow{\rgn} \tau^{22}}
+      {\inang{\rhobar \,|\, \phi_1}\bar{\tau^{11}}
+          \xrightarrow{\rgn} \tau^{12}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+

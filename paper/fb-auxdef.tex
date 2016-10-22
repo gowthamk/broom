@@ -1,1 +1,134 @@
-/Users/gowtham/git/broom/fullversion/broom/paper/fb-auxdef.tex
+\begin{figure*}[t]
+%
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{lcl}
+  \allocRgn(A\inang{\rgn\rbar}\inang{\tbar}) & = & \rgn\\
+  \allocRgn(\inang{\rhobar \,|\, \phi}\bar{\tau^1}
+      \xrightarrow{\rgn} \tau^2) & = & \rgn\\
+  \shape(A\inang{\rhoalloc\rhobar}\inang{\tbar}) & = & A\inang{\tbar}\\
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{lcl}
+  \bound_{\aenv}(\tyvar@\rgn) & = & \aenv(\tyvar)@\rgn\\
+  \bound_{\aenv}(\fbN) & = & \fbN\\
+  \fields(\ObjZ\inang{\rgn}) & = & \bullet \\
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+% \begin{minipage}{2.25in}
+% \begin{smathpar}
+% \begin{array}{lcl}
+%   \ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
+%   \ctype(B\inang{\tbar}\inang{\rbar}) & = & 
+%     \fields(B\inang{\tbar}\inang{\rbar})\\
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+%
+
+%
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,...\}\\
+    \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}] \qquad 
+    \fields(\substFn(\fbN)) = \bar{g}:\bar{\tau^g}
+  }
+  {
+    \fields(B\inang{\tbar}\inang{\rbar}) \;=\;
+      \bar{g}:\bar{\tau^g},\,\bar{f}:\substFn(\bar{\tau^f})
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,\bar{d}\}\\
+    m \notin \bar{d} \qquad 
+    \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}]
+  }
+  {
+    \mtype (m,B\inang{\tbar}\inang{\rbar}) \;=\;
+    \mtype (m, \substFn(\fbN))
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+
+\begin{minipage}{3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,\bar{d}\}\\
+    \tau^2 \; m\mang (\bar{\tau^1}\;\bar{x})\{...\} \in \bar{d} \qquad
+    \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}]
+  }
+  {
+    \mtype (m,B\inang{\tbar}\inang{\rbar}) \;=\;
+    \substFn(\mang\bar{\tau^1} \rightarrow \tau^2)
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+
+    \mtype(m,\fbN) = \inang{\bar{\rho_1}\,|\, \phi_1}\bar{\tau^{11}} 
+                      \rightarrow \tau^{12} \\ 
+    \texttt{implies} \spc \isvalid{\A.\phicx}
+                  {\phi_2 \Leftrightarrow \subst{\bar{\rho_2}}{\bar{\rho_1}}(\phi_1)}
+    \texttt{and} \\ 
+    \bar{\tau^{21}} = \subst{\bar{\rho_2}}{\bar{\rho_1}}(\bar{\tau^{11}}) \spc 
+    \texttt{and} \spc \subtyp{\A}{\tau^{22}} {\subst{\bar{\rho_2}}{\bar{\rho_1}}(\tau^{12})}
+%   \substFn = \subst{\bar{\rho_2}}{\bar{\rho_1}}
+%              \subst{\rhoalloc_2}{\rhoalloc_1}
+    %\substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
+  }
+  {
+    \A \vdash \override(m,\fbN,\inang{\bar{\rho_2}\,|\, \phi_1}
+              \bar{\tau^{21}} \rightarrow \tau^{22})
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+
+% \begin{minipage}{5in}
+% \begin{smathpar}
+% \begin{array}{c}
+%   \rhoset,\rhoenv \in 2^{\rho} \qquad
+%   \aenv \in \tyvar \rightarrow \fgjN \qquad
+%   \A = (\subtypcx)\\
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+%
+
+\caption{\fbname: Auxiliary definitions}
+\label{fig:fb-auxdef}
+\end{figure*}

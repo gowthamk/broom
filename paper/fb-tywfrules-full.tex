@@ -1,1 +1,132 @@
-/Users/gowtham/git/broom/fullversion/broom/paper/fb-tywfrules-full.tex
+%
+\begin{minipage}{1.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn \in \rhoenv
+  }
+  {
+    \tywf{(\rhoenv,\aenv,\phicx)}{\ObjZ\inang{\rgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  { 
+    \fgjtywf{\A.\aenv}{T}
+  }
+  {
+    \tywf{\A}{\RgnZ\inang{T}\inang{\toprgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{1in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn_0,\rgn_1 \in \rhoenv
+%   \mem(\rgn_0) = \LIVE \spc
+%   \mem(\rgn_1) = \LIVE
+  }
+  {
+    \tywf{\rhoenv}{\rgn_0 \outlives \rgn_1}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{3.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    CT(B) = \headerOf{B}\{...\}\\
+    \rbar \in \rhoenv \spc
+%   \mem(\rbar) = \overline{\LIVE} \spc
+    \fgjtywf{\aenv}{B\inang{\tbar}}\spc
+%   \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}] \spc
+    \isvalid{\phicx}{[\rbar/\rhobar](\phi)}
+  }
+  {
+    \tywf{(\rhoenv,\aenv,\phicx)}{B\inang{\rbar}\inang{\tbar}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
+\begin{minipage}{0.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \tywf{\rhoenv}{\phi_0} \\ \tywf{\rhoenv}{\phi_1}
+  }
+  {
+    \tywf{\rhoenv}{\phi_0 \wedge \phi_1}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+% 
+\begin{minipage}{2.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn \in \rhoenv \spc
+    \rhobar \not\in \rhoenv\\
+%   \rhobar \notin dom(\mem) \\
+%   \mem' = \mem[\rhobar \mapsto \overline{\LIVE}] \spc
+    \rhoenv' = \rhoenv \cup \{\rhobar\} \spc
+    \A' = (\rhoenv', \aenv, \phicx \conj \phi) \\
+    \tywf{\rhoenv'}{\phi}\spc 
+    \tywf{\A'}{\bar{\tau^1}} \spc
+    \tywf{\A'}{\tau^2}
+  }
+  {
+    \tywf{(\rhoenv,\aenv,\phicx)}{\inang{\rhobar \,|\, \phi}
+              \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
+\begin{minipage}{1.65in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    \fgjtywf{\aenv}{T}\spc
+%   \rgn \in \A.\rhoenv\\
+    \rgn \in \rhoenv\\
+    \fgjsubtyp{\aenv}{T}{\ObjZ}\spc
+  }
+  {
+    \tywf{(\rhoenv,\aenv,\phicx)}{T@\rgn}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
