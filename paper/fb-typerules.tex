@@ -184,8 +184,7 @@
     \rhobar \notin \rhoenv \\
 %   \not\exists (\rgn'\in\Delta).~\rgn'\neq\rgn \;\conj\; 
 %       \isvalid{\phicx}{\rgn\outlives\rgn'}\\
-    \forall (\rgn'\in\Delta).~(\isvalid{\phicx}{\rgn\outlives\rgn'}) 
-            ~\Rightarrow~ \rgn = \rgn'\\
+    \forall (\rgn'\in\frv(e)\setminus\{\rhobar\}).~\isvalid{\phicx}{\rgn'\outlives\rgn}\\
     \A' = (\rhoenv \cup \{\rhobar\}, \aenv, 
           \phicx \conj \phi)\spc
     \tywf{\rhoenv \cup \{\rhobar\}}{\phi}\\

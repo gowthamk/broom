@@ -488,13 +488,11 @@ containing bindings for function's arguments, assuming that region
 parameters are live, and that declared constraints over region
 parameters hold. The constraints ($\phi$) are required to be
 well-formed under $\rhoenv$ extended with the function's region
-parameters ($\rhobar$).The premise $\forall
-(\rgn'\in\Delta).~(\isvalid{\phicx}{\rgn\outlives\rgn'}) ~\Rightarrow~
-\rgn = \rgn'$ ensures that the closure is always allocated in the
-last-opened region (also called the \emph{current allocation context}).
-This prevents the closure from escaping the context in which it is
-created , thus trivially ensuring the safety of any dereferences
-inside the closure.
+parameters ($\rhobar$). The premise $\forall
+(\rgn'\in\frv(e)\setminus\{\rhobar\}). ~\isvalid{\phicx}
+{\rgn'\outlives\rgn}$ ensures the safety of dereferences inside the
+closure by requring that all free region variables ($\frv$) trapped by
+the closure outlive the allocation region of the closure.
 
 % The type rule for the \C{new} expression is a straightforward
 % adaptation of corresponding FGJ rule to the the region type setting.

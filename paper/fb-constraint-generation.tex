@@ -83,7 +83,7 @@
    \A = (\rhoenv,\aenv,\phicx)  \spc \rgn \notin \rhoenv \spc
       \A' = (\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn))
    \nl
-   \exprok{\A',\env} {e} {\tau} {C_1} \spc
+   \exprok{\A',\rgn,\env} {e} {\tau} {C_1} \spc
       \typeok {\A} {\tau} {C_2}
 }{
    \exprok{\stdcontext} {\letregion{\rgn}{e}} {\tau} {(C_1 \cup C_2)}
@@ -127,18 +127,20 @@ C_3 = \{\isvalid{\A.\phicx}{[\bar{\pi}/\rhobar]\phi}\} \spc
     \spc
 %   \rhoenv' = \rhoenv \cup \{\rhoalloc,\rhobar\}\spc
     \A' = (\A.\rhoenv \cup \{\rhobar\}, \A.\aenv, 
-          \A.\phicx \conj \phi)\spc
-    \tywf{\A'.\rhoenv}{\phi}
+          \A.\phicx \conj \phi)
     \\
+    \tywf{\A'.\rhoenv}{\phi}\spc
     \typeok {\A'} {\bar{\tau^1}} {C_1} \spc
-    \typeok {\A'} {\tau^2} {C_2} \spc
-    \exprok {\A',\env[\xbar \mapsto \bar{\tau^1}]} {e} {\tau^2} {C_3}
+    \typeok {\A'} {\tau^2} {C_2}
+    \\
+    \exprok {\A',\env[\xbar \mapsto \bar{\tau^1}]} {e} {\tau^2} {C_3} \spc
+    C_4 = \bigcup\limits_{\pi'\in \frv(e)\setminus\{\rhobar\}}\{\pi'\outlives\pi\}
   }
   {
     \exprok {\stdcontext}
            {\lambdaexp{\rgn}{\rhobar \,|\, \phi} {\xbar:\bar{\tau^1}}{e}}
            {\inang{\rhobar \,|\, \phi} \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
-	   {C_1 \cup C_2 \cup C_3}
+	   {\cup_{i=1}^{4} C_i}
   }
 
 \myendrules
