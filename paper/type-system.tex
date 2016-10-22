@@ -561,34 +561,31 @@ region that has been transferred or freed):
 \begin{theorem}
 \emph{(\textbf{Type Safety})}
 \label{thm:fb-type-safety}
-$\forall e, \tau, \rhoenv, \rhomap, \rgn$, such that $\rgn \in
-\rhoenv$ and $\tywf{\rhoenv}{\phicx}$, if $\hastyp{\emptyA,\rgn,
+$\forall e, \tau, \Delta, \mem$, such that $\tywf{\rhoenv}{\phicx}$, if $\hastyp{\emptyA,
 \cdot}{e}{\tau}$, then either $e$ is a value, or $e$ raises an
-exception ($\redstoo{(e,\rhomap)}{\invalidexn}$), or there exists an
-$e'$ and a $\rhomap'$ such that $\redstoo{(e,\rhomap)}{(e',\rhomap')}$
-and $\hastyp{\emptyASigp,\rgn, \cdot}{e'}{\tau}$.
+exception ($\redstoo{\Delta}{(e,\mem)}{\invalidexn}$), or there exists an
+$e'$ and a $\mem'$ such that $\redstoo{\Delta}{(e,\mem)}{(e',\mem')}$
+and $\hastyp{\emptyASigp,\cdot}{e'}{\tau}$.
 \end{theorem}
 
-Furthermore, we prove the following theorem about \FB, which, in
-conjunction with the type safety theorem, implies the safety of region
-transfers across address spaces:
-\begin{theorem}
-\emph{(\textbf{Transfer Safety})}
-\label{thm:fb-transfer-safety}
-$\forall$ $v$, $\rhoenv$, $\rhoenv'$, $\rhomap$, $\rhomap'$, $\phicx$,
-$\phicx'$, $\rgn$, $\rgn'$, such that $\rgn \in \rhoenv$, $\rgn' \in
-\rhoenv'$, $\rgn_i \neq \toprgn$ and
-$\rgn_i \notin dom(\rhomap') \cup \rhoenv'$, if $\hastyp{\emptyA,\rgn,
-\cdot}{\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$, then
-$\hastyp{(\rhomap'[\rgn_i \mapsto \CLOSED],\rhoenv',\cdot,\phicx')}
-{\\\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$
-\end{theorem}
-The above theorem states that if a $\C{new}\; \RgnZT{\rgn_i}(v)$ value
-is well-typed under one context, then it is also well-typed under
-every other context, whose $\rhomap$ maps $\rgn_i$ to closed
-($\CLOSED$) state.  Thus, a recipient of a transferable region only
-needs to add a binding for the region to its $\rhomap$ in order to
-preserve its type safety. 
+% Furthermore, we prove the following theorem about \FB, which, in
+% conjunction with the type safety theorem, implies the safety of region
+% transfers across address spaces:
+% \begin{theorem}
+% \emph{(\textbf{Transfer Safety})}
+% \label{thm:fb-transfer-safety}
+% $\forall$ $v$, $\rhoenv$, $\rhoenv'$, $\mem$, $\mem'$, $\phicx$,
+% $\phicx'$, such that $\loc \not\in dom(\mem')$, if $\hastyp{\emptyA, \cdot}{\C{new}\;
+% \RgnZT{\toploc\loc}(v)}{\RgnZT{\toprgn}}$, then
+% $\hastyp{\rhoenv',\cdot,\phicx')}
+% {\\\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$
+% \end{theorem}
+% The above theorem states that if a $\C{new}\; \RgnZT{\rgn_i}(v)$ value
+% is well-typed under one context, then it is also well-typed under
+% every other context, whose $\mem$ maps $\rgn_i$ to closed
+% ($\CLOSED$) state.  Thus, a recipient of a transferable region only
+% needs to add a binding for the region to its $\mem$ in order to
+% preserve its type safety. 
 % Notably, this result could not have been
 % established if it were possible for a transferable region to contain
 % references to objects outside the region.
