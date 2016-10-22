@@ -559,12 +559,19 @@ region that has been transferred or freed):
 \begin{theorem}
 \emph{(\textbf{Type Safety})}
 \label{thm:fb-type-safety}
-$\forall e, \tau, \Delta, \mem$, such that $\tywf{\rhoenv}{\phicx}$, if $\hastyp{\emptyA,
+$\forall e, \tau, \Delta, \mem$, such that $\consistent(\Delta,\mem)$
+and $\tywf{\rhoenv}{\phicx}$, if $\hastyp{\emptyA,
 \cdot}{e}{\tau}$, then either $e$ is a value, or $e$ raises an
 exception ($\redstoo{\Delta}{(e,\mem)}{\invalidexn}$), or there exists an
-$e'$ and a $\mem'$ such that $\redstoo{\Delta}{(e,\mem)}{(e',\mem')}$
-and $\hastyp{\emptyASigp,\cdot}{e'}{\tau}$.
+$e'$ and a $\mem'$ such that $\consistent(\Delta,\mem')$ and
+$\redstoo{\Delta}{(e,\mem)}{(e',\mem')}$ and
+$\hastyp{\emptyASigp,\cdot}{e'}{\tau}$.
 \end{theorem}
+The relation $\consistent$ relates $\Delta$ and $\mem$ only if both
+make consistent assumptions about liveness of regions. Since $\Delta$
+is consistent with both $\mem$ and $\mem'$, the theorem also captures
+the key property of operational semantics that no live region is ever
+freed or transferred.
 
 % Furthermore, we prove the following theorem about \FB, which, in
 % conjunction with the type safety theorem, implies the safety of region
