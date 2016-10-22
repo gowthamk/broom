@@ -84,6 +84,14 @@
             {\invalidexn}
 	  }{Exception}
 
+\lopsemrule{2in}{
+%   \fgjN = \RgnZ\inang{T} \spc
+%   \rgn \in dom(\mem) \spc
+}{
+    \redstoo{\Delta}{(\letexp{x}{v}{e},\mem)}
+            {([v/x]e,\mem)}
+	  }{LetExp}
+
 % \lopsemrule{3.2in}{
 %     \not\exists \loc.~\mem(\loc) = \FREE
 % }{
