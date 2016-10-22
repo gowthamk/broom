@@ -4,7 +4,7 @@
 \renewcommand{\arraystretch}{1.2}
 \begin{array}{lclcl} 
 \multicolumn{5}{c}{
-  {\pi} \in \mathtt{Static \; region \; ids} \qquad
+  {\pi} \in \mathtt{Region \; identifiers} \qquad
   {\rho} \in \mathtt{Region \; variables} \qquad
   {\loc} \in \mathtt{Memory\; locations} }\\
 \multicolumn{5}{c}{
@@ -18,7 +18,7 @@ T  & \in & \M{FGJ \; types} & \coloneqq & \tyvar \ALT  \fgjN \ALT \unitZ
 r  & \in & \M{Region\; annotations} & \coloneqq & \rho \ALT \pi \ALT \loc\\
 \status & \in & \mathtt{Region\; Typestate} & \coloneqq & %\FREE \ALT
                   \USED \ALT \LIVE \ALT \XFERRED\\
-\fbN  & \in & \M{\FB \; class \; types} & \coloneqq & 
+\fbN  & \in & \M{Annotated \; class \; types} & \coloneqq & 
      cn\inang{\tbar}\inang{\rbar} \\
 \tau &\in& \M{types} & \coloneqq & T@\rgn  
       \ALT \fbN \ALT \unitZ 

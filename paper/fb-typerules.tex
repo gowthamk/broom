@@ -13,7 +13,7 @@
     \isvalid{\phicx}{[\rbar/\rhobar](\phi)}
   }
   {
-    \tywf{(\rhoenv,\aenv,\phicx)}{B\inang{\rbar}\inang{\tbar}}
+    \tywf{(\rhoenv,\aenv,\phicx)}{B\inang{\tbar}\inang{\rbar}}
   }
 \end{array}
 \end{smathpar}
@@ -125,7 +125,7 @@
 \RULE
   {
     \A = (\subtypcx) \spc
-    \{\rbar\} \subseteq \rhoenv \\
+    \rbar \in \rhoenv \\
     \hastyp{\exptycx{\env}}{e}
         {\inang{\rhobar \,|\, \phi}
             \bar{\tau^1} \xrightarrow{\rgn} \tau^2}\\
@@ -151,6 +151,7 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
     \hastyp{\exptycx{\env}}{e_a}
             {\RgnZ\inang{T}\inang{\toprgn}}\\
     \A = (\subtypcx) \spc
@@ -181,6 +182,10 @@
     \rgn \in \rhoenv \spc
 %   \rhobar \notin dom(\mem)\\
     \rhobar \notin \rhoenv \\
+%   \not\exists (\rgn'\in\Delta).~\rgn'\neq\rgn \;\conj\; 
+%       \isvalid{\phicx}{\rgn\outlives\rgn'}\\
+    \forall (\rgn'\in\Delta).~(\isvalid{\phicx}{\rgn\outlives\rgn'}) 
+            ~\Rightarrow~ \rgn = \rgn'\\
     \A' = (\rhoenv \cup \{\rhobar\}, \aenv, 
           \phicx \conj \phi)\spc
     \tywf{\rhoenv \cup \{\rhobar\}}{\phi}\\
