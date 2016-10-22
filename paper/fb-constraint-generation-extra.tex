@@ -65,6 +65,32 @@
        {[\rbar/\rhobar](\tau^2)} {C_1 \cup C_2 \cup C_3 \cup C_4 \cup C_5}
   }
 
+%%%%%%%%%%% LAMBDA %%%%%%%%%%%
+
+\lgcrule{Lambda}
+  {
+    \rgn \in \A.\rhoenv \spc
+    \rhobar \notin \A.\rhoenv
+    \spc
+%   \rhoenv' = \rhoenv \cup \{\rhoalloc,\rhobar\}\spc
+    \A' = (\A.\rhoenv \cup \{\rhobar\}, \A.\aenv, 
+          \A.\phicx \conj \phi)
+    \\
+    \tywf{\A'.\rhoenv}{\phi}\spc
+    \typeok {\A'} {\bar{\tau^1}} {C_1} \spc
+    \typeok {\A'} {\tau^2} {C_2}
+    \\
+    \exprok {\A',\env[\xbar \mapsto \bar{\tau^1}]} {e} {\tau^2} {C_3} \spc
+    C_4 = \bigcup\limits_{\pi'\in \frv(e)\setminus\{\rhobar\}}\{\pi'\outlives\pi\}
+  }
+  {
+    \exprok {\stdcontext}
+           {\lambdaexp{\rgn}{\rhobar \,|\, \phi} {\xbar:\bar{\tau^1}}{e}}
+           {\inang{\rhobar \,|\, \phi} \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
+	   {\cup_{i=1}^{4} C_i}
+  }
+
+
 %%%%%%%%%%% SUBTYPING %%%%%%%%%%%
 \lgcrule{SubTyping}{
     \exprok {\exptycx{\env}} {e} {\tau} {C_1} \spc  \subtypeok {\A} {\tau} {\tau'} {C_2}
