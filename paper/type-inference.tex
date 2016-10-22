@@ -402,12 +402,12 @@ variables in $\rhoenv$ that are yet to be inferred.
 %%  ensures that the generated constraints produces a restricted form of constraints that is easier to solve.
 
 Let $\consOf{q}$ denote the set of constraints generated from an elaborated program $q$.
-The following theorem states that constraint-generation is sound and complete:
+The following theorem states that constraint-generation is sound:
 \begin{theorem}
 \label{thm:constraint-generation-sc}
 Let $C = \consOf{q}$.
 An assignment $\soln$ (for the region and predicate variables in $q$)
-satisfies $C$ iff $q[\soln]$ is well-typed.
+satisfies $C$ only if $q[\soln]$ is well-typed.
 \end{theorem}
 
 \subsection{The Constraint Solver}
@@ -641,16 +641,20 @@ using any Datalog engine.
 
 \subsection{Soundness and Completeness: Discussion}
 
-Theorems~\ref{thm:constraint-generation-sc} and~\ref{thm:constraint-solver-sc}
-show that the second and third steps of the type-inference algorithm are both
-sound and complete.
-It is easy to verify the soundness of the first step (the elaboration phase):
-For any program $p \in \absof{\FB}$, the elaboration phase produces a $q$
-such that for any assignment $\soln$, we have $\absof{q[\soln]} = p$.
+Theorem~\ref{thm:constraint-generation-sc}
+and~\ref{thm:constraint-solver-sc} show that the second and third
+steps of the type-inference algorithm are sound. It is easy to verify
+the soundness of the first step (the elaboration phase): For any
+program $p \in \absof{\FB}$, the elaboration phase produces a $q$ such
+that for any assignment $\soln$, we have $\absof{q[\soln]} = p$.
 %
 The soundness of the type inference algorithm follows.
-The only sources of incompleteness in the type inference algorithm are some heuristic
-choices made in the first step, as explained below.
+Theorem~\ref{thm:constraint-solver-sc} also establishes the
+completeness of constraint solving.
+
+The main source of incompleteness in the type inference algorithm is
+the set of heuristic choices made during region parameterization step,
+as explained below.
 
 %% \begin{theorem}
 %% \emph{(\textbf{Soundness})}
@@ -747,7 +751,7 @@ and useful candidate.
 
 If users provide partial region annotations, especially in situations (such as above) where elaboration
 makes a heuristic choice, the elaboration procedure can use the user-provided choices instead.
-This can help the type-inference overcome these sources of incompleteness.
+This can help the type-inference overcome these limitations.
 
 %\textbf{TODO: Update example discussion}
 %
