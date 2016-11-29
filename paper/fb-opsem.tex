@@ -47,22 +47,22 @@
 \lopsemrule{3.85in}{
 %   \allocRgn(\fbN) \in \rhoenv \spc
     \mem(\loc) = \LIVE \spc
-    \mbody(m,A\inang{\tbar}\inang{\loc\locbar}) = \rhobar.\bar{x}.e 
+    \mbody(m,A\inang{\tbar}\inang{\loc\locbar}) = \rho\rhobar.\bar{x}.e 
 %   \redstoo{\Delta}{(, \mem)}{(e',\mem')}
 }{
-    \redstoo{\Delta}{((\C{new}\;A\inang{\tbar}\inang{\loc\locbar}(\bar{v})).m\inang{\overline{\loc'}}
+    \redstoo{\Delta}{((\C{new}\;A\inang{\tbar}\inang{\loc\locbar}(\bar{v})).m\inang{\loc'\overline{\loc'}}
                       (\bar{v'}),\mem)}
-            {([\overline{\loc'}/\rhobar][\bar{v'}/\xbar]
+            {([\loc'\overline{\loc'}/\rho\rhobar][\bar{v'}/\xbar]
                 [\C{new} \; A\inang{\tbar}\inang{\loc\locbar}(\bar{v})/\thisZ]\,e,\mem)}
 	  }{MethodInv}
 
 \lopsemrule{2.85in}{
-    v_a = \lambdaexp{\loc}{\rhobar}
+    v_a = \lambdaexp{\loc'}{\rho\rhobar}
                         {\taubar \; \xbar}{e} \spc
-    \mem(\loc) = \LIVE  \spc 
+    \mem(\loc') = \LIVE  \spc 
 }{
-    \redstoo{\Delta}{(v_a\inang{\locbar}(\bar{v}) ,\mem)}
-            {([\bar{v}/\xbar][\locbar/\rhobar]\,e,\mem)}
+    \redstoo{\Delta}{(v_a\inang{\loc\locbar}(\bar{v}) ,\mem)}
+            {([\bar{v}/\xbar][\loc\locbar/\rho\rhobar]\,e,\mem)}
 	  }{FnApply}
 
 %
@@ -158,7 +158,6 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
     \redstoo{\Delta}{(\letd{\loc}{e},\mem)}{(\letd{\loc}{e'},\mem')}
   }{LetRegion}
 
-
 \lopsemrule{3in}{
 %   \rgn \notin \rhoenv
 %   \mem' = \mem[\loc \mapsto \FREE]
@@ -186,13 +185,13 @@ E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \A
 	      }{NewRegion}
 
 \lopsemrule{3.3in}{
-    \mem(\loc) = \USED \spc
+%   \mem(\loc) = \USED \spc % Type system cannot guarantee this.
     \redstocup{\loc}{(e,\mem[\loc \mapsto \LIVE]) }{(e',\mem')}
 }{
     \redstoo{\Delta}{(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
                 (e),\mem)}
             {(\C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}
-                (e'),\mem'[\loc\mapsto\USED])}
+                (e'),\mem')} %[\loc\mapsto\USED])}
 	      }{NewRegion}
 
 % \lopsemrule{2.8in}{

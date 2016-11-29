@@ -15,10 +15,10 @@ relation:
 
 \begin{lemma}[\textbf{consistency preservation}]
 \label{lem:consistency}
-$\forall(e,\Delta,\mem,\phicx,\tau)$. if $\consistent(\Delta,\mem)$
-and $\tywf{\Delta}{\phicx}$ and
-$\hastyp{(\Delta,\cdot,\phicx),\cdot}{e}{\tau}$ and
-$\redstoo{\Delta}{(e,\mem)}{(e',\mem')}$, then
+$\forall(e,\Delta,\mem,\phicx,\rgn,\tau)$. if $\consistent(\Delta,\mem)$
+and $\tywf{\Delta}{\phicx}$ %and $\rgn \in \Delta$ 
+and $\hastyp{(\Delta,\cdot,\phicx),\cdot,\rgn}{e}{\tau}$ 
+and $\redstoo{\Delta}{(e,\mem)}{(e',\mem')}$, then
 $\consistent(\Delta,\mem')$.
 \end{lemma}
 \begin{proof}
@@ -41,31 +41,38 @@ are discussed below:
   \item Rule $\rulelabel{LetRegionBegin}$: All live regions in $\mem$
   are also live in $\mem'$. Proof follows
   \item Rule $\rulelabel{LetRegion}$: By inductive hypothesis, $\mem'$
-  is consistent with $\Delta \cup \{\loc\}$. Hence, it is consistent
-  with $\Delta$.
+  is consistent with $\Delta$. Hence, it is consistent
+% is consistent with $\Delta \cup \{\loc\}$. Hence, it is consistent
+% with $\Delta$.
   \item Rule $\rulelabel{LetRegionEnd}$: Here, $\loc$ is set to
   $\XFERRED$ in $\mem'$. However, since $e$ is the \C{letd}
   expression, and the type rule for the \C{letd} expression gives us
-  $\loc \not\in \Delta$. Hence $\Delta$ is consisten with $\mem'$.
+  $\loc \not\in \Delta$. Hence $\Delta$ is consistent with $\mem'$.
   \item Rule $\rulelabel{NewRegion}$: $\mem'$ extends $\mem$ with a
   new binding. Consistency is trivially preserved.
-  \item Rule \#2 of $\rulelabel{NewRegion}$ : Since $\mem(\loc)=\USED$
-  and $\consistent(\Delta,\mem)$, $\loc \not\in \Delta$. The proof
-  follows from inductive hypothesis.
+% \item Rule \#2 of $\rulelabel{NewRegion}$ : Since $\mem(\loc)=\USED$
+% and $\consistent(\Delta,\mem)$, $\loc \not\in \Delta$. The proof
+% follows from inductive hypothesis.
+  \item Rule \#2 of $\rulelabel{NewRegion}$ : Since $\consistent(\Delta,
+  \mem)$, we have $\consistent(\Delta \cup \{\loc\}, \mem[\loc\mapsto 
+  \LIVE])$. By inductive hypothesis, $\consistent(\Delta \cup \{\loc\}, 
+  \mem')$. Hence, $\consistent(\Delta, \mem')$.
   \item Rule $\rulelabel{Open}$: As $\mem'=\mem[\loc\mapsto\LIVE]$,
   hence $\Delta$ remains consistent with $\mem'$. Here, we also take
   note of the fact that if the result expression (\C{opened}) is
   tagged with a typestate of $\USED$, then $\loc\notin \Delta$.
   \item Rule $\rulelabel{Opened}$: Inductive hypothesis guarantees
-  that $\Delta\cup\{\loc\}$ is consistent with $\mem'$. Hence,
-  $\Delta$ is consistent with $\mem'$. We also take note of the fact
-  that the typestate tagged with the $\C{opened}$ expression remains
-  invariant during reduction.
+  that $\Delta$ is consistent with $\mem'$.
+% that $\Delta\cup\{\loc\}$ is consistent with $\mem'$. Hence,
+% $\Delta$ is consistent with $\mem'$. 
+  We also take note of the fact that the typestate tagged with the
+  $\C{opened}$ expression remains invariant during reduction.
   \item Rule $\rulelabel{OpenEnd}$: $\mem'=\mem[\loc\mapsto s]$, where
   $s$ is the typestate tagged with the \C{opened} expression. As clear
   from the $\rulelabel{Open}$ rule, $s$ can be either $\USED$ or
-  $\LIVE$, and if $s$ is $\USED$ then $\loc\notin\Delta$. Hence, in
-  either case $\Delta$ remains consistent with $\mem$.
+  $\LIVE$. The type rule for \C{opened} tells us that if $s$ is
+  $\USED$ then $\loc\notin\Delta$. Hence, in either case $\Delta$
+  remains consistent with $\mem$.
   \item Rules $\rulelabel{Transfer}$: changes binding for a non-live
   location $\loc$. Hence, consistency is preserved.
 \end{itemize} 
@@ -85,33 +92,11 @@ lines of similar proof for FGJ.
 \qed
 \end{proof}
 
-
-% \begin{lemma}[weakening]
-% $\forall(v,\tau,\Delta,\Delta_0,\phicx,\phicx_0)$, 
-% if 
-% $\hastyp{(\Delta \cup \Delta_0,\cdot, \phicx \conj
-% \phicx_0),\cdot}{v}{\tau}$
-% and
-% $\tywf{(\Delta,\cdot,\phicx)}{\tau}$
-% then 
-% $\hastyp{(\Delta,\cdot, \phicx),\cdot} {v}{\tau}$.
-% \end{lemma}
-% \begin{proof}
-% The proof is by induction on $\hastyp{(\Delta \cup \Delta_0,\cdot, \phicx \conj
-% \phicx_0),\cdot}{v}{\tau}$. Since $v$ is a value, we have few cases:
-
-% \begin{itemize}
-%   \item Case ($v = \C{new}\; \fbN_0(\vbar)$ and $\tau = \fbN_0$): By
-%   inverting 
-% \end{itemize}
-
-% \end{proof}
-
 \begin{lemma}[progress]
 \label{lem:progress}
-$\forall e, \tau, \mem, \rhomap, \phicx$, if $\consistent(\Delta,\mem)$ and 
+$\forall e, \tau, \mem, \rhomap, \phicx, \rgn$, if $\consistent(\Delta,\mem)$ and 
 $\tywf{\Delta}{\phicx}$ and
-$\hastyp{\emptyA,\cdot}{e}{\tau}$, then one of the following holds:\\
+$\hastyp{\emptyA,\cdot, \rgn}{e}{\tau}$, then one of the following holds:\\
   \begin{smathpar}
   \begin{array}{rl}
     (i) & \exists (e',\rhomap').\;\redstoo{\Delta}{(e,\rhomap)}{(e',\rhomap')}\\
@@ -127,9 +112,10 @@ subexpression has a typing derivation, then it can make progress. We
 will consider cases where all subexpressions are values, but the
 expression itself is not a value.
 \begin{itemize}
-  \item $B\inang{\tbar}{\locbar}(\vbar).f_i$ case: This expression has
+  \item $B\inang{\tbar}\inang{\locbar}(\vbar).f_i$ case: This expression has
   a type only if $\tywf{\emptyA}{B\inang{\tbar}\inang{\locbar}}$, which is
-  possible only if $\locbar \in \Delta$. Hence $e$ can make progress.
+  possible only if $\locbar \in \Delta$. Since $\Delta$ is consistent
+  with $\mem$, we have $\mem(\locbar)=\LIVE$. Hence $e$ can make progress.
 
   \item $\C{let} \; x = v \; \C{in} \; e$ case: Always takes step via
   \rulelabel{LetExp}.
@@ -138,10 +124,27 @@ expression itself is not a value.
   \rulelabel{NewRegion} rule to $\C{new}\; \RgnZT{\toploc\loc}
   (v\inang{\loc}())$.
 
-  \item Method call case: Since $\mtype$ is defined, $\mbody$ is also
-  defined, and the execution takes a step by $\rulelabel{MethodInv}$.
+  \item $\C{new}\; \RgnZT{\toploc\loc}(e)$ case: takes a step by
+  \rulelabel{NewRegion} rule \#2 to $\C{new}\; \RgnZT{\toploc\loc}(e')$.
 
-  \item Lambda application case: takes step by \rulelabel{FnApply}
+  \item Method call case
+  ($v_0.m\inang{\loc'\overline{\loc'}}(\overline{v'})$): From the type
+  rule, since $\bound$ is defined for the type of $v_0$, we infer that
+  the type is of form $A\inang{\tbar}\inang{\loc\locbar}$ and $v_0 =
+  A\inang{\tbar}\inang{\loc\locbar}(\vbar)$.  Since $\mtype$ is
+  defined, $\mbody$ is also defined. Well-formedness requirement on
+  $A\inang{\tbar}\inang{\loc\locbar}$ gives $\loc \in \Delta$. Since
+  $\consistent(\Delta,\mem)$, we have $\mem(\loc)=\LIVE$. Hence the
+  execution takes a step by $\rulelabel{MethodInv}$.
+
+  \item Lambda application case ($e = (\lambdaexp{\loc'}{\rho\rhobar \,|\, 
+  \phi}{\xbar:\bar{\tau^1}}{e_0})\inang{\rgn\rbar}(\vbar)$): The type
+  rule gives $\loc',\rgn,\rbar \in \Delta$. Since
+  $\consistent(\Delta,\mem)$ and $dom(\mem)$ only contains locations,
+  we have $\rgn=\loc$ and $\rbar=\locbar$, for some locations $\loc,
+  \locbar$. Since $\loc' \in \Delta$, $\consistent(\Delta,\mem)$ also
+  gives $\mem(\loc')=\LIVE$. Hence, $e$ takes step by
+  \rulelabel{FnApply}.
 
   \item \C{letregion} case: takes a step by \rulelabel{LetRegionBegin}
   rule.
@@ -150,23 +153,34 @@ expression itself is not a value.
   exception by \rulee{OpenTransferred} rule, depending on the typestate
   of the region location.
 
-  \item \C{letd} case: The subexpression is typed under $\Delta \cup
-  \{\loc\}$, hence the subexpression takes a step under $\Delta \cup
-  \{\loc\}$. This allows \C{letd} expression take a step via
-  \rulee{LetRegion} rule. If subexpression is a value, then \C{letd}
-  takes a step via \rulee{LetRegionEnd} rule.
+  \item \C{letd} case: takes a step via \rulee{LetRegion} rule.  If
+  subexpression is a value, then \C{letd} takes a step via
+  \rulee{LetRegionEnd} rule.
 
-  \item \C{opened} case: similar to \C{letd} case.
+  \item \C{opened} case: takes a step via \rulee{Opened} rule.  If
+  subexpression is a value, then \C{letd} takes a step via
+  \rulee{OpenEnd} rule.
+
+  \item \C{transfer} case: Either takes a step via \rulee{Transfer}
+  rule, or throws an exception via \rulee{TransferOpened}, depending
+  on the typestate of the region.
+
+  \item Subtype case: The premise is that
+  $\hastyp{(\Delta,\cdot,\phicx),\cdot,\rgn}{e}{\tau'}$ and 
+  $\subtyp{(\Delta,\cdot,\phicx)}{\tau'}{\tau}$. Inductive hypothesis
+  from $\hastyp{(\Delta,\cdot,\phicx),\cdot,\rgn}{e}{\tau'}$ directly
+  gives the proof.
+
 \end{itemize}
 \qed
 \end{proof}
 
 \begin{lemma}[preservation]
 \label{lem:preservation}
-$\forall e, \tau, \Delta, \mem$, such that $\consistent(\Delta,\mem)$
+$\forall e, \tau, \Delta, \mem, \rgn$, such that $\consistent(\Delta,\mem)$
 and $\tywf{\rhoenv}{\phicx}$, if $\hastyp{\emptyA,
-\cdot}{e}{\tau}$, and $\redstoo{\Delta}{(e,\mem)}{(e',\mem')}$, then 
-$\hastyp{\emptyASigp,\cdot}{e'}{\tau}$.
+\cdot,\rgn}{e}{\tau}$, and $\redstoo{\Delta}{(e,\mem)}{(e',\mem')}$, then 
+$\hastyp{\emptyASigp,\cdot,\rgn}{e'}{\tau}$.
 \end{lemma}
 \begin{proof}
   Proof is by induction on the reduction step. Most cases follow from
@@ -177,73 +191,157 @@ $\hastyp{\emptyASigp,\cdot}{e'}{\tau}$.
     \item \rulee{FieldAccess} case: $\C{new}\; A\inang{\tbar}
     \inang{\loc\locbar}(\vbar).f_i$ takes a step to $v_i$. The field
     access expression has a type of $i^{th}$ field returned by
-    $\fields$ definition, and so does $v_i$, if ${new}\;
-    A\inang{\tbar} \inang{\loc\locbar}(\vbar)$ has to be typable.
+    $\fields$ definition, and so does $v_i$, if $\C{new}\;
+    A\inang{\tbar} \inang{\loc\locbar}(\vbar)$ has to be typeable.
     Hence the type is preserved.
 
-    \item \rulee{MethodInv} case: From the method invocation type rule
-    and method well-formedness condition, method body ($e'$) has a type
-    $\tau^2$ under $(\{\loc,\locbar,\rhobar\},\cdot,\phi),\cdot[\xbar
-    \mapsto \overline{\tau^1}]$. Also,
-    $\tywf{\loc,\locbar,\rhobar}{\phi}$. Since $\overline{\loc'} \neq \rhobar$
-    (locations are never equal to region variables), we have:
+    \item \rulee{MethodInv} case ($e = (\C{new}\; A\inang{\tbar}
+    \inang{\loc\locbar}(\vbar)).m\inang{\loc'\overline{\loc'}}
+    (\overline{v'})$): Let $\mtype(A\inang{\tbar}\inang{\loc\locbar}) 
+    \,=\, \inang{\rho\rhobar \,|\, \phi}\overline{\tau^1}\rightarrow 
+    \tau^2$. Hence $\tau = \tau^2$. Method invocation type rule tells
+    us $r = \loc'$. Further, from the method well-formedness
+    condition, method body ($e_0$) has a type $\tau^2$ under
+    $(\{\loc,\locbar,\rho,\rhobar\},\cdot,\phi),\cdot[\xbar \mapsto
+    \overline{\tau^1}], \rho$. Also,
+    $\tywf{\loc,\locbar,\rho,\rhobar}{\phi}$. Since $\loc' \neq \rho$
+    and $\overline{\loc'} \neq \rhobar$ (locations are never equal to
+    region variables), we have:
     \begin{center}
-    $\hastyp{(\{\loc,\locbar,\overline{\loc'}\},\cdot,[\overline{\loc'}/\rhobar]\phi),\cdot[\xbar
-    \mapsto \overline{\tau^1}]}{e'}{\tau^2}$ and
-    $\tywf{\{\loc,\locbar,\overline{\loc'}\}}{[\overline{\loc'}/\rhobar]\phi}$
+    $\hastyp{(\{\loc,\locbar,\loc',\overline{\loc'}\},\cdot,
+      [\loc'\overline{\loc'}/\rho\rhobar]\phi),\cdot[\xbar
+      \mapsto \overline{\tau^1}],\loc'}{e_0}{\tau^2}$ and
+    $\tywf{\{\loc,\locbar,\loc',\overline{\loc'}\}}
+          {[\loc'\overline{\loc'}/\rho\rhobar]\phi}$
     \end{center}
-    Since $\{\{\loc,\locbar,\overline{\loc'}\} \subseteq \Delta$, and
-    $\phicx \vdash [\overline{\loc'}/\rhobar]\phi$, we can strengthen
+    Since $\{\{\loc,\locbar,\loc',\overline{\loc'}\} \subseteq \Delta$, and
+    $\phicx \vdash [\loc'\overline{\loc'}/\rho\rhobar]\phi$, we can strengthen
     the context and derive:
     \begin{center}
-      $\hastyp{(\Delta,\cdot,\phicx),\cdot[\xbar \mapsto \overline{\tau^1}]}{e'}{\tau^2}$
+      $\hastyp{(\Delta,\cdot,\phicx),\cdot[\xbar \mapsto
+      \overline{\tau^1}], \loc'}{e_0}{\tau^2}$
     \end{center}
-    Applying the substitution lemma (Lemma~\ref{lem:substitution}) and
-    inductive hypothesis gives the proof.
-
+    Applying the substitution lemma (Lemma~\ref{lem:substitution})
+    gives:
+    \begin{center}
+      $\hastyp{(\Delta,\cdot,\phicx),\cdot,
+        \loc'}{[\overline{v'}/\xbar]e_0}{\tau^2}$
+    \end{center}
+    Since $e' \,=\, [\overline{v'}/\xbar]e_0$ and $\tau = \tau_2$, we
+    have the required:
+    \begin{center}
+      $\hastyp{(\Delta,\cdot,\phicx),\cdot, \loc'}{e'}{\tau}$
+    \end{center}
+    It is important to note that if $\rho$, the allocation context
+    parameter of $m$, was not instantiated with the current allocation
+    context $\loc'$, the proof would have failed.
     \item \rulee{FnApply} case: proceeds on the similar lines as
-    \rulee{MethodInv} case, except that no strengthening is needed;
-    function body is typed under a context that includes $\Delta$.
+    \rulee{MethodInv} case (an exception is that the typing context
+    for the method body already includes $\Delta$).
 
-    \item \rulee{LetRegionBegin} case: Since $\loc \notin dom(\mem)$,
-    it follows that $\loc \notin \Delta$. Rest of the premises
-    required to apply the \C{letd} type rule on result expression are
-    obtained from the \C{letregion} type rule of the initial
-    expression ($e$), by substituing $\loc$ for $\pi$.
+    \item \rulee{LetRegionBegin} case ($e = \letregion{\pi}{e'}$):
+    Steps to $\letd{\loc}{[\loc/\pi]e'}$.
+    $\loc$ is the new location introduced. Since $\loc \notin
+    dom(\mem)$, it follows that $\loc \notin \Delta$. Rest of the
+    premises required to apply the \C{letd} type rule on result
+    expression are obtained from the \C{letregion} type rule of the
+    initial expression ($e$), by substituing $\loc$ for $\pi$.
 
-    \item \rulee{LetRegionEnd} case: $e$ is a \C{letd} expression
-    which reduces to a value $v$. Invering the typing derivation of
-    $e$ yeilds the premise that $v$ is well-typed under the context
-    $(\Delta \cup \{\loc\},\cdot,\phicx \conj \Delta \outlives \loc)$.
-    However, we have to prove that $v$ is well-typed under the smaller
-    context $(\Delta,\cdot,\phicx)$. We carry out this proof by
+    \item \rulee{LetRegionEnd} case ($e = \letd{\loc}{v}$): Steps to
+    $v$. Inverting the typing derivation of $e$ yeilds the premise
+    that $v$ is well-typed under the context $(\Delta \cup
+    \{\loc\},\cdot,\phicx \conj \Delta \outlives \loc), \cdot, \loc$,
+    and that the type is well-formed under the smaller context
+    $(\Delta,\cdot,\phicx)$. Let the type be $\tau$. We now have to
+    prove that $v$ is well-typed ($\tau$) under the typing context
+    $(\Delta,\cdot,\phicx), \cdot, \loc'$. We carry out this proof by
     induction on the structure of value $v$:
     \begin{itemize}
-      \item If $v$ is an object value (e.g.,
-      $B\inang{\tbar}\inang{\locbar}(\vbar)$), IH yeilds the
-      well-typedness of $\vbar$ under $(\Delta,\cdot,\phicx)$, and the
-      premise 
-      $\tywf{(\Delta,\cdot,\phicx)} {B\inang{\tbar}\inang{\locbar}}$,
-      obtained by inverting the type judgment for \C{letd}, yeilds the
-      well-typedness of whole value.
+      \item When $v$ is an object value (i.e., $\C{new}\;
+      B\inang{\tbar}\inang{\locbar}(\vbar)$): We know that the type of
+      $\vbar$ is determined by
+      $\fields(B\inang{\tbar}\inang{\locbar})$. Since
+      $B\inang{\tbar}\inang{\locbar}$ is well-formed under
+      $(\Delta,\cdot,\phicx)$ (premise), and $\loc \notin \Delta$, we
+      know that types of $\vbar$ are well-formed under
+      $(\Delta,\cdot,\phicx)$ (see class well-formedness rule). Hence,
+      by IH, they retain their type under the typing context
+      $(\Delta,\cdot,\phicx), \cdot, \loc'$. Using the type rule of
+      \C{new}, we derive that $\C{new}\;
+      B\inang{\tbar}\inang{\locbar}(\vbar)$ has the type $\tau$ under
+      $(\Delta,\cdot,\phicx), \cdot, \loc'$.
 
-      \item A region handler value ($\RgnZT{\toploc\loc'}(v)$) is
-      well-typed under any context.
+      \item When $v$ is a region handler (i.e.,
+      $\RgnZT{\toploc\loc''}(v')$): $v'$ has type $T@\loc''$ under
+      $(\Delta \cup \{\loc,\loc''\},\cdot,\phicx \conj \Delta
+      \outlives \loc), \cdot, \loc$, and the type is well-formed under
+      $(\Delta \cup \{\loc,\loc''\},\cdot,\phicx \conj \Delta
+      \outlives \loc)$. But, $T@\loc''$ is a type that is well-formed
+      under the minimal context of $(\{\loc''\},\cdot,true)$. Since
+      the context can be strengthened without affecting
+      well-formedness, the type is also well-formed under $(\Delta
+      \cup \{\loc''\},\cdot,\phicx)$. By IH, $v'$ retains it's type
+      ($T@\loc''$) under $(\Delta \cup \{\loc''\},\cdot,\phicx)$. By
+      applying IH, we derive $\hastyp{(\Delta \cup
+      \{\loc''\},\cdot,\phicx), \cdot,
+      \loc'}{\RgnZT{\toploc\loc''}(v')}{\RgnZT{\toprgn}}$.
 
-      \item If $v$ is a function closure, then it is well-tuped under
-      $(\Delta,\cdot,\phicx)$ only if it doesn't trap any references
-      to $\loc$, the \C{letd} location. Since closure's type needs to
-      be well-formed under $(\Delta,\cdot,\phicx)$, its allocation
-      region belongs to $\Delta$, hence outlives $\loc$. Since the
-      closure typing rule requires all free region variables of the
-      closure body outlive the allocation region of closure, it
-      follows that all free region variables strictly outlive $\loc$,
-      hence they belong to $\Delta$. Hence the function closure is
-      well-typed outside \C{letd}.
+      \item When $v$ is a function closure (i.e.,
+      $\lambdaexp{\loc''}{\rho\rhobar\,|\,\phi}{\xbar:\taubar}{e_0}$).
+      By inversion on the typing deriviation of $v$, we know that
+      $\loc'' = \loc$ since a function closure is always allocated in
+      the current allocation context (i.e., the youngest region).
+      Hence it's type ($\tau$) is $\inang{\rho\rhobar \,|\,
+      \phi}\taubar\xrightarrow{\loc}\tau'$, for some $\tau'$. Since
+      $\loc \notin \Delta$, $\tau$ can not be well-formed under
+      $(\Delta, \cdot, \phicx)$ - a contradiction. In other words, a
+      function closure can never escape a region's lexical scope.
     \end{itemize}
 
-  \item \rulee{OpenEnd} case: The proof is similar to the \C{letd}
-  case.
+  \item \rulee{Open} case ($e \,=\, \open{v_a}{y}{\pi}{e_b}$): We know
+  that $v_a \,=\, \RgnZT{\toploc\loc}(v)$, for some location $\loc$
+  and value $v$. By inversion on the typing derivation:
+  \begin{smathpar}
+  \begin{array}{l}
+    \pi \notin \Delta \\
+    \hastyp{(\Delta \cup \{\pi\},\cdot,\phicx), [y\mapsto T@\pi],
+    \pi}{e_b}{\tau}\\
+    \tywf{(\Delta, \cdot, \phicx)}{\tau}\\
+    \hastyp{(\Delta,\cdot,\phicx),\cdot,\rgn}{v_a} {\RgnZT{\toprgn}}\\
+  \end{array}
+  \end{smathpar}
+  Since $\pi \notin \Delta$ and $\tywf{\Delta}{\phicx}$ and
+  $\tywf{(\Delta, \cdot, \phicx)}{\tau}$ (i.e., $\pi$ does not occur
+  free in $\phicx$ and $\tau$):
+  \begin{smathpar}
+  \begin{array}{l}
+    \hastyp{(\Delta \cup \{\loc\},\cdot,\phicx), [y\mapsto T@\loc],
+    \loc}{[\loc/\pi]e_b}{\tau}\\
+  \end{array}
+  \end{smathpar}
+  Since $\hastyp{(\Delta \cup \{\loc\},\cdot,\phicx), \cdot, \loc}
+  {v}{T@\loc}$, by substitution lemma:
+  \begin{smathpar}
+  \begin{array}{l}
+    \hastyp{(\Delta \cup \{\loc\},\cdot,\phicx), \cdot, \loc}
+      {[v/y][\loc/\pi]e_b}{\tau}\\
+  \end{array}
+  \end{smathpar}
+  We know that the reduced expression ($e'$) is $\opened{l}{s} 
+  {[v/y][\loc/\pi]e_b}$, where $s = \mem(\loc)$. Moreover, if 
+  $\loc \in \Delta$, then since $\consistent(\Delta,\mem)$, we have
+  $\mem(\loc)=\LIVE$. Therefore, by applying the type rule for
+  \C{opened} expression, we derive:
+  \begin{smathpar}
+  \begin{array}{l}
+    \hastyp{(\Delta,\cdot,\phicx), \cdot, \rgn} 
+      {\opened{\loc}{s}{[v/y][\loc/\pi]e_b}}{\tau}\\
+  \end{array}
+  \end{smathpar}
+  Hence, $e'$ has the same type as $e$.
+
+  \item \rulee{OpenEnd} case: The proof is very similar to the
+  \C{letd} case.
   \qed
   \end{itemize}
 \end{proof}

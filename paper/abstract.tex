@@ -16,14 +16,20 @@ to improve performance.
 
 Manual memory management is susceptible to the usual perils of
 dangling pointers. A key contribution of this paper is a
-refinement-based region type system, for a C\#-like typed object-oriented
-language with higher-order functions and generics, that ensures the
-memory safety of programs in the presence of transferable regions.
-We complement our type system with a type inference algorithm, which eliminates the need for programmers to write region annotations on types.
+refinement-based region type system, for a C\#-like typed
+object-oriented language with higher-order functions and generics,
+that ensures the memory safety of programs in the presence of
+transferable regions.  We complement our type system with a type
+inference algorithm, which eliminates the need for programmers to
+write region annotations on types.
 % The cornerstone of our inference algorithm is a novel constraint solver that
 % performs abduction in a partial-order constraint domain to infer weakest solutions
 % to recursive constraints.
-We establish soundness and partial completeness results for the type inference algorithm: in particular, the key steps of constraint-generation and constraint-solving in the type inference algorithm are complete. We describe a prototype implementation of our inference algorithm and the constraint solver, and our experience of using it to enforce memory safety in dataflow programs.
+The inference algorithm has been proven sound, and the constraint
+solving algorithm used by the inference has been proven complete.  We
+describe a prototype implementation of the inference algorithm and the
+solver, and our experience of using it to enforce memory safety in
+dataflow programs.
 
 
 % while facilitating the reuse of existing C\# libraries with no modifications.

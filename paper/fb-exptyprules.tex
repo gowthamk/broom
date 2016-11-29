@@ -1,39 +1,34 @@
 %
 % LET expression
-\begin{minipage}{2in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}{e_1}{\tau_1}\\
-    \hastyp{\exptycx{\ralloc}{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}\\
-  }
-  {
-    \hastyp{\exptycx{\ralloc}{\env}}{\letexp{x}{e_1}{e_2}}{\tau_2}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
 \begin{minipage}{1.8in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-   \\
-    \hastyp{\exptycx{\ralloc}{\env}}{\bar{e}}{\taubar} \\
-    \tywf{\A}{\fbN} \spc
-    \fields(\fbN) = \bar{f} : \taubar \\
-%   \subtyp{\A}{\bar{\tau'}}{\taubar}\\
-%   \absof{\fbN} = \RgnZ\inang{T} \; \Rightarrow \;
-%   \allocRgn(\fbN)=\toprgn\\
-%   allocRgn(\fbN) = \rgn \spc
-%   \isvalid{\A.\phicx}{\rgn \outlives \ralloc}
+    \hastyp{\exptycx{\env}{\rgn}}{e_1}{\tau_1}\\
+    \hastyp{\exptycx{\env[x\mapsto\tau_1]}{\rgn}}{e_2}{\tau_2}\\
   }
   {
-    \hastyp{\exptycx{\ralloc}{\env}}{\C{new}\; \fbN(\bar{e})}{\fbN}
+    \hastyp{\exptycx{\env}{\rgn}}{\letexp{x}{e_1}{e_2}}{\tau_2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
+\begin{minipage}{1.2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{\bar{e}}{\taubar} \\
+    \tywf{\A}{\fbN} \spc
+    \fields(\fbN) = \bar{f} : \taubar \\
+  }
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{\C{new}\; \fbN(\bar{e})}{\fbN}
   }
 \end{array}
 \end{smathpar}

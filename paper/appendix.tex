@@ -75,7 +75,7 @@ for a new transferable region, it is mapped to $\USED$. The binding is
 updated when the transferable region is opened, closed, or
 transferred. Likewise, when a $\C{letregion}$ expression is evaluated
 to a value, the binding for the corresponding location is set to
-$\XFERRED$, effectively dellocating the region. Opening an already
+$\XFERRED$, effectively deallocating the region. Opening an already
 transferred region, or transferring a currently-open region results in
 an exception ($\bot$). The semantics gets stuck while evaluating a
 field access, a method call, or a lambda application, if the region
@@ -86,7 +86,7 @@ the expression typing judgment (Fig.~\ref{fig:fb-staticsem-2}).
 
 \input{typesystem-proofs}
 
-\input{fb-constraint-generation-extra}
+%\input{fb-constraint-generation-extra}
 
-\input{typeinference-proofs}
+%\input{typeinference-proofs}
 \input{misc}

@@ -97,7 +97,7 @@
 \newcommand{\extends}{\triangleleft}
 \newcommand{\rextends}{\blacktriangleleft}
 \renewcommand{\bar}[1]{\overline{#1}}
-\newcommand{\angR}{\inang{\rhoalloc,\rhobar \,|\, \phi}}
+\newcommand{\angR}{\inang{\rhobar \,|\, \phi}}
 \newcommand{\angT}{\inang{\tbar}}
 \newcommand{\tyvar}{a}
 \newcommand{\tyvarb}{b}
@@ -116,7 +116,7 @@
 \newcommand{\constraintSet}{C}
 \newcommand{\regionDeltaMap}{{\Delta_R}}
 \newcommand{\predDeltaMap}{{\Delta_P}}
-\newcommand{\mang}{\inang{\rhoalloc_m,\bar{\rho_m} \,|\, \phi_m}}
+\newcommand{\mang}{\inang{\bar{\rho_m} \,|\, \phi_m}}
 \newcommand{\rhoset}{\Sigma}
 \newcommand{\rhomap}{\Sigma}
 \newcommand{\rhoenv}{\Delta}
@@ -127,7 +127,7 @@
 \newcommand{\phisol}{\phi_{sol}}
 \newcommand{\subtypcx}{\rhoenv,\aenv,\phicx}
 \newcommand{\A}{{\mathcal{A}}}
-\newcommand{\exptycx}[1]{\A,#1}
+\newcommand{\exptycx}[2]{\A,#1,#2}
 \newcommand{\void}{\C{void}}
 \newcommand{\functy}[3]{\FuncZ\inang{#1}\inang{#2,#3}}
 \newcommand{\stmtsemcx}{\A,\env}
@@ -206,8 +206,8 @@
 \newcommand{\RgnZT}[1]{\RgnZ\inang{T}\inang{#1}}
 \newcommand{\BZ}[0]{B\inang{\tbar}}
 \newcommand{\BZT}[1]{B\inang{\tbar}\inang{#1}}
-\newcommand{\redstoo}[3]{#1 \vdash #2 \longrightarrow #3}
-\newcommand{\redstocup}[3]{\redsto{\rhoenv \cup \{#1\}}{#2}{#3}}
+\newcommand{\redstoo}[3]{#2 \longrightarrow #3} %\Delta ignored
+\newcommand{\redstocup}[3]{\redstoo{\rhoenv \cup \{#1\}}{#2}{#3}}
 \newcommand{\loc}{\mathtt{l}}
 \newcommand{\locbar}{\overline{\loc}}
 \newcommand{\isLive}{{\sf isLive}}

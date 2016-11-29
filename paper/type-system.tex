@@ -34,7 +34,8 @@ be read \emph{extends}, and the symbol $\outlives$ stands for
 \emph{outlives}):
 \begin{codejava}[mathescape=true]
 class Pair<a $\extends$ Object, b $\extends$ Object>
-          <$\rho^a, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho^a \conj \rho_2 \outlives \rho^a$> $\extends$ Object<$\rho^a$> {
+          <$\rho_0, \rho_1, \rho_2 \,|\, \rho_1 \outlives \rho_0 \conj
+          \rho_2 \outlives \rho_0$> $\extends$ Object<$\rho_0$> {
   a@$\rho_1$ fst; 
   b@$\rho_2$ snd;
   a@$\rho_1$ getFst() { return this.fst; }
@@ -52,19 +53,24 @@ A class in \FB is parametric over zero or more type variables (as
 in FGJ) as well as one or more region variables $\rho$.
 % In the above example, the class \C{Pair} is parameterized over
 % $\rho^a, \rho_1, \rho_2$.
-We refer to the first region parameter, usually denoted $\rho^a$, as
-the \emph{allocation region} of the class: it serves to identify the
-region where an instance of the class is allocated.
+We refer to the first region parameter ($\rho_0$ in the above example)
+as the \emph{allocation region} of the class: it serves to identify
+the region where an instance of the class is allocated\footnote{In
+general, $\rhobar$ denotes the sequence $\rho_1\rho_2...$ of region
+parameters of a class or a method. In some cases, we also represent
+region parameters as $\rho\rhobar$ to clearly distinguish between
+the allocation region parameter ($\rho$) and the rest.}.
 %
-An object in \FB can contain fields referring to objects allocated in regions ($\rhobar$) other than its
-own allocation region ($\rhoalloc$), provided that the former outlive
-the latter (i.e., $\rhobar \outlives \rhoalloc$). In such case, the
-definition of object's class needs to be parametric over allocation
-regions of its fields (i.e., their classes). Furthermore, the
-constraint that such regions must outlive the allocation region of the
-class needs to be made explicit in the definition, as the \C{Pair}
-class does in the above definition. We say that the \C{Pair} class
-exhibits \emph{constrained region polymorphism}.
+An object in \FB can contain fields referring to objects allocated in
+regions ($\rhobar$) other than its own allocation region ($\rho$),
+provided that the former outlive the latter (i.e., $\rhobar \outlives
+\rho$). In such case, the definition of object's class needs to be
+parametric over allocation regions of its fields (i.e., their
+classes). Furthermore, the constraint that such regions must outlive
+the allocation region of the class needs to be made explicit in the
+definition, as the \C{Pair} class does in the above definition. We say
+that the \C{Pair} class exhibits \emph{constrained region
+polymorphism}.
 %
 % For instance, a \C{Pair} object allocated in a region ${\rhoalloc}$ can have its first
 % component coming from ${\rho_1}$ and second from $\rho_2$, as long as
@@ -77,6 +83,7 @@ variables ($\rho$) and region identifiers ($\pi$). Region identifiers
 are to region variables, as types ($T$) are to type variables ($a$)}
 ($\rgn$), respectively. For example:
 \begin{codejava}
+
 letregion $\pi_0$ in
   let snd = new Object<$\pi_0$>() in
   letregion $\pi_1$ in
@@ -84,7 +91,7 @@ letregion $\pi_0$ in
     let p = new Pair<Object,Object><$\pi_1$,$\pi_1$,$\pi_0$> (fst,snd);
 \end{codejava}
 %\vspace*{-0.1in}
-In the above code, the instantiation of $\rhoalloc$ and $\rho_1$ with
+In the above code, the instantiation of $\rho_0$ and $\rho_1$ with
 $\pi_1$, and $\rho_2$ with $\pi_0$ is allowed because (a) $\pi_0$
 and $\pi_1$ are live during the instantiation, and (b). $\pi_0
 \outlives \pi_1$ and $\pi_1 \outlives \pi_1$ (since outlives is
@@ -113,7 +120,7 @@ $\inang{\rho_0,\rho_1,\rho_2 \,|\, \rho_1 \outlives \rho_0 \conj
 region-polymorphic higher-order fields are used frequently by the
 dataflow operators, which apply them in the context of various regions
 (\emph{e.g.,} see Fig.~\ref{fig:motivating-eg-in-broom}). Keeping type
-parameterization seperate from region parameterization allows \FB to
+parameterization separate from region parameterization allows \FB to
 type such examples. This choice also simplifies type inference in the
 presence of higher-order functions.
 
@@ -309,12 +316,13 @@ extend (this artifact is inherited from FGJ), and
 constraints on regions in $\rhoenv$.
 \end{itemize}
 In addition, the context for the expression typing judgment also
-includes a type environment ($\env \in x \mapsto \tau$) that contains
-the type bindings for variables in scope. Like the judgments in
-FGJ~\cite{fgj}, all the judgments defined by the rules in
-Fig.~\ref{fig:fb-staticsem} are implicitly parameterized on a class
-table ($CT \in cn \mapsto D$) that maps class names to their
-definitions in \FB.
+includes (a). a type environment ($\env \in x \mapsto \tau$) that
+contains the type bindings for variables in scope, and (b). The region
+($\rgn$) that serves as the allocation context for the expression
+being type checked. Like the judgments in FGJ~\cite{fgj}, all the
+judgments defined by the rules in Fig.~\ref{fig:fb-staticsem} are
+implicitly parameterized on a class table ($CT \in cn \mapsto D$) that
+maps class names to their definitions in \FB.
 
 \noindent The well-formedness judgment on region types
 ($\tywf{\A}{\tau}$) makes use of the well-formedness and subtyping
@@ -458,17 +466,16 @@ result of its evaluation.
 
 The type rule for \C{letregion} expression requires that the static
 identifier introduced by the expression be unique under the current
-context (i.e., $\rgn \notin \rhoenv$). This condition is needed in
-order to prevent the new region from incorrectly assuming existing
-outlives relationships on an eponymous region. Provided this is
-satisfied, the expression ($e$) under \C{letregion} is then
-typechecked assuming that the new region is live ($\rgn \in \rhoenv$)
-and that it is outlived by all existing live regions ($\rhoenv
-\outlives \rgn$). The result of a \C{letregion} expression must have a
-type that is well-formed under a context not containing the new
-region. This ensures that the value obtained by evaluating a
-\C{letregion} expression contains no references to the temporary
-objects inside the region.
+context (i.e., $\pi \notin \Delta$). This condition is needed in order
+to prevent the new region from incorrectly assuming existing outlives
+relationships on an eponymous region. Provided this is satisfied, the
+expression ($e$) under \C{letregion} is then typechecked assuming that
+the new region is live ($\Delta \cup \{\pi\}$) and that it is outlived
+by all existing live regions ($\Delta \outlives \pi$). The result of a
+\C{letregion} expression must have a type that is well-formed under a
+context not containing the new region. This ensures that the value
+obtained by evaluating a \C{letregion} expression contains no
+references to the temporary objects inside the region.
 
 The rule for \C{open} expression, unlike the rule for \C{letregion},
 does not introduce any outlives relationship between the newly opened
@@ -478,21 +485,16 @@ inside the transferable region from storing references to those
 outside.  Environment ($\env$) is extended with binding for the type
 of root object while typechecking $e$. 
 
-The type rule for lambda expression typechecks
-% requires that its region
-% parameters ($\rhoalloc\rhobar$) be unique under the current context,
-% and that the constraints ($\phi$) over region parameters be
-% well-formed. 
-the lambda-bound expression ($e$) under an extended type environment
-containing bindings for function's arguments, assuming that region
-parameters are live, and that declared constraints over region
-parameters hold. The constraints ($\phi$) are required to be
-well-formed under $\rhoenv$ extended with the function's region
-parameters ($\rhobar$). The premise $\forall
-(\rgn'\in\frv(e)\setminus\{\rhobar\}). ~\isvalid{\phicx}
-{\rgn'\outlives\rgn}$ ensures the safety of dereferences inside the
-closure by requring that all free region variables ($\frv$) trapped by
-the closure outlive the allocation region of the closure.
+The type rule for lambda expression typechecks the lambda-bound
+expression ($e$) under an extended type environment containing
+bindings for function's arguments, assuming that region parameters are
+live, and that declared constraints over region parameters hold. The
+constraints ($\phi$) are required to be well-formed under $\Delta$
+extended with the function's region parameters ($\rho\rhobar$). Note
+that the closure is always allocated in the current allocation context
+($\rgn$). This prevents the closure from escaping the context in which
+it is created, thus trivially ensuring the safety of any dereferences
+inside the closure. 
 
 % The type rule for the \C{new} expression is a straightforward
 % adaptation of corresponding FGJ rule to the the region type setting.
@@ -512,7 +514,7 @@ the closure outlive the allocation region of the closure.
 
 Fig.~\ref{fig:fb-opsem-1} and~\ref{fig:fb-opsem-2} in the appendix
 defines a small-step operational semantics for \fbname via a
-five-place reduction relation:
+four-place reduction relation:
 % \vspace*{-0.15in}
 \begin{smathpar}
   \redstoo{\rhoenv}{(e,\mem)}{(e',\mem')}
@@ -523,16 +525,15 @@ abstracts all the memory locations associated with a region (i.e.,
 each memory region is associated with a single location). The
 typestate of regions is tracked by a finite map ($\mem$) from
 locations to typestates (Fig.~\ref{fig:region-fsm}). The reduction
-relation should be read as following: given a set ($\rhoenv$) of
-regions that are currently live, and an initial typestate map
-($\mem$), the expression $e$ reduces to $e'$, while updating $\mem$ to
-$\mem'$. The semantics gets ``stuck'' if $e$ attempts to access an
-object whose allocation region is not present in $\rhoenv$, or if $e$
-tries to \C{open} a transferable region that is not mapped to an
-appropriate typestate by $\mem$.  On the other hand, if $e$ attempts
-to commit an operation on a $\RgnZ$ object that is not sanctioned by
-the transition discipline in Fig.~\ref{fig:region-fsm}, then it raises
-an exception value ($\invalidexn$).
+relation relates an expression ($e$) and a typestate map ($\mem$) to a
+reduced expression ($e'$) and an updated typestate map ($\mem'$). The
+semantics gets ``stuck'' if $e$ attempts to access an object whose
+allocation region is not present in $\rhoenv$, or if $e$ tries to
+\C{open} a transferable region that is not mapped to an appropriate
+typestate by $\mem$.  On the other hand, if $e$ attempts to commit an
+operation on a $\RgnZ$ object that is not sanctioned by the transition
+discipline in Fig.~\ref{fig:region-fsm}, then it raises an exception
+value ($\invalidexn$).
 
 Replacing $\pi$'s and $\rho$'s with $\loc$'s at runtime results in a
 new class of expressions that are not captured in

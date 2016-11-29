@@ -78,9 +78,8 @@ The algorithm consists of the following steps:
 % \label{fig:type-inference-algo}
 % \end{figure}
 
-We later on establish the soundness of the type inference algorithm, and also establish
-that the constraint-generation and constraint-solving steps (the second and third steps
-above) are complete.
+We later on establish the soundness of the type inference algorithm,
+and the completeness of constraint-solving step.
 
 \subsection{Region Parameterization for Classes}
 \label{sec:fb-templatization}
@@ -577,7 +576,7 @@ if this set is non-empty. If this set is empty for any $\rho$, $\thesoln$ is und
 The set $\satC$ also makes it easy to check if $C$ is satisfiable.
 Let $\myground{C}$ denote the subset of all ground constraints
 (\ie, constraints without any region variable or predicate variable)
-in $\saturate{C}$. Let $\rhoC$ denote the subset of all wellformedness
+in $\saturate{C}$. Let $\rhoC$ denote the subset of all well-formedness
 constraints for region variables in $\satC$.
 Define $\solveCon{C}$ as below.
 

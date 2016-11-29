@@ -83,7 +83,7 @@
    \A = (\rhoenv,\aenv,\phicx)  \spc \rgn \notin \rhoenv \spc
       \A' = (\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn))
    \nl
-   \exprok{\A',\rgn,\env} {e} {\tau} {C_1} \spc
+   \exprok{\A',\env} {e} {\tau} {C_1} \spc
       \typeok {\A} {\tau} {C_2}
 }{
    \exprok{\stdcontext} {\letregion{\rgn}{e}} {\tau} {(C_1 \cup C_2)}

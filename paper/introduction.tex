@@ -210,13 +210,13 @@ annotations.
 % approach in practical setting.
 
 Our inference algorithm proceeds in three stages: in the first stage,
-we elaborate the program by introducing region parameters (for classes and methods);
-in the second stage we generate a set of constraints that must be satisfied for
-the program to type check; in the third stage, we solve the set of constraints,
-inferring the preconditions of all classes and methods (in terms of the
-expected outlives-constraints between the region parameters).
-We show that the second and third stages are sound as well as
-complete (while the first stage is sound).
+we elaborate the program by introducing region parameters (for classes
+and methods); in the second stage we generate a set of constraints
+that must be satisfied for the program to type check; in the third
+stage, we solve the set of constraints, inferring the preconditions of
+all classes and methods (in terms of the expected outlives-constraints
+between the region parameters).  We show that the algorithm is sound,
+and the last stage of constraint solving is complete.
 % (using an interprocedural fixed point computation).
 
 \paragraph{Evaluation.}
