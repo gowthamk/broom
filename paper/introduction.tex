@@ -1,5 +1,6 @@
 \newcommand{\TODO}[1]{\textbf{TODO: #1}} \newcommand{\eg}{\emph{e.g.}}
 \newcommand{\ie}{\emph{i.e.}}
+\newcommand{\mypara}[1]{\textbf{#1}}
 
 \section{Introduction} \label{sec:introduction}
 
@@ -21,7 +22,7 @@ to its successor.
 
 \input{motivating-eg}
 
-\paragraph{Performance.}
+\mypara{Performance.}
 When the transferred data structures are large, as is the case with many
 streaming big-data analysis systems, garbage collection overhead becomes
 significant~\cite{Broom:HotOS}.  Further, in a distributed
@@ -61,7 +62,7 @@ invalid after transfer.}
 \label{fig:transfer-violations}
 \end{figure}
 
-\paragraph{Safety.}
+\mypara{Safety.}
 Several of these systems are designed to allow the producer and consumer to
 execute in the same address space or in different address spaces
 (as determined by the compiler and runtime).
@@ -85,7 +86,7 @@ is transferred. Allowing such references is crucial, % to performance,
 as any non-trivial program creates temporary references to the internal
 objects of a data-structure.
 
-\paragraph{Safe Transferable Regions.}
+\mypara{Safe Transferable Regions.}
 In this paper, we present a language-based approach to cleanly encapsulated
 transferable data and a safe and efficient implementation of such data based
 on regions. 
@@ -141,7 +142,7 @@ Unlike the prior work, we ensure memory safety in the presence of
 transferable regions through a \emph{combination of a static
 typing discipline and lightweight runtime checks in place of linear types}.
 
-\paragraph{Language.}
+\mypara{Language.}
 The cornerstone of this approach is an \C{open} lexical block for transferable regions,
 that ``opens'' a transferable region and guarantees that the region
 won't be transferred/freed while it is open. By nesting a
@@ -171,13 +172,13 @@ regions such objects are allocated in, and by maintaining outlives
 relationships between various regions, we can statically decide the
 safety of all references in the program.
 
-\paragraph{Type System.}
+\mypara{Type System.}
 Formally, our type system introduces \emph{region parameters} (for both
 classes and methods) and uses constrained parametric polymorphism
 over these parameters, where the constraints capture outlives constraints
 between the region parameters.
 
-\paragraph{Lightweight Runtime Checks.}
+\mypara{Lightweight Runtime Checks.}
 Ensuring memory safety using this approach requires ensuring
 that the use of transferable regions satisfies certain temporal properties.
 Firstly, a transferable region should not be transferred/freed
@@ -199,7 +200,7 @@ coarse-grained objects manipulated infrequently, when compared to the
 fine-grained objects that are present inside these regions, for which
 safety is enforced statically. 
 
-\paragraph{Type Inference.}
+\mypara{Type Inference.}
 One of the key contributions of this paper is a sound type inference algorithm
 that eliminates the need for users to write region type annotations.
 The users write programs in the underlying language that provides
@@ -219,7 +220,7 @@ between the region parameters).  We show that the algorithm is sound,
 and the last stage of constraint solving is complete.
 % (using an interprocedural fixed point computation).
 
-\paragraph{Evaluation.}
+\mypara{Evaluation.}
 Our work was inspired by~\cite{Broom:HotOS}, which presents evidence that
 realistic programs can be written using transferable regions
 and that this can yield significant performance improvements.
@@ -412,7 +413,7 @@ verify programs correct (once the errors were fixed).
 % it would be for the first set of invariants.
 % >>>>>>> af17b22a358a6165ae10628a5247cd4fa66adc07
 
-\paragraph{Contributions.}
+\mypara{Contributions.}
 The paper makes the following contributions:
 
 \begin{itemize} 

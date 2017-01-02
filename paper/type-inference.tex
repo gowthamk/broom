@@ -31,8 +31,8 @@ expressions, similar to the language introduced in
 For simplicity, we assume that each \C{letregion} and \C{open} construct
 in the input program introduces a distinct region identifier $\pi$.
 
-\paragraph{Overview.}
-
+\mypara{Overview.}
+%
 % Fig.~\ref{fig:type-inference-algo}
 We now present a high-level outline of the type inference algorithm.
 The algorithm consists of the following steps:
@@ -252,7 +252,7 @@ We will discuss this aspect again later.
 The constraint generation algorithm mimics the static type checker, but accumulates
 constraints that must hold for the type checking to succeed.
 
-\paragraph{Syntax of Constraints.}
+\mypara{Syntax of Constraints.}
 (See~Fig.~\ref{fig:constraint-syntax}.)
 The constraints are expressed using a set $\regionConstants$ of region constants,
 a set $\regionVars$ of region variables, and a set $\predVars$ of predicate variables.
@@ -336,7 +336,7 @@ constraint formulas over a fixed set of  regions ($\rhoenv = \{ \pi_1, \cdots, \
 %
 %\end{itemize}
 
-\paragraph{Constraint Solution.}
+\mypara{Constraint Solution.}
 We define an \emph{assignment} $\soln$ to be a pair of functions $(\solnR,\solnP)$,
 where $\solnR$ is a map from $\regionVars$ to $\regionConstants$
 and $\solnP$ is a map from $\predVars$ to a region-constraint formula.
@@ -346,7 +346,7 @@ We say that $C$ is \emph{satisfiable} if it has a satisfying assignment.
 
 \input{fb-constraint-generation}
 
-\paragraph{Constraint Generation.}
+\mypara{Constraint Generation.}
 The constraint generation algorithm is a direct adaption of the type checker:
 each type checking judgment is modified to produce a set of constraints that must hold
 for the type checker to succeed.
@@ -482,7 +482,7 @@ The above lemma shows how we can reduce a non-trivial abduction constraint to
 either a trivial abduction constraint or a non-abduction constraint,
 provided that the consequent is an outlives-constraint without region variables.
 
-\paragraph{Constraint Solver.}
+\mypara{Constraint Solver.}
 The first step in our algorithm for solving a set of constraints $C$
 computes a set $\satC \supseteq C$ of constraints by iteratively applying
 the following rules until a fixed point is reached:
@@ -601,7 +601,7 @@ $\ell_i$ and $r$ is an outlives-constraint.
 Let $D$ denote $\{ \isvalid{}{\ell_i} \;|\; i \in I \}$.
 The given constraint is valid iff $r$ belongs to $\saturate{D}$.
 
-\paragraph{Algorithmic Aspects.}
+\mypara{Algorithmic Aspects.}
 Note that checking the validity of a ground constraint can be realized using
 a simple graph reachability algorithm.
 %
@@ -756,7 +756,7 @@ This can help the type-inference overcome these limitations.
 %
 %\subsection{Example}
 %
-%\paragraph{Constraints Example 1} Consider the $\C{Pair}$ class
+%\mypara{Constraints Example 1} Consider the $\C{Pair}$ class
 %template from \S\ref{sec:fb-templatization}. Following constraints are
 %generated during its elaboration (Constrains are identified with
 %$\mathbf{c_i}$'s. Some trivial constraints, such as $\rho_4 \in
@@ -775,7 +775,7 @@ This can help the type-inference overcome these limitations.
 %\end{array}
 %\end{smathpar}
 %
-%\paragraph{Constraints Example 2} Let us add to the \C{Pair} class a
+%\mypara{Constraints Example 2} Let us add to the \C{Pair} class a
 %contrived method $\C{alt}$ that accepts a \C{Region} object \C{r}, a
 %\C{Pair} object \C{q}, and an object \C{y}. It assigns
 %\C{y} to \C{fst} and \C{snd} fields of \C{q}, and calls itself
@@ -826,7 +826,7 @@ This can help the type-inference overcome these limitations.
 %\end{array}
 %\end{smathpar}
 %
-% \paragraph{Constraints Example 1} The original source of all
+% \mypara{Constraints Example 1} The original source of all
 % outlives constraints is the validity constraint $C_3$ in $\elabClass$
 % function (Fig.~\ref{fig:fb-elabmeth}). In context of the $\C{Pair}$
 % class template from \S\ref{sec:fb-templatization}, the constraint is
@@ -836,7 +836,7 @@ This can help the type-inference overcome these limitations.
 %   \succeq \rhoalloc_0 \conj \rho_4 = \rhoalloc_0}\)
 % \end{center}
 
-% \paragraph{Constraints Example 2} Consider a contrived method
+% \mypara{Constraints Example 2} Consider a contrived method
 % $\C{alt}$ that accepts an argument $\C{p}$ of type
 % $\C{Pair}\inang{\C{A},\C{A}}$, and two objects ($\C{x}$ and $\C{y}$)
 % of type $A$. It then assigns one object to $\C{p.fst}$ and other to

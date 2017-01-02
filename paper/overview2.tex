@@ -10,7 +10,7 @@ region-specific constructs.
 \subsection{Using Regions in \name}
 \label{sec:alloc-ctxt}
 
-\paragraph{Stack Regions} The ``\C{letregion R \{ S \}}'' construct
+\mypara{Stack Regions} The ``\C{letregion R \{ S \}}'' construct
 creates a new stack region, with a static identifier \C{R}, whose
 scope is restricted to the statement \C{S}. The semantics of
 \C{letregion} is similar to Tofte and Talpin~\cite{tofte94}'s
@@ -18,7 +18,7 @@ scope is restricted to the statement \C{S}. The semantics of
 newly created region while \C{R} is in scope, but the region and all
 objects allocated within it are freed at the end of \C{S}.
 
-\paragraph{Object Allocation} The ``\C{new@R T()}'' construct creates
+\mypara{Object Allocation} The ``\C{new@R T()}'' construct creates
 a new object of type \C{T} in the region \C{R}. The specification of
 the allocation region \C{R} in this construct is optional.  At
 runtime, \name maintains a stack of \emph{active} regions, and we
@@ -35,14 +35,14 @@ region-oblivious C\# libraries, as explained soon.
 %effect that all objects allocated by this invocation are allocated in
 %the new region \C{R}.
 
-\paragraph{Transferable Regions} 
+\mypara{Transferable Regions} 
 % \name's \emph{transferable regions} are an encapsulation of a
 % data-structure that can be transferred between autonomous entities
 % (\eg, between two concurrently executing threads or actors).  Hence,
 % unlike stack regions, transferable regions are not constrained to have
 % a lexically scoped lifetime.  (Hence, we also refer to them as
 % \emph{dynamic} regions.)
-
+%
 Transferable regions are first class values of \name: they are objects
 of the class \C{Region}, they are created using the \C{new} keyword,
 and can be passed as arguments, stored in data structures, and
@@ -92,7 +92,7 @@ within it), and \C{transfer} method that transfers the region to a
 % unimportant in the context of the region type system and we will not
 % discuss them further.
 
-\paragraph{Open and Closed Regions} A transferable region must be
+\mypara{Open and Closed Regions} A transferable region must be
 explicitly \emph{opened} using \name's \C{open} construct in order to
 either read or update or allocate objects in the region.
 Specifically, the construct ``\C{open rgn as v@R \{ S \}}'' does the
@@ -115,7 +115,7 @@ Thus, given a  C\# library function \C{f} (that makes no use of \name's region c
 opening a region \C{R} and invoking \C{f} has the effect that all objects created by this
 invocation are allocated in the region \C{R}.
 
-\paragraph{Motivating Example}
+\mypara{Motivating Example}
 % We now illustrate how the features of \name can be used to 
 Fig.~\ref{fig:motivating-eg-in-broom} shows how the motivating example
 of Fig.~\ref{fig:motivating-eg} can be written in \name.  The
@@ -208,7 +208,7 @@ method transfers the \C{outRgn} at \C{map[t]} to a downstream actor.
 
 \input{fb-syntax}
 
-\paragraph{Cloning} Note that in the example from
+\mypara{Cloning} Note that in the example from
 Fig.~\ref{fig:motivating-eg-in-broom} the object returned by the
 \C{selector} (on Line 13) should not contain any references to the
 input object, since the input region, where the object resides, will
