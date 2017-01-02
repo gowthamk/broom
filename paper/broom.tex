@@ -1,8 +1,21 @@
-\documentclass{llncs}
+\documentclass[a4paper,UKenglish]{lipics-v2016}
+%This is a template for producing LIPIcs articles. 
+%See lipics-manual.pdf for further information.
+%for A4 paper format use option "a4paper", for US-letter use option "letterpaper"
+%for british hyphenation rules use option "UKenglish", for american hyphenation rules use option "USenglish"
+% for section-numbered lemmas etc., use "numberwithinsect"
+ 
+\usepackage{microtype}%if unwanted, comment out or use option "draft"
+
+%\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
+
+\bibliographystyle{plainurl}% the recommended bibstyle
+
+%%%%%%%%%%%%%%%% OUR PRELIM STUFF BEGINS %%%%%%%%%%%%%%%%%%%%
 
 \usepackage{courier}            % standard fixed width font
 \usepackage[scaled]{helvet} % see www.ctan.org/get/macros/latex/required/psnfss/psnfss2e.pdf
-\usepackage{listings}          % format code
+% \usepackage{listings}          % format code
 \usepackage{enumitem}      % adjust spacing in enums
 \usepackage{xspace}
 \usepackage{mathtools}
@@ -11,7 +24,7 @@
 \usepackage{amsmath}
 \usepackage{latexsym}
 \usepackage{graphicx}
-\usepackage[usenames,dvipsnames]{color}
+% \usepackage[usenames,dvipsnames]{color}
 \usepackage{listings}
 \usepackage{subcaption}
 \usepackage{stmaryrd}
@@ -19,7 +32,7 @@
 \usepackage{float}
 \usepackage{verbatimbox}
 \usepackage{breakurl}
-\usepackage[breaklinks,draft=false,backref]{hyperref}
+% \usepackage[breaklinks,draft=false,backref]{hyperref}
 \hypersetup{
      colorlinks   = true,
      citecolor    = blue,
@@ -29,18 +42,45 @@
 \usepackage[multiple]{footmisc}
 
 \input{macros}
-\begin{document}
 
-\newcommand{\dv}[1]{{\bf DV:}\begin{color}{red}#1\end{color}}
+%%%%%%%%%%%%%%%% OUR PRELIM STUFF ENDS %%%%%%%%%%%%%%%%%%%%
 
-%The Paper
-%---------------------
+% Author macros::begin %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title{Safe Transferable Regions}
 
-\author{Gowtham Kaki\inst{1} \and G. Ramalingam\inst{2} \and Kapil Vaswani\inst{2} \and Dimitrios Vytiniotis\inst{2}}
-\institute{Purdue University \and Microsoft Research}
+%% Please provide for each author the \author and \affil macro, even when authors have the same affiliation, i.e. for each author there needs to be the  \author and \affil macros
+\author[1]{Gowthan Kaki}
+\author[2]{G. Ramalingam}
+\author[3]{Kapil Vaswani}
+\author[4]{Dimitrios Vytiniotis}
+\affil[1]{Purdue University}
+\affil[2]{Microsoft Research}
+\affil[3]{Microsoft Research}
+\affil[4]{Microsoft Research}
+\authorrunning{G. Kaki, G. Ramalingam, K. Vaswani, and D. Vytiniotis} %mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et. al.'
 
-% \authorinfo{} {} {}
+\Copyright{Gowtham Kaki, G. Ramalingam, Kapil Vaswani, and Dimitrios Vytiniotis}%mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
+
+% \subjclass{Dummy classification -- please refer to \url{http://www.acm.org/about/class/ccs98-html}}% mandatory: Please choose ACM 1998 classifications from http://www.acm.org/about/class/ccs98-html . E.g., cite as "F.1.1 Models of Computation". 
+\keywords{Memory management, regions, type system, type inference}% mandatory: Please provide 1-5 keywords
+% Author macros::end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\EventEditors{John Q. Open and Joan R. Acces}
+\EventNoEds{2}
+\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
+\EventShortTitle{ECOOP 2017}
+\EventAcronym{ECOOP}
+\EventYear{2017}
+\EventDate{December 24--27, 2016}
+\EventLocation{Little Whinging, United Kingdom}
+\EventLogo{}
+\SeriesVolume{42}
+\ArticleNo{23}
+% Editor-only macros::end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
 \maketitle
 
 \begin{abstract}
@@ -61,13 +101,18 @@
 
 \input{related}
 
-\bibliographystyle{splncs03}
-\small
-\bibliography{broom}
+%%
+%% Appendix
+%%
 
 \appendix
 
 \input{appendix}
 
-\end{document}
+%%
+%% Bibliography
+%%
 
+\bibliography{broom}
+
+\end{document}
