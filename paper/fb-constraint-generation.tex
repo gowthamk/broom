@@ -35,7 +35,7 @@
 \newcommand{\typeok}[3]{{#1\,\vdash\,#2 \; \texttt{ok} \, \lhd #3}}
 \newcommand{\exprok}[4]{{#1} \, \vdash \, {#2} : {#3} \, \lhd {#4}}
 \newcommand{\subtypeok}[4]{{#1} \, \vdash \, {#2}  \subtypesym {#3} \, \lhd {#4}} 
-\newcommand{\stdcontext}{\A,\env}
+\newcommand{\stdcontext}{\A,\env,r}
 
 %% ************ END MACROS *************
 
@@ -68,7 +68,7 @@
     % \typeok {\A.\aenv} {T} {C_1} \spc
     % C_1 = \{ \rgn \in \A.\rhoenv \}
    % \spc
-   \exprok {\stdcontext} {e} {\inang{\rho} \unitZ \xrightarrow{\rgn} T@\rho} {C}
+   \exprok {\stdcontext} {e} {\inang{\rho} \unitZ \xrightarrow{r} T@\rho} {C}
     % \nl
     % \exprok{(\{\rho\},\A.\aenv,true),{\cdot}}{e}{T@\rho}{C_2}
   }
@@ -83,7 +83,7 @@
    \A = (\rhoenv,\aenv,\phicx)  \spc \rgn \notin \rhoenv \spc
       \A' = (\rhoenv \cup \{\rgn\}, \aenv, \phicx \conj (\rhoenv \outlives \rgn))
    \nl
-   \exprok{\A',\env} {e} {\tau} {C_1} \spc
+   \exprok{\A',\env,\rgn} {e} {\tau} {C_1} \spc
       \typeok {\A} {\tau} {C_2}
 }{
    \exprok{\stdcontext} {\letregion{\rgn}{e}} {\tau} {(C_1 \cup C_2)}

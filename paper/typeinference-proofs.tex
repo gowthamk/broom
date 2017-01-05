@@ -25,7 +25,7 @@ we can construct a corresponding \emph{candidate} derivation
 tree $\zeta_2$ of $\hastyp {\A[\soln],\env[\soln]}{e[\soln]}{\tau[\soln]}$.
 We can show that $\zeta_2$ is a valid derivation tree if $\soln$ satisfies $C$.
 (We make use of analogous lemmas for type well-formedness rules as well.)
-\qed
+% \qed
 \end{proof}
 
 %\begin{lemma}
@@ -41,7 +41,7 @@ We can show that $\zeta_2$ is a valid derivation tree if $\soln$ satisfies $C$.
   The only rule that modifies $\phicx$ is the rule for \C{letregion}
   that adds the set of constraints $\pi_f \outlives \pi$ for every $\pi_f \in \rhoenv$
   as conjuncts to $\phicx$.
-\qed
+% \qed
 \end{proof}
 
 We recall the definition of $\predDeltaMap(\varphi)$ first. We work with sets of constraints $C$ that
@@ -91,7 +91,7 @@ is likely.
   then $\phi$ includes the outlives-constraint $\pi'' \outlives \pi'$ for every $\pi'' \in \Delta$.
 
   The result follows.
-\qed
+% \qed
 \end{proof}
 
 %\begin{theorem}
@@ -106,7 +106,7 @@ is likely.
   The Transitivity and Substitution steps are straightforward. The Abduction Decomposition
   step is justified by Lemmas~\ref{lemma:gc-is-decomposable} and~\ref{lemma:decomposition}.
   The reverse implication is trivial.
-\qed
+% \qed
 \end{proof}
 
 \begin{lemma}
@@ -141,7 +141,7 @@ the constraint solver.
 Formally, we can prove via induction that if $\exprok{\stdcontext}{e}{\tau}{C}$ then
 every region variable in the result type $\tau$ will be bound to one of the ``live''
 region constants (\ie, region constants in $\A$).
-\qed
+% \qed
 
 \end{proof}
 
@@ -175,7 +175,7 @@ Then,
   In case (a), $\varphi$ must be bound to a conjunction that includes both
   $\pi_1 \outlives \pi_2$ and $\pi_2 \outlives \pi_1$ in any satisfying assignment
   for $\satC$.
-\qed
+% \qed
 \end{proof}
 
 % \begin{lemma}
@@ -245,7 +245,7 @@ We can show (using Lemma~\ref{lemma:two-bindings}) that $\soln$ satisfies $\isva
 Hence, $\soln$ satisfies $\isvalid{\ell}{r}$ as well.
 
 The same idea works for constraints with occurrences of two region variables in the consequent.
-\qed
+% \qed
 \end{proof}
 
 \begin{theorem}
@@ -282,7 +282,7 @@ We can show that $\{ \pi, \hat{\pi} \} \subseteq \predDeltaMap(\varphi)$
 We can show, by induction over the constraint-generation rules, that if $\Delta$
 includes some element of $\predDeltaMap(\varphi)$, then it includes all elements of $\predDeltaMap(\varphi)$.
 Hence, it follows that $\hat{\pi} \in \Delta$.
-\qed
+% \qed
 % for some predicate variable $\varphi$.
 %
 % If $\groundC$ is satisfiable, the solver will fail to return an assignment only if the set $S_\rho$ = 
@@ -313,6 +313,6 @@ Hence, it follows that $\hat{\pi} \in \Delta$.
 \begin{proof}[\textbf{Theorem~\ref{thm:constraint-solver-sc}}]
 
 Follows from Theorems~\ref{thm:constraint-solver-soundness} and~\ref{thm:constraint-solver-completeness}.
-\qed
+% \qed
 \end{proof}
 

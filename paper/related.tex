@@ -147,9 +147,10 @@ real-time Java has been proposed by~\cite{MIT03}.
 % Like us, they too assume a source language with programmer-managed
 % memory regions, and focus on proving safety of programs written in
 % that language.  
-Their language permits only lexically-scoped (stack) regions
-(in the context of shared-memory concurrency). In contrast, we permit
-regions with dynamically determined lifetimes (in the context of message-passing concurrency).
+Their language permits only lexically-scoped (stack) regions.
+% (in the context of shared-memory concurrency).
+In contrast, we permit regions with dynamically determined lifetimes.
+% (in the context of message-passing concurrency).
 % We borrow outlives relation from their formal
 % development, and our type system bears some similarities to theirs.
 Our language also admits generics and higher-order functions.
