@@ -177,6 +177,8 @@ Formally, our type system introduces \emph{region parameters} (for both
 classes and methods) and uses constrained parametric polymorphism
 over these parameters, where the constraints capture outlives constraints
 between the region parameters.
+The type system may be seen as a form of ownership type system~\cite{OwnershipSurvey},
+with a region being the owner of all objects allocated in that region.
 
 \mypara{Lightweight Runtime Checks.}
 Ensuring memory safety using this approach requires ensuring

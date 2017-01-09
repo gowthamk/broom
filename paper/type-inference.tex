@@ -79,7 +79,8 @@ The algorithm consists of the following steps:
 % \end{figure}
 
 We later on establish the soundness of the type inference algorithm,
-and the completeness of constraint-solving step.
+and the completeness of the constraint-generation and constraint-solving steps
+(steps 2 and 3 above).
 
 \subsection{Region Parameterization for Classes}
 \label{sec:fb-templatization}
@@ -132,7 +133,7 @@ class Pair $\extends$ $\ObjZ$ {
 &
 $\Rightarrow \; \;$
 &
-\begin{minipage}{0.6\linewidth}
+\begin{minipage}{0.5\linewidth}
 \begin{codejava}
 class Pair $\langle \rho_0, \rho_1, \rho_2 \; | \; \varphi \rangle$ $\extends$ $\ObjZ \langle \rho_0 \rangle$ {
   $\ObjZ \langle \rho_1 \rangle$ fst;
@@ -166,7 +167,7 @@ class List $\extends$ $\ObjZ$ {
 &
 $\Rightarrow \; \;$
 &
-\begin{minipage}{0.65\linewidth}
+\begin{minipage}{0.5\linewidth}
 \begin{codejava}
 class List $\langle \rho_0, \rho_1 \; | \; \varphi \rangle$ $\extends$ $\ObjZ \langle \rho_0 \rangle$ {
   $\ObjZ \langle \rho_1 \rangle$ data;
@@ -184,8 +185,7 @@ then instantiating them).
 % Type parameters of classes are handled as follows.
 % Consider a type-parametric class \C{C $\langle$ T $\extends$ B $\rangle$}.
 The type parameter \C{T} of a class \C{C} is instantiated as $\C{T}@\rho$ using a single region parameter $\rho$. 
-(This can be extended to use the bound specified for \C{T}, if any. We do not
-discuss this due to space restrictions.)
+(This can be extended to use the bound specified for \C{T}, if any.)
 % number of region parameters
 % that its bound \C{B} has. If no bound is specified for \C{T}, the bound is taken
 % to be \C{Object}, and \C{T} is instantiated with one region parameter.
@@ -259,14 +259,17 @@ a set $\regionVars$ of region variables, and a set $\predVars$ of predicate vari
 
 \input{constraint-syntax}
 
-Recall that a \emph{region variable} is introduced to represent an unknown actual region parameter
-of a method invocation or object allocation, which will be bound to a region constant by the end of the
-type inference.
-A region constant may be 
+Recall that a \emph{region constant} may be either
 (a) a \emph{formal region parameter} of a class or method, or
 (b) a \emph{static region identifier} introduced by a \C{letregion} construct, or
 (c) an  \emph{open transferable region identifier} introduced by an \C{open} construct.
+A \emph{region variable} is introduced to represent an unknown \emph{actual} region parameter
+of a method invocation or object allocation, and the constraint-solver, if successful, 
+will bind each region variable to a region constant.
+% by the end of the type inference.
 
+A \emph{region-constraint} $\phi$ consists of a conjunction of \emph{outlives-constraints}
+of the form $\rho_1 \outlives \rho_2$.
 A predicate variable $\varphi$ is introduced to represent, \eg, the unknown precondition of a method.
 The constraint-solver will end up binding it to a \emph{region-constraint} $\phi$
 over a set of fixed formal region parameters.
@@ -303,7 +306,7 @@ to restrict the domain of unification for a region variable ($\rho$)
 to a constant set $\rhoenv = \{ \pi_1, \cdots, \pi_n \}$ of regions in scope,
 and  well-formedness constraints of form $\tywf{\rhoenv}{\varphi}$ to
 restrict the domain of a predicate variable ($\varphi$) to the set of all possible
-constraint formulas over a fixed set of  regions ($\rhoenv = \{ \pi_1, \cdots, \pi_n \}$) in scope.
+region-constraint formulas over a fixed set of  regions ($\rhoenv = \{ \pi_1, \cdots, \pi_n \}$) in scope.
 
 %The constraints generated are of the following kinds:
 %\begin{itemize}
@@ -357,7 +360,7 @@ These rules use the same context as the corresponding typing judgment in
 Fig.~\ref{fig:fb-staticsem}, except that this is generalized to permit the
 use of region variables and predicate variables.
 Symbols $\A$ and $\env$ retain their meaning, modulo this extension.
-Thus, the component $\phicx$ of $\A$ will now be a symbolic expression
+Thus, the component $\phicx$ of $\A$ will now be a \emph{symbolic expression}
 of the form $\varphi \conj \phi$, where $\varphi$ is the predicate variable
 representing the undetermined precondition of the method being analyzed.
 The algorithm proceeds top-down, analyzes an expression $e$ in a context
@@ -365,15 +368,19 @@ $\stdcontext$, and returns a type $\tau$ and a set of constraints $C$
 (expressed in the rules as $\exprok {\stdcontext} {e} {\tau} {C}$ ),
 indicating that the expression will have a type $\tau$ provided the constraints $C$ hold.
 
-Note that some of the conditions in the antecedents are checked at constraint-generation
-time, while some are encoded as constraints (to be resolved by the constraint-solver).
-E.g., we assume that the region constants introduced by
-\C{open}
-and
-\C{letregion}
-constructs are unique (and the elaboration phase ensures this by alpha-renaming
+When we adapt a type-checking judgement rule to produce a corresponding
+constraint-generation rule, we treat the antecedent conditions of the type-checking
+rule in one of two ways. Many of these antecedent conditions are converted into
+constraints which are accumulated in the set $C$. However, some of the antecedent
+conditions are expected to be trivially satisfied and are expressed as
+antecedent conditions in the constraint-generation rule as well.
+% Note that some of the conditions in the antecedents are checked at constraint-generation
+% time, while some are encoded as constraints (to be resolved by the constraint-solver).
+E.g., our frontend ensures that the region constants introduced by \C{open}
+and \C{letregion} constructs are unique (and the elaboration phase ensures this by alpha-renaming
 them as needed). Thus, the precondition $\rho \not\in \Delta$ in rules \textsc{LetRegion}
-and \textsc{Open} merely validates this at constraint-generation time.
+and \textsc{Open} is expected to hold true at constraint-generation time
+(and does not produce any constraints).
 
 The rules for generating constraints from a method and
 class definition first build a context ($\A$) containing a set ($ \rhoenv$) denoting
@@ -401,12 +408,12 @@ variables in $\rhoenv$ that are yet to be inferred.
 %%  ensures that the generated constraints produces a restricted form of constraints that is easier to solve.
 
 Let $\consOf{q}$ denote the set of constraints generated from an elaborated program $q$.
-The following theorem states that constraint-generation is sound:
+The following theorem states that constraint-generation is sound and complete:
 \begin{theorem}
 \label{thm:constraint-generation-sc}
 Let $C = \consOf{q}$.
 An assignment $\soln$ (for the region and predicate variables in $q$)
-satisfies $C$ only if $q[\soln]$ is well-typed.
+satisfies $C$ iff $q[\soln]$ is well-typed.
 \end{theorem}
 
 \subsection{The Constraint Solver}
@@ -694,7 +701,7 @@ class List $\extends$ $\ObjZ$
 &
 $\Rightarrow  \; \; \;$
 &
-\begin{minipage}{0.65\linewidth}
+\begin{minipage}{0.5\linewidth}
 \begin{codejava}
 class List $\langle \rho_0, \rho_1, \rho_2 \; | \; \varphi \rangle$ $\extends$ $\ObjZ \langle \rho_0 \rangle$
 {
