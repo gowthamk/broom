@@ -1,1 +1,77 @@
-/Users/gowtham/git/broom/fullversion/broom/paper/fb-morewfrules.tex
+% \begin{figure*}[!t]
+
+\textbf{Method Well-formedness}  \; \fbox
+  {\(d \; \mathtt{ok \; in} \; B \)}\\
+%
+\begin{minipage}{5.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+%   \rhoenv = \{\rhobar,\bar{\rho_m}\} \spc
+%   \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
+%   \phicx = \phi \conj \phi_m \spc
+    \Delta = \{\rhobar,\rho_m, \bar{\rho_m}\} \spc
+    \A = (\Delta, [\bar{\tyvar} \mapsto \bar{\fgjN}], \phi_m)\spc
+    \tywf{\Delta}{\phi_m} \\
+    \tywf{\A}{\bar{\tau^1},\tau^2} \spc
+%   \tywf{\A}{\tau^2} \spc
+    CT(B) = \headerOf{B}\{...\}\\
+    \env = \cdot[\xbar\mapsto\bar{\tau^1}][\thisZ\mapsto
+            B\inang{\bar{\tyvar}}\inang{\rhobar}] \spc
+    \A \vdash \override(m,\fbN,\inang{\rho_m\rhobarm \,|\, \phi_m}\bar{\tau^1} 
+             \rightarrow \tau^2) \spc
+%   \stmtsem{\rhoallocm}{s}{\stmtsemcx}{\stmtsemcxp}\spc
+    \hastyp{\exptycx{\env}{\rho_m}}{e}{\tau^2} \spc
+%   \subtyp{\A}{\tau}{\tau^2}
+  }
+  {
+    \okin 
+        {\tau^2 \; m\inang{\rho_m\rhobarm \,|\, \phi_m}
+              (\bar{\tau^1}\;\xbar)\{\C{return}\,e;\}}
+        {B}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\bigskip
+
+\textbf{Class Well-formedness}  \; \fbox
+  {\(B \; \mathtt{ok}\)}\\
+%
+\begin{minipage}{5.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rhoenv = \{\rho,\rhobar\} \spc
+    \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
+    \phicx = \phi \spc
+    \A = (\subtypcx)\spc
+%   \A = (\{\rho,\rhobar\},[\bar{\tyvar} \mapsto \bar{\fgjN}],\phi)\spc
+    \tywf{\rhoenv}{\phi} \spc
+    \fgjtywf{\aenv}{\bar{\fgjN}} \\
+    \tywf{\A}{\fbN,\bar{\tau^f}} \spc
+    \shape(\fbN) \neq \RgnZ\inang{T}\spc
+%   \tywf{\A}{\bar{\tau^f}} \spc
+    \isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rho} \spc
+%   \ctype(\fbN) = \bar{\tau^{\fbN}} \spc
+%    k = B(\bar{\tau^{\fbN}}\;\xbar,\bar{\tau^f}\;\bar{y})
+%        \{\superZ(\xbar);\,\thisZ.\bar{f} = \bar{y};\} \spc
+    \okin{\bar{d}}{B}
+  }
+  {
+    \C{class}\; B\angAlpha\inang{\rho\rhobar \,|\, \phi} \extends \fbN
+    \{\bar{\tau^f}\;\bar{f};\, \bar{d}\} \;{\texttt{ok}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+% \caption{\fbname: Method and Class Well-formedness}
+% \label{fig:fb-morewfrules}
+% \end{figure*}
