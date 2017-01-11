@@ -158,15 +158,22 @@ We also establish type safety and transfer safety results that
 formalize the guarantees provided by our system. While~\cite{MIT03}'s
 language is explicitly typed, our language comes equipped with full
 type inference.
+However, several inference algorithms have been proposed in the context
+of other ownership type systems.
+Our type inference algorithm is also novel compared to these existing
+ownership inference algorithms, which are based on, e.g.,
+pointer analysis~\cite{HuangEtAl:ECOOP12} or boolean satisfiability~\cite{DietlEtAl:ECOOP11}.
+(See Section 5.2 of~\cite{OwnershipSurvey} for a more comprehensive discussion
+of ownership inference algorithms.)
+Some distinguishing characteristics of our algorithm is that it is customized
+to our problem, does not use any pointer analysis algorithm (which
+can be a source of imprecision) or SAT solvers (which can be a source of inefficiency),
+and comes with relative completeness guarantees.
 
 % Although there is some support for local
 % type inference, region types for methods and classes need to be
 % written explicitly. In contrast, our region type inference that
 % eliminates any such need.
-% Our type inference algorithm is also novel compared to existing type
-% inference approaches for ownership types, which are based on, e.g.,
-% context-insensitive pointer analysis or boolean satisfiability.
-% E.g., papers 55 and 79.
 
 ~\cite{HMN01} proposes a flow-sensitive approach for first-order programs
 % to overcome some of the drawbacks of~\cite{tofte97}
