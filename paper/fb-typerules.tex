@@ -127,10 +127,10 @@
 \RULE
   {
     \A = (\subtypcx) \spc
-    \rgn,\rbar \in \rhoenv \\
+    \rgn',\rgn,\rbar \in \rhoenv \\
     \hastyp{\exptycx{\env}{\rgn}}{e}
         {\inang{\rho\rhobar \,|\, \phi}
-            \bar{\tau^1} \xrightarrow{\rgn} \tau^2}\\
+            \bar{\tau^1} \xrightarrow{\rgn'} \tau^2}\\
 %   \substFn = \subst{\rbar}{\rhobar} \spc
     \isvalid{\phicx}{\subst{\rgn\rbar}{\rho\rhobar}\phi} \spc
     \hastyp{\exptycx{\env}{\rgn}}{\bar{e}}
@@ -160,7 +160,7 @@
 %   \rgn \notin dom(\mem) \spc
     \tywf{\A}{\tau} \spc
     \A' = (\rhoenv\cup\{\pi\},\aenv,\phicx) \\
-    \env' =  \env[y\mapsto T@\rgn]\spc
+    \env' =  \env[y\mapsto T@\pi]\spc
     \hastyp{\A',\env',\pi}{e_b}{\tau} \spc
   }
   {

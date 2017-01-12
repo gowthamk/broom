@@ -43,7 +43,7 @@
 \end{minipage}
 %
 
-\begin{minipage}{1.8in}
+\begin{minipage}{2in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -160,7 +160,7 @@
 %
 
 %
-\begin{minipage}{2.6in}
+\begin{minipage}{2.8in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -207,7 +207,7 @@
 %   \rgn \notin dom(\mem) \spc
     \tywf{\A}{\tau} \spc
     \A' = (\rhoenv\cup\{\pi\},\aenv,\phicx) \\
-    \env' =  \env[y\mapsto T@\rgn]\spc
+    \env' =  \env[y\mapsto T@\pi]\spc
     \hastyp{\A',\env',\pi}{e_b}{\tau} \spc
   }
   {
@@ -227,10 +227,10 @@
 \RULE
   {
     \A = (\subtypcx) \spc
-    \rgn,\rbar \in \rhoenv \\
+    \rgn',\rgn,\rbar \in \rhoenv \\
     \hastyp{\exptycx{\env}{\rgn}}{e}
         {\inang{\rho\rhobar \,|\, \phi}
-            \bar{\tau^1} \xrightarrow{\rgn} \tau^2}\\
+            \bar{\tau^1} \xrightarrow{\rgn'} \tau^2}\\
 %   \substFn = \subst{\rbar}{\rhobar} \spc
     \isvalid{\phicx}{\subst{\rgn\rbar}{\rho\rhobar}\phi} \spc
     \hastyp{\exptycx{\env}{\rgn}}{\bar{e}}
@@ -270,7 +270,7 @@
 %
 
 %
-\begin{minipage}{3in}
+\begin{minipage}{2.3in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -283,7 +283,7 @@
 %   \loc \notin \rhoenv \\ % An open region can be opened again.
 %   \loc \notin dom(\mem) \spc
     \A' = (\rhoenv\cup\{\loc\},\aenv,\phicx) \\
-    \loc \in \Delta ~\texttt{implies}~ s = \LIVE \spc
+    \loc \in \Delta ~\texttt{implies}~ s = \LIVE \\
     \hastyp{\A',\env,\loc}{e}{\tau} \spc
     \tywf{\A}{\tau}
   }
@@ -294,14 +294,15 @@
 \end{smathpar}
 \end{minipage}
 %
-
 %
-\begin{minipage}{2in}
+\begin{minipage}{1.6in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
+    \\
+    \\
     \hastyp{\exptycx{\env}{\rgn}}{e}{\RgnZ\inang{T}\inang{\toprgn}}
   }
   {
@@ -317,7 +318,8 @@
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \hastyp{\exptycx{\env}{\rgn}}{e}{\tau} \spc
+    \\
+    \hastyp{\exptycx{\env}{\rgn}}{e}{\tau} \\
     \subtyp{\A}{\tau}{\tau'}
   }
   {

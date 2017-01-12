@@ -76,7 +76,7 @@ are discussed below:
   \item Rules $\rulelabel{Transfer}$: changes binding for a non-live
   location $\loc$. Hence, consistency is preserved.
 \end{itemize} 
-\qed
+%\qed
 \end{proof}
 
 \begin{lemma}[value substitution preserves typing]
@@ -89,7 +89,7 @@ $\forall(e,z,\tau_1,\tau_2,\Delta,\phicx)$, if $\hastyp{(\Delta,\cdot,
 \begin{proof}
 The proof is by induction on typing derivation and follows on the
 lines of similar proof for FGJ.
-\qed
+%\qed
 \end{proof}
 
 \begin{lemma}[progress]
@@ -172,7 +172,7 @@ expression itself is not a value.
   gives the proof.
 
 \end{itemize}
-\qed
+%\qed
 \end{proof}
 
 \begin{lemma}[preservation]
@@ -342,12 +342,12 @@ $\hastyp{\emptyASigp,\cdot,\rgn}{e'}{\tau}$.
 
   \item \rulee{OpenEnd} case: The proof is very similar to the
   \C{letd} case.
-  \qed
+  %\qed
   \end{itemize}
 \end{proof}
 
 \begin{proof}[\textbf{Theorem~\ref{thm:fb-type-safety}}]
 Follows from Lemmas~\ref{lem:consistency},~\ref{lem:progress},
 and~\ref{lem:preservation}.
-\qed
+%\qed
 \end{proof}
