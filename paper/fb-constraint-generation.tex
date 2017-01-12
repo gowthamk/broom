@@ -1,7 +1,4 @@
 %% ************ MACROS *************
-% \newcommand{\hdOf}[2]{\C{class}\; #1\angAlpha\inang{\rhoalloc \rhobar \,|\, #2} \extends \fbN}
-
-% mathpartir's inferrule: seems to have problems with linebreaks
 
 \newcommand{\rulepart}[1]{%
 \begingroup%
@@ -31,8 +28,10 @@
 \newcommand{\nl}{\\}
 
 \newcommand{\subtypesym}{<:}
+\newcommand{\classok}[2]{\vdash \, {#1} \texttt{ ok} \, \lhd \, {#2}}
 \newcommand{\okinok}[3]{{\vdash\,#1 \; \texttt{ok} \; \texttt{in} \; #2 \, \lhd #3}}
 \newcommand{\typeok}[3]{{#1\,\vdash\,#2 \; \texttt{ok} \, \lhd #3}}
+\newcommand{\typeconsok}[3]{{#1\,\vdash\,#2 \; \texttt{ok} \, \lhd #3}}
 \newcommand{\exprok}[4]{{#1} \, \vdash \, {#2} : {#3} \, \lhd {#4}}
 \newcommand{\subtypeok}[4]{{#1} \, \vdash \, {#2}  \subtypesym {#3} \, \lhd {#4}} 
 \newcommand{\stdcontext}{\A,\env,r}
@@ -92,23 +91,24 @@
 %%%%%%%%%%% FUNCTION INVOCATION %%%%%%%%%%%
 \lgcrule{FnApply}
 {
-C_1 = \{\bar{\pi} \in \A.\rhoenv\} \spc
-\exprok {\stdcontext} {e} {\inang{\rhobar\,|\,\phi}\bar{\tau^1} \xrightarrow{\rgn} \tau^2} {C_2}
+  \A = (\rhoenv,\aenv,\phicx) \spc
+  C_1 = \{r \bar{r} \in \rhoenv\} \spc
+\exprok {\stdcontext} {e} {\inang{\rho\rhobar\,|\,\phi}\bar{\tau^1} \xrightarrow{r} \tau^2} {C_2}
 \nl
-C_3 = \{\isvalid{\A.\phicx}{[\bar{\pi}/\rhobar]\phi}\} \spc
-\exprok {\stdcontext} {\bar{e}} {[\bar{\pi}/\bar{\rho}] \bar{\tau^1}} {C_4}
+C_3 = \{\isvalid{\phicx}{[r \bar{r} / \rho\rhobar]\phi}\} \spc
+\exprok {\stdcontext} {\bar{e}} {[r \bar{r} / \rho\bar{\rho}] \bar{\tau^1}} {C_4}
 % \spc \substFn = [\bar{\pi}/\rhobar]
 % \spc
 % \subtypeok {\A} {\bar{\tau'}} {\substFn(\bar{\tau})} {C_5}
 }{
-\exprok {\stdcontext} {e\inang{\bar{\pi}}(\bar{e})} {[\bar{\pi}/\bar{\rho}] \tau^2} {\cup_{i=1}^4 C_i}
+  \exprok {\stdcontext} {e\inang{r \bar{r}}(\bar{e})} {[r \bar{r}/ \rho\bar{\rho}] \tau^2} {\cup_{i=1}^4 C_i}
 }
 
 %%%%%%%%%%% OPEN-REGION %%%%%%%%%%%
 \lgcrule{Open}{
-   \exprok {\stdcontext} {e_a} {\RgnZ\inang{T}\inang{\toprgn}} {C_1} \spc
    \A = (\rhoenv,\aenv,\phicx) \spc
-   \rgn \notin \rhoenv
+   \rgn \notin \rhoenv \spc
+   \exprok {\stdcontext} {e_a} {\RgnZ\inang{T}\inang{\toprgn}} {C_1}
    \\
    % (\A',\env') = ((\rhoenv \cup \{\rgn\},\aenv,\phicx),\env[y\mapsto T@\rgn] \spc
    \exprok {(\rhoenv \cup \{\rgn\},\aenv,\phicx),\env[y\mapsto T@\rgn]} {e_b} {\tau} {C_2}

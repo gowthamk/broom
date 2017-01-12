@@ -40,7 +40,7 @@
   \lgcrule{Let}
   {
     \exprok{\stdcontext}{e_1}{\tau_1}{C_1} \spc
-    \exprok{\A,{\env[x\mapsto\tau_1]}}{e_2}{\tau_2}{C_2} \\
+    \exprok{\A,{\env[x\mapsto\tau_1]},r}{e_2}{\tau_2}{C_2} \\
   }
   {
     \exprok{\stdcontext}{\letexp{x}{e_1}{e_2}}{\tau_2}{C_1 \cup C_2}
@@ -49,7 +49,7 @@
 %%%%%%%%%%% METHOD-INV %%%%%%%%%%%
   \lgcrule{MethodInv}
   {
-    \exprok {\stdcontext} {e_0} {\tau} {C_1} \spc C_2 = \{ \rbar \in \A.\rhoenv \}
+    \exprok {\stdcontext} {e_0} {\tau} {C_1} \spc C_2 = \{ r \rbar \in \A.\rhoenv \}
     \nl
     \mtype(m,\bound_{\A.\aenv}(\tau)) = \inang{\rho \rhobar \,|\, \phi}\bar{\tau^1}\rightarrow{\tau^2}
     \nl
@@ -108,34 +108,43 @@
 
 \lgcrule{Method}{
 CT(B) = \C{class}\; B \angAlpha \inang{\rhobar \,|\, \varphi} \extends \fbN
-   \{\bar{\tau^f}\,\xbar;\;\bar{d}\}
+   \{ \cdots \}
+   % \{ \bar{\tau^f}\,\xbar;\;\bar{d} \}
 \nl
-\A = (\rhoenv,\aenv,\phicx) = (\{\rhobar,\rhobarm\}, [\bar{\tyvar} \mapsto \bar{\fgjN}], \varphi_m) \spc\spc
+\A = (\rhoenv,\aenv,\phicx) = (\{\rhobar,\rho_m,\rhobarm\}, [\bar{\tyvar} \mapsto \bar{\fgjN}], \varphi_m) \spc\spc
 C_1 = \{ \tywf{\rhoenv}{\varphi_m} \}
 \nl
 \env = \cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhobar}][\xbar \mapsto \bar{\tau^1}]
 \spc
 \mtype(m,\fbN) = \inang{\rhobarm \,|\, \phi_m}\bar{\tau^1} \rightarrow \tau^2
 \nl
-\exprok {\stdcontext}{e} {\tau^2} {C_2}
+\exprok {\A,\env,\rho_m}{e} {\tau^2} {C_2}
 \spc \typeok {\A} {\bar{\tau^1}} {C_3}
 \spc \typeok {\A} {\tau^2} {C_4}
 % \subtypeok {\A} {\tau'} {\tau} {C_3}
 }{
-\okinok {\tau^2 \; m\inang{\rhobarm \,|\, \varphi_m} (\bar{\tau^1} \;  \xbar)\{\C{return} e;\}} {B} {(C_1 \cup C_2 \cup C_3 \cup C_4)}
+\okinok {\tau^2 \; m\inang{\rho_m \rhobarm \,|\, \varphi_m} (\bar{\tau^1} \;  \xbar)\{\C{return} e;\}}
+   {B}
+   {(C_1 \cup C_2 \cup C_3 \cup C_4)}
 }
 
 %%%%%%%%%%% CLASS %%%%%%%%%%%
+\multicolumn{2}{l}{
+   \textbf{Class Well-formedness Constraint Generation}  \; \fbox{$\classok{B}{C}$}
+}
+\\[0.3cm]
+
 \lgcrule{Class}{
   \A = (\rhoenv, \aenv, \phicx) = (\{\rho,\rhobar\}, [\bar{\tyvar} \mapsto \bar{\fgjN}],\varphi) \\
 C_1 = \{ \tywf{\rhoenv}{\varphi} \} \spc\spc
+\fgjtywf{\aenv}{\bar{\fgjN}} \spc\spc
 \typeok {\A} {\fbN} {C_2} \spc\spc
 \typeok {\A} {\bar{\tau^f}} {C_3} \\
 C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rho \conj \allocRgn(\fbN) = \rho}\} \\
 \okinok {\bar{d}} {B} {C_5}
 }{
 % \typeok {} {\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}} {\bigcup_{i=1}^5 C_i}
-\typeok {}
+\classok
   {\C{class}\; B\angAlpha \inang{\rho \rhobar \,|\, \varphi} \extends \fbN
       \{\bar{\tau^f}\,\xbar;\;\bar{d}\}}
   {\bigcup_{i=1}^5 C_i}
@@ -151,76 +160,6 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rho \conj \allocRgn(
 \begin{figure*}[t!]
 
 \beginrules
-
-%%%%%%%%%%% Header Box %%%%%%%%%%%
-\multicolumn{2}{l}{
-  \textbf{Type Well-formedness Constraint Generation} \;
-  \fbox{  \( \typeok{\A}{\tau}{C} \)}
-}
-\\[0.3cm]
-
-%%%%%%%%%%% TYPE WELL-FORMEDNESS %%%%%%%%%%%
-
-%%%%%%%%%%% OBJECT TYPE %%%%%%%%%%%
-\lgcrule{ObjectType}
-  {
-    C = \{ \rgn \in \A.\rhoenv \}
-  }
-  {
-    \typeok {\A} {\ObjZ\inang{\rgn}} {C}
-  }
-
-%%%%%%%%%%% CLASS TYPE %%%%%%%%%%%
-  \lgcrule{ClassType}
-  {
-    CT(B) = \headerOf{B}\{...\}
-    \spc
-    \fgjtywf{\aenv}{B\inang{\tbar}}
-    \\
-    C = \{ \rbar \in \rhoenv, \isvalid{\phicx}{[\rbar/\rhobar](\phi)} \}
-  }
-  {
-    \typeok {(\rhoenv,\aenv,\phicx)} {B\inang{\rbar}\inang{\tbar}} {C}
-  }
-
-%%%%%%%%%%% GENERIC TYPE PARAMETER %%%%%%%%%%%
-  \lgcrule{TypeParam}
-  {
-    \fgjtywf{\A.\aenv}{T} \spc
-    \fgjsubtyp{\A.\aenv}{T}{\ObjZ} \spc
-    \spc
-    C = \{ \rgn \in \A.\rhoenv \}
-  }
-  {
-    \typeok {\A}{T@\rgn} {C}
-  }
-
-%%%%%%%%%%% FUNCTION TYPE %%%%%%%%%%%
-  \lgcrule{FnType}
-  {
-    C_1 = \{ \rgn \in \rhoenv \}
-    \\
-    \rhobar \notin \A.\rhoenv \spc
-    \rhoenv' = \rhoenv \cup \{\rhobar\} \spc
-    \A' = (\rhoenv', \aenv, \phicx \conj \phi)
-    \\
-    \tywf{\rhoenv'}{\phi}\spc 
-    \typeok{\A'}{\bar{\tau^1}} {C_2} \spc
-    \typeok{\A'}{\tau^2} {C_3}
-  }
-  {
-    \typeok{(\rhoenv,\aenv,\phicx)} {\inang{\rhobar \,|\, \phi} \bar{\tau^1} \xrightarrow{\rgn} \tau^2} 
-       {C_1 \cup C_2 \cup C_3}
-  }
-
-%%%%%%%%%%% REGION TYPE %%%%%%%%%%%
-  \lgcrule{RegionType}
-  { 
-    \fgjtywf{\A.\aenv}{T}
-  }
-  {
-    \typeok {\A} {\RgnZ\inang{T}\inang{\toprgn}} {\{\}}
-  }
 
 %%%%%%%%%%% Header Box %%%%%%%%%%%
 \multicolumn{2}{l}{
@@ -263,6 +202,76 @@ C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rho \conj \allocRgn(
       {\inang{\rhobar \,|\, \phi_2}\bar{\tau^{21}} \xrightarrow{\rgn} \tau^{22}}
       {\inang{\rhobar \,|\, \phi_1}\bar{\tau^{11}} \xrightarrow{\rgn} \tau^{12}}
       {C_1 \cup C_2 \cup C_3}
+  }
+
+%%%%%%%%%%% Header Box %%%%%%%%%%%
+\multicolumn{2}{l}{
+  \textbf{Type Well-formedness Constraint Generation} \;
+  \fbox{  \( \typeok{\A}{\tau}{C} \)}
+}
+\\[0.3cm]
+
+%%%%%%%%%%% TYPE WELL-FORMEDNESS %%%%%%%%%%%
+
+%%%%%%%%%%% OBJECT TYPE %%%%%%%%%%%
+\lgcrule{ObjectType}
+  {
+    C = \{ \rgn \in \rhoenv \}
+  }
+  {
+    \typeok {(\rhoenv,\aenv,\phicx)} {\ObjZ\inang{\rgn}} {C}
+  }
+
+%%%%%%%%%%% CLASS TYPE %%%%%%%%%%%
+  \lgcrule{ClassType}
+  {
+    CT(B) = \headerOf{B}\{...\}
+    \spc
+    \fgjtywf{\aenv}{B\inang{\tbar}}
+    \\
+    C = \{ \rbar \in \rhoenv, \isvalid{\phicx}{[\rbar/\rhobar](\phi)} \}
+  }
+  {
+    \typeok {(\rhoenv,\aenv,\phicx)} {B\inang{\tbar}\inang{\rbar}} {C}
+  }
+
+%%%%%%%%%%% GENERIC TYPE PARAMETER %%%%%%%%%%%
+  \lgcrule{TypeParam}
+  {
+    \fgjtywf{\aenv}{T} \spc
+    \fgjsubtyp{\aenv}{T}{\ObjZ} \spc
+    \spc
+    C = \{ \rgn \in \rhoenv \}
+  }
+  {
+    \typeok {(\rhoenv,\aenv,\phicx)}{T@\rgn} {C}
+  }
+
+%%%%%%%%%%% FUNCTION TYPE %%%%%%%%%%%
+  \lgcrule{FnType}
+  {
+    C_1 = \{ \rgn \in \rhoenv \}
+    \\
+    \rhobar \notin \rhoenv \spc
+    \rhoenv' = \rhoenv \cup \{\rhobar\} \spc
+    \A' = (\rhoenv', \aenv, \phicx \conj \phi)
+    \\
+    \typeconsok{\rhoenv'}{\phi} {C_2} \spc 
+    \typeok{\A'}{\bar{\tau^1}} {C_3} \spc
+    \typeok{\A'}{\tau^2} {C_4}
+  }
+  {
+    \typeok{(\rhoenv,\aenv,\phicx)} {\inang{\rhobar \,|\, \phi} \bar{\tau^1} \xrightarrow{\rgn} \tau^2} 
+       {C_1 \cup C_2 \cup C_3 \cup C_4}
+  }
+
+%%%%%%%%%%% REGION TYPE %%%%%%%%%%%
+  \lgcrule{RegionType}
+  { 
+    \fgjtywf{\aenv}{T}
+  }
+  {
+    \typeok {(\rhoenv,\aenv,\phicx)} {\RgnZ\inang{T}\inang{\toprgn}} {\{\}}
   }
 
 \myendrules
