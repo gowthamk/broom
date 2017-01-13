@@ -1,0 +1,17 @@
+\begin{figure*}[t!]
+%
+\begin{smathpar}
+\renewcommand{\arraystretch}{1.2}
+\begin{array}{lclcl} 
+{\loc} & \in & \mathtt{Memory\; locations} & & \\
+r  & \in & \M{Region\; annotations} & \coloneqq & \loc \ALT \dots \\
+\status & \in & \mathtt{Region\; Typestate} & \coloneqq & %\FREE \ALT
+                  \USED \ALT \LIVE \ALT \XFERRED\\
+e  & \in & \M{Expressions} & \coloneqq &  \letd{\loc}{e} \ALT 
+                        \opened{\loc}{\status}{e} \ALT \bot \ALT \dots \\
+\end{array}
+\end{smathpar}
+
+\caption{\fbname: extended syntax to accommodate run-time constructs}
+\label{fig:fb-syntax-extra}
+\end{figure*}

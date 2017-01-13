@@ -24,8 +24,6 @@ delivered.  At this point, the operator completes the processing for
 time window $t$ and sends a corresponding output message to its
 successor.
 
-\input{motivating-eg}
-
 \mypara{Performance.}
 When the transferred data structures are large, as is the case with many
 streaming big-data analysis systems, garbage collection overhead becomes
@@ -43,6 +41,8 @@ in the context of several  systems and languages (e.g.,
 Spark~\cite{SPARK:2015}, Scala~\cite{ScalaOffHeap}, Rust).
 Several systems (e.g.,~\cite{TRILL:2014}) resort to using ``free object pools'' to partially alleviate this problem, in
 the absence of language support.
+
+\input{motivating-eg}
 
 \begin{figure}
 \centering

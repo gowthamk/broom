@@ -107,11 +107,12 @@ of \name.
 
 Note that classes in \FB are independently parameterized over types
 and regions. While this design decision has a downside that it allows
-type variables to only denote objects contained in a single region, it
-yeilds benefits that far outweigh the costs. In particular, it lets us
-support region-polymorphic higher-order functions as class fields.
-This allows, for example, a generic class, whose type parameters are
-$a$ and $b$, to contain a region-polymorphic function of type
+type variables to only denote the types of objects contained in a
+single region, it yeilds benefits that far outweigh the costs. In
+particular, it lets us support region-polymorphic higher-order
+functions as class fields.  This allows, for example, a generic class,
+whose type parameters are $a$ and $b$, to contain a region-polymorphic
+function of type
 $\inang{\rho_0,\rho_1,\rho_2 \,|\, \rho_1 \outlives \rho_0 \conj
 \rho_2 \outlives \rho_0}(a@\rho_1,b@\rho_2) \rightarrow
 \C{Pair}\inang{a,b}\inang{\rho_0,\rho_1,\rho_2}$ as its field. Such
@@ -323,6 +324,8 @@ judgments defined by the rules in Fig.~\ref{fig:fb-staticsem} are
 implicitly parameterized on a class table ($CT \in cn \mapsto D$) that
 maps class names to their definitions in \FB.
 
+\input{fb-staticsem}
+
 \noindent The well-formedness judgment on region types
 ($\tywf{\A}{\tau}$) makes use of the well-formedness and subtyping
 judgments on core types. We use a double-piped turnstile ($\Vdash$)
@@ -360,8 +363,6 @@ references between transferable regions, which become unsafe in
 context of the recipient's address space. Fortunately, such references
 are explicitly prohibited by the type rule of \C{\RgnZ} objects, as
 described below.
-
-\input{fb-staticsem}
 
 % Transferable regions are first-class objects in \name, hence in \FB.
 % The type of a transferable region handler is of the form
@@ -458,17 +459,19 @@ its class's fields.
 
 The type rule for \C{new \RgnZ} expressions expects the \RgnZ class's
 constructor to be called with a nullary function that returns a value
-in its allocation context. 
-% It enforces this by typechecking the body ($e$) of the function
-% under an empty context containing nothing but the allocation context
-% of the function. 
-This ensures that the value returned by the function stores no
-references to objects allocated elsewhere, including the top region
-($\toprgn$), thus preventing cross-region references originating from
-transferable regions. The body of the function might however create
-new regions while execution, but this is not a problem as long as such
-regions, and objects allocated in them, don't find their way into the
-result of its evaluation.
+in its allocation context.  This ensures that the value returned by
+the function stores no references to objects allocated elsewhere,
+including the top region ($\toprgn$), thus preventing cross-region
+references originating from transferable regions. The body of the
+function might however create new regions while execution, but this is
+not a problem as long as such regions, and objects allocated in them,
+don't find their way into the result of its evaluation.
+
+% \begin{figure}[!t]
+%   \input{fb-morewfrules}
+%   \caption{\fbname: method and class well-formedness rules}
+%   \label{fig:fb-morewfrules}
+% \end{figure}
 
 The type rule for \C{letregion} expression requires that the static
 identifier introduced by the expression be unique under the current
@@ -519,11 +522,9 @@ $\rho_1$ (i.e., $m\inang{\rho_0,\rho_1}(\dots)$). Suppose the method
 immediately returns a function closure that contains a reference to
 (an object in) $\rho_1$. Since function closures are always allocated
 in the current allocation context, the closure is allocated in
-$\rho_0$, the allocation context for the method body\footnote{
-Fig.~\ref{fig:fb-staticsem-1} of the Appendix contains the method
-well-formedness rule, which is on the similar lines as the lambda type
-rule shown in Fig.~\ref{fig:fb-staticsem}}. Now, consider the
-following use of the method:
+$\rho_0$, the allocation context for the method body (the rule for
+methods discussed below). Now, consider the following use of the
+method:
 \begin{codejava}
 letregion R0 in
   let f = letregion R1 in m<R0,R1>()
@@ -548,21 +549,44 @@ during method and function applications as described above.
 % inside a stack region within a method from escaping the region's scope
 % via an assignment to an instance variable.
 
+The method well-formedness rule makes use of an auxiliary definition
+$\override$ that judges whether the current method is a valid
+overriding of any eponymous method from the super class. The type
+environment is extended with a binding that binds the $\thisZ$ keyword
+to the type of the current class. Note that the the type of the
+current method as accessed via $\thisZ$ (i.e., $\thisZ.m$) is
+region-parametric, thus admitting region-polymorphic recursion (i.e.,
+recursive call to $m$ can have different region arguments than $m$). 
+
 \subsection{Operational Semantics and Type Safety}
 \label{sec:fb-opsem}
 
-Fig.~\ref{fig:fb-opsem-1} and~\ref{fig:fb-opsem-2} in the appendix
-defines a small-step operational semantics for \fbname via a
-four-place reduction relation:
+\input{fb-syntax-extra}
+
+The operational semantics of \FB describes a non-trivial runtime
+component that introduces memory regions and performs run-time
+verification of their typestate. Fig.~\ref{fig:syntax-extra} shows the
+additional langauge constructs of \FB that manifest only at run-time.
+A location ($\loc$) abstracts all the memory locations associated with
+a region (i.e., each memory region is associated with a single
+location). A transferable region can be in one of three possible
+states: closed ($\USED$), open/live ($\LIVE$), and transferred/freed
+($\XFERRED$). Constructs \C{letd} and \C{opened} are the run-time
+manifestations of \C{let} and \C{open}; \C{let} reduces to \C{letd}
+while allocating a (static) region, and \C{open} reduces to \C{opened}
+while opening a (transferable) region. An \C{opened}
+expression is tagged with the typestate ($s$) of the transferable
+region before it is opened (as Fig.~\ref{fig:region-fsm} shows, a
+transferable region can be \C{open}'d from either an open state or a
+closed state). Special value $\bot$ denotes an exception. 
+
+Operational semantics of \FB defines a four-place small-step reduction
+relation of the form shown below:
 % \vspace*{-0.15in}
 \begin{smathpar}
   \redstoo{\rhoenv}{(e,\mem)}{(e',\mem')}
 \end{smathpar}
-Operational semantics replaces abstract region annotations ($\pi$ and
-$\rho$) with \emph{locations} ($\loc$), where each \emph{location}
-abstracts all the memory locations associated with a region (i.e.,
-each memory region is associated with a single location). The
-typestate of regions is tracked by a finite map ($\mem$) from
+The typestate of regions is tracked by a finite map ($\mem$) from
 locations to typestates (Fig.~\ref{fig:region-fsm}). The reduction
 relation relates an expression ($e$) and a typestate map ($\mem$) to a
 reduced expression ($e'$) and an updated typestate map ($\mem'$). The
@@ -572,13 +596,15 @@ allocation region is not present in $\rhoenv$, or if $e$ tries to
 typestate by $\mem$.  On the other hand, if $e$ attempts to commit an
 operation on a $\RgnZ$ object that is not sanctioned by the transition
 discipline in Fig.~\ref{fig:region-fsm}, then it raises an exception
-value ($\invalidexn$).
+value ($\invalidexn$). An illustrative subset of operational semantics
+that formalize the intuitions desribed above is shown in
+Fig.~\ref{fig:fb-opsem}.  Fig.~\ref{fig:fb-opsem-1} of the appendix
+contains rest of the rules. 
 
-Replacing $\pi$'s and $\rho$'s with $\loc$'s at runtime results in a
-new class of expressions that are not captured in
-Fig.~\ref{fig:fb-syntax}. Appendix contains full syntax that includes
-such expressions. To help state the type safety theorem, we define the
-syntactic class of (runtime) values:
+\input{fb-opsem}
+
+To help state the type safety theorem, we define the syntactic class
+of (runtime) values:
 \begin{smathpar}
 \begin{array}{lclcl}
 v & \in & \mathtt{values} & \coloneqq & \C{new}\;
@@ -613,24 +639,15 @@ is consistent with both $\mem$ and $\mem'$, the theorem also captures
 the key property of operational semantics that no live region is ever
 freed or transferred.
 
-% Furthermore, we prove the following theorem about \FB, which, in
-% conjunction with the type safety theorem, implies the safety of region
-% transfers across address spaces:
-% \begin{theorem}
-% \emph{(\textbf{Transfer Safety})}
-% \label{thm:fb-transfer-safety}
-% $\forall$ $v$, $\rhoenv$, $\rhoenv'$, $\mem$, $\mem'$, $\phicx$,
-% $\phicx'$, such that $\loc \not\in dom(\mem')$, if $\hastyp{\emptyA, \cdot}{\C{new}\;
-% \RgnZT{\toploc\loc}(v)}{\RgnZT{\toprgn}}$, then
-% $\hastyp{\rhoenv',\cdot,\phicx')}
-% {\\\C{new}\; \RgnZT{\rgn_i}(v)}{\RgnZT{\toprgn}}$
-% \end{theorem}
-% The above theorem states that if a $\C{new}\; \RgnZT{\rgn_i}(v)$ value
-% is well-typed under one context, then it is also well-typed under
-% every other context, whose $\mem$ maps $\rgn_i$ to closed
-% ($\CLOSED$) state.  Thus, a recipient of a transferable region only
-% needs to add a binding for the region to its $\mem$ in order to
-% preserve its type safety. 
-% Notably, this result could not have been
-% established if it were possible for a transferable region to contain
-% references to objects outside the region.
+{\bf A note on region handlers}. \FB stores the region handlers in a
+distinguished top region, which abstracts the GC heap. Type system
+prevents transferable regions from storing references into the GC
+heap. A static region however can store references to region handles,
+which need to be taken into account while GC'ing the heap.  Traversing
+the region memory to identify references into the GC heap
+unfortunately defeats the purpose of regions. A solution is to disable
+collecting region handles as long as any static region is open. Since
+static regions are intended to store temporary objects while
+populating a dynamic region, their lifetimes are short enough to let
+region handles to be GC’d.  
+

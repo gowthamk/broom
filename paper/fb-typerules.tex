@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%% WF RULES %%%%%%%%%%%%%%%%%%%%%%%%%%%
-\fbox {\(\tywf{\A}{\tau} \)}\\
+\textbf{Type Well-formedness}  \; \fbox {\(\tywf{\A}{\tau} \)}\\
 %
 \begin{minipage}{2.55in}
 \begin{smathpar}
@@ -59,9 +59,8 @@
 
 \bigskip
 %%%%%%%%%%%%%%%%%%%%%%%% TYPE RULES %%%%%%%%%%%%%%%%%%%%%%%%%%%
-\fbox
-  {\(\tywf{\A}{\tau}, \spc \hastyp{\exptycx{\env}{\rgn}}{e}{\tau} 
-  \)}\\
+\textbf{Expression Typing}  \; \fbox
+  {\(\hastyp{\exptycx{\env}{\rgn}}{e}{\tau} \)}\\
 %
 \begin{minipage}{2.2in}
 \begin{smathpar}
@@ -250,3 +249,44 @@
 \end{smathpar}
 \end{minipage}
 %
+\bigskip
+
+%%%%%%%%%%%%%%%%%%%%% METHOD WF %%%%%%%%%%%%%%%%%%%%%%%
+\textbf{Method Well-formedness}  \; \fbox
+  {\(d \; \mathtt{ok \; in} \; B \)}\\
+%
+\begin{minipage}{5.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+%   \rhoenv = \{\rhobar,\bar{\rho_m}\} \spc
+%   \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
+%   \phicx = \phi \conj \phi_m \spc
+    \Delta = \{\rhobar,\rho_m, \bar{\rho_m}\} \spc
+    \A = (\Delta, [\bar{\tyvar} \mapsto \bar{\fgjN}], \phi_m)\spc
+    \tywf{\Delta}{\phi_m} \\
+    \tywf{\A}{\bar{\tau^1},\tau^2} \spc
+%   \tywf{\A}{\tau^2} \spc
+    CT(B) = \headerOf{B}\{...\}\\
+    \env = \cdot[\xbar\mapsto\bar{\tau^1}][\thisZ\mapsto
+            B\inang{\bar{\tyvar}}\inang{\rhobar}] \spc
+    \A \vdash \override(m,\fbN,\inang{\rho_m\rhobarm \,|\, \phi_m}\bar{\tau^1} 
+             \rightarrow \tau^2) \spc
+%   \stmtsem{\rhoallocm}{s}{\stmtsemcx}{\stmtsemcxp}\spc
+    \hastyp{\exptycx{\env}{\rho_m}}{e}{\tau^2} \spc
+%   \subtyp{\A}{\tau}{\tau^2}
+  }
+  {
+    \okin 
+        {\tau^2 \; m\inang{\rho_m\rhobarm \,|\, \phi_m}
+              (\bar{\tau^1}\;\xbar)\{\C{return}\,e;\}}
+        {B}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+
