@@ -4,23 +4,18 @@
 The purpose of \name's region type system is to enforce the key
 invariant required for memory safety, namely that an object $o_1$ in a
 region $R_1$ contains a reference to an object $o_2$ in $R_2$, only if
-$R_2$ is guaranteed to outlive $R_1$.  We now formally develop this
-intuition via \fbname (\FB), our explicitly typed core language (with
-region types) that incorporates the features introduced in the
+$R_2$ is guaranteed to outlive $R_1$.  While the invariant is easily
+stated, enforcing it in the presence of first-class dynamic regions,
+parametric polymorphism (generics), and higher-order functions
+requires new reasoning principles that we formally develop in this
+section. We introduce \fbname (\FB), an explicitly typed core language
+(with region types) that incorporates the features introduced in the
 previous section. \fbname builds on the Featherweight Generic Java
 (FGJ)~\cite{fgj} formalism, and reuses notations and various
 definitions from~\cite{fgj}, such as the definition of type
 well-formedness for the core (region-free) language.  (The language
 used in Section~\ref{sec:overview} is essentially a version of FGJ
 without region types and with some syntactic sugar.)
-
-% In this section, we formally develop \fbname, a language that
-% incorporates the features introduced in the previous section, as well
-% as its type system, building on the Featherweight Generic Java
-% (FGJ)~\cite{fgj} formalism.  Our development reuses notations and
-% various definitions from~\cite{fgj}, such as the definition of type
-% well-formedness for the core (region-free) language, which are
-% elaborated further in the appendix~\cite{techrep}.
 
 \subsection{Syntax}
 \label{sec:fb-syntax}
@@ -49,8 +44,8 @@ Note that we elide showing constructors since they are uninteresting
 from the type system's standpoint; their behavior in \FB is same as in
 FGJ. 
 
-A class in \FB is parametric over zero or more type variables (as
-in FGJ) as well as one or more region variables $\rho$.
+A class in \FB is parametric over zero or more type variables (as in
+FGJ) as well as one or more region variables $\rho$.
 % In the above example, the class \C{Pair} is parameterized over
 % $\rho^a, \rho_1, \rho_2$.
 We refer to the first region parameter ($\rho_0$ in the above example)
@@ -58,8 +53,8 @@ as the \emph{allocation region} of the class: it serves to identify
 the region where an instance of the class is allocated\footnote{In
 general, $\rhobar$ denotes the sequence $\rho_1\rho_2...$ of region
 parameters of a class or a method. In some cases, we also represent
-region parameters as $\rho\rhobar$ to clearly distinguish between
-the allocation region parameter ($\rho$) and the rest.}.
+region parameters as $\rho\rhobar$ to clearly distinguish between the
+allocation region parameter ($\rho$) and the rest.}.
 %
 An object in \FB can contain fields referring to objects allocated in
 regions ($\rhobar$) other than its own allocation region ($\rho$),
@@ -108,22 +103,26 @@ $a$ is a type variable, assumes the form $a@\pi$. If $a$ is
 instantiated with \C{Pair<\ObjZ,\ObjZ>}, the result is the type of a
 \C{Pair} object contained in  $\pi$. Class fields are not allowed to
 be type polymorphic, in keeping with C\#, which constitutes the core
-of \name. Separate parameterization over types and regions is needed
-in \FB to support region-polymorphic higher-order functions as class
-fields. For such higher-order class fields, regions are parameterized
-at the (class) field level whereas types are parameterized at the
-class level. This allows, for example, a generic class, whose type
-parameters are $a$ and $b$, to contain a region-polymorphic function of type
+of \name. 
+
+Note that classes in \FB are independently parameterized over types
+and regions. While this design decision has a downside that it allows
+type variables to only denote objects contained in a single region, it
+yeilds benefits that far outweigh the costs. In particular, it lets us
+support region-polymorphic higher-order functions as class fields.
+This allows, for example, a generic class, whose type parameters are
+$a$ and $b$, to contain a region-polymorphic function of type
 $\inang{\rho_0,\rho_1,\rho_2 \,|\, \rho_1 \outlives \rho_0 \conj
 \rho_2 \outlives \rho_0}(a@\rho_1,b@\rho_2) \rightarrow
 \C{Pair}\inang{a,b}\inang{\rho_0,\rho_1,\rho_2}$ as its field. Such
 region-polymorphic higher-order fields are used frequently by the
 dataflow operators, which apply them in the context of various regions
 (\emph{e.g.,} see Fig.~\ref{fig:motivating-eg-in-broom}). Keeping type
-parameterization separate from region parameterization allows \FB to
-type such examples. This choice also simplifies type inference in the
-presence of higher-order functions.
-
+and region parameterizations separate also simplifies the type system
+to the point that inference becomes practical
+(Sec.~\ref{sec:type-inference}); as our experience with Hindley-Milner
+type systems suggests, type inference is pivotal to the practical
+utility of sophisticated type systems.
 
 % The region type of $\ObjZ$ class in \FB has no fields, hence its
 % region type is of form $\ObjZ@\rgn$. 
@@ -235,14 +234,13 @@ presence of higher-order functions.
 % existentially bound region variable with $\rgn$, and assume the type
 % of $\RgnZ\inang{\rgn}$.
 
-\input{fb-staticsem}
-
 Like classes, methods can also exhibit constrained region
 polymorphism.  A method definition in \FB is necessarily polymorphic
-over its allocation context (\S~\ref{sec:alloc-ctxt}), and
-optionally polymorphic with respect to the regions containing its
-arguments.  Region parameters, like those on classes, are qualified
-with constraints ($\phi$).
+over its allocation context (\S~\ref{sec:alloc-ctxt}), and optionally
+polymorphic with respect to the regions containing its arguments
+(i.e., a method has at least one region parameter). Region
+parameters, like those on classes, are qualified with constraints
+($\phi$).
 % Region parameters on the methods, like those on classes, are
 % accompanied by constraints ($\phi$) capturing the conditions that the
 % parameters need to satisfy for the method to be considered well-formed
@@ -276,11 +274,12 @@ constrained region polymorphism, as evident in their arrow region type
 % expression ($e\inang{\ralloc\rbar}$), and a region generalization
 % expression ($\Lambdaexp{\rhoalloc\rhobar \,|\, \phi}{e}$) to
 % instantiate and generalize region variables. 
-Since a function closure can escape the context in which it is
-created, it is important to keep track of the region in which it is
-created in order to avoid unsafe dereferences. The $\rgn$ annotation
-above the arrow in the arrow type denotes the allocation region of the
-corresponding closure. 
+A function, like a method, is necessarily polymorphic w.r.t its
+allocation context.  Since a function closure can escape the context
+in which it is created, it is important to keep track of the region in
+which it is created in order to avoid unsafe dereferences. The $\rgn$
+annotation above the arrow in the arrow type denotes the allocation
+region of the corresponding closure. 
 % Note that it is important to distinguish
 % between the allocation context argument ($\rhoalloc$) of a function
 % and the allocation region ($\rgn$) of its closure. In \name, the later
@@ -351,8 +350,8 @@ region arguments substituted for formal region parameters, under the
 conditions ($\phicx$) guaranteed by the context. The semantics of this
 sequent is straightforward, and follows directly from the properties
 of outlives and equality relations. For any well-formed core type $T$,
-$T@\rgn$ is a well-formed region type if $\rgn$ is a valid region. The
-type $\RgnZT{\rgn}$ is well-formed only if $\rgn = \toprgn$, where
+$T@\rgn$ is a well-formed region type if $\rgn$ is a valid region.
+The type $\RgnZT{\rgn}$ is well-formed only if $\rgn = \toprgn$, where
 $\toprgn$ is a special immortal region that outlives every other live
 region. This arrangement allows \C{\RgnZ} handlers to be aliased and
 referenced freely from objects in various regions, regardless of their
@@ -361,6 +360,14 @@ references between transferable regions, which become unsafe in
 context of the recipient's address space. Fortunately, such references
 are explicitly prohibited by the type rule of \C{\RgnZ} objects, as
 described below.
+
+\input{fb-staticsem}
+
+% Transferable regions are first-class objects in \name, hence in \FB.
+% The type of a transferable region handler is of the form
+% $\RgnZT{\rgn}$, where, like any other object, $\rgn$ denotes the
+% region in which the handler object is allocated. However, region
+% handlers are often required to escape the scope and address 
 
 % Recall that a class definition in \FB is annotated with constraints
 % over its region arguments, which require the regions referred by its
@@ -447,8 +454,7 @@ auxiliary definition called $\fields$ (undefined for $\RgnZ$ class)
 that returns the sequence of type bindings for fields (instance
 variables) of a given class type.  Like in FGJ, the names and types of
 a constructor's arguments in \FB are same as the names and types of
-its class's fields, and the type rule relies on this fact to typecheck
-constructor applications.  
+its class's fields.  
 
 The type rule for \C{new \RgnZ} expressions expects the \RgnZ class's
 constructor to be called with a nullary function that returns a value
@@ -468,34 +474,67 @@ The type rule for \C{letregion} expression requires that the static
 identifier introduced by the expression be unique under the current
 context (i.e., $\pi \notin \Delta$). This condition is needed in order
 to prevent the new region from incorrectly assuming existing outlives
-relationships on an eponymous region. Provided this is satisfied, the
-expression ($e$) under \C{letregion} is then typechecked assuming that
-the new region is live ($\Delta \cup \{\pi\}$) and that it is outlived
-by all existing live regions ($\Delta \outlives \pi$). The result of a
-\C{letregion} expression must have a type that is well-formed under a
-context not containing the new region. This ensures that the value
-obtained by evaluating a \C{letregion} expression contains no
-references to the temporary objects inside the region.
+relationships on an eponymous region. The expression ($e$) under
+\C{letregion} is typechecked with the new region as its allocation
+context, under the assumption that the region is live ($\Delta \cup
+\{\pi\}$) and that it is outlived by all existing live regions
+($\Delta \outlives \pi$). The result of a \C{letregion} expression
+must have a type that is well-formed under a context not containing
+the new region. This ensures that the value obtained by evaluating a
+\C{letregion} expression contains no references to the temporary
+objects inside the region.
 
 The rule for \C{open} expression, unlike the rule for \C{letregion},
 does not introduce any outlives relationship between the newly opened
 region and any pre-existing region while checking the type of the
 expression ($e$) under \C{open}. This prevents new objects allocated
 inside the transferable region from storing references to those
-outside.  Environment ($\env$) is extended with binding for the type
-of root object while typechecking $e$. 
+outside. The newly opened region becomes the allocation context for
+$e$, which is type checked under an environment ($\env$) extended with
+the type binding for the root object.
 
 The type rule for lambda expression typechecks the lambda-bound
 expression ($e$) under an extended type environment containing
 bindings for function's arguments, assuming that region parameters are
 live, and that declared constraints over region parameters hold. The
 constraints ($\phi$) are required to be well-formed under $\Delta$
-extended with the function's region parameters ($\rho\rhobar$). Note
-that the closure is always allocated in the current allocation context
-($\rgn$). This prevents the closure from escaping the context in which
-it is created, thus trivially ensuring the safety of any dereferences
-inside the closure. 
+extended with the function's region parameters ($\rho\rhobar$).
+Unlike a typical object, a function closure might capture references
+that may become unsafe if the closure escapes its allocation context.
+\FB prevents this scenario by requiring the function closure to always
+be allocated in the current allocation context ($\rgn$). 
 
+The type rule for method application uses auxiliary definitions
+$\mtype$ and $\bound$ which originate from the FGJ calculus - the
+former gives the type of a class method and the latter defines the
+bound of a type variable. Method application involves instantiation of
+method's region parameters, and the type rule requires the first
+region parameter to be instantiated with the current allocation
+context ($r$). The type rule for function application does similarly.
+This requirement ensures the safety of closures as demonstrated by the
+following example.
+
+Consider a method $m$ with two region parameters - $\rho_0$ and
+$\rho_1$ (i.e., $m\inang{\rho_0,\rho_1}(\dots)$). Suppose the method
+immediately returns a function closure that contains a reference to
+(an object in) $\rho_1$. Since function closures are always allocated
+in the current allocation context, the closure is allocated in
+$\rho_0$, the allocation context for the method body\footnote{
+Fig.~\ref{fig:fb-staticsem-1} of the Appendix contains the method
+well-formedness rule, which is on the similar lines as the lambda type
+rule shown in Fig.~\ref{fig:fb-staticsem}}. Now, consider the
+following use of the method:
+\begin{codejava}
+letregion R0 in
+  let f = letregion R1 in m<R0,R1>()
+  in f()
+\end{codejava}
+Observe that the first region parameter of \C{m} is instantiated with
+\C{R0}, while the allocation context for the method call is \C{R1}.
+The function \C{f} returned by \C{m} stores a reference to \C{R1},
+which is unsafe when \C{f} is finally called. The type system
+fortunately disallows this scenario by enforcing certain restrictions
+during method and function applications as described above.
 % The type rule for the \C{new} expression is a straightforward
 % adaptation of corresponding FGJ rule to the the region type setting.
 

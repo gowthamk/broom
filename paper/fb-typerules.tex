@@ -1,3 +1,5 @@
+%%%%%%%%%%%%%%%%%%%%%%% WF RULES %%%%%%%%%%%%%%%%%%%%%%%%%%%
+\fbox {\(\tywf{\A}{\tau} \)}\\
 %
 \begin{minipage}{2.55in}
 \begin{smathpar}
@@ -55,6 +57,11 @@
 \end{minipage}
 %
 
+\bigskip
+%%%%%%%%%%%%%%%%%%%%%%%% TYPE RULES %%%%%%%%%%%%%%%%%%%%%%%%%%%
+\fbox
+  {\(\tywf{\A}{\tau}, \spc \hastyp{\exptycx{\env}{\rgn}}{e}{\tau} 
+  \)}\\
 %
 \begin{minipage}{2.2in}
 \begin{smathpar}
@@ -97,13 +104,29 @@
 %
 
 %
+\begin{minipage}{2.2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{e}{\tau'}\\
+    \bar{f}:\taubar \,=\, \fields(\bound_{\A.\aenv}(\tau'))
+  }
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{e.f_i}{\tau_i}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
 \begin{minipage}{2.9in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \\
     \A = (\subtypcx) \spc
     \A' = (\rhoenv\cup\{\pi\}, \aenv, \phicx \conj \phi)\\
     \pi \notin \rhoenv \spc
@@ -114,32 +137,6 @@
   }
   {
     \hastyp{\exptycx{\env}{\rgn}}{\letregion{\pi}{e}}{\tau}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-%
-\begin{minipage}{2.3in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \A = (\subtypcx) \spc
-    \rgn',\rgn,\rbar \in \rhoenv \\
-    \hastyp{\exptycx{\env}{\rgn}}{e}
-        {\inang{\rho\rhobar \,|\, \phi}
-            \bar{\tau^1} \xrightarrow{\rgn'} \tau^2}\\
-%   \substFn = \subst{\rbar}{\rhobar} \spc
-    \isvalid{\phicx}{\subst{\rgn\rbar}{\rho\rhobar}\phi} \spc
-    \hastyp{\exptycx{\env}{\rgn}}{\bar{e}}
-        {\subst{\rgn\rbar}{\rho\rhobar}\bar{\tau^1}}\spc
-%   \subtyp{\A}{\taubar}{\bar{\tau^1}}
-  }
-  {
-    \hastyp{\A,\env,\rgn}{e\inang{\rgn\rbar}(\bar{e})}
-           {\subst{\rgn\rbar}{\rho\rhobar}\tau^2}
   }
 \end{array}
 \end{smathpar}
@@ -194,6 +191,60 @@
                       {\xbar:\bar{\tau^1}}{e}}
            {\inang{\rho\rhobar \,|\, \phi}
             \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{2.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx) \spc
+    \hastyp{\exptycx{\env}{\rgn}}{e_0}{\tau} \\
+%   \rbar \in \A.\rhoenv \\
+    \mtype(m,\bound_{\aenv}(\tau)) = \inang{\rho\rhobar \,|\, 
+        \phi}\bar{\tau^1}\rightarrow{\tau^2} \\
+    \rgn,\rbar \in \rhoenv \spc
+    \tywf{\A}{\inang{\rho\rhobar \,|\,
+    \phi}\bar{\tau^1}\rightarrow{\tau^2}}\\
+    \hastyp{\exptycx{\env}{\rgn}}{\bar{e}}{[\rgn\rbar/\rho\rhobar]\,\bar{\tau^1}} \spc
+    \isvalid{\phicx}{[\rgn\rbar/\rho\rhobar]\,\phi}
+  }
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{e_0.m\inang{\rgn\rbar}(\bar{e})} 
+           {[\rgn\rbar/\rho\rhobar]\,\tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
+\begin{minipage}{2.3in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    \A = (\subtypcx) \spc
+    \rgn',\rgn,\rbar \in \rhoenv \\
+    \hastyp{\exptycx{\env}{\rgn}}{e}
+        {\inang{\rho\rhobar \,|\, \phi}
+            \bar{\tau^1} \xrightarrow{\rgn'} \tau^2}\\
+%   \substFn = \subst{\rbar}{\rhobar} \spc
+    \isvalid{\phicx}{\subst{\rgn\rbar}{\rho\rhobar}\phi} \spc
+    \hastyp{\exptycx{\env}{\rgn}}{\bar{e}}
+        {\subst{\rgn\rbar}{\rho\rhobar}\bar{\tau^1}}\spc
+%   \subtyp{\A}{\taubar}{\bar{\tau^1}}
+  }
+  {
+    \hastyp{\A,\env,\rgn}{e\inang{\rgn\rbar}(\bar{e})}
+           {\subst{\rgn\rbar}{\rho\rhobar}\tau^2}
   }
 \end{array}
 \end{smathpar}
