@@ -4,21 +4,25 @@
 
 \section{Introduction} \label{sec:introduction}
 
-This paper presents a \emph{safe} and \emph{efficient} region-based approach
-to \emph{data transferable} between a set of concurrent actors, motivated by the following concerns.
+% This paper presents a \emph{safe} and \emph{efficient} region-based approach
+% to \emph{data transferable} between a set of concurrent actors, motivated by the following concerns.
 
-Consider the example (of  a producer creating a data structure and transferring it to a consumer)
-in Fig.~\ref{fig:motivating-eg}.
-This represents a \C{SELECT} query operator that receives a stream of input messages,
-each associated with a time window $t$, processed by method \texttt{onReceive}.
-Each input message contains a list of inputs, each processed by applying a user-defined function to
-create a corresponding output.  Multiple messages with the same timestamp
-are permitted and messages with different timestamps may arrive out of order.
-An invocation of method
-\texttt{OnNotify} indicates that no more input messages with a timestamp
-$t$ will be subsequently delivered.  At this point, the operator completes
-the processing for time window $t$ and sends a corresponding output message
-to its successor.
+Computations performed by a network of concurrent communicating actors
+often involve data transfer between producers and consumers. Consider
+for example the \C{SELECT} query operator shown in
+Fig.~\ref{fig:motivating-eg}, which functions as an actor in a
+dataflow computation involving a network of other such query
+operators. \C{SELECT} receives a stream of input messages, each
+associated with a time window $t$, processed by method
+\texttt{onReceive}.  Each input message contains a list of inputs,
+each processed by applying a user-defined function to create a
+corresponding output.  Multiple messages with the same timestamp are
+permitted and messages with different timestamps may arrive out of
+order.  An invocation of method \texttt{OnNotify} indicates that no
+more input messages with a timestamp $t$ will be subsequently
+delivered.  At this point, the operator completes the processing for
+time window $t$ and sends a corresponding output message to its
+successor.
 
 \input{motivating-eg}
 
@@ -87,7 +91,7 @@ as any non-trivial program creates temporary references to the internal
 objects of a data-structure.
 
 \mypara{Safe Transferable Regions.}
-In this paper, we present a language-based approach to cleanly encapsulated
+In this paper, we present a language-based approach to cleanly encapsulate
 transferable data and a safe and efficient implementation of such data based
 on regions. 
 %
@@ -203,12 +207,12 @@ fine-grained objects that are present inside these regions, for which
 safety is enforced statically. 
 
 \mypara{Type Inference.}
-One of the key contributions of this paper is a sound type inference algorithm
-that eliminates the need for users to write region type annotations.
-The users write programs in the underlying language that provides
-primitives for the users to manipulate regions (create, open, free,
-transfer) and to allocate objects in regions, but has no region type
-annotations.
+One of the key contributions of this paper is a type inference
+algorithm that eliminates the need for users to write region type
+annotations.  The users write programs in the underlying language that
+provides primitives for the users to manipulate regions (create, open,
+free, transfer) and to allocate objects in regions, but has no region
+type annotations.
 % This, we believe, significantly reduces the impediment to adopt our
 % approach in practical setting.
 
@@ -219,18 +223,25 @@ that must be satisfied for the program to type check; in the third
 stage, we solve the set of constraints, inferring the preconditions of
 all classes and methods (in terms of the expected outlives-constraints
 between the region parameters).  We show that the algorithm is sound,
-and the last stage of constraint solving is complete.
+and the stages of constraint generation and solving are complete
+(i.e., the algorithm is complete relative to the first stage of
+elaboration).
 % (using an interprocedural fixed point computation).
 
 \mypara{Evaluation.}
-Our work was inspired by~\cite{Broom:HotOS}, which presents evidence that
-realistic programs can be written using transferable regions
-and that this can yield significant performance improvements.
-The system described in~\cite{Broom:HotOS}, however, provides no memory
-safety guarantees, which is the subject of our contribution.
-We report on an implementation of our type inference algorithm that
-was able to identify some unsafe memory accesses and was able to successfully
-verify programs correct (once the errors were fixed).
+Our work was inspired by~\cite{Broom:HotOS}, which presents evidence
+that realistic programs can be written using transferable regions and
+that this can yield significant performance improvements.
+While~\cite{Broom:HotOS} addresses the engineering challenges in
+extending a managed runtime with transferable regions, it adopts an ad
+hoc approach insofar as language design is concerned, exposing the
+region functionality through an unsafe API, and in the process losing
+the safety guarantees. Our contribution is an alternative approach
+that is grounded in sound theory and restores the language safety
+guarantees. The utility of our approach is demonstrated by a prototype
+implementation of our type inference algorithm that was able to
+identify unsafe memory accesses among the benchmarks extracted
+from~\cite{Broom:HotOS}.  
 
 % transferableally checking for the second category of
 % invariants is easy and does not pose a performance concern (unlike,
@@ -419,13 +430,13 @@ verify programs correct (once the errors were fixed).
 The paper makes the following contributions:
 
 \begin{itemize} 
-  \item We present \broom, a \csharp-like typed
-  object-oriented language that eschews garbage collection in favour of
-  programmer-managed memory regions. \broom{} extends its core language,
-  which includes \emph{lambdas} (higher-order functions) and
-  \emph{generics} (parametric polymorphism), with constructs to create,
-  manage and free static and transferable memory regions. Transferable regions
-  are first-class values in \broom.
+  \item We present \broom, a \csharp-like typed object-oriented
+  language that supports programmer-managed memory regions. \broom{}
+  extends its core language, which includes \emph{lambdas}
+  (higher-order functions) and \emph{generics} (parametric
+  polymorphism), with constructs to create, manage and free static and
+  transferable memory regions. Transferable regions are first-class
+  values in \broom.
   % Experiments demonstrate that   \naiad~\cite{naiad} dataflow
   % program using programmer-managed memory regions outperform their
   % GC counterparts by a margin of upto 59\%. 
@@ -442,14 +453,14 @@ The paper makes the following contributions:
   \item We describe a region type inference algorithm for \broom that
   (a). completely eliminates the need to annotate \broom programs with
   region types, and (b). enables seamless interoperability between
-  region-aware \broom programs and legacy standard library code that is
-  region-oblivious. The cornerstone of our inference algorithm is a
-  novel constraint solver that performs abduction in a partial-order
+  region-aware \broom programs and legacy standard library code that
+  is region-oblivious. Our inference algorithm is based on a novel
+  constraint solver that performs abduction in a partial-order
   constraint domain to infer weakest solutions to recursive
   constraints.
 
-\item We establish soundness of type inference algorithm, and
-completeness of constraint solving.
+\item We establish the soundness and relative completeness of the type
+inference algorithm.
 
   \item We describe an implementation of \broom frontend in OCaml,
   along with case studies where the region type system was able to
