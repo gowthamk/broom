@@ -64,7 +64,7 @@ impact on aspects such type inference.
 
 Tofte and Talpin's approach~\cite{tofte97} uses compiler-managed lexically
 scoped (stack) regions (as a replacement for GC).
-Our type inference is analogous to their's in some respects,
+Our type inference is analogous to theirs in some respects,
 while differing in others.
 Their inference algorithm only generates equality constraints, solvable via unification.
 Our type inference algorithm generates partial order outlives constraints.
@@ -170,16 +170,16 @@ to our problem, does not use any pointer analysis algorithm (which
 can be a source of imprecision) or SAT solvers (which can be a source of inefficiency),
 and comes with relative completeness guarantees.
 
-% Although there is some support for local
-% type inference, region types for methods and classes need to be
-% written explicitly. In contrast, our region type inference that
-% eliminates any such need.
 
-~\cite{HMN01} proposes a flow-sensitive approach for first-order programs
-% to overcome some of the drawbacks of~\cite{tofte97}
-to generalize~\cite{tofte97}'s approach to dynamic regions.
-However, dynamic regions are still not first-class values of the language,
-and reference counting is needed to ensure memory safety.
+~\cite{HMN01} proposes a flow-sensitive approach for first-order
+programs to generalize~\cite{tofte97}'s approach to dynamic
+regions.~\cite{CR04} describes a flow-insensitive and
+context-sensitive analysis that transforms Java programs to use
+(dynamic) regions.  However, neither~\cite{HMN01} nor~\cite{CR04}
+supports dynamic regions as first-class objects; they cannot be stored
+in data structures or passed to methods. Furthermore,
+while~\cite{HMN01} requires reference counting to ensure memory
+safety,~\cite{CR04} comes with no formal safety guarantees.
 %
 \cite{gpu14} uses regions to safely transfer data between the CPU and GPU
 in the context of Scheme. However, their setting only includes lexically-scoped

@@ -10,8 +10,11 @@ locations to typestates if and only if forall $\loc\in\Delta$,
 $\mem(\loc) = \LIVE$.
 \end{definition}
 
-Consistency between $\Delta$ and $\mem$ is preserved by the reduction
-relation:
+The rationale behind the $\consistent$ relation is to establish the
+correspondence between the concrete memory ($\mem$) of the operational
+semantics and its abstraction ($\Delta$) used by the static semantics.
+We now prove that consistency between $\Delta$ and $\mem$ is preserved
+by the reduction relation:
 
 \begin{lemma}[\textbf{consistency preservation}]
 \label{lem:consistency}

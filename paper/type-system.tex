@@ -108,7 +108,7 @@ of \name.
 Note that classes in \FB are independently parameterized over types
 and regions. While this design decision has a downside that it allows
 type variables to only denote the types of objects contained in a
-single region, it yeilds benefits that far outweigh the costs. In
+single region, it yields benefits that far outweigh the costs. In
 particular, it lets us support region-polymorphic higher-order
 functions as class fields.  This allows, for example, a generic class,
 whose type parameters are $a$ and $b$, to contain a region-polymorphic
@@ -451,11 +451,15 @@ described below.
 The type rules distinguish between the \C{new} expressions that create
 objects of  the \RgnZ class, and \C{new} expressions that create
 objects of other classes. The rule for the latter relies on an
-auxiliary definition called $\fields$ (undefined for $\RgnZ$ class)
-that returns the sequence of type bindings for fields (instance
-variables) of a given class type.  Like in FGJ, the names and types of
-a constructor's arguments in \FB are same as the names and types of
-its class's fields.  
+auxiliary definition\footnote{All auxiliary definitions we use in this
+exposition originate from the FGJ calculus.} called $\fields$
+(undefined for $\RgnZ$ class) that returns the sequence of type
+bindings for fields (instance variables) of a given class type.  Like
+in FGJ, the names and types of a constructor's arguments in \FB are
+same as the names and types of its class's fields. The type rule for
+the field access expression ($e.f_i$) also uses $\fields$ and another
+definition called $\bound$, which returns the bound of a type variable
+($\bound$ is an identity function for concrete types).
 
 The type rule for \C{new \RgnZ} expressions expects the \RgnZ class's
 constructor to be called with a nullary function that returns a value
@@ -507,15 +511,13 @@ that may become unsafe if the closure escapes its allocation context.
 \FB prevents this scenario by requiring the function closure to always
 be allocated in the current allocation context ($\rgn$). 
 
-The type rule for method application uses auxiliary definitions
-$\mtype$ and $\bound$ which originate from the FGJ calculus - the
-former gives the type of a class method and the latter defines the
-bound of a type variable. Method application involves instantiation of
-method's region parameters, and the type rule requires the first
-region parameter to be instantiated with the current allocation
-context ($r$). The type rule for function application does similarly.
-This requirement ensures the safety of closures as demonstrated by the
-following example.
+The type rule for method application uses an auxiliary definition
+$\mtype$ that gives the type of a class method. Method application
+involves instantiation of method's region parameters, and the type
+rule requires the first region parameter to be instantiated with the
+current allocation context ($r$). The type rule for function
+application does similarly.  This requirement ensures the safety of
+closures as demonstrated by the following example.
 
 Consider a method $m$ with two region parameters - $\rho_0$ and
 $\rho_1$ (i.e., $m\inang{\rho_0,\rho_1}(\dots)$). Suppose the method
@@ -554,9 +556,10 @@ $\override$ that judges whether the current method is a valid
 overriding of any eponymous method from the super class. The type
 environment is extended with a binding that binds the $\thisZ$ keyword
 to the type of the current class. Note that the the type of the
-current method as accessed via $\thisZ$ (i.e., $\thisZ.m$) is
+current method as accessed via $\thisZ$ (i.e., $\thisZ.\C{m}$) is
 region-parametric, thus admitting region-polymorphic recursion (i.e.,
-recursive call to $m$ can have different region arguments than $m$). 
+recursive call to $\C{m}$ can have different region arguments than
+$\C{m}$). 
 
 \subsection{Operational Semantics and Type Safety}
 \label{sec:fb-opsem}
@@ -566,7 +569,7 @@ recursive call to $m$ can have different region arguments than $m$).
 The operational semantics of \FB describes a non-trivial runtime
 component that introduces memory regions and performs run-time
 verification of their typestate. Fig.~\ref{fig:syntax-extra} shows the
-additional langauge constructs of \FB that manifest only at run-time.
+additional language constructs of \FB that manifest only at run-time.
 A location ($\loc$) abstracts all the memory locations associated with
 a region (i.e., each memory region is associated with a single
 location). A transferable region can be in one of three possible
@@ -597,7 +600,7 @@ typestate by $\mem$.  On the other hand, if $e$ attempts to commit an
 operation on a $\RgnZ$ object that is not sanctioned by the transition
 discipline in Fig.~\ref{fig:region-fsm}, then it raises an exception
 value ($\invalidexn$). An illustrative subset of operational semantics
-that formalize the intuitions desribed above is shown in
+that formalize the intuitions described above is shown in
 Fig.~\ref{fig:fb-opsem}.  Fig.~\ref{fig:fb-opsem-1} of the appendix
 contains rest of the rules. 
 

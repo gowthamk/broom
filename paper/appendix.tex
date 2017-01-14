@@ -4,40 +4,40 @@
 %
 \section{\fbname}
 
-\subsection{Full Syntax}
-\input{fb-syntax-full}
+% \subsection{Full Syntax}
+% \input{fb-syntax-full}
 
-The full syntax of \FB, including expressions that manifest only at
-runtime, is shown in Fig.~\ref{fig:fb-syntax-full}. Such expressions
-include:
-\begin{itemize}
+% The full syntax of \FB, including expressions that manifest only at
+% runtime, is shown in Fig.~\ref{fig:fb-syntax-full}. Such expressions
+% include:
+% \begin{itemize}
 
-\item Memory locations ($\loc$) corresponding to the memory regions,
+% \item Memory locations ($\loc$) corresponding to the memory regions,
 
-\item A special expression $\RgnZT{\toploc\loc}(e)$ that evaluates to
-a region handler object (the syntax of this expression is captured by
-the $\C{new}\;\fbN(\overline{e})$ construct). $\toploc$ is the
-location of the special $\toprgn$ region where region handlers are
-stored. $\loc$ is the location of the corresponding transferable
-region.
+% \item A special expression $\RgnZT{\toploc\loc}(e)$ that evaluates to
+% a region handler object (the syntax of this expression is captured by
+% the $\C{new}\;\fbN(\overline{e})$ construct). $\toploc$ is the
+% location of the special $\toprgn$ region where region handlers are
+% stored. $\loc$ is the location of the corresponding transferable
+% region.
 
-\item A $\letd{\loc}{e}$ expression that results when
-$\letregion{\pi}{e}$ expression takes a step (see
-Fig.~\ref{fig:fb-opsem-2}).  $\loc$ is the location of the newly
-allocated region.  
+% \item A $\letd{\loc}{e}$ expression that results when
+% $\letregion{\pi}{e}$ expression takes a step (see
+% Fig.~\ref{fig:fb-opsem-2}).  $\loc$ is the location of the newly
+% allocated region.  
 
-\item An $\opened{\loc}{s}{e}$ expression that
-results when $\C{open}\;{\RgnZT{\toploc\loc}(v)} ...$ expression takes
-a step. $\loc$ is the location of the newly open transferable region.
-The symbol $s$ denotes the typestate of the
-transferable region before it is opened\footnote{Operational semantics
-lets a transferable region to be opened while it is already open. This
-allows methods to safely open a transferable region argument
-regardless of the calling context.}. The typestate can assume the
-values of $\USED$ (allocated and closed), $\LIVE$ (allocated and
-live), and $\XFERRED$ (transferred or freed).
+% \item An $\opened{\loc}{s}{e}$ expression that
+% results when $\C{open}\;{\RgnZT{\toploc\loc}(v)} ...$ expression takes
+% a step. $\loc$ is the location of the newly open transferable region.
+% The symbol $s$ denotes the typestate of the
+% transferable region before it is opened\footnote{Operational semantics
+% lets a transferable region to be opened while it is already open. This
+% allows methods to safely open a transferable region argument
+% regardless of the calling context.}. The typestate can assume the
+% values of $\USED$ (allocated and closed), $\LIVE$ (allocated and
+% live), and $\XFERRED$ (transferred or freed).
 
-\end{itemize}
+% \end{itemize}
 
 \subsection{Full Static Semantics}
 
@@ -61,25 +61,6 @@ present in $CT$ and that the definition is well-formed.
 
 \input{fb-opsem-full}
 Figs.~\ref{fig:fb-opsem-1} and~\ref{fig:fb-opsem-2} show the
-operational semantics of \fbname. The semantics defines a five-place
-reduction relation:
-\begin{smathpar}
-  \redstoo{\Delta}{(e,\mem)}{(e',\mem')}
-\end{smathpar}
-Where $\Delta$ is the set of currently-live region locations, and
-$\mem$ is a map from memory locations ($\loc$) to type states ($s$).
-Evaluating a $\C{letregion}$ or a $\C{new}\;\C{Region}$ expression
-results in the addition of a new binding to $\mem$. For a new static
-region, the memory location ($\loc$) is mapped to $\LIVE$ (live), and
-for a new transferable region, it is mapped to $\USED$. The binding is
-updated when the transferable region is opened, closed, or
-transferred. Likewise, when a $\C{letregion}$ expression is evaluated
-to a value, the binding for the corresponding location is set to
-$\XFERRED$, effectively deallocating the region. Opening an already
-transferred region, or transferring a currently-open region results in
-an exception ($\bot$). The semantics gets stuck while evaluating a
-field access, a method call, or a lambda application, if the region
-containing the target object is not live. The type safety result
-establishes that this can never happen while evaluating a well-typed
-expression. The set ($\Delta$) of live region is the same set used by
-the expression typing judgment (Fig.~\ref{fig:fb-staticsem-2}). 
+operational semantics of \fbname (Fig.~\ref{fig:fb-opsem-2} is also
+contained in the main paper as Fig.~\ref{fig:fb-opsem}. It is included
+here for the sake of completeness). 
