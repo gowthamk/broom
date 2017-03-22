@@ -4,11 +4,12 @@ thoughtful suggestions for improvement.
 1. Why are closures treated specially? Why don't classes suffice?
 It is true that C# treats lambdas as objects of class `Func`. A flip
 side of such punning is that C# classes cannot have type-polymorphic
-lambdas as class fields (since all fields have monomorphic types).
-Adopting C#'s approach in the region type system would lead to a
-similar drawback: we can no longer support region-polymorphic lambdas
-as class fields, but this feature is used frequently in practice. An
-example is presented in Fig.3 (and explained in 3rd paragraph on p.8). 
+lambdas as class fields (since all fields have monomorphic types,
+i.e., there cannot be any quantifiers).  Adopting C#'s approach in the
+region type system would lead to a similar drawback: we can no longer
+support region-polymorphic lambdas as class fields, but this feature
+is used frequently in practice. An example is presented in Fig.3 (and
+explained in 3rd paragraph on p.8). 
 
 2. We agree with reviewer 24A's comparison with HM. Separation of type
 and region parameters is an example of the language aspect designed with
