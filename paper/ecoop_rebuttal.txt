@@ -10,19 +10,19 @@ similar drawback: we can no longer support region-polymorphic lambdas
 as class fields, but this feature is used frequently in practice. An
 example is presented in Fig.3 (and explained in 3rd paragraph on p.8). 
 
-2. We are summarily in agreement with reviewer 24A's comparison with
-HM. Separation of type and region parameters is an example of the
-language aspect designed with inference in mind. "Action at distance
-errors" do occur in our case, and we conjecture that the recent
-advances[oopsla15,pldi15] could help us migitage the problem.
+2. We agree with reviewer 24A's comparison with HM. Separation of type
+and region parameters is an example of the language aspect designed with
+inference in mind. "Action at distance errors" do occur in our case,
+and we conjecture that the recent advances[oopsla15,pldi15] could help
+us migitage the problem.
 
 3. Reviewer 24B's IntBox example is (rightfully) rejected by the type
 system. The type system enforces two invariants on every well-typed
-object: (a). its type signature explicitly captures the regions to
-which its fields refer to, and (b). all such regions must outlive the
+object: (a) Its type signature explicitly captures the regions to
+which its fields refer to, and (b) All such regions must outlive the
 allocation region of the object. The discussion on constrained region
 polymorphism (p.8) covers this informally, but formal enforcement is
-done by the class well-formedness rule, which was relegated to the
+done by the class well-formedness rule, which was (unfortunately) relegated to the
 appendix (Fig. 13). In the context of reviewer’s example, if
 `b.boxref` is a reference to an object in region `R2`, and if `b`
 itself (an `IntBoxBox`) is allocated in `R1`, then the type signature
@@ -33,13 +33,17 @@ between R1 and R2 (since both are transferable regions). Thus, this
 instantiation is disallowed, effectively preempting the possibility of
 an unsafe reference.
 
-4. Reviewer 24B's lambda example is (incorrectly) accepted by the type
-system. The reason for this is that the closure type rule of Fig. 6 is
-missing the premise `Δ ≥ r` (Δ outlives r). We had this premise in the
-previous draft of the paper, but got rid of it during the days leading
-to the submission, perhaps reasoning (incorrectly) that it is a
-tautology. We regret this decision. Restoring this premise would
-prevent the example from type checking since `x` doesn't outlive `y`.
+4. (Lambda allocation regions) Reviewer 24B's intuition and points in
+this regard are correct. The closure type rule of Fig. 6 is
+unfortunately missing a premise, namely `Δ ≥ r` (every region in Δ outlives r).
+Adding this premise will ensure that the reviewer's example is correctly handled
+(since `x` doesn't outlive `y`). And it is also correct that with this
+premise, the allocation of lambda does not have to be restricted to the
+allocation region.
+
+We had an equivalent premise in the previous draft of the paper, but got rid
+of it during the days leading to the submission, with a faulty simplification
+considering only allocation regions. We apologize for the confusion caused by this mistake. 
 
 5. It is true that the FB^+ language used in the evaluation is
 improverished in comparison with Java/C#, but is is enough to capture
