@@ -77,6 +77,21 @@ informal statement can be misconstrued as stronger guarantees provided
 by the type system. We accept the reviewer's suggestion to include
 a clarification.
 
+8. Why do we need constraint based lifetime parameters for classes?
+What are the distinctive examples which this design enables which a
+simpler ownership system cannot provide? 
+Transferable regions are self-contained, containing no objects with
+pointers to objects in other regions. However, stack regions are more
+flexible, and are permitted to contain objects with pointers to
+objects in other regions. Stack regions are very useful as "working
+storage" (paragraph 3 on p.3). For example, consider a dataflow
+computation that indexes the intermediary results obtained from an
+upstream actor in a transferable region (`R1`), before updating the
+results, and transferring them to a downstream actor. The index,
+perhaps a B-tree, is an auxiliary structure that need not be
+transferred, hence can be stored in a stack region (`R2`). Outlives
+constraints are needed to admit safe references from `R2` into `R1`.
+
 ### References ###
 
 [oopsla14]: Z Pavlinovic, Finding minimum type error sources, OOPSLA'14
