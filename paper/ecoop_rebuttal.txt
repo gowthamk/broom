@@ -13,7 +13,7 @@ example is presented in Fig.3 (and explained in 3rd paragraph on p.8).
 2. We agree with reviewer 24A's comparison with HM. Separation of type
 and region parameters is an example of the language aspect designed with
 inference in mind. "Action at distance errors" do occur in our case,
-and we conjecture that the recent advances[oopsla15,pldi15] could help
+and we conjecture that the recent advances[oopsla14,pldi15] could help
 us migitage the problem.
 
 3. Reviewer 24B's IntBox example is (rightfully) rejected by the type
@@ -41,10 +41,11 @@ With this added premise, the reviewer's example is correctly handled
 premise, the allocation of lambda does not have to be restricted to the
 allocation region.
 
-We had an equivalent premise in the previous draft of the paper, but got rid
-of it during the days leading to the submission, with a faulty simplification
-considering only allocation regions. We apologize for the confusion caused by
-this mistake. Thanks to the reviewer for catching this.
+We had an equivalent premise in the previous draft of the paper, but
+got rid of it during the days leading to the submission, with a faulty
+simplification considering only allocation regions. We apologize for
+the confusion caused by this mistake. Thanks to the reviewer for
+catching this.
 
 5. It is true that the FB^+ language used in the evaluation is
 improverished in comparison with Java/C#, but is is enough to capture
@@ -56,3 +57,26 @@ of regions. Instances of the safety violation described in the paper
 were found in all 4, and the violation can manifest in an actual
 execution in in each case. We accept the reviewer's suggestion to
 include these details in the paper.
+
+6. In the definition of C-decomposable, why only one of the regions is
+required to be in Δ? 
+The asymmetry in this definition reflects properties of the
+constraint-generation, namely that the context Φ is modified only by
+adding conjuncts of the form `Δ ≥ π` where `π` is not a
+region-parameter (see the rule LetRegion), as discussed in the proof
+of Lemma 3 in Appendix C.
+
+7. In the explanation of the type safety result, the statement "the
+theorem also captures the key property of operational semantics that
+no live region is ever freed or transferred" is informal for "if
+`consistent(Δ,Σ)` and `(e,Σ)-->(e',Σ')` then `consistent(Δ,Σ')`"
+(Lemma 8 of the appendix). Thus, operational semantics in fact never
+frees or transfers a live region. We however understand that the
+informal statement can be misconstrued as stronger guarantees provided
+by the type statement, and accept the reviewer's suggestion to include
+a clarification.
+
+### References ###
+
+[oopsla14]: Z Pavlinovic, Finding minimum type error sources, OOPSLA'14
+[pldi15]: D Zhang et al, Diagnosing type errors with class, PLDI'15
