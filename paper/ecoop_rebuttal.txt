@@ -14,7 +14,7 @@ example is presented in Fig.3 (and explained in 3rd paragraph on p.8).
 and region parameters is an example of the language aspect designed with
 inference in mind. "Action at distance errors" do occur in our case,
 and we conjecture that the recent advances[oopsla14,pldi15] could help
-us migitage the problem.
+us mitigate the problem.
 
 3. Reviewer 24B's IntBox example is (rightfully) rejected by the type
 system. The type system enforces two invariants on every well-typed
@@ -27,7 +27,7 @@ appendix (Fig. 13). In the context of reviewer’s example, if
 `b.boxref` is a reference to an object in region `R2`, and if `b`
 itself (an `IntBoxBox`) is allocated in `R1`, then the type signature
 is `IntBoxBox<R1,R2 | R2≥R1>`. The example (implicitly) tries to
-instantiate `R1` with `x` (rather, it’s region idenfitier), and `R2`
+instantiate `R1` with `x` (rather, it’s region identifier), and `R2`
 with `y`, but note that there does not exist any outlives relationship
 between R1 and R2 (since both are transferable regions). Thus, this
 instantiation is disallowed, effectively preempting the possibility of
@@ -48,7 +48,7 @@ the confusion caused by this mistake. Thanks to the reviewer for
 catching this.
 
 5. It is true that the FB^+ language used in the evaluation is
-improverished in comparison with Java/C#, but is is enough to capture
+impoverished in comparison with Java/C#, but is is enough to capture
 the aspects of Naiad operators relevant to the region type system.
 There are a total of 6 Naiad streaming query operators, out of which
 we analyzed 4 (Select, SelectMany, Join and WindowJoin). The other two
@@ -73,7 +73,7 @@ no live region is ever freed or transferred" is informal for "if
 (Lemma 8 of the appendix). Thus, operational semantics in fact never
 frees or transfers a live region. We however understand that the
 informal statement can be misconstrued as stronger guarantees provided
-by the type statement, and accept the reviewer's suggestion to include
+by the type system. We accept the reviewer's suggestion to include
 a clarification.
 
 ### References ###
