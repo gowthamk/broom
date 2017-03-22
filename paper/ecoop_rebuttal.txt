@@ -1,98 +1,108 @@
 We thank the reviewers for their extensive review of our work, and
 thoughtful suggestions for improvement.
 
-1. Why are closures treated specially? Why don't classes suffice?
+1. **Why are closures treated specially? Why don't classes suffice?**
 It is true that C# treats lambdas as objects of class `Func`. A flip
 side of such punning is that C# classes cannot have type-polymorphic
 lambdas as class fields (since all fields have monomorphic types,
 i.e., there cannot be any quantifiers).  Adopting C#'s approach in the
 region type system would lead to a similar drawback: we can no longer
-support region-polymorphic lambdas as class fields, but this feature
-is used frequently in practice. An example is presented in Fig.3 (and
-explained in 3rd paragraph on p.8). 
+support region-polymorphic lambdas as class fields, but this
+functionality is required in practice to support user-defined
+functions (UDFs) in LINQ queries. An example is presented in Fig.3
+(and explained in 3rd paragraph on p.8). 
 
-2. We agree with reviewer 24A's comparison with HM. Separation of type
-and region parameters is an example of the language aspect designed with
-inference in mind. "Action at distance errors" do occur in our case,
-and we conjecture that the recent advances[oopsla14,pldi15] could help
-us mitigate the problem.
+2. We agree with reviewer 24A's **comparison with HM**. Separation of type
+and region parameters is an example of the language aspect designed
+with inference in mind. "Action at distance errors" do occur in our
+case, and we conjecture that the recent advances
+[[oopsla14][oopsla14],[pldi15][pldi15]] could help us mitigate the
+problem.
 
-3. Reviewer 24B's IntBox example is (rightfully) rejected by the type
-system. The type system enforces two invariants on every well-typed
-object: (a) Its type signature explicitly captures the regions to
-which its fields refer to, and (b) All such regions must outlive the
-allocation region of the object. The discussion on constrained region
-polymorphism (p.8) covers this informally, but formal enforcement is
-done by the class well-formedness rule, which was (unfortunately) relegated to the
-appendix (Fig. 13). In the context of reviewer’s example, if
-`b.boxref` is a reference to an object in region `R2`, and if `b`
-itself (an `IntBoxBox`) is allocated in `R1`, then the type signature
-is `IntBoxBox<R1,R2 | R2≥R1>`. The example (implicitly) tries to
-instantiate `R1` with `x` (rather, it’s region identifier), and `R2`
-with `y`, but note that there does not exist any outlives relationship
-between R1 and R2 (since both are transferable regions). Thus, this
-instantiation is disallowed, effectively preempting the possibility of
-an unsafe reference.
+3. Reviewer 24B's **`IntBox` example** is (rightfully) rejected by the
+type system. The type system enforces two invariants on every
+well-typed object: (a) Its type signature explicitly captures the
+regions to which its fields refer to, and (b) All such regions must
+outlive the allocation region of the object. The discussion on
+constrained region polymorphism (p.8) covers this informally, but
+formal enforcement is done by the class well-formedness rule, which
+was (unfortunately) relegated to the appendix (Fig. 13). In the
+context of reviewer’s example, if `b.boxref` is a reference to an
+object in region `R2`, and if `b` itself (an `IntBoxBox`) is allocated
+in `R1`, then the type signature is `IntBoxBox<R1,R2 | R2≥R1>`. The
+example (implicitly) tries to instantiate `R1` with (the region
+identifier of) `x`, and `R2` with `y`, but note that there does not
+exist any outlives relationship between R1 and R2 (since both are
+transferable regions). Thus, this instantiation is disallowed,
+effectively preempting the possibility of an unsafe reference.
 
-4. (Lambda allocation regions) Reviewer 24B's intuition and points in
-this regard are correct. The closure type rule of Fig. 6 is
-unfortunately missing a premise, namely `Δ ≥ r` (every region in Δ outlives r).
-With this added premise, the reviewer's example is correctly handled
-(since `x` doesn't outlive `y`). And it is also correct that with this
-premise, the allocation of lambda does not have to be restricted to the
+4. **Lambda allocation regions**: Reviewer 24B's intuition and points
+in this regard are correct. The closure type rule of Fig. 6 is
+unfortunately missing a premise, namely `Δ ≥ r` (every region in Δ
+outlives r). The premise requires a closure to be well-typed under
+only the regions that outlive its allocation region. With this added
+condition, the reviewer's example is correctly handled (since `x`
+doesn't outlive `y`). And it is also correct that with this premise,
+the allocation of lambda does not have to be restricted to the
 allocation region.
-
 We had an equivalent premise in the previous draft of the paper, but
 got rid of it during the days leading to the submission, with a faulty
 simplification considering only allocation regions. We apologize for
-the confusion caused by this mistake. Thanks to the reviewer for
-catching this.
+the confusion caused by this mistake. We are grateful to the reviewer
+for pointing it out.
 
-5. It is true that the FB^+ language used in the evaluation is
+5. It is true that the FB^+ **language used in the evaluation** is
 impoverished in comparison with Java/C#, but is is enough to capture
 the aspects of Naiad operators relevant to the region type system.
 There are a total of 6 Naiad streaming query operators, out of which
-we analyzed 4 (Select, SelectMany, Join and WindowJoin). The other two
-are aggregation operators, which do not contain any interesting use
-of regions. Instances of the safety violation described in the paper
-were found in all 4, and the violation can manifest in an actual
-execution in in each case. We accept the reviewer's suggestion to
-include these details in the paper.
+we analyzed 4 (Select, Join, GroupBy, and Aggregate). The other two
+are not interesting from the region type system perspective. Instances
+of the safety violation described in the paper were found in all 4,
+and the violation can manifest in an actual execution in in each case.
+We accept reviewer 24B's suggestion to include these details in the
+paper. To answer reviewer 24D's question of whether the need to clone
+objects negates the benefits of regions, we believe the answer is no.
+As explained in paragraph 2 on p.1 (citing [7]), the savings obtained
+by using regions are primarily because of (a). avoiding multiple older
+generation collections over long-lived objects, and (b). preventing
+cascading effect of long GC pauses on the latency at downstream actors.
+Both these factors are unaffected by cloning, which happens only once
+per objects (as against multiple GC walks over a large data structure
+that aggregates objects).
 
-6. In the definition of C-decomposable, why only one of the regions is
-required to be in Δ? 
+6. **In the definition of C-decomposable, why only one of the regions is
+required to be in Δ?**
 The asymmetry in this definition reflects properties of the
-constraint-generation, namely that the context Φ is modified only by
+constraint-generation, namely that the context `Φ` is modified only by
 adding conjuncts of the form `Δ ≥ π` where `π` is not a
 region-parameter (see the rule LetRegion), as discussed in the proof
 of Lemma 3 in Appendix C.
 
-7. In the explanation of the type safety result, the statement "the
-theorem also captures the key property of operational semantics that
-no live region is ever freed or transferred" is informal for "if
+7. In the **explanation of the type safety result**, the statement
+"the theorem also captures the key property of operational semantics
+that no live region is ever freed or transferred" is informal for "if
 `consistent(Δ,Σ)` and `(e,Σ)-->(e',Σ')` then `consistent(Δ,Σ')`"
-(Lemma 8 of the appendix). Thus, operational semantics in fact never
-frees or transfers a live region. We however understand that the
-informal statement can be misconstrued as stronger guarantees provided
-by the type system. We accept the reviewer's suggestion to include
-a clarification.
+(included in the type safety statement, and proved as Lemma 8 in the
+appendix). Thus, operational semantics in fact never frees or
+transfers a live region. We however understand that the informal
+statement can be misconstrued as stronger guarantees provided by the
+type system. We accept the reviewer's suggestion to include a
+clarification.
 
-8. Why do we need constraint based lifetime parameters for classes?
+8. **Why do we need constraint based lifetime parameters for classes?
 What are the distinctive examples which this design enables which a
-simpler ownership system cannot provide? 
-Transferable regions are self-contained, containing no objects with
-pointers to objects in other regions. However, stack regions are more
-flexible, and are permitted to contain objects with pointers to
-objects in other regions. Stack regions are very useful as "working
-storage" (paragraph 3 on p.3). For example, consider a dataflow
-computation that indexes the intermediary results obtained from an
-upstream actor in a transferable region (`R1`), before updating the
-results, and transferring them to a downstream actor. The index,
-perhaps a B-tree, is an auxiliary structure that need not be
-transferred, hence can be stored in a stack region (`R2`). Outlives
-constraints are needed to admit safe references from `R2` into `R1`.
+simpler ownership system cannot provide?**  Transferable regions are
+self-contained, containing no objects with pointers to objects in
+other regions. However, stack regions are more flexible, and are
+permitted to contain objects with pointers to objects in other
+regions. Stack regions are very useful as "working storage" (paragraph
+3 on p.3). For example, consider a dataflow computation that indexes
+the intermediary results obtained from an upstream actor in a
+transferable region (`R1`), before updating the results, and
+transferring them to a downstream actor. The index, perhaps a B-tree,
+is an auxiliary structure that need not be transferred, hence can be
+stored in a stack region (`R2`). Outlives constraints are needed to
+admit safe references from `R2` into `R1`.
 
-### References ###
-
-[oopsla14]: Z Pavlinovic, Finding minimum type error sources, OOPSLA'14
-[pldi15]: D Zhang et al, Diagnosing type errors with class, PLDI'15
+[oopsla14]: http://dl.acm.org/citation.cfm?id=2660230
+[pldi15]: http://dl.acm.org/citation.cfm?id=2738009 
