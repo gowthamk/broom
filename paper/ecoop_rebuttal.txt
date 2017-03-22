@@ -1,0 +1,53 @@
+We thank the reviewers for their extensive review of our work, and
+thoughtful suggestions for improvement.
+
+1. Why are closures treated specially? Why don't classes suffice?
+It is true that C# treats lambdas as objects of class `Func`. A flip
+side of such punning is that C# classes cannot have type-polymorphic
+lambdas as class fields (since all fields have monomorphic types).
+Adopting C#'s approach in the region type system would lead to a
+similar drawback: we can no longer support region-polymorphic lambdas
+as class fields, but this feature is used frequently in practice. An
+example is presented in Fig.3 (and explained in 3rd paragraph on p.8). 
+
+2. We are summarily in agreement with reviewer 24A's comparison with
+HM. Separation of type and region parameters is an example of the
+language aspect designed with inference in mind. "Action at distance
+errors" do occur in our case, and we conjecture that the recent
+advances[oopsla15,pldi15] could help us migitage the problem.
+
+3. Reviewer 24B's IntBox example is (rightfully) rejected by the type
+system. The type system enforces two invariants on every well-typed
+object: (a). its type signature explicitly captures the regions to
+which its fields refer to, and (b). all such regions must outlive the
+allocation region of the object. The discussion on constrained region
+polymorphism (p.8) covers this informally, but formal enforcement is
+done by the class well-formedness rule, which was relegated to the
+appendix (Fig. 13). In the context of reviewer’s example, if
+`b.boxref` is a reference to an object in region `R2`, and if `b`
+itself (an `IntBoxBox`) is allocated in `R1`, then the type signature
+is `IntBoxBox<R1,R2 | R2≥R1>`. The example (implicitly) tries to
+instantiate `R1` with `x` (rather, it’s region idenfitier), and `R2`
+with `y`, but note that there does not exist any outlives relationship
+between R1 and R2 (since both are transferable regions). Thus, this
+instantiation is disallowed, effectively preempting the possibility of
+an unsafe reference.
+
+4. Reviewer 24B's lambda example is (incorrectly) accepted by the type
+system. The reason for this is that the closure type rule of Fig. 6 is
+missing the premise `Δ ≥ r` (Δ outlives r). We had this premise in the
+previous draft of the paper, but got rid of it during the days leading
+to the submission, perhaps reasoning (incorrectly) that it is a
+tautology. We regret this decision. Restoring this premise would
+prevent the example from type checking since `x` doesn't outlive `y`.
+
+5. It is true that the FB^+ language used in the evaluation is
+improverished in comparison with Java/C#, but is is enough to capture
+the aspects of Naiad operators relevant to the region type system.
+There are a total of 6 Naiad streaming query operators, out of which
+we analyzed 4 (Select, SelectMany, Join and WindowJoin). The other two
+are aggregation operators, which do not contain any interesting use
+of regions. Instances of the safety violation described in the paper
+were found in all 4, and the violation can manifest in an actual
+execution in in each case. We accept the reviewer's suggestion to
+include these details in the paper.
