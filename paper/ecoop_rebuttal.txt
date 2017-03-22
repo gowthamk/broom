@@ -36,14 +36,15 @@ an unsafe reference.
 4. (Lambda allocation regions) Reviewer 24B's intuition and points in
 this regard are correct. The closure type rule of Fig. 6 is
 unfortunately missing a premise, namely `Δ ≥ r` (every region in Δ outlives r).
-Adding this premise will ensure that the reviewer's example is correctly handled
+With this added premise, the reviewer's example is correctly handled
 (since `x` doesn't outlive `y`). And it is also correct that with this
 premise, the allocation of lambda does not have to be restricted to the
 allocation region.
 
 We had an equivalent premise in the previous draft of the paper, but got rid
 of it during the days leading to the submission, with a faulty simplification
-considering only allocation regions. We apologize for the confusion caused by this mistake. 
+considering only allocation regions. We apologize for the confusion caused by
+this mistake. Thanks to the reviewer for catching this.
 
 5. It is true that the FB^+ language used in the evaluation is
 improverished in comparison with Java/C#, but is is enough to capture
