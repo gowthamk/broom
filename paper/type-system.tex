@@ -101,29 +101,26 @@ $B\inang{\tbar}@\pi$ as being equivalent to
 $B\inang{\tbar}\inang{\rbar}$. Region annotation on type $a$, where
 $a$ is a type variable, assumes the form $a@\pi$. If $a$ is
 instantiated with \C{Pair<\ObjZ,\ObjZ>}, the result is the type of a
-\C{Pair} object contained in  $\pi$. Class fields are not allowed to
-be type polymorphic, in keeping with C\#, which constitutes the core
-of \name. 
+\C{Pair} object contained in  $\pi$.  
 
-Note that classes in \FB are independently parameterized over types
-and regions. While this design decision has a downside that it allows
-type variables to only denote the types of objects contained in a
-single region, it yields benefits that far outweigh the costs. In
-particular, it lets us support region-polymorphic higher-order
-functions as class fields.  This allows, for example, a generic class,
-whose type parameters are $a$ and $b$, to contain a region-polymorphic
-function of type
-$\inang{\rho_0,\rho_1,\rho_2 \,|\, \rho_1 \outlives \rho_0 \conj
-\rho_2 \outlives \rho_0}(a@\rho_1,b@\rho_2) \rightarrow
+Classes in \FB are independently parameterized over types and regions.
+While this design decision has a downside that it allows type
+variables to only denote the types of objects contained in a single
+region, it yields benefits that outweigh the costs. In particular, it
+lets us support region-polymorphic higher-order functions as class
+fields.  This allows, for example, a generic class, whose type
+parameters are $a$ and $b$, to contain a region-polymorphic function
+of type $\inang{\rho_0,\rho_1,\rho_2 \,|\, \rho_1 \outlives \rho_0
+\conj \rho_2 \outlives \rho_0}(a@\rho_1,b@\rho_2) \rightarrow
 \C{Pair}\inang{a,b}\inang{\rho_0,\rho_1,\rho_2}$ as its field. Such
 region-polymorphic higher-order fields are used frequently by the
 dataflow operators, which apply them in the context of various regions
 (\emph{e.g.,} see Fig.~\ref{fig:motivating-eg-in-broom}). Keeping type
 and region parameterizations separate also simplifies the type system
-to the point that inference becomes practical
-(Sec.~\ref{sec:type-inference}); as our experience with Hindley-Milner
-type systems suggests, type inference is pivotal to the practical
-utility of sophisticated type systems.
+so that inference becomes practical (Sec.~\ref{sec:type-inference}).
+The need for polymorphism at the field level is also why \FB treats
+function closures specially, rather than as objects of type \C{Func}
+as in C\#.
 
 % The region type of $\ObjZ$ class in \FB has no fields, hence its
 % region type is of form $\ObjZ@\rgn$. 
@@ -316,8 +313,8 @@ extend (this artifact is inherited from FGJ), and
 constraints on regions in $\rhoenv$.
 \end{itemize}
 In addition, the context for the expression typing judgment also
-includes (a). a type environment ($\env \in x \mapsto \tau$) that
-contains the type bindings for variables in scope, and (b). The region
+includes (a).~a type environment ($\env \in x \mapsto \tau$) that
+contains the type bindings for variables in scope, and (b).~the region
 ($\rgn$) that serves as the allocation context for the expression
 being type checked. Like the judgments in FGJ~\cite{fgj}, all the
 judgments defined by the rules in Fig.~\ref{fig:fb-staticsem} are
@@ -348,7 +345,7 @@ The well-formedness rule for class types
 safety property that prevents objects from containing unsafe
 references. It does so by insisting that regions $\rbar$ satisfy the
 constraints ($\phi$) imposed by the class on its region parameters.
-The later is enforced by checking the validity of $\phi$, with actual
+The latter is enforced by checking the validity of $\phi$, with actual
 region arguments substituted for formal region parameters, under the
 conditions ($\phicx$) guaranteed by the context. The semantics of this
 sequent is straightforward, and follows directly from the properties
@@ -461,7 +458,7 @@ the field access expression ($e.f_i$) also uses $\fields$ and another
 definition called $\bound$, which returns the bound of a type variable
 ($\bound$ is an identity function for concrete types).
 
-The type rule for \C{new \RgnZ} expressions expects the \RgnZ class's
+The type rule for the \C{new \RgnZ} expression expects the \RgnZ class's
 constructor to be called with a nullary function that returns a value
 in its allocation context.  This ensures that the value returned by
 the function stores no references to objects allocated elsewhere,
@@ -477,7 +474,7 @@ don't find their way into the result of its evaluation.
 %   \label{fig:fb-morewfrules}
 % \end{figure}
 
-The type rule for \C{letregion} expression requires that the static
+The type rule for the \C{letregion} expression requires that the static
 identifier introduced by the expression be unique under the current
 context (i.e., $\pi \notin \Delta$). This condition is needed in order
 to prevent the new region from incorrectly assuming existing outlives
@@ -491,16 +488,16 @@ the new region. This ensures that the value obtained by evaluating a
 \C{letregion} expression contains no references to the temporary
 objects inside the region.
 
-The rule for \C{open} expression, unlike the rule for \C{letregion},
-does not introduce any outlives relationship between the newly opened
-region and any pre-existing region while checking the type of the
-expression ($e$) under \C{open}. This prevents new objects allocated
-inside the transferable region from storing references to those
-outside. The newly opened region becomes the allocation context for
-$e$, which is type checked under an environment ($\env$) extended with
-the type binding for the root object.
+The rule for the \C{open} expression, unlike the rule for
+\C{letregion}, does not introduce any outlives relationship between
+the newly opened region and any pre-existing region while checking the
+type of the expression ($e$) under \C{open}. This prevents new objects
+allocated inside the transferable region from storing references to
+those outside. The newly opened region becomes the allocation context
+for $e$, which is type checked under an environment ($\env$) extended
+with the type binding for the root object.
 
-The type rule for lambda expression typechecks the lambda-bound
+The type rule for the lambda expression typechecks the lambda-bound
 expression ($e$) under an extended type environment containing
 bindings for function's arguments, assuming that region parameters are
 live, and that declared constraints over region parameters hold. The
@@ -555,7 +552,7 @@ The method well-formedness rule makes use of an auxiliary definition
 $\override$ that judges whether the current method is a valid
 overriding of any eponymous method from the super class. The type
 environment is extended with a binding that binds the $\thisZ$ keyword
-to the type of the current class. Note that the the type of the
+to the type of the current class. Note that the type of the
 current method as accessed via $\thisZ$ (i.e., $\thisZ.\C{m}$) is
 region-parametric, thus admitting region-polymorphic recursion (i.e.,
 recursive call to $\C{m}$ can have different region arguments than
@@ -568,7 +565,7 @@ $\C{m}$).
 
 The operational semantics of \FB describes a non-trivial runtime
 component that introduces memory regions and performs run-time
-verification of their typestate. Fig.~\ref{fig:syntax-extra} shows the
+verification of their typestate. Fig.~\ref{fig:fb-syntax-extra} shows the
 additional language constructs of \FB that manifest only at run-time.
 A location ($\loc$) abstracts all the memory locations associated with
 a region (i.e., each memory region is associated with a single
@@ -642,15 +639,15 @@ is consistent with both $\mem$ and $\mem'$, the theorem also captures
 the key property of operational semantics that no live region is ever
 freed or transferred.
 
-{\bf A note on region handlers}. \FB stores the region handlers in a
+{\bf Integrating regions with GC heap}. \FB stores the region handlers in a
 distinguished top region, which abstracts the GC heap. Type system
 prevents transferable regions from storing references into the GC
 heap. A static region however can store references to region handles,
-which need to be taken into account while GC'ing the heap.  Traversing
+which need to be taken into account while GC'ing the heap. Traversing
 the region memory to identify references into the GC heap
-unfortunately defeats the purpose of regions. A solution is to disable
-collecting region handles as long as any static region is open. Since
-static regions are intended to store temporary objects while
-populating a dynamic region, their lifetimes are short enough to let
-region handles to be GC’d.  
+unfortunately defeats the purpose of regions. The solution we adopt is
+to disable collecting region handles as long as any static region is
+open. Since static regions are intended to store temporary objects
+while populating a dynamic region, their lifetimes are short enough to
+let region handles to be GC’d.  
 

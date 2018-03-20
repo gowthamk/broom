@@ -43,7 +43,7 @@ able to infer the expected region types for all these classes under 10ms.
 Fig~\ref{fig:rev} shows the region-type-annotated
 definition computed for the list reverse method. Observe that \namec
 was able to infer that the list and its data (of type \C{T}) can be
-allocated in different regions, as long as the later outlives the
+allocated in different regions, as long as the latter outlives the
 former. This allows, for instance, a \C{preOrder} method to traverse a
 tree in a transferable region, and return a list of its nodes, where
 the list itself is allocated in the stack region. 
@@ -67,18 +67,20 @@ class LinkedList<T><R5,R4 | R4$\outlives$R5> {
 \vspace*{-0.15in}
 \end{figure}
 
-Next, we translated some of the Naiad streaming query operator
+Next, we translated 4 out of the 6 Naiad streaming query operator
 benchmarks (Naiad vertices) used in~\cite{Broom:HotOS} to
-$\absof{\FB^+}$, and used \namec to verify their safety.
-The number of LOC performing operations on \C{Region} objects relative
-to the total LOC is 8\% or under in the Naiad benchmarks. 
-During the process, we found multiple instances of potential memory safety
-violations in the $\absof{FB^+}$ translation of benchmarks, which we
-verified to be present in the original C\# implementation as well. The
-cause of all safety violations is the creation of a reference from the
-outgoing message (a transferable region) to the payload of the
-incoming message. For example, the implementation of \C{SelectVertex}
-contains the following:
+$\absof{\FB^+}$, and used \namec to verify their safety (The remaining
+two Naiad vertices are not interesting from the type system
+perspective).  The number of LOC performing operations on \C{Region}
+objects relative to the total LOC is 8\% or under in the Naiad
+benchmarks.  During the process, we found multiple instances of
+potential memory safety violations in the $\absof{FB^+}$ translation
+of all the 4 Naiad vertices, which we verified to be present in the
+original C\# implementation as well. The cause of all safety
+violations is the creation of a reference from the outgoing message (a
+transferable region) to the payload of the incoming message. For
+example, the implementation of \C{SelectVertex} contains the
+following:
 \begin{codejava}
   if (this.selector(inMsg.payload[i])) {
     outMsg.set(outputOffset, inMsg.payload[i]);

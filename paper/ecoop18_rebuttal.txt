@@ -1,0 +1,80 @@
+We thank the reviewers for their reviews and suggestions for improvement.
+
+Review #50A
+------------
+
+1. The other two Naiad benchmarks that were left out of evaluation
+were so left out because they are very similar to the existing
+benchmarks insofar as region type system is concerned. In particular,
+the Naiad vertex `RegionWindowJoinVertex` is similar to
+`RegionJoinVertex`, and `RegionSelectManyVertex` is similar to
+`RegionSelectVertex`. They were nonetheless included in the evaluation
+of [7] because they allow the runtime overhead of regions to be
+measured at scale (allowing [7] to make a case for regions from the
+performance standpoint, as opposed to the safety standpoint). We shall
+include this note in the final version of the paper.
+
+Review #50B
+-------------
+
+1. Dealing with run-time errors: Run-time exceptions are raised either
+when the program attempts to transfer/free an open region, or open a
+transferred/freed region (The operational semantics (Figs. 15 and 16)
+precisely identify these two cases). The former is often a mere
+programming oversight, which can be rectified by moving the
+`transfer`/`free` out of the lexical scope of `open`. The latter could
+however denote a genuine bug in the program, where a dynamic region is
+assumed to be always available at some program point, when in fact
+it could have been freed/transferred along a program path leading to
+that point. The solution in this case is to fix the program logic by
+acknowledging that the region may no longer be available at that
+program point.
+
+
+Review #50C
+-----------
+
+1. How the type system differentiates between `free` and `transfer`:
+The type system doesn't. Dynamic regions in Broom are primarily
+intended to transfer data among actors (hence the name "Transferable
+Regions"). It is therefore expected that a dynamic region is
+transferred at least once during its lifetime (before it is freed),
+thereby making it unsafe to allow outgoing references from the region
+to other regions.  While nothing prevents a transferable region to be
+used merely as dynamic memory, that is not an intended usecase for
+which Broom is optimized.
+
+2. Serializing: Broom's region runtime [7] serializes data if the
+receiver of a transferable region is remote.
+
+3. Our model does admit aliases (through the `let` expression). The
+operational semantics defines a a *store* (Σ) that maps locations to
+their typestates, and implicitly models a heap at the granularity of a
+region (each location $l$ denotes a region, and every object whose
+first region parameter is $l$ (e.g., `new B<l,..>)(...)`) is allocated
+in the region at $l$). Mutable object fields constitute an ostensible
+omission from our model (also the FGJ model), but this isn't a major
+shortcoming considering that constructor application (during the new
+object creation) includes assignments to object fields. We would
+include a detailed note to this extent in the final version.
+
+4. As far as the syntax is concerned, `transfer` and `free` are like
+any other methods, hence their application is modeled by the generic
+method application expression ($e.m<...>(...)$). Since the operational
+semantics models a single actor (and not a system of actors), the
+behavior of `free` is same as that of `transfer`: both result in the
+region becoming unavailable to the actor calling `transfer`/`free`.
+The rule for `transfer` captures this semantics.
+
+5. The run-time checks are precisely captured by the premises of
+the opsem rules that deal with exceptions (namely, OpenTransferred and
+TransferOpened). The checks basically check whether the action being
+performed (e.g., `transfer`) is allowed given the current typestate of
+the region (e.g., "live"), raising an exception otherwise. 
+
+6. `inRgn.free()` in Fig. 3 is needed to prevent a memory leak.
+Reference going out of scope doesn't automatically free a region,
+because the region may have been aliased. Naiad code does contain
+`free` statements.
+
+

@@ -175,7 +175,8 @@
 \RULE
   {
     \A = (\subtypcx) \spc
-    \rgn \in \rhoenv \\
+    \rgn \in \rhoenv \spc
+    \rhoenv \outlives \rgn \\
     \rho,\rhobar \notin \rhoenv \spc
     \A' = (\rhoenv \cup \{\rho,\rhobar\}, \aenv, 
           \phicx \conj \phi)\\

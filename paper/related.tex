@@ -143,7 +143,7 @@ ownership type system~\cite{OwnershipSurvey}, where each region is the
 owner of all objects allocated in the region.
 %
 An ownership type system for safe region-based memory management in
-real-time Java has been proposed by~\cite{MIT03}.  
+real-time Java has been proposed by Boyapati \emph{et al.}~\cite{MIT03}.  
 % Like us, they too assume a source language with programmer-managed
 % memory regions, and focus on proving safety of programs written in
 % that language.  
@@ -153,38 +153,40 @@ In contrast, we permit regions with dynamically determined lifetimes.
 % (in the context of message-passing concurrency).
 % We borrow outlives relation from their formal
 % development, and our type system bears some similarities to theirs.
-Our language also admits generics and higher-order functions.
-We also establish type safety and transfer safety results that
-formalize the guarantees provided by our system. While~\cite{MIT03}'s
+Our language also admits generics and higher-order functions.  We also
+establish type safety and transfer safety results that formalize the
+guarantees provided by our system. While Boyapati \emph{et al.}'s
 language is explicitly typed, our language comes equipped with full
-type inference.
-However, several inference algorithms have been proposed in the context
-of other ownership type systems.
-Our type inference algorithm is also novel compared to these existing
-ownership inference algorithms, which are based on, e.g.,
-pointer analysis~\cite{HuangEtAl:ECOOP12} or boolean satisfiability~\cite{DietlEtAl:ECOOP11}.
-(See Section 5.2 of~\cite{OwnershipSurvey} for a more comprehensive discussion
-of ownership inference algorithms.)
-Some distinguishing characteristics of our algorithm is that it is customized
-to our problem, does not use any pointer analysis algorithm (which
-can be a source of imprecision) or SAT solvers (which can be a source of inefficiency),
-and comes with relative completeness guarantees.
+type inference.  However, several inference algorithms have been
+proposed in the context of other ownership type systems.  Our type
+inference algorithm is also novel compared to these existing ownership
+inference algorithms, which are based on, e.g., pointer
+analysis~\cite{HuangEtAl:ECOOP12} or boolean
+satisfiability~\cite{DietlEtAl:ECOOP11}.  (See Section 5.2 of Clark
+\emph{et al.}'s survey of ownership type
+systems~\cite{OwnershipSurvey} for a more comprehensive discussion of
+ownership inference algorithms.) Some distinguishing characteristics
+of our algorithm is that it is customized to our problem, does not use
+any pointer analysis algorithm (which can be a source of imprecision)
+or SAT solvers (which can be a source of inefficiency), and comes with
+relative completeness guarantees.
 
 
-~\cite{HMN01} proposes a flow-sensitive approach for first-order
-programs to generalize~\cite{tofte97}'s approach to dynamic
-regions.~\cite{CR04} describes a flow-insensitive and
-context-sensitive analysis that transforms Java programs to use
-(dynamic) regions.  However, neither~\cite{HMN01} nor~\cite{CR04}
-supports dynamic regions as first-class objects; they cannot be stored
-in data structures or passed to methods. Furthermore,
-while~\cite{HMN01} requires reference counting to ensure memory
-safety,~\cite{CR04} comes with no formal safety guarantees.
+Henglein \emph{et al.}~\cite{HMN01} propose a flow-sensitive approach
+for first-order programs to generalize Tofte and Talpin's approach to
+dynamic regions. Cherem and Rugina~\cite{CR04} describe a
+flow-insensitive and context-sensitive analysis that transforms Java
+programs to use (dynamic) regions.  However, neither of themr supports
+dynamic regions as first-class objects; they cannot be stored in data
+structures or passed to methods. Furthermore, while Henglein \emph{et
+al.}~\cite{HMN01} require reference counting to ensure memory safety,
+Cherem and Rugina's analysis~\cite{CR04} comes with no formal safety
+guarantees.
 %
-\cite{gpu14} uses regions to safely transfer data between the CPU and GPU
-in the context of Scheme. However, their setting only includes lexically-scoped
-regions for which Tofte and Talpin-style analysis~\cite{tofte97}
-suffices. In contrast, we provide first-class support for
-transferable regions with dynamic lifetimes.
+Holk \emph{et al.}~\cite{gpu14} use regions to safely transfer data
+between the CPU and GPU in the context of Scheme. However, their
+setting only includes lexically-scoped regions for which Tofte and
+Talpin-style analysis suffices. In contrast, we provide first-class
+support for transferable regions with dynamic lifetimes.
 % We require this generality in order to support streaming query operators, such as the
 % one shown in Fig.~\ref{fig:motivating-eg}. 

@@ -154,10 +154,10 @@ Tofte-Talpin style \C{letregion} lexical block, that delimits
 the lifetime of a stack region, inside an \C{open} lexical block for a
 transferable region, we can guarantee that the transferable region
 will remain live as long as the stack region is live. We say that the
-former \emph{outlives} the later., and any references from the stack
-region to the transferable region are therefore safe.
-This is particular useful, since such stack regions serve as temporary
-working storage while working with the (opened) transferable regions.
+former \emph{outlives} the latter, and any references from the stack
+region to the transferable region are therefore safe. This is
+particular useful, since such stack regions serve as temporary working
+storage while working with the (opened) transferable regions.
 
 By controlling the outlives relationships between various
 regions, we only allow safe cross-region references, while prohibiting
@@ -444,7 +444,7 @@ The paper makes the following contributions:
 \item \broom{} is equipped with a region type system that statically
   guarantees safety of all memory accesses in a well-typed program,
   provided that certain typestate invariants on regions hold.  The
-  later invariants are enforced via simple runtime checks.
+  latter invariants are enforced via simple runtime checks.
 
   \item We define an operational semantics for \broom, and a type
   safety result that clearly defines and proves safety guarantees
