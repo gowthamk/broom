@@ -77,4 +77,10 @@ Reference going out of scope doesn't automatically free a region,
 because the region may have been aliased. Naiad code does contain
 `free` statements.
 
+7. The immediate difference between Kilim and Broom seems to be the
+enforcement of linearity of references to transferable objects. Kilim
+relies on ownership and borrowing techniques (ala Rust) to ensure that
+transferable objects are not aliased. Broom on the other had lets
+transferable regions to be aliased freely, allowing idiomatic C# code
+(e.g., iterators) to work without modifications.
 
