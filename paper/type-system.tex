@@ -67,9 +67,10 @@ definition, as the \C{Pair} class does in the above definition. We say
 that the \C{Pair} class exhibits \emph{constrained region
 polymorphism}.
 %
-% For instance, a \C{Pair} object allocated in a region ${\rhoalloc}$ can have its first
-% component coming from ${\rho_1}$ and second from $\rho_2$, as long as
-% $\rho_1, \rho_2$ outlive $\rhoalloc$, as illustrated by the above definition.
+% For instance, a \C{Pair} object allocated in a region ${\rhoalloc}$
+% can have its first component coming from ${\rho_1}$ and second from
+% $\rho_2$, as long as $\rho_1, \rho_2$ outlive $\rhoalloc$, as
+% illustrated by the above definition.
 
 To construct objects of the \C{Pair} class, its type and region
 parameters need to be instantiated with core types ($T$) and region
@@ -87,16 +88,16 @@ letregion $\pi_0$ in
 \end{codejava}
 %\vspace*{-0.1in}
 In the above code, the instantiation of $\rho_0$ and $\rho_1$ with
-$\pi_1$, and $\rho_2$ with $\pi_0$ is allowed because (a) $\pi_0$
-and $\pi_1$ are live during the instantiation, and (b). $\pi_0
-\outlives \pi_1$ and $\pi_1 \outlives \pi_1$ (since outlives is
-reflexive). Observe that the region type of \C{p} conveys
-the fact that (a). it is allocated in region $\pi_1$, and (b). it
-holds references to objects allocated in region $\pi_0$ and $\pi_1$.
-In contrast, if we choose to allocate the \C{snd} object also in
-$\pi_1$, then \C{p} would be contained in $\pi_1$, and its region
-type would be \C{Pair<\ObjZ,\ObjZ><$\pi_1$,$\pi_1$,$\pi_1$>}, which
-we abbreviate as \C{Pair<\ObjZ,\ObjZ>@$\pi_1$}. In general, we treat
+$\pi_1$, and $\rho_2$ with $\pi_0$ is allowed because (a) $\pi_0$ and
+$\pi_1$ are live during the instantiation, and (b). $\pi_0 \outlives
+\pi_1$ and $\pi_1 \outlives \pi_1$ (since outlives is reflexive).
+Observe that the region type of \C{p} conveys the fact that (a). it is
+allocated in region $\pi_1$, and (b). it holds references to objects
+allocated in region $\pi_0$ and $\pi_1$.  In contrast, if we choose to
+allocate the \C{snd} object also in $\pi_1$, then \C{p} would be
+contained in $\pi_1$, and its region type would be
+\C{Pair<\ObjZ,\ObjZ><$\pi_1$,$\pi_1$,$\pi_1$>}, which we abbreviate as
+\C{Pair<\ObjZ,\ObjZ>@$\pi_1$}. In general, we treat
 $B\inang{\tbar}@\pi$ as being equivalent to
 $B\inang{\tbar}\inang{\rbar}$. Region annotation on type $a$, where
 $a$ is a type variable, assumes the form $a@\pi$. If $a$ is

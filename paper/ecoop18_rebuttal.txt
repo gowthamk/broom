@@ -48,7 +48,7 @@ which Broom is optimized.
 receiver of a transferable region is remote.
 
 3. Our model does admit aliases (through the `let` expression). The
-operational semantics defines a a *store* (Σ) that maps locations to
+operational semantics defines a *store* (Σ) that maps locations to
 their typestates, and implicitly models a heap at the granularity of a
 region (each location $l$ denotes a region, and every object whose
 first region parameter is $l$ (e.g., `new B<l,..>)(...)`) is allocated
