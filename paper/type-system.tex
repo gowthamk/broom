@@ -99,13 +99,13 @@ contained in $\pi_1$, and its region type would be
 \C{Pair<\ObjZ,\ObjZ><$\pi_1$,$\pi_1$,$\pi_1$>}, which we abbreviate as
 \C{Pair<\ObjZ,\ObjZ>@$\pi_1$}. In general, we treat
 $B\inang{\tbar}@\pi$ as being equivalent to
-$B\inang{\tbar}\inang{\rbar}$. Region annotation on type $a$, where
-$a$ is a type variable, assumes the form $a@\pi$. If $a$ is
+$B\inang{\tbar}\inang{\bar{\pi}}$. Region annotation on type $a$,
+where $a$ is a type variable, assumes the form $a@\pi$. If $a$ is
 instantiated with \C{Pair<\ObjZ,\ObjZ>}, the result is the type of a
 \C{Pair} object contained in  $\pi$.  
 
 Classes in \FB are independently parameterized over types and regions.
-While this design decision has a downside that it allows type
+While this design decision has a downside in that it allows type
 variables to only denote the types of objects contained in a single
 region, it yields benefits that outweigh the costs. In particular, it
 lets us support region-polymorphic higher-order functions as class
@@ -295,6 +295,13 @@ region of the corresponding closure.
 % \ObjZ\inang{\rho^a}$, coveying that (a). \C{f}'s closure is allocated
 % in $\rgn$, and (b). when executed under an allocation context
 % $\rho^a$, the closure returns an object allocated in $\rho^a$.
+
+Note that mutable object fields are conspicuously absent from the \FB
+model (and also the FGJ model in general), but this isn't a major
+shortcoming considering that constructor application, which happens
+during a new object creation, includes assignments to the object
+fields (see FGJ~\cite{fgj}). Thus the type system is already obligated
+to handle unsafe assignments.
 
 \subsection{Types and Well-formedness}
 
@@ -573,9 +580,9 @@ a region (i.e., each memory region is associated with a single
 location). A transferable region can be in one of three possible
 states: closed ($\USED$), open/live ($\LIVE$), and transferred/freed
 ($\XFERRED$). Constructs \C{letd} and \C{opened} are the run-time
-manifestations of \C{let} and \C{open}; \C{let} reduces to \C{letd}
-while allocating a (static) region, and \C{open} reduces to \C{opened}
-while opening a (transferable) region. An \C{opened}
+manifestations of \C{letregion} and \C{open}; \C{letregion} reduces to
+\C{letd} while allocating a (static) region, and \C{open} reduces to
+\C{opened} while opening a (transferable) region. An \C{opened}
 expression is tagged with the typestate ($s$) of the transferable
 region before it is opened (as Fig.~\ref{fig:region-fsm} shows, a
 transferable region can be \C{open}'d from either an open state or a

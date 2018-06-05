@@ -117,23 +117,23 @@ invocation are allocated in the region \C{R}.
 
 \mypara{Motivating Example}
 % We now illustrate how the features of \name can be used to 
-Fig.~\ref{fig:motivating-eg-in-broom} shows how the motivating example
-of Fig.~\ref{fig:motivating-eg} can be written in \name.  The
+Fig~\ref{fig:motivating-eg-in-broom} shows how the motivating example
+of Fig.~\ref{fig:motivating-eg} can be written in \name. The
 \C{onReceive} method receives its input message in a
 \emph{transferred} region (\ie, a \emph{closed} region whose ownership
-is transferred to the recipient).  Line 7 creates a new region to
+is transferred to the recipient). On Line 7, we create a new region to
 store the output for time \C{t}, initializing it to contain an empty
-list.  Line 8 opens the input region to process it.
-% \footnote{We omit \C{@R} annotation in \C{open} when we don't need \C{R}.}
-Line 9 creates a stack region \C{R0}.  Thus, the temporary objects created by
-the iteration in line 10, for example, will be allocated in this stack
-region that lives just long enough.  We open the desired output region
-in line 11, so that the new output objects created by the invocation
-of \C{selector} in line 12 are allocated in the output region.
-Finally, the input region is freed in line 14. The output region at
-\C{map[t]} stays as along as input messages with timestamp \C{t} keep
-arriving. When the timing message for \C{t} arrives, the \C{onNotify}
-method transfers the \C{outRgn} at \C{map[t]} to a downstream actor.
+list. On Lines 8 and 9, we open the input region \C{inRgn} followed by
+creating a new stack region \C{R0}. The temporary objects created by
+the iteration on line 10, for example, will be allocated in the stack
+region \C{R0} that lives just long enough.  We open the desired output
+region on line 11, so that the new output objects created by the
+invocation of \C{selector} on line 12 are allocated in the output
+region.  Finally, the input region is freed on line 14. The output
+region at \C{map[t]} stays as along as input messages with timestamp
+\C{t} keep arriving. When the timing message for \C{t} arrives, the
+\C{onNotify} method transfers the \C{outRgn} at \C{map[t]} to a
+downstream actor.
 % After the transfer, \C{SelectVertex} is no longer allowed to access
 % the \C{outRgn}, facilitating its deallocation.
 
@@ -210,7 +210,7 @@ method transfers the \C{outRgn} at \C{map[t]} to a downstream actor.
 
 \mypara{Cloning} Note that in the example from
 Fig.~\ref{fig:motivating-eg-in-broom} the object returned by the
-\C{selector} (on Line 13) should not contain any references to the
+\C{selector} (on Line 12) should not contain any references to the
 input object, since the input region, where the object resides, will
 be freed at the end of the method. If there is a need for the output
 object to point to subobjects of the input object, such subobjects

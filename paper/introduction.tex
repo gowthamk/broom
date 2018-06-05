@@ -147,17 +147,18 @@ transferable regions through a \emph{combination of a static
 typing discipline and lightweight runtime checks in place of linear types}.
 
 \mypara{Language.}
-The cornerstone of this approach is an \C{open} lexical block for transferable regions,
-that ``opens'' a transferable region and guarantees that the region
-won't be transferred/freed while it is open. By nesting a
-Tofte-Talpin style \C{letregion} lexical block, that delimits
-the lifetime of a stack region, inside an \C{open} lexical block for a
-transferable region, we can guarantee that the transferable region
-will remain live as long as the stack region is live. We say that the
-former \emph{outlives} the latter, and any references from the stack
-region to the transferable region are therefore safe. This is
-particular useful, since such stack regions serve as temporary working
-storage while working with the (opened) transferable regions.
+The cornerstone of this approach is an \C{open} lexical block for
+transferable regions, that ``opens'' a transferable region and
+guarantees that the region won't be transferred/freed while it is
+open. By nesting a Tofte-Talpin style \C{letregion} lexical block,
+that delimits the lifetime of a stack region, inside an \C{open}
+lexical block for a transferable region, we can guarantee that the
+transferable region will remain live as long as the stack region is
+live. We say that the former \emph{outlives} the latter, and any
+references from the stack region to the transferable region are
+therefore safe. This is particularly useful, since such stack regions
+serve as temporary working storage while working with the (opened)
+transferable regions.
 
 By controlling the outlives relationships between various
 regions, we only allow safe cross-region references, while prohibiting

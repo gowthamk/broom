@@ -443,31 +443,27 @@ as well as the runtime overhead of checking the region's state transition discip
 \subsection{An Example}
 
 Fig~\ref{fig:motivating-eg-in-broom} shows how the motivating example
-of Fig.~\ref{fig:motivating-eg} can be written in \name.
-The \C{onReceive} method receives its input message in a \emph{transferred}
-region (\ie, a \emph{closed} region whose ownership is transferred to the
-recipient).
-Line 7 creates a new region to store the output for time \C{t},
-initializing it to contain an empty list.
-Line 9 opens the input region to process it.
-Line 10 creates a stack region \C{R0}.
-Thus, the temporary objects created by the iteration in line 11,
-for example, will be allocated in this stack region that lives just
-long enough.
-We open the desired output region in line 12, so that the new output
-objects created by the invocation of \C{selector} in line 13
-are allocated in the output region.
-Finally, the input region is freed in line 19.
+of Fig.~\ref{fig:motivating-eg} can be written in \name. The
+\C{onReceive} method receives its input message in a
+\emph{transferred} region (\ie, a \emph{closed} region whose ownership
+is transferred to the recipient). On Line 7, we create a new region to
+store the output for time \C{t}, initializing it to contain an empty
+list. On Lines 8 and 9, we open the input region \C{inRgn} followed by
+creating a new stack region \C{R0}. The temporary objects created by
+the iteration on line 10, for example, will be allocated in the stack
+region \C{Ro} that lives just long enough.  We open the desired output
+region on line 11, so that the new output objects created by the
+invocation of \C{selector} on line 12 are allocated in the output
+region.  Finally, the input region is freed on line 14.
 
-Note that this approach works correctly only if \C{selector}
-creates an output object that does not share any subobjects with its input
-object (which resides in the input region and will be freed at the end of
-the method).
-If desired, such subobjects must be cloned (to copy them from the input
-region to the output region).
-Fortunately, \name's region type system (\S~\ref{sec:type-system}) is
-capable of capturing such nuances in the type of \C{selector}
-and the type checker will ensure correctness.
-Furthermore, the type can be automatically inferred by \name's region type
-inference (\S~\ref{sec:type-inference}), which can perform the above
-non-trivial reasoning on behalf of the programmer.
+Note that this approach works correctly only if \C{selector} creates
+an output object that does not share any subobjects with its input
+object (which resides in the input region and will be freed at the end
+of the method).  If desired, such subobjects must be cloned (to copy
+them from the input region to the output region).  Fortunately,
+\name's region type system (\S~\ref{sec:type-system}) is capable of
+capturing such nuances in the type of \C{selector} and the type
+checker will ensure correctness.  Furthermore, the type can be
+automatically inferred by \name's region type inference
+(\S~\ref{sec:type-inference}), which can perform the above non-trivial
+reasoning on behalf of the programmer.

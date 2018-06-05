@@ -18,7 +18,7 @@ class SelectVertex<TIn, TOut> {
   void onNotify(Time t) {
      Region<List<TOut>> outRgn = map[t];
      map.Remove(t);
-     outRgn.transfer();
+     outRgn.transfer(successorId);
   }
 }
 \end{numcodejava}

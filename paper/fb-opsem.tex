@@ -42,7 +42,7 @@
 %   \mem' = \mem[\loc \mapsto \FREE]
     \mem' = \mem[\loc \mapsto \XFERRED]
 }{
-    \redstoo{\Delta}{(\letd{\loc}{v},\mem)}{(v,\mem)}
+    \redstoo{\Delta}{(\letd{\loc}{v},\mem)}{(v,\mem')}
   }{LetRegionEnd}
 
 \lopsemrule{3.3in}{
@@ -104,14 +104,14 @@
     \mem(\loc) = \USED \spc
     \mem' = \mem[\loc \mapsto \XFERRED]
 }{
-    \redstoo{\Delta}{((\C{new}\;\RgnZ\inang{T}\inang{\toploc\loc}(v)).\transfer(),\mem)}
+    \redstoo{\Delta}{((\C{new}\;\RgnZ\inang{T}\inang{\toploc\loc}(v)).\transfer(\ldots),\mem)}
             {(\unitval,\mem')}
 	  }{Transfer}
 
 \lopsemrule{2.5in}{
     \mem(\loc) = \TLIVE \spc
 }{
-    \redstoo{\Delta}{((\C{new}\;\RgnZ\inang{T}\inang{\toploc\loc}(v)).\transfer(),\mem)}
+    \redstoo{\Delta}{((\C{new}\;\RgnZ\inang{T}\inang{\toploc\loc}(v)).\transfer(\dots),\mem)}
             {\invalidexn}
 	  }{TransferOpened}
 
