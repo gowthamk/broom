@@ -1,6 +1,6 @@
 \begin{figure*}[t]
 %
-\begin{minipage}{3in}
+\begin{minipage}{2.6in}
 \begin{smathpar}
 \begin{array}{lcl}
   \allocRgn(A\inang{\rgn\rbar}\inang{\tbar}) & = & \rgn\\
@@ -11,7 +11,7 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{3in}
+\begin{minipage}{2.6in}
 \begin{smathpar}
 \begin{array}{lcl}
   \bound_{\aenv}(\tyvar@\rgn) & = & \aenv(\tyvar)@\rgn\\
@@ -21,7 +21,7 @@
 \end{smathpar}
 \end{minipage}
 %
-% \begin{minipage}{2.25in}
+% \begin{minipage}{\textwidth}
 % \begin{smathpar}
 % \begin{array}{lcl}
 %   \ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
@@ -33,13 +33,13 @@
 %
 
 %
-\begin{minipage}{3in}
+\begin{minipage}{\textwidth}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,...\}\\
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,...\}\spc
     \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}] \qquad 
     \fields(\substFn(\fbN)) = \bar{g}:\bar{\tau^g}
   }
@@ -51,13 +51,14 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{3in}
+
+\begin{minipage}{\textwidth}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,\bar{d}\}\\
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,\bar{d}\}\spc
     m \notin \bar{d} \qquad 
     \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}]
   }
@@ -70,16 +71,14 @@
 \end{minipage}
 %
 
-
-\begin{minipage}{3in}
+\begin{minipage}{\textwidth}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \\
-    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,\bar{d}\}\\
-    \tau^2 \; m\mang (\bar{\tau^1}\;\bar{x})\{...\} \in \bar{d} \qquad
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,\bar{d}\}\spc
+    \tau^2 \; m\mang (\bar{\tau^1}\;\bar{x})\{...\} \in \bar{d} \spc
     \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}]
   }
   {
@@ -90,7 +89,7 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{2.5in}
+\begin{minipage}{\textwidth}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -98,10 +97,10 @@
   {
 
     \mtype(m,\fbN) = \inang{\bar{\rho_1}\,|\, \phi_1}\bar{\tau^{11}} 
-                      \rightarrow \tau^{12} \\ 
-    \texttt{implies} \spc \isvalid{\A.\phicx}
+                      \rightarrow \tau^{12} \spc \texttt{implies} \\
+    \isvalid{\A.\phicx}
                   {\phi_2 \Leftrightarrow \subst{\bar{\rho_2}}{\bar{\rho_1}}(\phi_1)}
-    \texttt{and} \\ 
+    \spc \texttt{and} \spc
     \bar{\tau^{21}} = \subst{\bar{\rho_2}}{\bar{\rho_1}}(\bar{\tau^{11}}) \spc 
     \texttt{and} \spc \subtyp{\A}{\tau^{22}} {\subst{\bar{\rho_2}}{\bar{\rho_1}}(\tau^{12})}
 %   \substFn = \subst{\bar{\rho_2}}{\bar{\rho_1}}
@@ -118,7 +117,7 @@
 %
 
 
-% \begin{minipage}{5in}
+% \begin{minipage}{\textwidth}
 % \begin{smathpar}
 % \begin{array}{c}
 %   \rhoset,\rhoenv \in 2^{\rho} \qquad

@@ -11,7 +11,7 @@ all:
 
 haste:
 	pdflatex broom
-	open broom.pdf
+#open broom.pdf
 
 clean:
 	rm *.log *.aux *.bbl

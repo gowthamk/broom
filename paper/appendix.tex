@@ -1,66 +1,872 @@
-%\section{Operational Semantics}
-%
-%Fig.~\ref{fig:fb-opsem} contains a definition of the operational semantics for \fbname.
-%
-\section{\fbname}
-
-% \subsection{Full Syntax}
-% \input{fb-syntax-full}
-
-% The full syntax of \FB, including expressions that manifest only at
-% runtime, is shown in Fig.~\ref{fig:fb-syntax-full}. Such expressions
-% include:
-% \begin{itemize}
-
-% \item Memory locations ($\loc$) corresponding to the memory regions,
-
-% \item A special expression $\RgnZT{\toploc\loc}(e)$ that evaluates to
-% a region handler object (the syntax of this expression is captured by
-% the $\C{new}\;\fbN(\overline{e})$ construct). $\toploc$ is the
-% location of the special $\toprgn$ region where region handlers are
-% stored. $\loc$ is the location of the corresponding transferable
-% region.
-
-% \item A $\letd{\loc}{e}$ expression that results when
-% $\letregion{\pi}{e}$ expression takes a step (see
-% Fig.~\ref{fig:fb-opsem-2}).  $\loc$ is the location of the newly
-% allocated region.  
-
-% \item An $\opened{\loc}{s}{e}$ expression that
-% results when $\C{open}\;{\RgnZT{\toploc\loc}(v)} ...$ expression takes
-% a step. $\loc$ is the location of the newly open transferable region.
-% The symbol $s$ denotes the typestate of the
-% transferable region before it is opened\footnote{Operational semantics
-% lets a transferable region to be opened while it is already open. This
-% allows methods to safely open a transferable region argument
-% regardless of the calling context.}. The typestate can assume the
-% values of $\USED$ (allocated and closed), $\LIVE$ (allocated and
-% live), and $\XFERRED$ (transferred or freed).
-
-% \end{itemize}
+\section{Appendix}
 
 \subsection{Full Static Semantics}
 
-\input{fb-auxdef}
-\input{fb-staticsem-full}
+\begin{figure*}[h!]
+%
+\begin{minipage}{2.6in}
+\begin{smathpar}
+\begin{array}{lcl}
+  \allocRgn(A\inang{\rgn\rbar}\inang{\tbar}) & = & \rgn\\
+  \allocRgn(\inang{\rhobar \,|\, \phi}\bar{\tau^1}
+      \xrightarrow{\rgn} \tau^2) & = & \rgn\\
+  \shape(A\inang{\rbar}\inang{\tbar}) & = & A\inang{\tbar}\\
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.6in}
+\begin{smathpar}
+\begin{array}{lcl}
+  \bound_{\aenv}(\tyvar@\rgn) & = & \aenv(\tyvar)@\rgn\\
+  \bound_{\aenv}(\fbN) & = & \fbN\\
+  \fields(\ObjZ\inang{\rgn}) & = & \bullet \\
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+% \begin{minipage}{\textwidth}
+% \begin{smathpar}
+% \begin{array}{lcl}
+%   \ctype(\ObjZ\inang{\rgn}) & = & \bullet \\
+%   \ctype(B\inang{\tbar}\inang{\rbar}) & = & 
+%     \fields(B\inang{\tbar}\inang{\rbar})\\
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+%
 
-Figs.~\ref{fig:fb-staticsem-1} and~\ref{fig:fb-staticsem-2} show full
-static semantics of \FB. Fig.~\ref{fig:fb-staticsem-1} contains subtyping
-rules, and rules to check well-formedness of \FB types, type
-constraints, methods, and class definitions. Method well-formedness
-rule makes use of the expression typing judgment defined in
-Fig.~\ref{fig:fb-staticsem-2}. Auxiliary definitions used in
-Figs.~\ref{fig:fb-staticsem-1} and~\ref{fig:fb-staticsem-2} are
-defined in Fig.~\ref{fig:fb-auxdef}. As described in
-\S~\ref{sec:type-system}, all judgments are parameterized over the
-class table ($CT$). The premise $CT(B) = \headerOf{B}\{...\}$
-used in some of the rules means that the definition of class $B$ is
-present in $CT$ and that the definition is well-formed.
+%
+\begin{minipage}{\textwidth}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,...\}\spc
+    \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}] \qquad 
+    \fields(\substFn(\fbN)) = \bar{g}:\bar{\tau^g}
+  }
+  {
+    \fields(B\inang{\tbar}\inang{\rbar}) \;=\;
+      \bar{g}:\bar{\tau^g},\,\bar{f}:\substFn(\bar{\tau^f})
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
 
-\subsection{Operational Semantics}
+\begin{minipage}{\textwidth}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,\bar{d}\}\spc
+    m \notin \bar{d} \qquad 
+    \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}]
+  }
+  {
+    \mtype (m,B\inang{\tbar}\inang{\rbar}) \;=\;
+    \mtype (m, \substFn(\fbN))
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
 
-\input{fb-opsem-full}
-Figs.~\ref{fig:fb-opsem-1} and~\ref{fig:fb-opsem-2} show the
-operational semantics of \fbname (Fig.~\ref{fig:fb-opsem-2} is also
-contained in the main paper as Fig.~\ref{fig:fb-opsem}. It is included
-here for the sake of completeness). 
+\begin{minipage}{\textwidth}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    CT(B) = \headerOf{B}\{\bar{\tau^f}\;\bar{f};\,\bar{d}\}\spc
+    \tau^2 \; m\mang (\bar{\tau^1}\;\bar{x})\{...\} \in \bar{d} \spc
+    \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}]
+  }
+  {
+    \mtype (m,B\inang{\tbar}\inang{\rbar}) \;=\;
+    \substFn(\mang\bar{\tau^1} \rightarrow \tau^2)
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{\textwidth}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+
+    \mtype(m,\fbN) = \inang{\bar{\rho_1}\,|\, \phi_1}\bar{\tau^{11}} 
+                      \rightarrow \tau^{12} \spc \texttt{implies} \\
+    \isvalid{\A.\phicx}
+                  {\phi_2 \Leftrightarrow \subst{\bar{\rho_2}}{\bar{\rho_1}}(\phi_1)}
+    \spc \texttt{and} \spc
+    \bar{\tau^{21}} = \subst{\bar{\rho_2}}{\bar{\rho_1}}(\bar{\tau^{11}}) \spc 
+    \texttt{and} \spc \subtyp{\A}{\tau^{22}} {\subst{\bar{\rho_2}}{\bar{\rho_1}}(\tau^{12})}
+%   \substFn = \subst{\bar{\rho_2}}{\bar{\rho_1}}
+%              \subst{\rhoalloc_2}{\rhoalloc_1}
+    %\substFn = [\rbar/\rhobar, \ralloc/\rhoalloc, \tbar/\bar{\tyvar}]
+  }
+  {
+    \A \vdash \override(m,\fbN,\inang{\bar{\rho_2}\,|\, \phi_1}
+              \bar{\tau^{21}} \rightarrow \tau^{22})
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+\caption{\fbname: auxiliary definitions}
+\label{fig:fb-auxdef}
+\end{figure*}
+
+
+\begin{figure*}[!h]
+%
+\textbf{Subtyping}  \; \fbox
+  {\(\subtyp{\A}{\tau_1}{\tau_2}\)}\\
+%
+\begin{minipage}{1.8in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+  \subtyp{\A}{\tau}{\tau} \\
+  \subtyp{(\Delta,\aenv,\phicx)}{\tyvar @\rho}{\aenv(\tyvar) @\rho}\qquad
+% \subtyp{\A}{\RgnZ\inang{\rgn}}{\RgnZ\inang{\toprgn}}\qquad
+% \subtyp{\A}{\RgnZ\inang{\toprgn}}{\RgnZ\inang{\rgn}}
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.7in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \\
+    CT(B) = \headerOf{B}\{...\}
+  }
+  {
+    \subtyp{\A}{B\inang{\tbar}\inang{\rbar}}
+        {[\rbar/\rhobar, \tbar/\bar{\tyvar}](\fbN)}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+\begin{minipage}{1.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \subtyp{\A}{\tau_1}{\tau_2}\\
+    \subtyp{\A}{\tau_2}{\tau_3}
+  }
+  {
+    \subtyp{\A}{\tau_1}{\tau_3}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+\begin{minipage}{2.75in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \isvalid{\A.\phicx}{\phi_1 \Rightarrow \phi_2} \\
+    \subtyp{\A}{\bar{\tau^{11}}}{\bar{\tau^{21}}} \spc
+    \subtyp{\A}{\tau^{22}}{\tau^{12}}
+  }
+  {
+    \subtyp{\A}
+      {\inang{\rhobar \,|\, \phi_2}\bar{\tau^{21}}
+          \xrightarrow{\rgn} \tau^{22}}
+      {\inang{\rhobar \,|\, \phi_1}\bar{\tau^{11}}
+          \xrightarrow{\rgn} \tau^{12}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+
+%
+
+\textbf{Type, and Type Constraint Well-formedness}  \; \fbox
+  {\(\tywf{\A}{\tau}, \spc 
+     \tywf{\rhoenv}{\phi}\)}\\
+%
+\begin{minipage}{1.95in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn \in \rhoenv
+  }
+  {
+    \tywf{(\rhoenv,\aenv,\phicx)}{\ObjZ\inang{\rgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
+\begin{minipage}{1.5in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn_0,\rgn_1 \in \rhoenv
+%   \mem(\rgn_0) = \LIVE \spc
+%   \mem(\rgn_1) = \LIVE
+  }
+  {
+    \tywf{\rhoenv}{\rgn_0 \outlives \rgn_1}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
+\begin{minipage}{1.8in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \tywf{\rhoenv}{\phi_0} \spc
+    \tywf{\rhoenv}{\phi_1}
+  }
+  {
+    \tywf{\rhoenv}{\phi_0 \wedge \phi_1}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+% 
+\begin{minipage}{\textwidth}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rgn \in \rhoenv \spc
+    \rhobar \not\in \rhoenv\spc
+%   \rhobar \notin dom(\mem) \\
+%   \mem' = \mem[\rhobar \mapsto \overline{\LIVE}] \spc
+    \rhoenv' = \rhoenv \cup \{\rhobar\} \spc
+    \A' = (\rhoenv', \aenv, \phicx \conj \phi) \spc
+    \tywf{\rhoenv'}{\phi}\spc 
+    \tywf{\A'}{\bar{\tau^1}} \spc
+    \tywf{\A'}{\tau^2}
+  }
+  {
+    \tywf{(\rhoenv,\aenv,\phicx)}{\inang{\rhobar \,|\, \phi}
+              \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+
+%
+\textbf{Class Well-formedness}  \; \fbox
+  {\(B \; \mathtt{ok}\)}\\
+%
+\begin{minipage}{\textwidth}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \rhoenv = \{\rho,\rhobar\} \spc
+    \aenv = [\bar{\tyvar} \mapsto \bar{\fgjN}] \spc
+    \phicx = \phi \spc
+    \A = (\subtypcx)\spc
+%   \A = (\{\rho,\rhobar\},[\bar{\tyvar} \mapsto \bar{\fgjN}],\phi)\spc
+    \tywf{\rhoenv}{\phi} \spc
+    \fgjtywf{\aenv}{\bar{\fgjN}} \spc
+    \okin{\bar{d}}{B}
+    \\
+    \tywf{\A}{\fbN,\bar{\tau^f}} \spc
+    \shape(\fbN) \neq \RgnZ\inang{T}\spc
+%   \tywf{\A}{\bar{\tau^f}} \spc
+    \isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rho} \spc
+%   \ctype(\fbN) = \bar{\tau^{\fbN}} \spc
+%    k = B(\bar{\tau^{\fbN}}\;\xbar,\bar{\tau^f}\;\bar{y})
+%        \{\superZ(\xbar);\,\thisZ.\bar{f} = \bar{y};\} \spc
+    \allocRgn(\fbN) = \rho \spc
+  }
+  {
+    \C{class}\; B\angAlpha\inang{\rho\rhobar \,|\, \phi} \extends \fbN
+    \{\bar{\tau^f}\;\bar{f};\, \bar{d}\} \;{\texttt{ok}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
+
+\caption{\fbname: subtyping and well-formedness rules (contiunuation
+of Fig.~\ref{fig:fb-staticsem})}
+\label{fig:fb-staticsem-1}
+\end{figure*}
+
+\begin{figure*}[!t]
+\textbf{Expression Typing}  \; \fbox {\(\hastyp{\exptycx{\env}{\rgn}}{e}{\tau}\)}\\
+
+%
+\begin{minipage}{0.4\textwidth}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{e_1}{\tau_1}\\
+    \hastyp{\exptycx{\env[x\mapsto\tau_1]}{\rgn}}{e_2}{\tau_2}\\
+  }
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{\letexp{x}{e_1}{e_2}}{\tau_2}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+%
+\begin{minipage}{0.58\textwidth}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+%   \A = (\subtypcx)\\
+%   \loc \in \rhoenv \spc
+%   \hastyp{\exptycx{\env}}{e}{\tau}
+    \A = (\subtypcx) \spc
+    \loc \notin \rhoenv \\
+    \A' = (\rhoenv\cup\{\loc\}, \aenv, \phicx \conj \Delta \outlives
+    \loc)\\
+    \hastyp{\A',\env,\loc}{e}{\tau} \spc
+    \tywf{\A}{\tau}
+  }
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{\letd{\loc}{e}}{\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{\textwidth}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx)\spc
+    \A' = (\rhoenv\cup\{\loc\}, \aenv,\phicx) \spc
+%   \mem(\loc) = \USED \spc
+    \tywf{\A'}{T@\loc} \spc
+%   \fgjN = \RgnZ\inang{T}\spc
+    \hastyp{\A',\env, \loc}{e}{T@\loc}
+  }
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{\C{new}\;
+    \RgnZT{\toploc\loc}(e)} {\RgnZT{\toprgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+%
+\begin{minipage}{3.4in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+%   \A = (\subtypcx)\\
+%   \loc \in \rhoenv \spc
+%   \hastyp{\exptycx{\env}}{e}{\tau}
+    \A = (\subtypcx) \spc
+%   \loc \notin \rhoenv \\ % An open region can be opened again.
+%   \loc \notin dom(\mem) \spc
+    \A' = (\rhoenv\cup\{\loc\},\aenv,\phicx) \\
+    \loc \in \Delta ~\texttt{implies}~ s = \LIVE \spc
+    \hastyp{\A',\env,\loc}{e}{\tau} \spc
+    \tywf{\A}{\tau}
+  }
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{\opened{\loc}{s}{e}}{\tau}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+% %
+% \begin{minipage}{2in}
+% \begin{smathpar}
+% \begin{array}{c}
+% \renewcommand*{\arraystretch}{1.2}
+% \RULE
+%   {
+%     \\
+%     \\
+%     \hastyp{\exptycx{\env}{\rgn}}{e}{\RgnZ\inang{T}\inang{\toprgn}}
+%   }
+%   {
+%     \hastyp{\exptycx{\env}{\rgn}}{e.\transfer(\ldots)}{\unitZ}
+%   }
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+%
+\begin{minipage}{1.2in}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{e}{\tau} \\
+    \subtyp{\A}{\tau}{\tau'}
+  }
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{e}{\tau'}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+\caption{\fbname: expression typing (contiunuation of Fig.~\ref{fig:fb-staticsem})}
+\label{fig:fb-staticsem-2}
+\end{figure*}
+
+% Figs.~\ref{fig:fb-staticsem-1} and~\ref{fig:fb-staticsem-2} show full
+% static semantics of \FB. Fig.~\ref{fig:fb-staticsem-1} contains subtyping
+% rules, and rules to check well-formedness of \FB types, type
+% constraints, methods, and class definitions. Method well-formedness
+% rule makes use of the expression typing judgment defined in
+% Fig.~\ref{fig:fb-staticsem-2}. Auxiliary definitions used in
+% Figs.~\ref{fig:fb-staticsem-1} and~\ref{fig:fb-staticsem-2} are
+% defined in Fig.~\ref{fig:fb-auxdef}. As described in
+% \S~\ref{sec:type-system}, all judgments are parameterized over the
+% class table ($CT$). The premise $CT(B) = \headerOf{B}\{...\}$
+% used in some of the rules means that the definition of class $B$ is
+% present in $CT$ and that the definition is well-formed.
+
+\subsection{Full Operational Semantics}
+
+% Figs.~\ref{fig:fb-opsem-1} and~\ref{fig:fb-opsem-2} show the
+% operational semantics of \fbname (Fig.~\ref{fig:fb-opsem-2} is also
+% contained in the main paper as Fig.~\ref{fig:fb-opsem}. It is included
+% here for the sake of completeness). 
+\begin{figure*}[h!]
+
+%
+\fbox {\(\redstoo{\Delta}{(e,\mem)}{(e',\mem')}\)}\\
+
+\lopsemrule{\textwidth}{
+    \redstoo{\Delta}{(e,\mem)}{(e',\mem')}
+}{
+    \redstoo{\Delta}{(E\lbrack e \rbrack, \mem)}
+            {(E\lbrack e' \rbrack, \mem')}
+	  }{EvalOrder}
+%
+\vspace*{-0.1in}
+%
+
+\lopsemrule{\textwidth}{
+    \redstoo{\Delta}{(e,\mem)}{\invalidexn}
+  }{
+    \redstoo{\Delta}{(E\lbrack e \rbrack, \mem)}
+            {\invalidexn}
+	  }{Exception}
+%
+
+\lopsemrule{\textwidth}{
+%   \allocRgn(A\inang{\rgn\locbar}\inang{\tbar}) & = & \rgn
+%   \allocRgn(\fbN) \in \rhoenv \spc
+    \mem(\loc) = \LIVE \spc
+    \fields(A\inang{\tbar}\inang{\loc\locbar}) = \bar{f}:\taubar
+}{
+    \redstoo{\Delta}{((\C{new} \; A\inang{\tbar}\inang{\loc\locbar}(\vbar)).f_i,\mem)}{(v_i,\mem)}
+}{FieldAccess}
+
+\lopsemrule{\textwidth}{
+%   \allocRgn(\fbN) \in \rhoenv \spc
+    \mem(\loc) = \LIVE \spc
+    \mbody(m,A\inang{\tbar}\inang{\loc\locbar}) = \rho\rhobar.\bar{x}.e 
+%   \redstoo{\Delta}{(, \mem)}{(e',\mem')}
+}{
+    \redstoo{\Delta}{((\C{new}\;A\inang{\tbar}\inang{\loc\locbar}(\bar{v})).m\inang{\loc'\overline{\loc'}}
+                      (\bar{v'}),\mem)}
+            {\\([\loc'\overline{\loc'}/\rho\rhobar][\bar{v'}/\xbar]
+                [\C{new} \; A\inang{\tbar}\inang{\loc\locbar}(\bar{v})/\thisZ]\,e,\mem)}
+	  }{MethodInv}
+
+\lopsemrule{\textwidth}{
+    v_a = \lambdaexp{\loc'}{\rho\rhobar}
+                        {\taubar \; \xbar}{e} \spc
+    \mem(\loc') = \LIVE  \spc 
+}{
+    \redstoo{\Delta}{(v_a\inang{\loc\locbar}(\bar{v}) ,\mem)}
+            {([\bar{v}/\xbar][\loc\locbar/\rho\rhobar]\,e,\mem)}
+	  }{FnApply}
+
+%
+% \lopsemrule{\textwidth}{
+% %   \rgn \notin \rhoenv \spc
+% %   \fresh(\rgn') \spc
+%     \redstoo{\Delta}{(e,\mem)}{\invalidexn}
+% }{
+%     \redstoo{\Delta}{(\letregion{\rgn}{e},\mem)}{\invalidexn}
+%   }{EXCEPTION}
+
+\lopsemrule{\textwidth}{
+%   \fgjN = \RgnZ\inang{T} \spc
+%   \rgn \in dom(\mem) \spc
+    \mem(\loc) = \USED \spc
+    \redstocup{\loc}{(e,\mem[\loc \mapsto \LIVE])}{\invalidexn}
+}{
+    \redstoo{\Delta}{(\C{new} \; \RgnZT{\toploc\loc} (e),\mem)}
+            {\invalidexn}
+	  }{Exception}
+
+\lopsemrule{\textwidth}{
+%   \fgjN = \RgnZ\inang{T} \spc
+%   \rgn \in dom(\mem) \spc
+}{
+    \redstoo{\Delta}{(\letexp{x}{v}{e},\mem)}
+            {([v/x]e,\mem)}
+	  }{LetExp}
+
+\textbf{Evaluation Context} \fbox {\(E\)}\\
+\begin{smathpar}
+\begin{array}{lcl}
+E & \coloneqq & \bullet \ALT (\bullet).f \ALT \bullet.m\inang{\locbar}(\ebar) \ALT
+      v.m\inang{\locbar}(...,\bullet,...) \ALT \C{new}\;
+      \fbN(...,\bullet,...) \\
+  &  & \ALT \C{new} \; \RgnZ\inang{T}\inang{\toprgn}(\bullet)
+       \ALT \bullet\inang{\locbar}(\ebar)\ALT
+       v\inang{\locbar}(...,\bullet,...)\\
+  &  & \ALT \letexp{x}{\bullet}{e} \ALT \open{\bullet}{\rgn}{y}{e} 
+%      \ALT \opened{\loc}{\status}{\bullet} \ALT \letd{\loc}{\bullet}
+%     The following should be forbidden. See NEW-REGION rule 2.
+%      \ALT \C{new} \; \RgnZ\inang{T}\inang{\toploc\loc}(\bullet)
+\end{array}
+\end{smathpar}
+
+\caption{\fbname: operational semantics (continuation of
+Fig.~\ref{fig:fb-opsem})}
+\label{fig:fb-opsem-1}
+\end{figure*}
+\clearpage
+
+
+
+
+
+\subsection{Full Constraint Generation Semantics}
+
+\newcommand{\localokin}[2]{#1 \; \texttt{ok} \; \texttt{in} \; #2}
+\newcommand{\exptycxFix}[1]{\A,#1,r}
+
+\begin{figure*}[!h]
+
+\beginrules
+
+%%%%%%%%%%% Header Box %%%%%%%%%%%
+\multicolumn{2}{l}{
+  \textbf{Expression Typing Constraint Generation} \; \fbox{  \( \exprok{\stdcontext}{e}{\tau}{C} \)}
+}
+\\[0.3cm]
+
+%%%%%%%%%%% () and x %%%%%%%%%%%
+\lgcfact{Unit}{\exprok{\stdcontext}{\unitval}{\unitZ}{\{\}}}
+
+\lgcfact{Var}{\exprok{\stdcontext}{x}{\env(\tau)}{\{\}}}
+
+% \begin{minipage}{1.2in}
+% \begin{smathpar}
+% \begin{array}{l}
+% \renewcommand*{\arraystretch}{1.2}
+% \exprok{\stdcontext}{\unitval}{\unitZ}{\{\}} \\
+% \exprok{\stdcontext}{x}{\env(\tau)}{\{\}}
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+
+%%%%%%%%%%% FIELD-ACCESS: e.f %%%%%%%%%%%
+\lgcrule{FieldAccess}
+  {
+    \exprok{\stdcontext}{e}{\tau'}{C} \spc
+    \bar{f}:\taubar \,=\, \fields(\bound_{\A.\aenv}(\tau'))
+  }
+  {
+    \exprok{\stdcontext}{e.f_i}{\tau_i}{C}
+  }
+
+%%%%%%%%%%% LET %%%%%%%%%%%
+  \lgcrule{Let}
+  {
+    \exprok{\stdcontext}{e_1}{\tau_1}{C_1} \spc
+    \exprok{\A,{\env[x\mapsto\tau_1]},r}{e_2}{\tau_2}{C_2} \\
+  }
+  {
+    \exprok{\stdcontext}{\letexp{x}{e_1}{e_2}}{\tau_2}{C_1 \cup C_2}
+  }
+
+%%%%%%%%%%% METHOD-INV %%%%%%%%%%%
+  \lgcrule{MethodInv}
+  {
+    \exprok {\stdcontext} {e_0} {\tau} {C_1} \spc C_2 = \{ r \rbar \in \A.\rhoenv \}
+    \nl
+    \mtype(m,\bound_{\A.\aenv}(\tau)) = \inang{\rho \rhobar \,|\, \phi}\bar{\tau^1}\rightarrow{\tau^2}
+    \nl
+%   \substFn = [\rbar/\rhobar] \\
+    \typeok {\A} {\inang{\rho\rhobar \,|\,\phi}\bar{\tau^1}\rightarrow{\tau^2}} {C_3}
+       \spc
+       \exprok {\stdcontext} {\bar{e}} {[r\rbar/\rho\rhobar](\bar{\tau^1})} {C_4}
+    \nl
+%   \subtyp{\A}{\bar{\tau'}}{\substFn(\bar{\tau^1})} \spc
+    C_5 = \{ \isvalid{\A.\phicx}{[r\rbar/\rho\rhobar](\phi)} \}
+  }
+  {
+    \exprok {\stdcontext} {e_0.m\inang{r \rbar}(\bar{e})} 
+       {[r \rbar / \rho \rhobar](\tau^2)} {C_1 \cup C_2 \cup C_3 \cup C_4 \cup C_5}
+  }
+
+%%%%%%%%%%% LAMBDA %%%%%%%%%%%
+
+\lgcrule{Lambda}
+  {
+    \rgn \in \A.\rhoenv \spc
+    \rho\rhobar \notin \A.\rhoenv
+    \spc
+%   \rhoenv' = \rhoenv \cup \{\rhoalloc,\rhobar\}\spc
+    \A' = (\A.\rhoenv \cup \{\rho\rhobar\}, \A.\aenv, 
+          \A.\phicx \conj \phi)
+    \\
+    \tywf{\A'.\rhoenv}{\phi}\spc
+    \typeok {\A'} {\bar{\tau^1}} {C_1} \spc
+    \typeok {\A'} {\tau^2} {C_2}
+    \\
+    \exprok {\A',\env[\xbar \mapsto \bar{\tau^1}],\rho} {e} {\tau^2} {C_3}
+    % \spc
+    % C_4 = \bigcup\limits_{\pi'\in \frv(e)\setminus\{\rhobar\}}\{\pi'\outlives\pi\}
+  }
+  {
+    \exprok {\stdcontext}
+           {\lambdaexp{\rgn}{\rho\rhobar \,|\, \phi} {\xbar:\bar{\tau^1}}{e}}
+           {\inang{\rho\rhobar \,|\, \phi} \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
+	   {\cup_{i=1}^{4} C_i}
+  }
+
+
+%%%%%%%%%%% SUBTYPING %%%%%%%%%%%
+\lgcrule{SubTyping}{
+    \exprok {\exptycxFix{\env}} {e} {\tau} {C_1} \spc  \subtypeok {\A} {\tau} {\tau'} {C_2}
+}{
+    \exprok {\exptycxFix{\env}} {e} {\tau'} {C_1 \cup C_2}
+}
+
+%%%%%%%%%%% METHOD %%%%%%%%%%%
+\multicolumn{2}{l}{
+   \textbf{Method Well-formedness Constraint Generation}  \; \fbox{$\okinok{d}{B}{C}$}
+}
+\\[0.3cm]
+
+\lgcrule{Method}{
+CT(B) = \C{class}\; B \angAlpha \inang{\rhobar \,|\, \varphi} \extends \fbN
+   \{ \cdots \}
+   % \{ \bar{\tau^f}\,\xbar;\;\bar{d} \}
+\nl
+\A = (\rhoenv,\aenv,\phicx) = (\{\rhobar,\rho_m,\rhobarm\}, [\bar{\tyvar} \mapsto \bar{\fgjN}], \varphi_m) \spc\spc
+C_1 = \{ \tywf{\rhoenv}{\varphi_m} \}
+\nl
+\env = \cdot[\thisZ \mapsto B\inang{\bar{\tyvar}}\inang{\rhobar}][\xbar \mapsto \bar{\tau^1}]
+\spc
+\mtype(m,\fbN) = \inang{\rhobarm \,|\, \phi_m}\bar{\tau^1} \rightarrow \tau^2
+\nl
+\exprok {\A,\env,\rho_m}{e} {\tau^2} {C_2}
+\spc \typeok {\A} {\bar{\tau^1}} {C_3}
+\spc \typeok {\A} {\tau^2} {C_4}
+% \subtypeok {\A} {\tau'} {\tau} {C_3}
+}{
+\okinok {\tau^2 \; m\inang{\rho_m \rhobarm \,|\, \varphi_m} (\bar{\tau^1} \;  \xbar)\{\C{return} e;\}}
+   {B}
+   {(C_1 \cup C_2 \cup C_3 \cup C_4)}
+}
+
+%%%%%%%%%%% CLASS %%%%%%%%%%%
+\multicolumn{2}{l}{
+   \textbf{Class Well-formedness Constraint Generation}  \; \fbox{$\classok{B}{C}$}
+}
+\\[0.3cm]
+
+\lgcrule{Class}{
+  \A = (\rhoenv, \aenv, \phicx) = (\{\rho,\rhobar\}, [\bar{\tyvar} \mapsto \bar{\fgjN}],\varphi) \\
+C_1 = \{ \tywf{\rhoenv}{\varphi} \} \spc\spc
+\fgjtywf{\aenv}{\bar{\fgjN}} \spc\spc
+\typeok {\A} {\fbN} {C_2} \spc\spc
+\typeok {\A} {\bar{\tau^f}} {C_3} \\
+C_4 = \{\isvalid{\phicx}{\allocRgn(\bar{\tau^f}) \outlives \rho \conj \allocRgn(\fbN) = \rho}\} \\
+\okinok {\bar{d}} {B} {C_5}
+}{
+% \typeok {} {\hdOf{B}{\varphi}\{\bar{\tau^f}\,\xbar;\;\bar{d}\}} {\bigcup_{i=1}^5 C_i}
+\classok
+  {\C{class}\; B\angAlpha \inang{\rho \rhobar \,|\, \varphi} \extends \fbN
+      \{\bar{\tau^f}\,\xbar;\;\bar{d}\}}
+  {\bigcup_{i=1}^5 C_i}
+}
+
+
+\myendrules
+
+\caption{\fbname: Constraint generation rules part 2 (Continuation of
+Fig.~\ref{fig:constraint-gen-0})}
+\label{fig:constraint-gen-1}
+\end{figure*}
+
+\newpage
+
+\begin{figure*}[t!]
+
+\beginrules
+
+%%%%%%%%%%% Header Box %%%%%%%%%%%
+\multicolumn{2}{l}{
+  \textbf{Subtyping Constraint Generation} \;
+\fbox{  \( \subtypeok{\A}{\tau_1}{\tau_2}{C} \)}
+}
+\\[0.3cm]
+
+%%%%%%%%%%% SUBTYPING: REFLEXIVE %%%%%%%%%%%
+
+  \lgcfact{Reflexivity}{
+    \subtypeok{\A}{\tau}{\tau}{\{\}}
+  }
+
+%%%%%%%%%%% SUBTYPING: UNIFICATION %%%%%%%%%%%
+  \lgcfact{Unify}{
+    \subtypeok{\A}{\tau}{[\pi/\rho](\tau)}{ \{ \pi \outlives \rho, \rho \outlives \pi \} }
+  }
+
+%%%%%%%%%%% SUBTYPING: TRANSITIVITY %%%%%%%%%%%
+
+  \lgcrule{Transitivity}{
+    \subtypeok{\A}{\tau_1}{\tau_2}{C_1} \spc
+    \subtypeok{\A}{\tau_2}{\tau_3}{C_2}
+  }{
+    \subtypeok{\A}{\tau_1}{\tau_3}{C_1 \cup C_2}
+  }
+
+%%%%%%%%%%% FUNCTION SUBTYPING %%%%%%%%%%%
+  \lgcrule{FnSubtyping}
+  {
+    C_1 = \{ \isvalid{\A.\phicx}{\phi_1 \Rightarrow \phi_2} \}
+    \\
+    \subtypeok {\A} {\bar{\tau^{11}}} {\bar{\tau^{21}}} {C_2}
+    \spc
+    \subtypeok {\A} {\tau^{22}} {\tau^{12}} {C_3}
+  }
+  {
+    \subtypeok {\A}
+      {\inang{\rhobar \,|\, \phi_2}\bar{\tau^{21}} \xrightarrow{\rgn} \tau^{22}}
+      {\inang{\rhobar \,|\, \phi_1}\bar{\tau^{11}} \xrightarrow{\rgn} \tau^{12}}
+      {C_1 \cup C_2 \cup C_3}
+  }
+
+%%%%%%%%%%% Header Box %%%%%%%%%%%
+\multicolumn{2}{l}{
+  \textbf{Type Well-formedness Constraint Generation} \;
+  \fbox{  \( \typeok{\A}{\tau}{C} \)}
+}
+\\[0.3cm]
+
+%%%%%%%%%%% TYPE WELL-FORMEDNESS %%%%%%%%%%%
+
+%%%%%%%%%%% OBJECT TYPE %%%%%%%%%%%
+\lgcrule{ObjectType}
+  {
+    C = \{ \rgn \in \rhoenv \}
+  }
+  {
+    \typeok {(\rhoenv,\aenv,\phicx)} {\ObjZ\inang{\rgn}} {C}
+  }
+
+%%%%%%%%%%% CLASS TYPE %%%%%%%%%%%
+  \lgcrule{ClassType}
+  {
+    CT(B) = \headerOf{B}\{...\}
+    \spc
+    \fgjtywf{\aenv}{B\inang{\tbar}}
+    \\
+    C = \{ \rbar \in \rhoenv, \isvalid{\phicx}{[\rbar/\rhobar](\phi)} \}
+  }
+  {
+    \typeok {(\rhoenv,\aenv,\phicx)} {B\inang{\tbar}\inang{\rbar}} {C}
+  }
+
+%%%%%%%%%%% GENERIC TYPE PARAMETER %%%%%%%%%%%
+  \lgcrule{TypeParam}
+  {
+    \fgjtywf{\aenv}{T} \spc
+    \fgjsubtyp{\aenv}{T}{\ObjZ} \spc
+    \spc
+    C = \{ \rgn \in \rhoenv \}
+  }
+  {
+    \typeok {(\rhoenv,\aenv,\phicx)}{T@\rgn} {C}
+  }
+
+%%%%%%%%%%% FUNCTION TYPE %%%%%%%%%%%
+  \lgcrule{FnType}
+  {
+    C_1 = \{ \rgn \in \rhoenv \}
+    \\
+    \rhobar \notin \rhoenv \spc
+    \rhoenv' = \rhoenv \cup \{\rhobar\} \spc
+    \A' = (\rhoenv', \aenv, \phicx \conj \phi)
+    \\
+    \typeconsok{\rhoenv'}{\phi} {C_2} \spc 
+    \typeok{\A'}{\bar{\tau^1}} {C_3} \spc
+    \typeok{\A'}{\tau^2} {C_4}
+  }
+  {
+    \typeok{(\rhoenv,\aenv,\phicx)} {\inang{\rhobar \,|\, \phi} \bar{\tau^1} \xrightarrow{\rgn} \tau^2} 
+       {C_1 \cup C_2 \cup C_3 \cup C_4}
+  }
+
+%%%%%%%%%%% REGION TYPE %%%%%%%%%%%
+  \lgcrule{RegionType}
+  { 
+    \fgjtywf{\aenv}{T}
+  }
+  {
+    \typeok {(\rhoenv,\aenv,\phicx)} {\RgnZ\inang{T}\inang{\toprgn}} {\{\}}
+  }
+
+\myendrules
+
+\caption{\fbname: Constraint generation rules part 3 (Continuation of
+Fig.~\ref{fig:constraint-gen-1})}
+\label{fig:constraint-gen-2}
+\end{figure*}
+\clearpage
+

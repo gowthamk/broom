@@ -1,49 +1,5 @@
 %
-\begin{minipage}{1.2in}
-\begin{smathpar}
-\begin{array}{l}
-\renewcommand*{\arraystretch}{1.2}
-\hastyp{\exptycx{\env}{\rgn}}{\unitval}{\unitZ}\\
-\hastyp{\exptycx{\env}{\rgn}}{x}{\env(\tau)}
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{1.8in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \hastyp{\exptycx{\env}{\rgn}}{e}{\tau'}\\
-    \bar{f}:\taubar \,=\, \fields(\bound_{\A.\aenv}(\tau'))
-  }
-  {
-    \hastyp{\exptycx{\env}{\rgn}}{e.f_i}{\tau_i}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{1.2in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \hastyp{\exptycx{\env}{\rgn}}{\bar{e}}{\taubar} \\
-    \tywf{\A}{\fbN} \spc
-    \fields(\fbN) = \bar{f} : \taubar \\
-  }
-  {
-    \hastyp{\exptycx{\env}{\rgn}}{\C{new}\; \fbN(\bar{e})}{\fbN}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-
-\begin{minipage}{2in}
+\begin{minipage}{0.4\textwidth}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -60,193 +16,7 @@
 \end{minipage}
 %
 %
-\begin{minipage}{3.2in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-%   \A = (\mem,\aenv,\phicx)\spc
-%   \fgjtywf{\aenv}{T} \\
-%   \rgn \in \A.\rhoenv \spc
-%   \mem(\rgn) = \LIVE \spc
-%   \hastyp{(\rhoenv\cup\{\rho\},\aenv,\phicx),{\env}}{e}
-%     {T@\rho}
-%   We don't need the following condition because of the
-%   guarantee provided by the lambda type rule.
-%   \A = (\subtypcx) \spc
-%   \rgn \in \rhoenv \\
-    \\
-    \hastyp{\exptycx{\env}{\rgn}}{e} {\inang{\rho} \unitZ \xrightarrow{\rgn} T@\rho} \spc
-  }
-  {
-    \hastyp{\exptycx{\env}{\rgn}}{\C{new}\;
-    \RgnZ\inang{T}\inang{\toprgn}(e)} {\RgnZ\inang{T}\inang{\toprgn}}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-
-%
-\begin{minipage}{5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \A = (\subtypcx)\spc
-    \A' = (\rhoenv\cup\{\loc\}, \aenv,\phicx) \spc
-%   \mem(\loc) = \USED \spc
-    \tywf{\A'}{T@\loc} \spc
-%   \fgjN = \RgnZ\inang{T}\spc
-    \hastyp{\A',\env, \loc}{e}{T@\loc}
-  }
-  {
-    \hastyp{\exptycx{\env}{\rgn}}{\C{new}\;
-    \RgnZT{\toploc\loc}(e)} {\RgnZT{\toprgn}}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-
-%
-\begin{minipage}{2.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \A = (\subtypcx) \spc
-    \hastyp{\exptycx{\env}{\rgn}}{e_0}{\tau} \\
-%   \rbar \in \A.\rhoenv \\
-    \mtype(m,\bound_{\aenv}(\tau)) = \inang{\rho\rhobar \,|\, 
-        \phi}\bar{\tau^1}\rightarrow{\tau^2} \\
-    \rgn,\rbar \in \rhoenv \spc
-    \tywf{\A}{\inang{\rho\rhobar \,|\,
-    \phi}\bar{\tau^1}\rightarrow{\tau^2}}\\
-    \hastyp{\exptycx{\env}{\rgn}}{\bar{e}}{[\rgn\rbar/\rho\rhobar]\,\bar{\tau^1}} \spc
-    \isvalid{\phicx}{[\rgn\rbar/\rho\rhobar]\,\phi}
-  }
-  {
-    \hastyp{\exptycx{\env}{\rgn}}{e_0.m\inang{\rgn\rbar}(\bar{e})} 
-           {[\rgn\rbar/\rho\rhobar]\,\tau^2}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{2.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \\
-    \A = (\subtypcx) \spc
-    \pi \notin \rhoenv \spc
-%   \Delta = \{\rgn \,|\, \rgn \in \rhoenv\} \spc
-    \phi = \Delta \outlives \pi \\
-    \A' = (\rhoenv\cup\{\pi\}, \aenv, \phicx \conj \phi)\\
-    \hastyp{\A',\env,\pi}{e}{\tau} \spc
-    \tywf{\A}{\tau}
-  }
-  {
-    \hastyp{\exptycx{\env}{\rgn}}{\letregion{\pi}{e}}{\tau}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-
-%
-\begin{minipage}{2.8in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \A = (\subtypcx) \spc
-%   \rgn \in \A.\rhoenv \spc
-    \rgn \in \rhoenv \spc
-    \rhoenv \outlives \rgn \\
-%   \rhobar \notin dom(\mem)\\
-    \rho,\rhobar \notin \rhoenv \spc
-%   \forall (\rgn'\in\Delta).~(\isvalid{\phicx}{\rgn\outlives\rgn'})
-
-%           ~\Rightarrow~ \rgn = \rgn'\\
-%   \forall (\rgn'\in\frv(e)\setminus\{\rhobar\}).~\isvalid{\phicx}{\rgn'\outlives\rgn}\\
-%   \A' = (\rhoenv \cup \{\rhobar\}, \aenv, 
-    \A' = (\rhoenv \cup \{\rho,\rhobar\}, \aenv, 
-          \phicx \conj \phi)\\
-    \tywf{\rhoenv \cup \{\rho,\rhobar\}}{\phi}\spc
-    \tywf{\A'}{\bar{\tau^1}}\\
-    \tywf{\A'}{\tau^2}\spc
-    \hastyp{\A',\env[\xbar \mapsto \bar{\tau^1}],\rho}{e}{\tau^2}
-  }
-  {
-    \hastyp{\exptycx{\env}{\rgn}}
-           {\lambdaexp{\rgn}{\rho\rhobar \,|\, \phi}
-                      {\xbar:\bar{\tau^1}}{e}}
-           {\inang{\rho\rhobar \,|\, \phi}
-            \bar{\tau^1} \xrightarrow{\rgn} \tau^2}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{2.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \A = (\subtypcx) \spc
-    \pi \notin \rhoenv \\
-    \hastyp{\exptycx{\env}{\rgn}}{e_a}
-            {\RgnZ\inang{T}\inang{\toprgn}}\\
-%   \rgn \notin dom(\mem) \spc
-    \tywf{\A}{\tau} \spc
-    \A' = (\rhoenv\cup\{\pi\},\aenv,\phicx) \\
-    \env' =  \env[y\mapsto T@\pi]\spc
-    \hastyp{\A',\env',\pi}{e_b}{\tau} \spc
-  }
-  {
-    \hastyp{\exptycx{\env}{\rgn}}{\open{e_a}{\pi}{y}{e_b}}
-            {\tau}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-
-%
-\begin{minipage}{2.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \A = (\subtypcx) \spc
-    \rgn',\rgn,\rbar \in \rhoenv \\
-    \hastyp{\exptycx{\env}{\rgn}}{e}
-        {\inang{\rho\rhobar \,|\, \phi}
-            \bar{\tau^1} \xrightarrow{\rgn'} \tau^2}\\
-%   \substFn = \subst{\rbar}{\rhobar} \spc
-    \isvalid{\phicx}{\subst{\rgn\rbar}{\rho\rhobar}\phi} \spc
-    \hastyp{\exptycx{\env}{\rgn}}{\bar{e}}
-        {\subst{\rgn\rbar}{\rho\rhobar}\bar{\tau^1}}\spc
-%   \subtyp{\A}{\taubar}{\bar{\tau^1}}
-  }
-  {
-    \hastyp{\A,\env,\rgn}{e\inang{\rgn\rbar}(\bar{e})}
-           {\subst{\rgn\rbar}{\rho\rhobar}\tau^2}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{2.5in}
+\begin{minipage}{0.58\textwidth}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -271,7 +41,32 @@
 %
 
 %
-\begin{minipage}{2.3in}
+\begin{minipage}{\textwidth}
+\begin{smathpar}
+\begin{array}{c}
+\renewcommand*{\arraystretch}{1.2}
+\RULE
+  {
+    \A = (\subtypcx)\spc
+    \A' = (\rhoenv\cup\{\loc\}, \aenv,\phicx) \spc
+%   \mem(\loc) = \USED \spc
+    \tywf{\A'}{T@\loc} \spc
+%   \fgjN = \RgnZ\inang{T}\spc
+    \hastyp{\A',\env, \loc}{e}{T@\loc}
+  }
+  {
+    \hastyp{\exptycx{\env}{\rgn}}{\C{new}\;
+    \RgnZT{\toploc\loc}(e)} {\RgnZT{\toprgn}}
+  }
+\end{array}
+\end{smathpar}
+\end{minipage}
+%
+
+
+
+%
+\begin{minipage}{3.4in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -284,7 +79,7 @@
 %   \loc \notin \rhoenv \\ % An open region can be opened again.
 %   \loc \notin dom(\mem) \spc
     \A' = (\rhoenv\cup\{\loc\},\aenv,\phicx) \\
-    \loc \in \Delta ~\texttt{implies}~ s = \LIVE \\
+    \loc \in \Delta ~\texttt{implies}~ s = \LIVE \spc
     \hastyp{\A',\env,\loc}{e}{\tau} \spc
     \tywf{\A}{\tau}
   }
@@ -295,31 +90,30 @@
 \end{smathpar}
 \end{minipage}
 %
+% %
+% \begin{minipage}{2in}
+% \begin{smathpar}
+% \begin{array}{c}
+% \renewcommand*{\arraystretch}{1.2}
+% \RULE
+%   {
+%     \\
+%     \\
+%     \hastyp{\exptycx{\env}{\rgn}}{e}{\RgnZ\inang{T}\inang{\toprgn}}
+%   }
+%   {
+%     \hastyp{\exptycx{\env}{\rgn}}{e.\transfer(\ldots)}{\unitZ}
+%   }
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
 %
-\begin{minipage}{1.6in}
+\begin{minipage}{1.2in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    \\
-    \\
-    \hastyp{\exptycx{\env}{\rgn}}{e}{\RgnZ\inang{T}\inang{\toprgn}}
-  }
-  {
-    \hastyp{\exptycx{\env}{\rgn}}{e.\transfer(\ldots)}{\unitZ}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-\begin{minipage}{1.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \\
     \hastyp{\exptycx{\env}{\rgn}}{e}{\tau} \\
     \subtyp{\A}{\tau}{\tau'}
   }

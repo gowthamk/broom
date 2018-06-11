@@ -1,5 +1,5 @@
 %
-\begin{minipage}{1.75in}
+\begin{minipage}{1.95in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -14,22 +14,8 @@
 \end{smathpar}
 \end{minipage}
 %
-\begin{minipage}{1.5in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  { 
-    \fgjtywf{\A.\aenv}{T}
-  }
-  {
-    \tywf{\A}{\RgnZ\inang{T}\inang{\toprgn}}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
 %
-\begin{minipage}{1in}
+\begin{minipage}{1.5in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
@@ -46,36 +32,15 @@
 \end{smathpar}
 \end{minipage}
 %
-
 %
-\begin{minipage}{3.5in}
+\begin{minipage}{1.8in}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
-    CT(B) = \headerOf{B}\{...\}\\
-    \rbar \in \rhoenv \spc
-%   \mem(\rbar) = \overline{\LIVE} \spc
-    \fgjtywf{\aenv}{B\inang{\tbar}}\spc
-%   \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}] \spc
-    \isvalid{\phicx}{[\rbar/\rhobar](\phi)}
-  }
-  {
-    \tywf{(\rhoenv,\aenv,\phicx)}{B\inang{\tbar}\inang{\rbar}}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
-%
-\begin{minipage}{0.75in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \tywf{\rhoenv}{\phi_0} \\ \tywf{\rhoenv}{\phi_1}
+    \tywf{\rhoenv}{\phi_0} \spc
+    \tywf{\rhoenv}{\phi_1}
   }
   {
     \tywf{\rhoenv}{\phi_0 \wedge \phi_1}
@@ -85,19 +50,42 @@
 \end{minipage}
 %
 
+% %
+% \begin{minipage}{\textwidth}
+% \begin{smathpar}
+% \begin{array}{c}
+% \renewcommand*{\arraystretch}{1.2}
+% \RULE
+%   {
+%     CT(B) = \headerOf{B}\{...\}\spc
+%     \rbar \in \rhoenv \spc
+% %   \mem(\rbar) = \overline{\LIVE} \spc
+%     \fgjtywf{\aenv}{B\inang{\tbar}}\spc
+% %   \substFn = [\rbar/\rhobar, \tbar/\bar{\tyvar}] \spc
+%     \isvalid{\phicx}{[\rbar/\rhobar](\phi)}
+%   }
+%   {
+%     \tywf{(\rhoenv,\aenv,\phicx)}{B\inang{\tbar}\inang{\rbar}}
+%   }
+% \end{array}
+% \end{smathpar}
+% \end{minipage}
+% %
+
+
 % 
-\begin{minipage}{2.75in}
+\begin{minipage}{\textwidth}
 \begin{smathpar}
 \begin{array}{c}
 \renewcommand*{\arraystretch}{1.2}
 \RULE
   {
     \rgn \in \rhoenv \spc
-    \rhobar \not\in \rhoenv\\
+    \rhobar \not\in \rhoenv\spc
 %   \rhobar \notin dom(\mem) \\
 %   \mem' = \mem[\rhobar \mapsto \overline{\LIVE}] \spc
     \rhoenv' = \rhoenv \cup \{\rhobar\} \spc
-    \A' = (\rhoenv', \aenv, \phicx \conj \phi) \\
+    \A' = (\rhoenv', \aenv, \phicx \conj \phi) \spc
     \tywf{\rhoenv'}{\phi}\spc 
     \tywf{\A'}{\bar{\tau^1}} \spc
     \tywf{\A'}{\tau^2}
@@ -110,23 +98,5 @@
 \end{smathpar}
 \end{minipage}
 %
-%
-\begin{minipage}{1.65in}
-\begin{smathpar}
-\begin{array}{c}
-\renewcommand*{\arraystretch}{1.2}
-\RULE
-  {
-    \\
-    \fgjtywf{\aenv}{T}\spc
-%   \rgn \in \A.\rhoenv\\
-    \rgn \in \rhoenv\\
-    \fgjsubtyp{\aenv}{T}{\ObjZ}\spc
-  }
-  {
-    \tywf{(\rhoenv,\aenv,\phicx)}{T@\rgn}
-  }
-\end{array}
-\end{smathpar}
-\end{minipage}
-%
+
+
